@@ -1,0 +1,44 @@
+html {
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    margin: 0;
+}
+
+.background {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    background-position: center;
+    background-size: cover;
+}
+
+.version-icon {
+    display: block;
+    position: absolute;
+    cursor: pointer;
+    right: 10vw;
+    bottom: 23vh;
+    background-size: contain;
+}
+
+.launch-button {
+    display: block;
+    position: absolute;
+    cursor: pointer;
+    right: 10vw;
+    bottom: 10vh;
+    width: 15vw;
+    height: 7vh;
+    border-radius: 8px;
+    background-color: #fdc606;
+    text-align: center;
+    line-height: 11vh;
+    color: #333;
+}
+.launch-button.disabled {
+    cursor: progress;
+}
+

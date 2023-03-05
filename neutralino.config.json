@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "com.3s.yaagl",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/dist",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": true,
+    "writeToLogFile": true
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.*",
+    "storage.*",
+    "debug.log",
+    "window.*"
+  ],
+  "globalVariables": {},
+  "modes": {
+    "window": {
+      "title": "Yet another anime game launcher",
+      "width": 1280,
+      "height": 730,
+      "minWidth": 400,
+      "minHeight": 200,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "enableInspector": true,
+      "borderless": false,
+      "maximize": false,
+      "hidden": true,
+      "resizable": false,
+      "icon": "/src/icons/appIcon.png",
+      "exitProcessOnClose": false
+    }
+  },
+  "cli": {
+    "binaryName": "Yaagl",
+    "resourcesPath": "/dist/",
+    "extensionsPath": "/extensions/",
+    "clientLibrary": "/dist/neutralino.js",
+    "binaryVersion": "4.9.0",
+    "clientVersion": "3.8.0"
+  }
+}
