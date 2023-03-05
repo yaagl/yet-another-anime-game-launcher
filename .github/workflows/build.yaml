@@ -1,0 +1,58 @@
+name: "Build latest version"
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build app
+        run: |
+          node ./build-app.js
+
+      - name: Tar app
+        run: |
+          mkdir -p output
+          cp Yaagl.app output/Yaagl.app
+          tar -cfz Yaagl.tar.gz output
+      - name: Upload artifact - app
+        uses: actions/upload-artifact@v3
+        with:
+          path: Yaagl.tar.gz
+      - name: Upload artifact - neu
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/Yaagl/resources.neu
