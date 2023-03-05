@@ -45,14 +45,14 @@ jobs:
 
       - name: Tar app
         run: |
-          mkdir -p output
-          cp Yaagl.app output/Yaagl.app
-          tar -cfz Yaagl.tar.gz output
+          tar -zcf Yaagl.tar.gz Yaagl.app
       - name: Upload artifact - app
         uses: actions/upload-artifact@v3
         with:
+          name: app
           path: Yaagl.tar.gz
       - name: Upload artifact - neu
         uses: actions/upload-artifact@v3
         with:
+          name: neu
           path: dist/Yaagl/resources.neu

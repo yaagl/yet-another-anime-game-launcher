@@ -13,8 +13,6 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   // run neu build command
   await execa("pnpm", ["exec", "neu", "build"]);
 
-  await new Promise((done) => setTimeout(done, 2000));
-
   // build done read neutralino.config.js file
   const config = await fs.readJSON(
     path.resolve(process.cwd(), "neutralino.config.json")
@@ -71,7 +69,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     path.resolve(process.cwd(), "dist", appname)
   );
   const resourcesFile = resources.find((file) => /res(ources)?/.test(file));
-  await fs.move(
+  await fs.copy(
     path.resolve(process.cwd(), "dist", appname, resourcesFile),
     path.resolve(
       process.cwd(),
@@ -217,6 +215,4 @@ exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
     </dict>
     </plist>`
   );
-
-  await rimraf(path.resolve(__dirname, "dist"));
 })();
