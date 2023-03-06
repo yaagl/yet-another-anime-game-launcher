@@ -1,8 +1,10 @@
-name: "Regular CI Build"
+name: "Build Latest (when new tag created)"
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*'
+env:
+  YAAGL_VERSION: ${{ github.ref_name }}
 jobs:
   build:
     runs-on: macos-latest
@@ -45,14 +47,23 @@ jobs:
 
       - name: Tar app
         run: |
-          tar -zcf Yaagl.tar.gz Yaagl.app
+          tar -zcf Yaagl.app.tar.gz Yaagl.app
       - name: Upload artifact - app
         uses: actions/upload-artifact@v3
         with:
           name: app
-          path: Yaagl.tar.gz
+          path: Yaagl.app.tar.gz
       - name: Upload artifact - neu
         uses: actions/upload-artifact@v3
         with:
           name: neu
           path: dist/Yaagl/resources.neu
+      - name: Generate prerelease
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          draft: true
+          title: "Release ${{ github.ref_name }}"
+          files: |
+            Yaagl.app.tar.gz
+            dist/Yaagl/resources.neu

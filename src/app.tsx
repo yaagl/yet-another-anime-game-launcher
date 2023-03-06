@@ -1,17 +1,24 @@
-import { CN_SERVER, ServerContentData } from "./constants/server";
-import { exec, log, spawn, timeout, wait, waitImageReady } from "./utils";
-import "./app.css";
+import {
+  exec,
+  log,
+  spawn,
+  timeout,
+  wait,
+  resolve,
+  appendFile,
+  prompt,
+} from "./utils";
 import { createAria2 } from "./aria2";
-import { checkWine, createWineInstallProgram } from "./wine";
+import { checkWine, createWine, createWineInstallProgram } from "./wine";
 import { createGithubEndpoint } from "./github";
+import { createLauncher } from "./launcher";
+import "./app.css";
+import { CURRENT_YAAGL_VERSION } from "./constants";
+import { createUpdater, downloadProgram } from "./updater";
+import { createCommonUpdateUI } from "./common-update-ui";
 
 export async function createApp() {
-  const server = CN_SERVER;
-
   let aria2_port = 6868;
-
-  // const b: ServerContentData = await (await fetch(server.bg_url)).json();
-  // await waitImageReady(b.data.adv.background);
 
   await Neutralino.events.on("ready", async () => {});
   await Neutralino.events.on("windowClose", async () => {
@@ -21,67 +28,62 @@ export async function createApp() {
     Neutralino.app.exit(0);
   });
 
-  // const g = await exec('xattr -r -d com.apple.quarantine "$HOME/Library/Application Support/Yaagl"', []);
-  // await log(g.stdOut);
-  // await log(g.stdErr);
+  const github = await createGithubEndpoint();
+  const aria2_session = await resolve("./aria2.session");
+  await appendFile(aria2_session, "");
+  await spawn("./sidecar/aria2/aria2c", [
+    "-q",
+    "-d",
+    "/",
+    "--no-conf",
+    "--enable-rpc",
+    `--rpc-listen-port=${aria2_port}`,
+    `--rpc-listen-all=true`,
+    `--rpc-allow-origin-all`,
+    `-c`,
+    `--input-file`,
+    `"${aria2_session}"`,
+    `--save-session`,
+    `"${aria2_session}"`,
+  ]);
+  const aria2 = await Promise.race([
+    createAria2({ host: "127.0.0.1", port: aria2_port }),
+    timeout(10000),
+  ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
+  await log(`Launched aria2 version ${aria2.version.version}`);
 
-  try {
-    // const github = await createGithubEndpoint();
-    // await spawn("./sidecar/aria2/aria2c", [
-    //   "--enable-rpc",
-    //   `--rpc-listen-port=${aria2_port}`,
-    //   `--rpc-listen-all=true`,
-    //   `--rpc-allow-origin-all`,
-    // ]);
-    // const aria2 = await Promise.race([
-    //   createAria2({ host: "127.0.0.1", port: aria2_port }),
-    //   timeout(10000),
-    // ]);
-    // await log(`Launched aria2 version ${aria2.version.version}`);
-
-    return ()=><div>TODO</div>
-
-    const { wineReady, wineUpdate } = await checkWine();
-
-    if (wineReady) {
-      return function App() {
-        // const bh = 40 / window.devicePixelRatio;
-        // const bw = 136 / window.devicePixelRatio;
-        const bh = 40;
-        const bw = 136;
-
-        return (
-          <div
-            class="background"
-            style={{
-              "background-image": `url(${b.data.adv.background})`,
-            }}
-          >
-            <div
-              role="button"
-              class="version-icon"
-              style={{
-                "background-image": `url(${b.data.adv.icon})`,
-                height: `${bh}px`,
-                width: `${bw}px`, //fixme: responsive size
-              }}
-            ></div>
-            <div role="button" class="launch-button">
-              启动游戏
-            </div>
-          </div>
-        );
-      };
-    } else {
-      return await createWineInstallProgram({
-        aria2,
-        wineUpdate:wineUpdate!
-      })
+  const { latest, downloadUrl } = await createUpdater({
+    github,
+    aria2,
+  });
+  // return createCommonUpdateUI(async function *(){
+  //   yield ['setStateText','progressing'];
+  //   for(let i=0;i<=100;i++) {
+  //     yield ['setProgress', i];
+  //     await wait(1000);
+  //   }
+  //   yield ['setUndeterminedProgress'];
+  //   await wait(10000);
+  // });
+  if (!latest) {
+    if (await prompt("NEW Version available", "Would you like to update to the latest version?")) {
+      return createCommonUpdateUI(() => downloadProgram(aria2, downloadUrl));
     }
-  } catch (e) {
-    if (e === "TIMEOUT") {
-      throw new Error("Aria2 failed to launch");
-    }
-    throw e;
+  }
+
+  return () => <div>If you are seeing this, it means everything works fine!<br/> Current version: {CURRENT_YAAGL_VERSION}</div>;
+
+  const { wineReady, wineUpdate } = await checkWine();
+
+  if (wineReady) {
+    const wine = await createWine({
+      prefix: "FIXME",
+    });
+    return await createLauncher({ aria2, wine });
+  } else {
+    return await createWineInstallProgram({
+      aria2,
+      wineUpdate: wineUpdate!,
+    });
   }
 }

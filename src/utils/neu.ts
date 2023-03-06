@@ -8,7 +8,7 @@ export async function resolve(command: string) {
   return command;
 }
 
-export async function exec(command: string, args: string[]) {
+export async function exec(command: string, args: string[]): Promise<Neutralino.os.ExecCommandResult> {
   const ret = await Neutralino.os.execCommand(
     `${await resolve(command)} ${args.join(" ")}`,
     {}
@@ -59,4 +59,17 @@ export function restart() {
 export async function fatal(error: any) {
   await Neutralino.os.showMessageBox("Fatal error", "", "OK");
   await Neutralino.app.exit(-1);
+}
+
+export async function appendFile(path: string, content: string) {
+  await Neutralino.filesystem.appendFile(await resolve(path),content);
+}
+
+export async function forceMove(source: string, destination: string) {
+  return await exec('mv',['-f',await resolve(source),await resolve(destination)]);
+}
+
+export async function prompt(title:string, message: string) {
+  const out = await Neutralino.os.showMessageBox(title, message, "YES_NO");
+  return out=="YES";
 }

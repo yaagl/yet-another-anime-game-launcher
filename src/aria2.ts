@@ -1,4 +1,4 @@
-import { WebSocket as AWS } from "libaria2-ts";
+import { WebSocket as RPC } from "libaria2-ts";
 import { wait } from "./utils";
 
 export async function createAria2({
@@ -8,20 +8,20 @@ export async function createAria2({
   host: string;
   port: number;
 }) {
-  const aws = new AWS.Client({
+  const rpc = new RPC.Client({
     host,
     port,
   });
 
-  const version = await aws.getVersion();
+  const version = await rpc.getVersion();
 
   function shutdown() {
-    return aws.shutdown();
+    return rpc.shutdown();
   }
 
   async function* doStreaming(gid: string) {
     while(true) {
-      const status = await aws.tellStatus(gid);
+      const status = await rpc.tellStatus(gid);
       if(status.status=='complete') {
         return;
       }
@@ -32,10 +32,11 @@ export async function createAria2({
 
   async function* doStreamingDownload(options:{
     uri:string;
-    dst: string;
+    absDst: string;
   }) {
-    const task = await aws.addUri(options.uri, {
-      "max-connection-per-server": 10
+    const task = await rpc.addUri(options.uri, {
+      "max-connection-per-server": 10,
+      "out": options.absDst
     });
     return yield* doStreaming(task);
   }

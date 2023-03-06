@@ -12,5 +12,5 @@
     "noEmit": true,
     "isolatedModules": true
   },
-  "include": ["src/**.ts","src/**.tsx", "src/utils/neu.ts"]
+  "include": ["src/**/*.ts","src/**/*.tsx"]
 }

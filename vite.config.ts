@@ -8,8 +8,8 @@ export default defineConfig({
   envPrefix: ["VITE_", "YAAGL_"],
   build: {
     target: "safari13",
-    minify: false,
-    sourcemap: true,
+    minify: true,
+    sourcemap: false,
     outDir: "dist",
     rollupOptions: {
     }
