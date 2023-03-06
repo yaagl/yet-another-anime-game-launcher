@@ -1,26 +1,28 @@
-import { Octokit } from "@octokit/rest";
+import { log, timeout } from "./utils";
 
-const END_POINTS = [
-    'https://github.com',
-    'https://'
-]
+const END_POINTS = ["", "https://gh.3ss.workers.dev/"];
 
 export async function createGithubEndpoint() {
-    const fastest = await Promise.race(END_POINTS.map(url=>fetch(`${url}/...`).then(x=>url)));
+  await log(`Checking github endpoints`);
+  const fastest = await Promise.race(
+    [...END_POINTS.map((prefix) =>
+      fetch(`${prefix}https://api.github.com/octocat`).then(x=>x.text()).then(x=>prefix)
+    ),timeout(1000)]
+  );
 
-    const api = new Octokit({
-        baseUrl: fastest
-    })
-    
+  fastest == "" || (await log(`Using github proxy ${fastest}`));
 
-    async function getLatest() {
-        await api.repos.getLatestRelease();
-        (await api.repos.downloadTarballArchive())
-    }
+  function api(path: `/${string}`): Promise<any> {
+    return fetch(`${fastest}https://api.github.com${path}`).then(x=>x.json())
+  }
 
-    return {
-        getLatest
-    };
+  return {
+    api,
+  };
 }
 
-export type Github = ReturnType<typeof createGithubEndpoint> extends Promise<infer T> ? T: never;
+export type Github = ReturnType<typeof createGithubEndpoint> extends Promise<
+  infer T
+>
+  ? T
+  : never;

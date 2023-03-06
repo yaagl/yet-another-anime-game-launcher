@@ -1,16 +1,17 @@
 import { CN_SERVER, ServerContentData } from "./constants/server";
-import { exec, log, spawn, timeout, waitImageReady } from "./utils";
+import { exec, log, spawn, timeout, wait, waitImageReady } from "./utils";
 import "./app.css";
 import { createAria2 } from "./aria2";
 import { checkWine, createWineInstallProgram } from "./wine";
+import { createGithubEndpoint } from "./github";
 
 export async function createApp() {
   const server = CN_SERVER;
 
   let aria2_port = 6868;
 
-  const b: ServerContentData = await (await fetch(server.bg_url)).json();
-  await waitImageReady(b.data.adv.background);
+  // const b: ServerContentData = await (await fetch(server.bg_url)).json();
+  // await waitImageReady(b.data.adv.background);
 
   await Neutralino.events.on("ready", async () => {});
   await Neutralino.events.on("windowClose", async () => {
@@ -25,17 +26,18 @@ export async function createApp() {
   // await log(g.stdErr);
 
   try {
-    await spawn("./sidecar/aria2/aria2c", [
-      "--enable-rpc",
-      `--rpc-listen-port=${aria2_port}`,
-      `--rpc-listen-all=true`,
-      `--rpc-allow-origin-all`,
-    ]);
-    const aria2 = await Promise.race([
-      createAria2({ host: "127.0.0.1", port: aria2_port }),
-      timeout(10000),
-    ]);
-    await log(`Launched aria2 version ${aria2.version.version}`);
+    // const github = await createGithubEndpoint();
+    // await spawn("./sidecar/aria2/aria2c", [
+    //   "--enable-rpc",
+    //   `--rpc-listen-port=${aria2_port}`,
+    //   `--rpc-listen-all=true`,
+    //   `--rpc-allow-origin-all`,
+    // ]);
+    // const aria2 = await Promise.race([
+    //   createAria2({ host: "127.0.0.1", port: aria2_port }),
+    //   timeout(10000),
+    // ]);
+    // await log(`Launched aria2 version ${aria2.version.version}`);
 
     return ()=><div>TODO</div>
 

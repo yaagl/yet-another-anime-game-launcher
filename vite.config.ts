@@ -5,7 +5,7 @@ import solidPlugin from "vite-plugin-solid";
 export default defineConfig({
   plugins: [solidPlugin()],
   
-  envPrefix: ["VITE_"],
+  envPrefix: ["VITE_", "YAAGL_"],
   build: {
     target: "safari13",
     minify: false,

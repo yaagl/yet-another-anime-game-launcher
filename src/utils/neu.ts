@@ -1,8 +1,7 @@
 import { resolve as resolvep } from "path-browserify";
 
 export async function resolve(command: string) {
-  // ?????
-  if (import.meta.env.DEV && command.startsWith("./")) {
+  if (import.meta.env.PROD && command.startsWith("./")) {
     command = resolvep(window.NL_PATH, command);
     await Neutralino.os.showMessageBox("1", command, "OK");
   }
