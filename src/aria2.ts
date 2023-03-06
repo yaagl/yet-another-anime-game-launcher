@@ -1,5 +1,5 @@
 import { WebSocket as RPC } from "libaria2-ts";
-import { wait } from "./utils";
+import { log, sha256_16, wait } from "./utils";
 
 export async function createAria2({
   host,
@@ -8,11 +8,11 @@ export async function createAria2({
   host: string;
   port: number;
 }) {
+  await wait(500); // FIXME:
   const rpc = new RPC.Client({
     host,
     port,
   });
-
   const version = await rpc.getVersion();
 
   function shutdown() {
@@ -20,36 +20,54 @@ export async function createAria2({
   }
 
   async function* doStreaming(gid: string) {
-    while(true) {
+    while (true) {
       const status = await rpc.tellStatus(gid);
-      if(status.status=='complete') {
-        return;
+      if (status.status == "complete") {
+        break;
+      }
+      if (status.totalLength == BigInt(0)) {
+        continue;
       }
       yield status;
-      await wait(1000);
+      await wait(100);
     }
   }
 
-  async function* doStreamingDownload(options:{
-    uri:string;
+  async function* doStreamingDownload(options: {
+    uri: string;
     absDst: string;
   }) {
-    const task = await rpc.addUri(options.uri, {
-      "max-connection-per-server": 10,
-      "out": options.absDst
-    });
-    return yield* doStreaming(task);
-  }
-
-  async function* doStreamingContinue() {
-
+    const gid = await sha256_16(`${options.uri}:${options.absDst}`);
+    try {
+      const status = await rpc.tellStatus(gid);
+      if(status.status=='paused') {
+        await rpc.unpause(gid);
+      } else {
+        throw new Error('FIXME: implmenet me (aria2.ts)')
+      }
+    } catch (e: any) {
+      if (e && e["code"] == 1) {
+        await rpc.addUri(options.uri, {
+          gid,
+          "max-connection-per-server": 10,
+          out: options.absDst,
+          continue: false,
+          "allow-overwrite": true, // in case control file broken
+        });
+      } else {
+        throw e;
+      }
+    }
+    return yield* doStreaming(gid);
   }
 
   return {
     version,
     shutdown,
-    doStreamingDownload
+    doStreamingDownload,
   };
 }
 
-export type Aria2 = ReturnType<typeof createAria2> extends Promise<infer T> ? T: never;
+export type Aria2 = ReturnType<typeof createAria2> extends Promise<infer T>
+  ? T
+  : never;

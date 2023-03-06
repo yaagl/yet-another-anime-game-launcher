@@ -157,7 +157,7 @@ exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
     `Resources`,
     `sidecar`
   );
-  await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst);
+  await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst , {preserveTimestamps: true});
 
   (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });

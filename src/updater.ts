@@ -2,7 +2,7 @@ import { Aria2 } from "./aria2";
 import { Github } from "./github";
 import { gt } from "semver";
 import { CURRENT_YAAGL_VERSION } from "./constants";
-import { forceMove, resolve } from "./utils";
+import { forceMove, log, resolve } from "./utils";
 import { CommonUpdateProgram } from "./common-update-ui";
 
 const owner = "3shain";
@@ -68,7 +68,7 @@ export async function* downloadProgram(
   })) {
     yield [
       "setProgress",
-      Number(progress.completedLength / progress.totalLength) * 100,
+      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
     ];
   }
   yield ["setUndeterminedProgress"];

@@ -7,6 +7,8 @@ import {
   resolve,
   appendFile,
   prompt,
+  addTerminationHook,
+  GLOBAL_onClose,
 } from "./utils";
 import { createAria2 } from "./aria2";
 import { checkWine, createWine, createWineInstallProgram } from "./wine";
@@ -22,17 +24,16 @@ export async function createApp() {
 
   await Neutralino.events.on("ready", async () => {});
   await Neutralino.events.on("windowClose", async () => {
-    for (const process of await Neutralino.os.getSpawnedProcesses()) {
-      await Neutralino.os.execCommand("kill " + process.pid);
+    if (await GLOBAL_onClose(false)) {
+      Neutralino.app.exit(0);
     }
-    Neutralino.app.exit(0);
   });
 
   const github = await createGithubEndpoint();
   const aria2_session = await resolve("./aria2.session");
   await appendFile(aria2_session, "");
-  await spawn("./sidecar/aria2/aria2c", [
-    "-q",
+  const pid = await spawn("./sidecar/aria2/aria2c", [
+    // "-q",
     "-d",
     "/",
     "--no-conf",
@@ -40,12 +41,19 @@ export async function createApp() {
     `--rpc-listen-port=${aria2_port}`,
     `--rpc-listen-all=true`,
     `--rpc-allow-origin-all`,
-    `-c`,
+    // `-c`,
     `--input-file`,
-    `"${aria2_session}"`,
+    `${aria2_session}`,
     `--save-session`,
-    `"${aria2_session}"`,
+    `${aria2_session}`,
+    `--pause`,
+    `true`,
   ]);
+  addTerminationHook(async () => {
+    await log("killing process " + pid);
+    await exec("kill", [pid + ""]);
+    return true;
+  });
   const aria2 = await Promise.race([
     createAria2({ host: "127.0.0.1", port: aria2_port }),
     timeout(10000),
@@ -66,12 +74,22 @@ export async function createApp() {
   //   await wait(10000);
   // });
   if (!latest) {
-    if (await prompt("NEW Version available", "Would you like to update to the latest version?")) {
+    if (
+      await prompt(
+        "NEW Version available",
+        "Would you like to update to the latest version?"
+      )
+    ) {
       return createCommonUpdateUI(() => downloadProgram(aria2, downloadUrl));
     }
   }
 
-  return () => <div>If you are seeing this, it means everything works fine!<br/> Current version: {CURRENT_YAAGL_VERSION}</div>;
+  return () => (
+    <div>
+      If you are seeing this, it means everything works fine!
+      <br /> Current version: {CURRENT_YAAGL_VERSION}
+    </div>
+  );
 
   const { wineReady, wineUpdate } = await checkWine();
 

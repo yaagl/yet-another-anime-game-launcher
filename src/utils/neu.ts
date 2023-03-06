@@ -1,20 +1,26 @@
-import { resolve as resolvep } from "path-browserify";
+import { join } from "path-browserify";
 
 export async function resolve(command: string) {
-  if (import.meta.env.PROD && command.startsWith("./")) {
-    command = resolvep(window.NL_PATH, command);
-    await Neutralino.os.showMessageBox("1", command, "OK");
+  if (command.startsWith("./")) {
+    command = join(
+      import.meta.env.PROD ? window.NL_PATH : window.NL_CWD,
+      command
+    );
+    // await Neutralino.os.showMessageBox("1", command, "OK");
   }
   return command;
 }
 
-export async function exec(command: string, args: string[]): Promise<Neutralino.os.ExecCommandResult> {
-  const ret = await Neutralino.os.execCommand(
-    `${await resolve(command)} ${args.join(" ")}`,
-    {}
-  );
-  if(ret.exitCode!=0) {
-    throw new Error(ret.stdErr);
+export async function exec(
+  command: string,
+  args: string[]
+): Promise<Neutralino.os.ExecCommandResult> {
+  const cmd = `${await resolve(command)} ${args.join(" ")}`;
+  const ret = await Neutralino.os.execCommand(cmd, {});
+  if (ret.exitCode != 0) {
+    throw new Error(
+      `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
+    );
   }
   return ret;
 }
@@ -24,11 +30,11 @@ export function tar_extract(src: string, dst: string) {
 }
 
 export async function spawn(command: string, args: string[]) {
-  const { pid } = await Neutralino.os.spawnProcess(
-    `${await resolve(command)} ${args.join(" ")}`
-  );
+  const cmd = `${await resolve(command)} ${args.join(" ")}`;
+  const { pid } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
-  Neutralino.debug.log(pid + "");
+  await log(pid + "");
+  await log(cmd);
   return pid;
 }
 
@@ -57,19 +63,53 @@ export function restart() {
 }
 
 export async function fatal(error: any) {
-  await Neutralino.os.showMessageBox("Fatal error", "", "OK");
+  await Neutralino.os.showMessageBox("Fatal error", String(error), "OK");
   await Neutralino.app.exit(-1);
 }
 
 export async function appendFile(path: string, content: string) {
-  await Neutralino.filesystem.appendFile(await resolve(path),content);
+  await Neutralino.filesystem.appendFile(await resolve(path), content);
 }
 
 export async function forceMove(source: string, destination: string) {
-  return await exec('mv',['-f',await resolve(source),await resolve(destination)]);
+  return await exec("mv", [
+    "-f",
+    await resolve(source),
+    await resolve(destination),
+  ]);
 }
 
-export async function prompt(title:string, message: string) {
+export async function prompt(title: string, message: string) {
   const out = await Neutralino.os.showMessageBox(title, message, "YES_NO");
-  return out=="YES";
+  return out == "YES";
 }
+
+const hooks: Array<(forced: boolean)=>Promise<boolean>> = [];
+
+export function addTerminationHook(fn: (forced: boolean)=>Promise<boolean>) {
+  hooks.push(fn);
+  const len = hooks.length;
+  return () => {
+    if(hooks.length!==len) {
+      throw new Error('Unexpected behavior!');
+    }
+    hooks.pop();
+  }
+}
+
+// ??
+export async function GLOBAL_onClose(forced: boolean) {
+  for(const hook of hooks.reverse()) {
+    if(!await hook(forced)&&!forced) {
+      return false; // aborted
+    }
+  }
+  return true;
+}
+
+export async function shutdown() {
+  for(const hook of hooks.reverse()) {
+    await hook(true);
+  }
+}
+
