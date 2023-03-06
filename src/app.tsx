@@ -65,13 +65,14 @@ export async function createApp() {
     aria2,
   });
   // return createCommonUpdateUI(async function *(){
-  //   yield ['setStateText','progressing'];
+  //   yield ['setStateText','测试进度'];
   //   for(let i=0;i<=100;i++) {
   //     yield ['setProgress', i];
-  //     await wait(1000);
+  //     await wait(50);
   //   }
   //   yield ['setUndeterminedProgress'];
-  //   await wait(10000);
+  //   await wait(2000);
+  //   yield ['setStateText','完成'];
   // });
   if (!latest) {
     if (

@@ -1,7 +1,8 @@
 import { Button, Progress, ProgressIndicator, Center } from "@hope-ui/solid";
-import { Box, VStack } from "@hope-ui/solid";
+import { Box, VStack, Image } from "@hope-ui/solid";
 import { createSignal, onMount, Show } from "solid-js";
 import { fatal, log, shutdown, wait } from "./utils";
+import s from "./assets/Nahida.cr.png";
 
 export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
   let confirmRestart: (v: any) => void;
@@ -33,9 +34,11 @@ export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
         await shutdown();
         // await wait(1000);
         // HACK
-        if(import.meta.env.PROD) {
+        if (import.meta.env.PROD) {
           const app = await Neutralino.os.getEnv("PATH_LAUNCH");
-          await Neutralino.os.execCommand(`open "${app}"`, {background:true});
+          await Neutralino.os.execCommand(`open "${app}"`, {
+            background: true,
+          });
           Neutralino.app.exit(0);
         } else {
           Neutralino.app.restartProcess();
@@ -48,16 +51,22 @@ export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
     return (
       <Center h="100vh" w="100vw">
         <VStack alignItems="stretch" spacing="$8" w="80vw">
-          <Box bg="transparent" h="40vh" w="100%"></Box>
+          <Center>
+            <Image boxSize={280} src={s}></Image>
+          </Center>
           <h1 style="text-align: center">{statusText()}</h1>
-          <Show
-            when={!done()}
-            fallback={<Button onClick={confirmRestart!}>重启以完成安装</Button>}
-          >
-            <Progress value={progress()} indeterminate={progress() == 0}>
-              <ProgressIndicator animated striped />
-            </Progress>
-          </Show>
+          <Box height={100}>
+            <Show
+              when={!done()}
+              fallback={
+                <Center><Button onClick={confirmRestart!}>重启以完成安装</Button></Center>
+              }
+            >
+              <Progress value={progress()} indeterminate={progress() == 0}>
+                <ProgressIndicator animated striped />
+              </Progress>
+            </Show>
+          </Box>
         </VStack>
       </Center>
     );

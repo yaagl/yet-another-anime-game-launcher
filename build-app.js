@@ -83,11 +83,11 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   // check if file exists
   if (
     fs.existsSync(
-      path.resolve(process.cwd(), "src", "icons", "appIcon.png")
+      path.join(process.cwd(), config.modes.window.icon)
     )
   ) {
     const iconFile = await fs.readFile(
-      path.resolve(process.cwd(), "src", "icons", "appIcon.png")
+      path.join(process.cwd(), config.modes.window.icon)
     );
     icns.addFromPng(iconFile, ["ic09"], raw);
     // icns.addFromPng(iconFile, ['ic07'], raw);
@@ -194,9 +194,9 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         <key>CFBundleIdentifier</key>
         <string>${config.applicationId}</string>
         <key>CFBundleName</key>
-        <string>${pkg.name}</string>
+        <string>${config.modes.window.title}</string>
         <key>CFBundleDisplayName</key>
-        <string>${config.cli.binaryName}</string>
+        <string>${config.modes.window.title}</string>
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleVersion</key>

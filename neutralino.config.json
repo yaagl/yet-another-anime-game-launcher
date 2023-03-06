@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
-  "applicationId": "com.3s.yaagl",
+  "applicationId": "com.3shain.yaagl",
   "version": "1.0.0",
   "defaultMode": "window",
   "port": 0,
@@ -36,7 +36,7 @@
       "maximize": false,
       "hidden": true,
       "resizable": false,
-      "icon": "/src/icons/appIcon.png",
+      "icon": "/src/icons/Paimon.cr.png",
       "exitProcessOnClose": false
     }
   },

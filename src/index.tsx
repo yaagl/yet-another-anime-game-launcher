@@ -9,6 +9,9 @@ if (typeof Neutralino == "undefined") {
   console.log(`This app doesn't work on browser.`);
 } else {
   Neutralino.init();
+  if (import.meta.env.PROD) {
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
+  }
   createApp()
     .then((UI) => {
       render(
