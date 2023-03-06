@@ -1,7 +1,7 @@
 import { Button, Progress, ProgressIndicator, Center } from "@hope-ui/solid";
 import { Box, VStack } from "@hope-ui/solid";
 import { createSignal, onMount, Show } from "solid-js";
-import { fatal, log, shutdown } from "./utils";
+import { fatal, log, shutdown, wait } from "./utils";
 
 export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
   let confirmRestart: (v: any) => void;
@@ -31,7 +31,15 @@ export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
         setDone(true);
         await confirmRestartPromise;
         await shutdown();
-        Neutralino.app.restartProcess();
+        // await wait(1000);
+        // HACK
+        if(import.meta.env.PROD) {
+          const app = await Neutralino.os.getEnv("PATH_LAUNCH");
+          await Neutralino.os.execCommand(`open "${app}"`, {background:true});
+          Neutralino.app.exit(0);
+        } else {
+          Neutralino.app.restartProcess();
+        }
       })()
         .then()
         .catch(fatal);

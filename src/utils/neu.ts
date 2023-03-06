@@ -15,7 +15,7 @@ export async function exec(
   command: string,
   args: string[]
 ): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = `${await resolve(command)} ${args.join(" ")}`;
+  const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
   const ret = await Neutralino.os.execCommand(cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
@@ -30,7 +30,7 @@ export function tar_extract(src: string, dst: string) {
 }
 
 export async function spawn(command: string, args: string[]) {
-  const cmd = `${await resolve(command)} ${args.join(" ")}`;
+  const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
   const { pid } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");
@@ -74,8 +74,8 @@ export async function appendFile(path: string, content: string) {
 export async function forceMove(source: string, destination: string) {
   return await exec("mv", [
     "-f",
-    await resolve(source),
-    await resolve(destination),
+    `"${await resolve(source)}"`,
+    `"${await resolve(destination)}"`,
   ]);
 }
 

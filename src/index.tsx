@@ -3,6 +3,7 @@ import { createApp } from "./app";
 import { HopeProvider } from "@hope-ui/solid";
 
 import "./styles.css";
+import { shutdown } from "./utils";
 
 if (typeof Neutralino == "undefined") {
   console.log(`This app doesn't work on browser.`);
@@ -26,6 +27,7 @@ if (typeof Neutralino == "undefined") {
         `Launcher failed to open\n${e}\n${e.stack}`,
         "OK"
       );
+      await shutdown();
       Neutralino.app.exit(-1);
     });
 }

@@ -43,9 +43,9 @@ export async function createApp() {
     `--rpc-allow-origin-all`,
     // `-c`,
     `--input-file`,
-    `${aria2_session}`,
+    `"${aria2_session}"`,
     `--save-session`,
-    `${aria2_session}`,
+    `"${aria2_session}"`,
     `--pause`,
     `true`,
   ]);
