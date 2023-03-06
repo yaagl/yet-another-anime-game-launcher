@@ -5,6 +5,10 @@ on:
       - '*'
 env:
   YAAGL_VERSION: ${{ github.ref_name }}
+permissions:
+  contents: "write"
+  packages: "write"
+  pull-requests: "read"
 jobs:
   build:
     runs-on: macos-latest
