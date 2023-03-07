@@ -1,7 +1,7 @@
 import { exec, resolve } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
-  return await exec(`xattr -r -d ${attr} ${await resolve(path)}`, []);
+  return await exec(`xattr`, [ '-r', '-d', attr ,`"${await resolve(path)}"`], {}, true);
 }
 
 export async function md5(path: string): Promise<string> {

@@ -42,8 +42,10 @@ export async function createAria2({
       const status = await rpc.tellStatus(gid);
       if(status.status=='paused') {
         await rpc.unpause(gid);
+      } else if(status.status=='complete') {
+        return;
       } else {
-        throw new Error('FIXME: implmenet me (aria2.ts)')
+        throw new Error('FIXME: implmenet me (aria2.ts) '+status.status)
       }
     } catch (e: any) {
       if (e && e["code"] == 1) {

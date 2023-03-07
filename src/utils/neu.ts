@@ -1,22 +1,37 @@
 import { join } from "path-browserify";
 
-export async function resolve(command: string) {
-  if (command.startsWith("./")) {
-    command = join(
-      import.meta.env.PROD ? window.NL_PATH : window.NL_CWD,
-      command
-    );
+export async function resolve(path: string) {
+  if (path.startsWith("./")) {
+    path = join(import.meta.env.PROD ? window.NL_PATH : window.NL_CWD, path);
     // await Neutralino.os.showMessageBox("1", command, "OK");
+    if (!path.startsWith("/") || path == "/")
+      throw new Error("Assertation failed " + path);
   }
-  return command;
+  return path;
 }
 
 export async function exec(
   command: string,
-  args: string[]
+  args: string[],
+  env?: { [key: string]: string },
+  sudo: boolean = false
 ): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
-  const ret = await Neutralino.os.execCommand(cmd, {});
+  const cmd = `${
+    env && typeof env == "object"
+      ? Object.keys(env)
+          .map((key) => {
+            return `${key}=${env[key]} `;
+          })
+          .join()
+      : ""
+  }"${await resolve(command)}" ${args
+    .map((x) => {
+      if (x.startsWith('"')||x.startsWith("'")) return x;
+      if (x.indexOf(" ") > -1) return `"${x}"`;
+      return x;
+    })
+    .join(" ")}`;
+  const ret = sudo ? await runInSudo(cmd) : await Neutralino.os.execCommand(cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
       `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
@@ -25,8 +40,19 @@ export async function exec(
   return ret;
 }
 
+export async function runInSudo(command: string) {
+  command = command
+  .replaceAll('"', "\\\\\\\"")
+  .replaceAll("'", "\\'");
+  await log(command);
+  return await Neutralino.os.execCommand(
+    `osascript -e $'do shell script "${command}" with administrator privileges'`,
+    {}
+  );
+}
+
 export function tar_extract(src: string, dst: string) {
-  return exec("tar", ["-xzvf", src, "-C", dst]);
+  return exec("tar", ["-zxvf", src, "-C", dst]);
 }
 
 export async function spawn(command: string, args: string[]) {
@@ -63,8 +89,13 @@ export function restart() {
 }
 
 export async function fatal(error: any) {
-  await Neutralino.os.showMessageBox("Fatal error", String(error), "OK");
-  await Neutralino.app.exit(-1);
+  await Neutralino.os.showMessageBox(
+    "Fatal error",
+    `${String(error)}`,
+    "OK"
+  );
+  await shutdown();
+  Neutralino.app.exit(-1);
 }
 
 export async function appendFile(path: string, content: string) {
@@ -79,28 +110,32 @@ export async function forceMove(source: string, destination: string) {
   ]);
 }
 
+export async function rmrf_dangerously(target: string) {
+  return await exec("rm", ["-rf", target]);
+}
+
 export async function prompt(title: string, message: string) {
   const out = await Neutralino.os.showMessageBox(title, message, "YES_NO");
   return out == "YES";
 }
 
-const hooks: Array<(forced: boolean)=>Promise<boolean>> = [];
+const hooks: Array<(forced: boolean) => Promise<boolean>> = [];
 
-export function addTerminationHook(fn: (forced: boolean)=>Promise<boolean>) {
+export function addTerminationHook(fn: (forced: boolean) => Promise<boolean>) {
   hooks.push(fn);
   const len = hooks.length;
   return () => {
-    if(hooks.length!==len) {
-      throw new Error('Unexpected behavior!');
+    if (hooks.length !== len) {
+      throw new Error("Unexpected behavior!");
     }
     hooks.pop();
-  }
+  };
 }
 
 // ??
 export async function GLOBAL_onClose(forced: boolean) {
-  for(const hook of hooks.reverse()) {
-    if(!await hook(forced)&&!forced) {
+  for (const hook of hooks.reverse()) {
+    if (!(await hook(forced)) && !forced) {
       return false; // aborted
     }
   }
@@ -108,8 +143,7 @@ export async function GLOBAL_onClose(forced: boolean) {
 }
 
 export async function shutdown() {
-  for(const hook of hooks.reverse()) {
+  for (const hook of hooks.reverse()) {
     await hook(true);
   }
 }
-

@@ -85,24 +85,27 @@ export async function createApp() {
     }
   }
 
-  return () => (
-    <div>
-      If you are seeing this, it means everything works fine!
-      <br /> Current version: {CURRENT_YAAGL_VERSION}
-    </div>
-  );
+  // return () => (
+  //   <div>
+  //     If you are seeing this, it means everything works fine!
+  //     <br /> Current version: {CURRENT_YAAGL_VERSION}
+  //   </div>
+  // );
 
-  const { wineReady, wineUpdate } = await checkWine();
-
+  const { wineReady, wineUpdate, wineUpdateTag } = await checkWine();
+  const prefixPath = await resolve("./wineprefix");
   if (wineReady) {
     const wine = await createWine({
+      installDir: "FIXME",
       prefix: "FIXME",
     });
     return await createLauncher({ aria2, wine });
   } else {
     return await createWineInstallProgram({
       aria2,
-      wineUpdate: wineUpdate!,
+      wineUpdateTarGzFile: wineUpdate,
+      wineAbsPrefix: prefixPath,
+      wineTag: wineUpdateTag,
     });
   }
 }
