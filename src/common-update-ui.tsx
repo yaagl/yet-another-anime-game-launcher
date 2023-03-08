@@ -3,8 +3,12 @@ import { Box, VStack, Image } from "@hope-ui/solid";
 import { createSignal, onMount, Show } from "solid-js";
 import { fatal, log, shutdown, wait } from "./utils";
 import s from "./assets/Nahida.cr.png";
+import { Locale, LocaleTextKey } from "./locale";
 
-export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
+export function createCommonUpdateUI(
+  locale: Locale,
+  program: () => CommonUpdateProgram
+) {
   let confirmRestart: (v: any) => void;
   const confirmRestartPromise = new Promise((res) => {
     confirmRestart = res;
@@ -25,7 +29,7 @@ export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
               setProgress(0);
               break;
             case "setStateText":
-              setStatusText(text[1]); //FIXME: locales
+              setStatusText(locale.format(text[1], text.slice(2)));
               break;
           }
         }
@@ -59,7 +63,9 @@ export function createCommonUpdateUI(program: () => CommonUpdateProgram) {
             <Show
               when={!done()}
               fallback={
-                <Center><Button onClick={confirmRestart!}>重启以完成安装</Button></Center>
+                <Center>
+                  <Button onClick={confirmRestart!}>{locale.get("RESTART_TO_INSTALL")}</Button>
+                </Center>
               }
             >
               <Progress value={progress()} indeterminate={progress() == 0}>
@@ -77,5 +83,5 @@ export type CommonUpdateProgram = AsyncGenerator<CommonProgressUICommand, void>;
 
 export type CommonProgressUICommand =
   | ["setProgress", number]
-  | ["setStateText", string, ...string[]]
+  | ["setStateText", LocaleTextKey, ...string[]]
   | ["setUndeterminedProgress"];

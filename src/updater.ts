@@ -46,6 +46,8 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
     return {
       latest: false,
       downloadUrl: neu.browser_download_url,
+      version: latest.tag_name,
+      description: latest.body
     } as const;
   }
   return {
@@ -61,7 +63,7 @@ export async function* downloadProgram(
   aria2: Aria2,
   url: string
 ): CommonUpdateProgram {
-  yield ["setStateText", "DOWNLOADING_FILE"];
+  yield ["setStateText", "DOWNLOADING_UPDATE_FILE"];
   for await (const progress of aria2.doStreamingDownload({
     uri: url,
     absDst: await resolve("./resources.neu.update"),

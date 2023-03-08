@@ -2,10 +2,12 @@ import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
 import { Github } from "./github";
+import { Locale } from "./locale";
 import {
   exec as unixExec,
   fatal,
   getKey,
+  humanFileSize,
   log,
   removeFile,
   resolve,
@@ -86,14 +88,16 @@ export async function createWineInstallProgram({
   wineUpdateTarGzFile,
   wineAbsPrefix,
   wineTag,
+  locale,
 }: {
   aria2: Aria2;
+  locale: Locale;
   wineUpdateTarGzFile: string;
   wineAbsPrefix: string;
   wineTag: string;
 }) {
   async function* program(): CommonUpdateProgram {
-    yield ["setStateText", "DOWNLOADING_ENVIROMENT"];
+    yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
     const wineTarPath = await resolve("./wine.tar.gz");
     for await (const progress of aria2.doStreamingDownload({
       uri: wineUpdateTarGzFile,
@@ -103,8 +107,9 @@ export async function createWineInstallProgram({
         "setProgress",
         Number((progress.completedLength * BigInt(100)) / progress.totalLength),
       ];
+      yield ["setStateText", "DOWNLOADING_ENVIRONMENT_SPEED", `${humanFileSize(Number(progress.downloadSpeed))}`];
     }
-    yield ["setStateText", "EXTRACT_ENVIROMENT"];
+    yield ["setStateText", "EXTRACT_ENVIRONMENT"];
     yield ["setUndeterminedProgress"];
 
     const wineBinaryDir = await resolve("./wine");
@@ -113,7 +118,7 @@ export async function createWineInstallProgram({
     await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
     await removeFile(wineTarPath);
     
-    yield ["setStateText", "CONFIGURING_ENVIROMENT"];
+    yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
     await xattrRemove("com.apple.quarantine", wineBinaryDir);
 
@@ -132,5 +137,5 @@ export async function createWineInstallProgram({
     await setKey("wine_update_tag", null);
   }
 
-  return createCommonUpdateUI(program);
+  return createCommonUpdateUI(locale, program);
 }

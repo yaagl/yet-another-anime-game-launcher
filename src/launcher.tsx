@@ -17,6 +17,7 @@ import {
   fatal,
   setKey,
   removeFile,
+  wait,
 } from "./utils";
 import {
   Box,
@@ -43,6 +44,7 @@ import {
 } from "./patch";
 import { md5 } from "./utils/unix";
 import { CommonUpdateProgram } from "./common-update-ui";
+import { Locale } from "./locale";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -59,17 +61,34 @@ const IconSetting = createIcon({
 
 const CURRENT_SUPPORTED_VERSION = "3.5.0";
 
-export async function checkGameState() {
+export async function checkGameState(locale: Locale) {
+  let gameDir = "";
   try {
-    const gameDir = await getKey("game_install_dir");
+    gameDir = await getKey("game_install_dir");
+  } catch {
+    return {
+      gameInstalled: false,
+    } as const;
+  }
+  try {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
       gameVersion: await getGameVersion(join(gameDir, CN_SERVER.dataDir)), //FIXME:
     } as const;
   } catch {
+    await locale.alert("CANT_OPEN_GAME_FILE", "CANT_OPEN_GAME_FILE_DESC");
+    const selection = await openDir(locale.get("SELECT_INSTALLATION_DIR"));
+    if (selection != gameDir) {
+      await locale.alert("GAME_DIR_CHANGED", "GAME_DIR_CHANGED_DESC");
+      return {
+        gameInstalled: false,
+      } as const;
+    }
     return {
-      gameInstalled: false,
+      gameInstalled: true,
+      gameInstallDir: gameDir,
+      gameVersion: await getGameVersion(join(gameDir, CN_SERVER.dataDir)), //FIXME:
     } as const;
   }
 }
@@ -77,9 +96,11 @@ export async function checkGameState() {
 export async function createLauncher({
   aria2,
   wine,
+  locale,
 }: {
   aria2: Aria2;
   wine: Wine;
+  locale: Locale;
 }) {
   const server = CN_SERVER;
   const b: ServerContentData = await (await fetch(server.bg_url)).json();
@@ -87,7 +108,9 @@ export async function createLauncher({
   const GAME_LATEST_VERSION = c.data.game.latest.version;
   await waitImageReady(b.data.adv.background);
 
-  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState();
+  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
+    locale
+  );
 
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
@@ -121,7 +144,7 @@ export async function createLauncher({
                   setProgress(0);
                   break;
                 case "setStateText":
-                  setStatusText(text[1]); //FIXME: locales
+                  setStatusText(locale.format(text[1], text.slice(2)));
                   break;
               }
             }
@@ -149,25 +172,29 @@ export async function createLauncher({
           });
         });
       } else {
-        const selection = await openDir("SELECT_INSTALLATION_DIR");
+        const selection = await openDir(locale.get("SELECT_INSTALLATION_DIR"));
         if (!selection.startsWith("/")) {
-          await alert("PATH_INVALID", "PLEASE_SELECT_A_DIR");
+          await locale.alert("PATH_INVALID", "PLEASE_SELECT_A_DIR");
           return;
         }
         try {
           await stats(join(selection, "pkg_version"));
         } catch {
-          await alert("NOT_SUPPORTED_YET", "DOWNLOAD_FUNCTION_TBD");
+          await locale.alert("NOT_SUPPORTED_YET", "DOWNLOAD_FUNCTION_TBD");
           return;
         }
         const gameVersion = await getGameVersion(
           join(selection, server.dataDir)
         );
         if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
-          await alert("UNSUPPORTED_VERSION", "PLEASE_WAIT_FOR_LAUNCHER_UPDATE");
+          await locale.alert(
+            "UNSUPPORTED_VERSION",
+            "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+            [gameVersion]
+          );
           return;
         } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
-          await alert("NOT_SUPPORTED_YET", "UPGRADE_FUNCTION_TBD");
+          await locale.alert("NOT_SUPPORTED_YET", "UPGRADE_FUNCTION_TBD");
           return;
         }
         try {
@@ -241,7 +268,9 @@ export async function createLauncher({
                   disabled={programBusy()}
                   onClick={() => onButtonClick().catch(fatal)}
                 >
-                  {_gameInstalled() ? "LAUNCH" : "INSTALL"}
+                  {_gameInstalled()
+                    ? locale.get("LAUNCH")
+                    : locale.get("INSTALL")}
                 </Button>
                 <Show when={false && _gameInstalled()}>
                   <IconButton
@@ -332,8 +361,13 @@ async function* checkIntegrityProgram({
     remoteName: string;
     md5: string;
   }[] = [];
-  yield ["setStateText", "SCANNING_FILES"];
   let count = 0;
+  yield [
+    "setStateText",
+    "SCANNING_FILES",
+    String(count),
+    String(entries.length),
+  ];
   for (const entry of entries) {
     const localPath = join(gameDir, entry.remoteName);
     try {
@@ -350,6 +384,12 @@ async function* checkIntegrityProgram({
       toFix.push(entry);
     }
     count++;
+    yield [
+      "setStateText",
+      "SCANNING_FILES",
+      String(count),
+      String(entries.length),
+    ];
     yield ["setProgress", (count / entries.length) * 100];
   }
   if (toFix.length == 0) {
@@ -357,7 +397,7 @@ async function* checkIntegrityProgram({
   }
   yield ["setUndeterminedProgress"];
 
-  yield ["setStateText", "FIXING_FILES"];
+  yield ["setStateText", "FIXING_FILES", String(count), String(entries.length)];
   count = 0;
   for (const entry of toFix) {
     const localPath = join(gameDir, entry.remoteName);
@@ -368,6 +408,12 @@ async function* checkIntegrityProgram({
       uri: remotePath,
       absDst: localPath,
     })) {
+      yield [
+        "setStateText",
+        "FIXING_FILES",
+        String(count),
+        String(entries.length),
+      ];
       yield [
         "setProgress",
         Number((progress.completedLength * BigInt(100)) / progress.totalLength),
