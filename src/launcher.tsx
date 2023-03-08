@@ -1,7 +1,23 @@
 import { Aria2 } from "./aria2";
 import { Wine } from "./wine";
-import { CN_SERVER, ServerContentData } from "./constants/server";
-import { waitImageReady } from "./utils";
+import {
+  CN_SERVER,
+  ServerContentData,
+  ServerVersionData,
+} from "./constants/server";
+import {
+  getKey,
+  log,
+  openDir,
+  waitImageReady,
+  alert,
+  readBinary,
+  readAllLines,
+  stats,
+  fatal,
+  setKey,
+  removeFile,
+} from "./utils";
 import {
   Box,
   Button,
@@ -16,6 +32,17 @@ import {
   VStack,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
+import { batch, createSignal, onMount, Show } from "solid-js";
+import { join } from "path-browserify";
+import { gt, lt } from "semver";
+import {
+  patchProgram,
+  patchRevertProgram,
+  patternSearch,
+  putLocal,
+} from "./patch";
+import { md5 } from "./utils/unix";
+import { CommonUpdateProgram } from "./common-update-ui";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -30,6 +57,23 @@ const IconSetting = createIcon({
   },
 });
 
+const CURRENT_SUPPORTED_VERSION = "3.5.0";
+
+export async function checkGameState() {
+  try {
+    const gameDir = await getKey("game_install_dir");
+    return {
+      gameInstalled: true,
+      gameInstallDir: gameDir,
+      gameVersion: await getGameVersion(join(gameDir, CN_SERVER.dataDir)), //FIXME:
+    } as const;
+  } catch {
+    return {
+      gameInstalled: false,
+    } as const;
+  }
+}
+
 export async function createLauncher({
   aria2,
   wine,
@@ -39,13 +83,110 @@ export async function createLauncher({
 }) {
   const server = CN_SERVER;
   const b: ServerContentData = await (await fetch(server.bg_url)).json();
+  const c: ServerVersionData = await (await fetch(server.url)).json();
+  const GAME_LATEST_VERSION = c.data.game.latest.version;
   await waitImageReady(b.data.adv.background);
+
+  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState();
 
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
     // const bw = 136 / window.devicePixelRatio;
     const bh = 40;
     const bw = 136;
+
+    const [statusText, setStatusText] = createSignal("");
+    const [progress, setProgress] = createSignal(0);
+    const [_gameInstalled, setGameInstalled] = createSignal(gameInstalled);
+    const [_gameInstallDir, setGameInstallDir] = createSignal(
+      gameInstallDir ?? ""
+    );
+    const [programBusy, setBusy] = createSignal(false);
+    const [gameCurrentVersion, setGameCurrentVersion] = createSignal(
+      gameVersion ?? "0.0.0"
+    );
+
+    const taskQueue: AsyncGenerator<any, void, () => CommonUpdateProgram> =
+      (async function* () {
+        const task = yield 0;
+        setBusy(true);
+        try {
+          for await (const text of task()) {
+            switch (text[0]) {
+              case "setProgress":
+                setProgress(text[1]);
+                break;
+              case "setUndeterminedProgress":
+                setProgress(0);
+                break;
+              case "setStateText":
+                setStatusText(text[1]); //FIXME: locales
+                break;
+            }
+          }
+        } catch (e) {
+          // fatal
+          await fatal(e);
+          return;
+        }
+        setBusy(false);
+      })();
+    taskQueue.next(); // ignored anyway
+
+    onMount(() => {});
+
+    async function onButtonClick() {
+      if (programBusy()) return; // ignore
+      if (_gameInstalled()) {
+        // assert:
+        taskQueue.next(async function* () {
+          yield* launchGameProgram({
+            gameDir: _gameInstallDir(),
+            wine,
+            gameExecutable: atob("WXVhblNoZW4uZXhl"),
+          });
+        });
+      } else {
+        const selection = await openDir("SELECT_INSTALLATION_DIR");
+        if (!selection.startsWith("/")) {
+          await alert("PATH_INVALID", "PLEASE_SELECT_A_DIR");
+          return;
+        }
+        try {
+          await stats(join(selection, "pkg_version"));
+        } catch {
+          await alert("NOT_SUPPORTED_YET", "DOWNLOAD_FUNCTION_TBD");
+          return;
+        }
+        const gameVersion = await getGameVersion(
+          join(selection, server.dataDir)
+        );
+        if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
+          await alert("UNSUPPORTED_VERSION", "PLEASE_WAIT_FOR_LAUNCHER_UPDATE");
+          return;
+        } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
+          await alert("NOT_SUPPORTED_YET", "UPGRADE_FUNCTION_TBD");
+          return;
+        }
+        try {
+          await stats(join(selection, "pkg_version"));
+          taskQueue.next(async function* () {
+            yield* checkIntegrityProgram({
+              aria2,
+              gameDir: selection,
+              remoteDir: c.data.game.latest.decompressed_path,
+            });
+            // setGameInstalled
+            batch(() => {
+              setGameInstalled(true);
+              setGameInstallDir(selection);
+              setGameCurrentVersion(gameVersion);
+            });
+            await setKey("game_install_dir", selection);
+          });
+        } catch {}
+      }
+    }
 
     return (
       <div
@@ -55,6 +196,7 @@ export async function createLauncher({
         }}
       >
         <div
+          onClick={() => Neutralino.os.open(b.data.adv.url)}
           role="button"
           class="version-icon"
           style={{
@@ -64,17 +206,48 @@ export async function createLauncher({
           }}
         ></div>
         <Flex h="100vh" direction={"column-reverse"}>
-          <Flex mr={"10vw"} ml={"10vw"} mb={50} columnGap="10vw" alignItems={"flex-end"}>
+          <Flex
+            mr={"10vw"}
+            ml={"10vw"}
+            mb={50}
+            columnGap="10vw"
+            alignItems={"flex-end"}
+          >
             <Box flex={1}>
-              <h3 style={"text-shadow: 1px 1px 2px #333;color:white;margin-bottom:5px;"}>Status</h3>
-              <Progress value={50} size="sm" borderRadius={8}>
-                <ProgressIndicator borderRadius={8}></ProgressIndicator>
-              </Progress>
+              <Show when={programBusy()}>
+                <h3
+                  style={
+                    "text-shadow: 1px 1px 2px #333;color:white;margin-bottom:5px;"
+                  }
+                >
+                  {statusText()}
+                </h3>
+                <Progress
+                  value={progress()}
+                  indeterminate={progress() == 0}
+                  size="sm"
+                  borderRadius={8}
+                >
+                  <ProgressIndicator borderRadius={8}></ProgressIndicator>
+                </Progress>
+              </Show>
             </Box>
             <Box>
-              <ButtonGroup size="xl" attached>
-                <Button mr="-1px">Launch</Button>
-                <IconButton fontSize={30} aria-label="Settings" icon={<IconSetting />} />
+              <ButtonGroup size="xl" attached minWidth={150}>
+                <Button
+                  mr="-1px"
+                  disabled={programBusy()}
+                  onClick={onButtonClick}
+                >
+                  {_gameInstalled() ? "LAUNCH" : "INSTALL"}
+                </Button>
+                <Show when={false && _gameInstalled()}>
+                  <IconButton
+                    fontSize={30}
+                    aria-label="Settings"
+                    icon={<IconSetting />}
+                  />
+                </Show>
               </ButtonGroup>
             </Box>
           </Flex>
@@ -82,4 +255,155 @@ export async function createLauncher({
       </div>
     );
   };
+}
+
+import a from "../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
+async function* launchGameProgram({
+  gameDir,
+  gameExecutable,
+  wine,
+}: {
+  gameDir: string;
+  gameExecutable: string;
+  wine: Wine;
+}): CommonUpdateProgram {
+  yield ["setUndeterminedProgress"];
+  yield ["setStateText", "PATCHING"];
+  yield* patchProgram(gameDir, wine.prefix, "cn");
+
+  await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  try {
+    await wine.exec("regedit", [
+      `"${wine.toWinePath(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"))}"`,
+    ]);
+    await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+    await wine.exec("copy", [
+      `"${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}"`,
+      '"%TEMP%\\\\"',
+    ]);
+    await wine.exec("copy", [
+      `"${wine.toWinePath(join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw==")))}"`,
+      '"%WINDIR%\\\\system32\\\\"',
+    ]);
+  } catch (e) {
+    yield* patchRevertProgram(gameDir, wine.prefix, "cn");
+    throw e;
+  }
+  try {
+    yield ["setStateText", "GAME_RUNNING"];
+    const g = wine.toWinePath(join(gameDir, gameExecutable));
+    await wine.exec(`"${g}"`, [], {
+      WINEESYNC: "1",
+      WINEDEBUG: "-all",
+      LANG: "zh_CN.UTF-8",
+      DXVK_HUD: "fps",
+      MVK_ALLOW_METAL_FENCES: "1",
+      WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+      DXVK_ASYNC: "1",
+    });
+  } catch (e) {
+    // it seems game crashed?
+    await log(JSON.stringify(e));
+  }
+
+  yield ["setStateText", "REVERT_PATCHING"];
+  yield* patchRevertProgram(gameDir, wine.prefix, "cn");
+}
+
+async function* checkIntegrityProgram({
+  gameDir,
+  remoteDir,
+  aria2,
+}: {
+  gameDir: string;
+  remoteDir: string;
+  aria2: Aria2;
+}): CommonUpdateProgram {
+  const entries: {
+    remoteName: string;
+    md5: string;
+    fileSize: number;
+  }[] = (await readAllLines(join(gameDir, "pkg_version")))
+    .filter((x) => x.trim() != "")
+    .map((x) => JSON.parse(x));
+  const toFix: {
+    remoteName: string;
+    md5: string;
+  }[] = [];
+  yield ["setStateText", "SCANNING_FILES"];
+  let count = 0;
+  for (const entry of entries) {
+    const localPath = join(gameDir, entry.remoteName);
+    try {
+      const fileStats = await stats(localPath);
+      if (fileStats.size !== entry.fileSize) {
+        throw new Error("Size not match");
+      }
+      const md5sum = await md5(localPath);
+      if (md5sum !== entry.md5) {
+        await log(`${md5sum} ${entry.md5} not match`);
+        throw new Error("Md5 not match");
+      }
+    } catch {
+      toFix.push(entry);
+    }
+    count++;
+    yield ["setProgress", (count / entries.length) * 100];
+  }
+  if (toFix.length == 0) {
+    return;
+  }
+  yield ["setUndeterminedProgress"];
+
+  yield ["setStateText", "FIXING_FILES"];
+  count = 0;
+  for (const entry of toFix) {
+    const localPath = join(gameDir, entry.remoteName);
+    const remotePath = join(remoteDir, entry.remoteName).replace(":/", "://"); //....join: wtf?
+    await log(remotePath);
+    await log(localPath);
+    for await (const progress of aria2.doStreamingDownload({
+      uri: remotePath,
+      absDst: localPath,
+    })) {
+      yield [
+        "setProgress",
+        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      ];
+    }
+    count++;
+    // yield ['setStateText', 'COMPLETE_FILE', count, toFix.length]
+  }
+}
+
+async function* downloadAndInstallGameProgram() {}
+
+// async function*
+async function checkGameFolder() {
+  return {
+    valid: false,
+  };
+}
+
+async function getGameVersion(gameDataDir: string) {
+  const ggmPath = join(gameDataDir, "globalgamemanagers");
+  await log(ggmPath);
+  const view = new Uint8Array(await readBinary(ggmPath));
+  await log(`read ${view.byteLength} bytes`);
+  const index = patternSearch(
+    view,
+    [
+      0x69, 0x63, 0x2e, 0x61, 0x70, 0x70, 0x2d, 0x63, 0x61, 0x74, 0x65, 0x67,
+      0x6f, 0x72, 0x79, 0x2e,
+    ]
+  );
+  if (index == -1) {
+    throw new Error("pattern not found"); //FIXME
+  } else {
+    const len = index + 120;
+    const v = new DataView(view.buffer);
+    const strlen = v.getUint32(len, true);
+    const str = String.fromCharCode(...view.slice(len + 4, len + strlen + 4));
+    return str.split("_")[0];
+  }
 }

@@ -1,7 +1,9 @@
+import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
+import { Github } from "./github";
 import {
-  exec,
+  exec as unixExec,
   fatal,
   getKey,
   log,
@@ -18,18 +20,42 @@ export async function createWine(options: {
   installDir: string;
   prefix: string;
 }) {
-  async function cmd(command: string, args: string[]) {}
+  async function cmd(command: string, args: string[]) {
+    return await exec("cmd", [command, ...args]);
+  }
 
-  async function launch(program: string) {}
+  async function exec(
+    program: string,
+    args: string[],
+    env?: { [key: string]: string }
+  ) {
+    return await unixExec(
+      join(options.installDir, "bin/wine64"),
+      program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
+      {
+        WINEPREFIX: `"${options.prefix}"`,
+        ...(env ?? {}),
+      }
+    );
+  }
 
-  return {};
+  function toWinePath(absPath: string) {
+    return "Z:" + absPath.replaceAll("/", "\\");
+  }
+
+  return {
+    exec,
+    cmd,
+    toWinePath,
+    prefix: options.prefix,
+  };
 }
 
 export type Wine = ReturnType<typeof createWine> extends Promise<infer T>
   ? T
   : never;
 
-export async function checkWine() {
+export async function checkWine(github: Github) {
   // TODO
   try {
     const wineState = await getKey("wine_state");
@@ -45,8 +71,9 @@ export async function checkWine() {
     // FIXME:
     return {
       wineReady: false,
-      wineUpdate:
-        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/wine.tar.gz",
+      wineUpdate: github.acceleratedPath(
+        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/wine.tar.gz"
+      ),
       wineUpdateTag: "gi-wine-1.0",
     } as const;
   }
@@ -80,7 +107,7 @@ export async function createWineInstallProgram({
 
     const wineBinaryDir = await resolve("./wine");
     await rmrf_dangerously(wineBinaryDir);
-    await exec("mkdir", ["-p", wineBinaryDir]);
+    await unixExec("mkdir", ["-p", wineBinaryDir]);
     const p = await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
     await log(p.stdOut);
     yield ["setStateText", "CONFIGURING_ENVIROMENT"];
@@ -88,17 +115,13 @@ export async function createWineInstallProgram({
     await xattrRemove("com.apple.quarantine", wineBinaryDir);
 
     const wine64Bin = await resolve("./wine/bin/wine64");
-    const d = await exec(
-      wine64Bin,
-      ["wineboot", "-u"],
-      { WINEPREFIX: `"${wineAbsPrefix}"` }
-    );
+    const d = await unixExec(wine64Bin, ["wineboot", "-u"], {
+      WINEPREFIX: `"${wineAbsPrefix}"`,
+    });
     await log(d.stdOut);
-    const g = await exec(
-      wine64Bin,
-      ["winecfg", "-v", "win10"],
-      { WINEPREFIX: `"${wineAbsPrefix}"` }
-    );
+    const g = await unixExec(wine64Bin, ["winecfg", "-v", "win10"], {
+      WINEPREFIX: `"${wineAbsPrefix}"`,
+    });
     await log(g.stdOut);
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);

@@ -47,6 +47,7 @@ jobs:
 
       - name: Build app
         run: |
+          ./configure.sh
           node ./build-app.js
 
       - name: Tar app

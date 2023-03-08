@@ -24,3 +24,8 @@ node_modules
 *.neu
 
 /wine*
+
+/external
+
+*.log
+*.dxvk-cache

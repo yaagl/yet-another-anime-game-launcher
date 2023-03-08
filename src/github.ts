@@ -21,8 +21,13 @@ export async function createGithubEndpoint() {
     })
   }
 
+  function acceleratedPath(path: string) {
+    return `${fastest}${path}`;
+  }
+
   return {
     api,
+    acceleratedPath
   };
 }
 

@@ -64,16 +64,6 @@ export async function createApp() {
     github,
     aria2,
   });
-  // return createCommonUpdateUI(async function *(){
-  //   yield ['setStateText','测试进度'];
-  //   for(let i=0;i<=100;i++) {
-  //     yield ['setProgress', i];
-  //     await wait(50);
-  //   }
-  //   yield ['setUndeterminedProgress'];
-  //   await wait(2000);
-  //   yield ['setStateText','完成'];
-  // });
   if (!latest) {
     if (
       await prompt(
@@ -85,19 +75,12 @@ export async function createApp() {
     }
   }
 
-  // return () => (
-  //   <div>
-  //     If you are seeing this, it means everything works fine!
-  //     <br /> Current version: {CURRENT_YAAGL_VERSION}
-  //   </div>
-  // );
-
-  const { wineReady, wineUpdate, wineUpdateTag } = await checkWine();
-  const prefixPath = await resolve("./wineprefix");
+  const { wineReady, wineUpdate, wineUpdateTag } = await checkWine(github);
+  const prefixPath = await resolve("./wineprefix"); // CHECK: hardcoded path?
   if (wineReady) {
     const wine = await createWine({
-      installDir: "FIXME",
-      prefix: "FIXME",
+      installDir: await resolve("./wine"), // CHECK: hardcoded path?
+      prefix: prefixPath,
     });
     return await createLauncher({ aria2, wine });
   } else {

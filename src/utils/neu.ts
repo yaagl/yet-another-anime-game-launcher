@@ -22,16 +22,18 @@ export async function exec(
           .map((key) => {
             return `${key}=${env[key]} `;
           })
-          .join()
+          .join("")
       : ""
   }"${await resolve(command)}" ${args
     .map((x) => {
-      if (x.startsWith('"')||x.startsWith("'")) return x;
+      if (x.startsWith('"') || x.startsWith("'")) return x;
       if (x.indexOf(" ") > -1) return `"${x}"`;
       return x;
     })
     .join(" ")}`;
-  const ret = sudo ? await runInSudo(cmd) : await Neutralino.os.execCommand(cmd, {});
+  const ret = sudo
+    ? await runInSudo(cmd)
+    : await Neutralino.os.execCommand(cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
       `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
@@ -41,9 +43,7 @@ export async function exec(
 }
 
 export async function runInSudo(command: string) {
-  command = command
-  .replaceAll('"', "\\\\\\\"")
-  .replaceAll("'", "\\'");
+  command = command.replaceAll('"', '\\\\\\"').replaceAll("'", "\\'");
   await log(command);
   return await Neutralino.os.execCommand(
     `osascript -e $'do shell script "${command}" with administrator privileges'`,
@@ -91,7 +91,7 @@ export function restart() {
 export async function fatal(error: any) {
   await Neutralino.os.showMessageBox(
     "Fatal error",
-    `${String(error)}`,
+    `${error instanceof Error ? String(error) : JSON.stringify(error)}`,
     "OK"
   );
   await shutdown();
@@ -117,6 +117,39 @@ export async function rmrf_dangerously(target: string) {
 export async function prompt(title: string, message: string) {
   const out = await Neutralino.os.showMessageBox(title, message, "YES_NO");
   return out == "YES";
+}
+
+export async function alert(title: string, message: string) {
+  return await Neutralino.os.showMessageBox(title, message, "OK");
+}
+
+export async function openDir(title: string) {
+  const out = await Neutralino.os.showFolderDialog(title, {});
+  return out;
+}
+
+export async function readBinary(path: string) {
+  return await Neutralino.filesystem.readBinaryFile(path);
+}
+
+export async function readAllLines(path: string) {
+  const content = await Neutralino.filesystem.readFile(path);
+  if (content.indexOf("\r\n") >= 0) {
+    return content.split("\r\n");
+  }
+  return content.split("\n");
+}
+
+export async function writeBinary(path: string, data: ArrayBuffer) {
+  return await Neutralino.filesystem.writeBinaryFile(path, data);
+}
+
+export async function removeFile(path: string) {
+  return await Neutralino.filesystem.removeFile(path);
+}
+
+export async function stats(path: string) {
+  return await Neutralino.filesystem.getStats(path);
 }
 
 const hooks: Array<(forced: boolean) => Promise<boolean>> = [];

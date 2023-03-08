@@ -6,7 +6,7 @@ export async function xattrRemove(attr: string, path: string) {
 
 export async function md5(path: string): Promise<string> {
   const p = await exec("md5", ["-q", await resolve(path)]);
-  return p.stdOut;
+  return p.stdOut.split('\n')[0];
 }
 
 export async function xdelta3(
