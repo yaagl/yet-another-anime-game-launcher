@@ -108,28 +108,30 @@ export async function createLauncher({
 
     const taskQueue: AsyncGenerator<any, void, () => CommonUpdateProgram> =
       (async function* () {
-        const task = yield 0;
-        setBusy(true);
-        try {
-          for await (const text of task()) {
-            switch (text[0]) {
-              case "setProgress":
-                setProgress(text[1]);
-                break;
-              case "setUndeterminedProgress":
-                setProgress(0);
-                break;
-              case "setStateText":
-                setStatusText(text[1]); //FIXME: locales
-                break;
+        while (true) {
+          const task = yield 0;
+          setBusy(true);
+          try {
+            for await (const text of task()) {
+              switch (text[0]) {
+                case "setProgress":
+                  setProgress(text[1]);
+                  break;
+                case "setUndeterminedProgress":
+                  setProgress(0);
+                  break;
+                case "setStateText":
+                  setStatusText(text[1]); //FIXME: locales
+                  break;
+              }
             }
+          } catch (e) {
+            // fatal
+            await fatal(e);
+            return;
           }
-        } catch (e) {
-          // fatal
-          await fatal(e);
-          return;
+          setBusy(false);
         }
-        setBusy(false);
       })();
     taskQueue.next(); // ignored anyway
 
@@ -237,7 +239,7 @@ export async function createLauncher({
                 <Button
                   mr="-1px"
                   disabled={programBusy()}
-                  onClick={onButtonClick}
+                  onClick={() => onButtonClick().catch(fatal)}
                 >
                   {_gameInstalled() ? "LAUNCH" : "INSTALL"}
                 </Button>
