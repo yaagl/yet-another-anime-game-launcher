@@ -24,6 +24,7 @@ import { createCommonUpdateUI } from "./common-update-ui";
 
 export async function createApp() {
   
+  await setKey("singleton", null);
 
   let aria2_port = 6868;
 
@@ -37,7 +38,8 @@ export async function createApp() {
   const github = await createGithubEndpoint();
   const aria2_session = await resolve("./aria2.session");
   await appendFile(aria2_session, "");
-  const pid = await spawn("./sidecar/aria2/aria2c", [
+  const pid = (await exec("echo", ["$PPID"])).stdOut.split("\n")[0];
+  await spawn("./sidecar/aria2/aria2c", [
     // "-q",
     "-d",
     "/",
@@ -53,12 +55,9 @@ export async function createApp() {
     `"${aria2_session}"`,
     `--pause`,
     `true`,
+    "--stop-with-process",
+    pid,
   ]);
-  addTerminationHook(async () => {
-    await log("killing process " + pid);
-    await exec("kill", [pid + ""]);
-    return true;
-  });
   const aria2 = await Promise.race([
     createAria2({ host: "127.0.0.1", port: aria2_port }),
     timeout(10000),
