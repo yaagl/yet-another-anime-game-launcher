@@ -23,14 +23,7 @@ import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 
 export async function createApp() {
-  try {
-    await getKey("singleton");
-    await alert("NOTE", "LAUNCHER_ALREADY_EXISTS");
-    Neutralino.app.exit(0);
-    return () => null;
-  } catch {
-    await setKey("singleton", "1");
-  }
+  
 
   let aria2_port = 6868;
 

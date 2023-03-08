@@ -152,10 +152,7 @@ export async function stats(path: string) {
   return await Neutralino.filesystem.getStats(path);
 }
 
-const hooks: Array<(forced: boolean) => Promise<boolean>> = [async ()=>{
-  await setKey("singleton", null);
-  return true;
-}];
+const hooks: Array<(forced: boolean) => Promise<boolean>> = [];
 
 export function addTerminationHook(fn: (forced: boolean) => Promise<boolean>) {
   hooks.push(fn);
