@@ -57,11 +57,11 @@ export function tar_extract(src: string, dst: string) {
 
 export async function spawn(command: string, args: string[]) {
   const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
-  const { pid } = await Neutralino.os.spawnProcess(cmd);
+  const { pid,id } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");
   await log(cmd);
-  return pid;
+  return {pid,id};
 }
 
 export async function getKey(key: string): Promise<string> {
@@ -142,6 +142,10 @@ export async function readAllLines(path: string) {
 
 export async function writeBinary(path: string, data: ArrayBuffer) {
   return await Neutralino.filesystem.writeBinaryFile(path, data);
+}
+
+export async function writeFile(path: string, data: string) {
+  return await Neutralino.filesystem.writeFile(path, data);
 }
 
 export async function removeFile(path: string) {

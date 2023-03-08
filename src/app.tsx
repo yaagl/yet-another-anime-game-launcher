@@ -41,7 +41,7 @@ export async function createApp() {
   const aria2_session = await resolve("./aria2.session");
   await appendFile(aria2_session, "");
   const pid = (await exec("echo", ["$PPID"])).stdOut.split("\n")[0];
-  const apid = await spawn("./sidecar/aria2/aria2c", [
+  const { pid: apid } = await spawn("./sidecar/aria2/aria2c", [
     // "-q",
     "-d",
     "/",

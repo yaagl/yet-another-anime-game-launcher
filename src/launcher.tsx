@@ -10,31 +10,27 @@ import {
   log,
   openDir,
   waitImageReady,
-  alert,
   readBinary,
   readAllLines,
   stats,
   fatal,
   setKey,
   removeFile,
-  wait,
+  humanFileSize,
+  writeFile,
 } from "./utils";
 import {
   Box,
   Button,
   ButtonGroup,
-  Center,
   Flex,
-  HStack,
   IconButton,
   Progress,
   ProgressIndicator,
-  Spacer,
-  VStack,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { batch, createSignal, onMount, Show } from "solid-js";
-import { join } from "path-browserify";
+import { batch, createSignal, Show } from "solid-js";
+import { basename, join } from "path-browserify";
 import { gt, lt } from "semver";
 import {
   patchProgram,
@@ -42,7 +38,7 @@ import {
   patternSearch,
   putLocal,
 } from "./patch";
-import { md5 } from "./utils/unix";
+import { doStreamUnzip, md5, mkdirp } from "./utils/unix";
 import { CommonUpdateProgram } from "./common-update-ui";
 import { Locale } from "./locale";
 
@@ -158,8 +154,6 @@ export async function createLauncher({
       })();
     taskQueue.next(); // ignored anyway
 
-    onMount(() => {});
-
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (_gameInstalled()) {
@@ -180,7 +174,24 @@ export async function createLauncher({
         try {
           await stats(join(selection, "pkg_version"));
         } catch {
-          await locale.alert("NOT_SUPPORTED_YET", "DOWNLOAD_FUNCTION_TBD");
+          taskQueue.next(async function* () {
+            yield* downloadAndInstallGameProgram({
+              aria2,
+              gameDir: selection,
+              gameFileZip: c.data.game.latest.path,
+              gameAudioZip: c.data.game.latest.voice_packs.find(
+                (x) => x.language == "zh-cn"
+              )!.path,
+              gameVersion: GAME_LATEST_VERSION,
+            });
+            // setGameInstalled
+            batch(() => {
+              setGameInstalled(true);
+              setGameInstallDir(selection);
+              setGameCurrentVersion(GAME_LATEST_VERSION);
+            });
+            await setKey("game_install_dir", selection);
+          });
           return;
         }
         const gameVersion = await getGameVersion(
@@ -197,23 +208,20 @@ export async function createLauncher({
           await locale.alert("NOT_SUPPORTED_YET", "UPGRADE_FUNCTION_TBD");
           return;
         }
-        try {
-          await stats(join(selection, "pkg_version"));
-          taskQueue.next(async function* () {
-            yield* checkIntegrityProgram({
-              aria2,
-              gameDir: selection,
-              remoteDir: c.data.game.latest.decompressed_path,
-            });
-            // setGameInstalled
-            batch(() => {
-              setGameInstalled(true);
-              setGameInstallDir(selection);
-              setGameCurrentVersion(gameVersion);
-            });
-            await setKey("game_install_dir", selection);
+        taskQueue.next(async function* () {
+          yield* checkIntegrityProgram({
+            aria2,
+            gameDir: selection,
+            remoteDir: c.data.game.latest.decompressed_path,
           });
-        } catch {}
+          // setGameInstalled
+          batch(() => {
+            setGameInstalled(true);
+            setGameInstallDir(selection);
+            setGameCurrentVersion(gameVersion);
+          });
+          await setKey("game_install_dir", selection);
+        });
       }
     }
 
@@ -424,7 +432,95 @@ async function* checkIntegrityProgram({
   }
 }
 
-async function* downloadAndInstallGameProgram() {}
+async function* downloadAndInstallGameProgram({
+  aria2,
+  gameFileZip,
+  gameAudioZip,
+  gameDir,
+  gameVersion,
+}: {
+  gameFileZip: string;
+  gameDir: string;
+  gameAudioZip: string;
+  gameVersion: string;
+  aria2: Aria2;
+}): CommonUpdateProgram {
+  // FIXME: remove hardcoded data
+  const gameChannel = 1;
+  const gameSubchannel = 1;
+  const gameCps = "pcadbdpz";
+
+  const downloadTmp = join(gameDir, ".ariatmp");
+  const gameFileTmp = join(downloadTmp, "game.zip");
+  const audioFileTmp = join(downloadTmp, "audio.zip");
+  await mkdirp(downloadTmp);
+  yield ["setUndeterminedProgress"];
+  yield ["setStateText", "ALLOCATING_FILE"];
+  let gameFileStart = false;
+  for await (const progress of aria2.doStreamingDownload({
+    uri: gameFileZip,
+    absDst: gameFileTmp,
+  })) {
+    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+      continue;
+    }
+    gameFileStart = true;
+    yield [
+      "setStateText",
+      "DOWNLOADING_FILE_PROGRESS",
+      basename(gameFileZip),
+      humanFileSize(Number(progress.downloadSpeed)),
+      humanFileSize(Number(progress.completedLength)),
+      humanFileSize(Number(progress.totalLength)),
+    ];
+    yield [
+      "setProgress",
+      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+    ];
+  }
+  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
+  for await (const [dec, total] of doStreamUnzip(gameFileTmp, gameDir)) {
+    yield ["setProgress", (dec / total) * 100];
+  }
+  await removeFile(gameFileTmp);
+  yield ["setUndeterminedProgress"];
+  yield ["setStateText", "ALLOCATING_FILE"];
+  gameFileStart = false;
+  for await (const progress of aria2.doStreamingDownload({
+    uri: gameAudioZip,
+    absDst: audioFileTmp,
+  })) {
+    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+      continue;
+    }
+    gameFileStart = true;
+    yield [
+      "setStateText",
+      "DOWNLOADING_FILE_PROGRESS",
+      basename(gameAudioZip),
+      humanFileSize(Number(progress.downloadSpeed)),
+      humanFileSize(Number(progress.completedLength)),
+      humanFileSize(Number(progress.totalLength)),
+    ];
+    yield [
+      "setProgress",
+      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+    ];
+  }
+  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
+  for await (const [dec, total] of doStreamUnzip(audioFileTmp, gameDir)) {
+    yield ["setProgress", (dec / total) * 100];
+  }
+  await removeFile(audioFileTmp);
+  await writeFile(
+    join(gameDir, "config.ini"),
+    `[General]
+game_version=${gameVersion}
+channel=${gameChannel}
+sub_channel=${gameSubchannel}
+cps=${gameCps}`
+  );
+}
 
 // async function*
 async function checkGameFolder() {

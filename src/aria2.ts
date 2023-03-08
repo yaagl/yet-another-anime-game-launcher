@@ -51,7 +51,7 @@ export async function createAria2({
       if (e && e["code"] == 1) {
         await rpc.addUri(options.uri, {
           gid,
-          "max-connection-per-server": 10,
+          "max-connection-per-server": 16,
           out: options.absDst,
           continue: false,
           "allow-overwrite": true, // in case control file broken

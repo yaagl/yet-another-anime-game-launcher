@@ -30,5 +30,9 @@ export default {
 
     // FIXME
     DOWNLOAD_FUNCTION_TBD: "启动器尚未实装下载游戏功能。",
-    UPGRADE_FUNCTION_TBD: "启动器尚未实装升级功能。"
+    UPGRADE_FUNCTION_TBD: "启动器尚未实装升级功能。",
+
+    DECOMPRESS_FILE_PROGRESS:"正在解压文件",
+    ALLOCATING_FILE: "正在分配磁盘空间",
+    DOWNLOADING_FILE_PROGRESS:"正在下载游戏文件：{0} ({2}/{3}) 速度：每秒{1}"
 }

@@ -33,5 +33,10 @@ const en: typeof zh_CN = {
 
   DOWNLOAD_FUNCTION_TBD: "",
   UPGRADE_FUNCTION_TBD: "",
+
+  DECOMPRESS_FILE_PROGRESS:"Decompressing files",
+  ALLOCATING_FILE: "Allocation files on disk",
+  DOWNLOADING_FILE_PROGRESS:"Downloading file: {0} ({2}/{3}) {1}/s"
+
 };
 export default en;
