@@ -7,6 +7,7 @@ import {
   fatal,
   getKey,
   log,
+  removeFile,
   resolve,
   restart,
   rmrf_dangerously,
@@ -93,9 +94,10 @@ export async function createWineInstallProgram({
 }) {
   async function* program(): CommonUpdateProgram {
     yield ["setStateText", "DOWNLOADING_ENVIROMENT"];
+    const wineTarPath = await resolve("./wine.tar.gz");
     for await (const progress of aria2.doStreamingDownload({
       uri: wineUpdateTarGzFile,
-      absDst: await resolve("./wine.tar.gz"),
+      absDst: wineTarPath,
     })) {
       yield [
         "setProgress",
@@ -108,8 +110,9 @@ export async function createWineInstallProgram({
     const wineBinaryDir = await resolve("./wine");
     await rmrf_dangerously(wineBinaryDir);
     await unixExec("mkdir", ["-p", wineBinaryDir]);
-    const p = await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
-    await log(p.stdOut);
+    await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
+    await removeFile(wineTarPath);
+    
     yield ["setStateText", "CONFIGURING_ENVIROMENT"];
 
     await xattrRemove("com.apple.quarantine", wineBinaryDir);
