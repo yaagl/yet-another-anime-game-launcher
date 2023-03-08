@@ -10,6 +10,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
 
   await execa("pnpm", ["exec", "vite", "build"]);
   await execa("pnpm", ["exec", "neu", "update"]);
+  await execa("cp", ["-R", "neutralinojs/.", "bin/."])
   // run neu build command
   await execa("pnpm", ["exec", "neu", "build"]);
 
