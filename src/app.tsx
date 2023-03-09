@@ -63,7 +63,11 @@ export async function createApp() {
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
-    await exec("kill", [apid + ""]);
+    try {
+      await exec("kill", [apid + ""]);
+    } catch {
+      await log("killing process failed?");
+    }
     return true;
   });
   const aria2 = await Promise.race([

@@ -23,8 +23,11 @@ import {
   Box,
   Button,
   ButtonGroup,
+  createDisclosure,
   Flex,
   IconButton,
+  Modal,
+  ModalOverlay,
   Progress,
   ProgressIndicator,
 } from "@hope-ui/solid";
@@ -41,6 +44,7 @@ import {
 import { doStreamUnzip, md5, mkdirp } from "./utils/unix";
 import { CommonUpdateProgram } from "./common-update-ui";
 import { Locale } from "./locale";
+import { createConfiguration, LauncherConfiguration } from "./config";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -108,6 +112,8 @@ export async function createLauncher({
     locale
   );
 
+  const { UI: ConfigurationUI, config } = await createConfiguration();
+
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
     // const bw = 136 / window.devicePixelRatio;
@@ -124,6 +130,7 @@ export async function createLauncher({
     const [gameCurrentVersion, setGameCurrentVersion] = createSignal(
       gameVersion ?? "0.0.0"
     );
+    const { isOpen, onOpen, onClose } = createDisclosure();
 
     const taskQueue: AsyncGenerator<any, void, () => CommonUpdateProgram> =
       (async function* () {
@@ -163,6 +170,7 @@ export async function createLauncher({
             gameDir: _gameInstallDir(),
             wine,
             gameExecutable: atob("WXVhblNoZW4uZXhl"),
+            config
           });
         });
       } else {
@@ -265,7 +273,10 @@ export async function createLauncher({
                   size="sm"
                   borderRadius={8}
                 >
-                  <ProgressIndicator style={"transition: none;"} borderRadius={8}></ProgressIndicator>
+                  <ProgressIndicator
+                    style={"transition: none;"}
+                    borderRadius={8}
+                  ></ProgressIndicator>
                 </Progress>
               </Show>
             </Box>
@@ -280,8 +291,10 @@ export async function createLauncher({
                     ? locale.get("LAUNCH")
                     : locale.get("INSTALL")}
                 </Button>
-                <Show when={false && _gameInstalled()}>
+                <Show when={_gameInstalled()}>
                   <IconButton
+                    onClick={onOpen}
+                    disabled={programBusy()}
                     fontSize={30}
                     aria-label="Settings"
                     icon={<IconSetting />}
@@ -289,6 +302,10 @@ export async function createLauncher({
                 </Show>
               </ButtonGroup>
             </Box>
+            <Modal centered opened={isOpen()} onClose={onClose}>
+              <ModalOverlay />
+              <ConfigurationUI onClose={onClose}></ConfigurationUI>
+            </Modal>
           </Flex>
         </Flex>
       </div>
@@ -297,32 +314,53 @@ export async function createLauncher({
 }
 
 import a from "../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
+import retina_on from "./constants/retina_on.reg?url";
+import retina_off from "./constants/retina_off.reg?url";
 async function* launchGameProgram({
   gameDir,
   gameExecutable,
   wine,
+  config,
 }: {
   gameDir: string;
   gameExecutable: string;
   wine: Wine;
+  config: LauncherConfiguration;
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
   yield* patchProgram(gameDir, wine.prefix, "cn");
 
-  await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   try {
-    await wine.exec("regedit", [
-      `"${wine.toWinePath(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"))}"`,
-    ]);
-    await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    await wine.exec("copy", [
-      `"${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}"`,
-      '"%TEMP%\\\\"',
-    ]);
-    await wine.exec("copy", [
-      `"${wine.toWinePath(join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw==")))}"`,
-      '"%WINDIR%\\\\system32\\\\"',
+    await Promise.all([
+      (async () => {
+        await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+        await wine.exec("regedit", [
+          `"${wine.toWinePath(
+            join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg")
+          )}"`,
+        ]);
+        await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+      })(),
+      wine.exec("copy", [
+        `"${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}"`,
+        '"%TEMP%\\\\"',
+      ]),
+      wine.exec("copy", [
+        `"${wine.toWinePath(join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw==")))}"`,
+        '"%WINDIR%\\\\system32\\\\"',
+      ]),
+      (async () => {
+        if (config.retina) {
+          await putLocal(retina_on, join(gameDir, "retina.reg"));
+        } else {
+          await putLocal(retina_off, join(gameDir, "retina.reg"));
+        }
+        await wine.exec("regedit", [
+          `"${wine.toWinePath(join(gameDir, "retina.reg"))}"`,
+        ]);
+        await removeFile(join(gameDir, "retina.reg"));
+      })(),
     ]);
   } catch (e) {
     yield* patchRevertProgram(gameDir, wine.prefix, "cn");
@@ -335,10 +373,10 @@ async function* launchGameProgram({
       WINEESYNC: "1",
       WINEDEBUG: "-all",
       LANG: "zh_CN.UTF-8",
-      DXVK_HUD: "fps",
+      DXVK_HUD: config.dxvkHud,
       MVK_ALLOW_METAL_FENCES: "1",
       WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-      DXVK_ASYNC: "1",
+      DXVK_ASYNC: config.dxvkAsync ? "1" : "",
     });
   } catch (e) {
     // it seems game crashed?
