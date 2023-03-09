@@ -265,7 +265,7 @@ export async function createLauncher({
                   size="sm"
                   borderRadius={8}
                 >
-                  <ProgressIndicator borderRadius={8}></ProgressIndicator>
+                  <ProgressIndicator style={"transition: none;"} borderRadius={8}></ProgressIndicator>
                 </Progress>
               </Show>
             </Box>
@@ -475,7 +475,9 @@ async function* downloadAndInstallGameProgram({
     ];
     yield [
       "setProgress",
-      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      Number(
+        (progress.completedLength * BigInt(10000)) / progress.totalLength
+      ) / 100,
     ];
   }
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
@@ -504,7 +506,9 @@ async function* downloadAndInstallGameProgram({
     ];
     yield [
       "setProgress",
-      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      Number(
+        (progress.completedLength * BigInt(10000)) / progress.totalLength
+      ) / 100,
     ];
   }
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
