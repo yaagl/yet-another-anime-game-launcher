@@ -29,3 +29,5 @@ node_modules
 
 *.log
 *.dxvk-cache
+
+.vscode
