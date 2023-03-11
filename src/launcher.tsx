@@ -443,7 +443,7 @@ async function* checkIntegrityProgram({
   }
   yield ["setUndeterminedProgress"];
 
-  yield ["setStateText", "FIXING_FILES", String(count), String(entries.length)];
+  yield ["setStateText", "FIXING_FILES", String(count), String(toFix.length)];
   count = 0;
   for (const entry of toFix) {
     const localPath = join(gameDir, entry.remoteName);
@@ -458,7 +458,7 @@ async function* checkIntegrityProgram({
         "setStateText",
         "FIXING_FILES",
         String(count),
-        String(entries.length),
+        String(toFix.length),
       ];
       yield [
         "setProgress",
