@@ -170,7 +170,7 @@ export async function createLauncher({
             gameDir: _gameInstallDir(),
             wine,
             gameExecutable: atob("WXVhblNoZW4uZXhl"),
-            config
+            config,
           });
         });
       } else {
@@ -332,44 +332,37 @@ async function* launchGameProgram({
   yield* patchProgram(gameDir, wine.prefix, "cn");
 
   try {
-    await Promise.all([
-      (async () => {
-        await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-        await wine.exec("regedit", [
-          `"${wine.toWinePath(
-            join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg")
-          )}"`,
-        ]);
-        await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-      })(),
-      wine.exec("copy", [
-        `"${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}"`,
-        '"%TEMP%\\\\"',
-      ]),
-      wine.exec("copy", [
-        `"${wine.toWinePath(join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw==")))}"`,
-        '"%WINDIR%\\\\system32\\\\"',
-      ]),
-      (async () => {
-        if (config.retina) {
-          await putLocal(retina_on, join(gameDir, "retina.reg"));
-        } else {
-          await putLocal(retina_off, join(gameDir, "retina.reg"));
-        }
-        await wine.exec("regedit", [
-          `"${wine.toWinePath(join(gameDir, "retina.reg"))}"`,
-        ]);
-        await removeFile(join(gameDir, "retina.reg"));
-      })(),
+    await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+    if (config.retina) {
+      await putLocal(retina_on, join(gameDir, "retina.reg"));
+    } else {
+      await putLocal(retina_off, join(gameDir, "retina.reg"));
+    }
+    const cmd = `@echo off
+  regedit "${wine.toWinePath(
+    join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg")
+  )}"
+  copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
+  copy "${wine.toWinePath(
+    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
+  )} "%WINDIR%\\system32\\"
+  regedit "${wine.toWinePath(join(gameDir, "retina.reg"))}"
+  `;
+    await writeFile(join(gameDir, "config.bat"), cmd);
+    await wine.exec("cmd", [
+      "/c",
+      `"${wine.toWinePath(join(gameDir, "config.bat"))}"`,
     ]);
+    await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+    await removeFile(join(gameDir, "retina.reg"));
+    await removeFile(join(gameDir, "config.bat"));
   } catch (e) {
     yield* patchRevertProgram(gameDir, wine.prefix, "cn");
     throw e;
   }
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const g = wine.toWinePath(join(gameDir, gameExecutable));
-    await wine.exec(`"${g}"`, [], {
+    await wine.exec(`"${wine.toWinePath(join(gameDir, gameExecutable))}"`, [], {
       WINEESYNC: "1",
       WINEDEBUG: "-all",
       LANG: "zh_CN.UTF-8",
@@ -562,13 +555,6 @@ channel=${gameChannel}
 sub_channel=${gameSubchannel}
 cps=${gameCps}`
   );
-}
-
-// async function*
-async function checkGameFolder() {
-  return {
-    valid: false,
-  };
 }
 
 async function getGameVersion(gameDataDir: string) {
