@@ -10,7 +10,7 @@ export async function createGithubEndpoint() {
         .then((x) => x.text())
         .then((x) => prefix)
     ),
-    timeout(20000),
+    timeout(5000),
   ]);
 
   fastest == "" || (await log(`Using github proxy ${fastest}`));
