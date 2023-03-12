@@ -139,21 +139,25 @@ export async function createWineInstallProgram({
         prefix: await resolve("./wineprefix"),
       });
       // backup
-      await wine.exec("reg", [
-        "export",
-        `"HKEY_CURRENT_USER\\Software\\${atob(
-          "bWlIb1lv"
-        )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
-        "backup1.reg",
-      ]);
-      await wine.exec("reg", [
-        "export",
-        `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
-        "backup2.reg",
-      ]);
+      try {
+        await wine.exec("reg", [
+          "export",
+          `"HKEY_CURRENT_USER\\Software\\${atob(
+            "bWlIb1lv"
+          )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
+          "backup1.reg",
+        ]);
+        await wine.exec("reg", [
+          "export",
+          `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
+          "backup2.reg",
+        ]);
+        existBackup = true;
+      } catch {
+        //failed to backup
+      }
       await rmrf_dangerously(wineBinaryDir);
       await rmrf_dangerously(wineAbsPrefix);
-      existBackup = true;
     } catch {}
     if (wineTag === "crossover") {
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
