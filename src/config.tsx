@@ -69,22 +69,24 @@ export async function createConfiguration({
     ...config,
     wine_tag: currentWineVersion,
   });
-  const [wineVersions, setwineVersions] = createSignal([
-    {
-      tag: currentWineVersion,
-      url: "not_applicable",
-    },
-  ]);
+  const [wineVersions, setwineVersions] = createSignal(
+    [
+      {
+        tag: currentWineVersion,
+        url: "not_applicable",
+      },
+    ].filter((x) => x.tag !== "crossover")
+  );
+  (async () => {
+    const versions = await wineVersionChecker.getAllReleases();
+    if (versions.find((x) => x.tag === currentWineVersion)) {
+      setwineVersions(versions);
+    } else {
+      setwineVersions((x) => [...x, ...versions]);
+    }
+  })();
   return {
     UI: function (props: { onClose: () => void }) {
-      onMount(async () => {
-        const versions = await wineVersionChecker.getAllReleases();
-        if (versions.find((x) => x.tag === currentWineVersion)) {
-          setwineVersions(versions);
-        } else {
-          setwineVersions((x) => [...x, ...versions]);
-        }
-      });
       async function onSave() {
         if (config.dxvkAsync != currentConfig().dxvkAsync) {
           config.dxvkAsync = currentConfig().dxvkAsync;
@@ -115,7 +117,7 @@ export async function createConfiguration({
             } else {
               setCurrentConfig((x) => {
                 return { ...x, wine_tag: currentWineVersion };
-              })
+              });
             }
           } else {
             await alert("启动器需要重启", "需要重启以更新wine版本");
