@@ -18,6 +18,8 @@ import {
   removeFile,
   humanFileSize,
   writeFile,
+  exec,
+  resolve,
 } from "./utils";
 import {
   Box,
@@ -329,51 +331,45 @@ async function* launchGameProgram({
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
-  yield* patchProgram(gameDir, wine.prefix, "cn");
 
+  await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  if (config.retina) {
+    await putLocal(retina_on, join(gameDir, "retina.reg"));
+  } else {
+    await putLocal(retina_off, join(gameDir, "retina.reg"));
+  }
+  const cmd = `@echo off
+cd "%~dp0"
+regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
+copy ${atob("bWh5cHJvdDMuc3lz")} "%TEMP%\\"
+copy ${atob("SG9Zb0tQcm90ZWN0LnN5cw==")} "%WINDIR%\\system32\\"
+regedit retina.reg
+YuanShen.exe`;
+  await writeFile(join(gameDir, "config.bat"), cmd);
+  yield* patchProgram(gameDir, wine.prefix, "cn");
+  await exec("mkdir", ["p", await resolve("./logs")]);
   try {
-    await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    if (config.retina) {
-      await putLocal(retina_on, join(gameDir, "retina.reg"));
-    } else {
-      await putLocal(retina_off, join(gameDir, "retina.reg"));
-    }
-    const cmd = `@echo off
-  regedit "${wine.toWinePath(
-    join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg")
-  )}"
-  copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
-  copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
-  )} "%WINDIR%\\system32\\"
-  regedit "${wine.toWinePath(join(gameDir, "retina.reg"))}"
-  `;
-    await writeFile(join(gameDir, "config.bat"), cmd);
-    await wine.exec("cmd", [
-      "/c",
-      `"${wine.toWinePath(join(gameDir, "config.bat"))}"`,
-    ]);
+    yield ["setStateText", "GAME_RUNNING"];
+    await wine.exec(
+      "cmd",
+      ["/c", `"${wine.toWinePath(join(gameDir, "config.bat"))}"`],
+      {
+        WINEESYNC: "1",
+        WINEDEBUG: "-all",
+        LANG: "zh_CN.UTF-8",
+        DXVK_HUD: config.dxvkHud,
+        MVK_ALLOW_METAL_FENCES: "1",
+        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+        DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+      },
+      `logs/game_${Date.now()}.log`
+    );
     await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
     await removeFile(join(gameDir, "retina.reg"));
     await removeFile(join(gameDir, "config.bat"));
-  } catch (e) {
-    yield* patchRevertProgram(gameDir, wine.prefix, "cn");
-    throw e;
-  }
-  try {
-    yield ["setStateText", "GAME_RUNNING"];
-    await wine.exec(`"${wine.toWinePath(join(gameDir, gameExecutable))}"`, [], {
-      WINEESYNC: "1",
-      WINEDEBUG: "-all",
-      LANG: "zh_CN.UTF-8",
-      DXVK_HUD: config.dxvkHud,
-      MVK_ALLOW_METAL_FENCES: "1",
-      WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-      DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-    });
-  } catch (e) {
+  } catch (e: any) {
     // it seems game crashed?
-    await log(JSON.stringify(e));
+    await log(String(e));
   }
 
   yield ["setStateText", "REVERT_PATCHING"];

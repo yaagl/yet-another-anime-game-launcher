@@ -30,7 +30,8 @@ export async function createWine(options: {
   async function exec(
     program: string,
     args: string[],
-    env?: { [key: string]: string }
+    env?: { [key: string]: string },
+    log_file: string | undefined = undefined
   ) {
     return await unixExec(
       join(options.installDir, "bin/wine64"),
@@ -38,7 +39,9 @@ export async function createWine(options: {
       {
         WINEPREFIX: `"${options.prefix}"`,
         ...(env ?? {}),
-      }
+      },
+      false,
+      log_file
     );
   }
 
