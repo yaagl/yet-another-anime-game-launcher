@@ -1,7 +1,7 @@
 import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
-import { Github } from "./github";
+import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
 import {
   exec as unixExec,
@@ -85,6 +85,32 @@ export async function checkWine(github: Github) {
   }
 }
 
+export async function createWineVersionChecker(github: Github) {
+  function getAllReleases() {
+    return github
+      .api("/repos/3shain/winecx/releases")
+      .then((x: GithubReleases) => {
+        return x.map((x) => {
+          return {
+            tag: x.tag_name,
+            url: github.acceleratedPath(x.assets.find((x) => x.name === "wine.tar.gz")!
+            .browser_download_url),
+          };
+        });
+      });
+  }
+
+  return {
+    getAllReleases,
+  };
+}
+
+export type WineVersionChecker = ReturnType<
+  typeof createWineVersionChecker
+> extends Promise<infer T>
+  ? T
+  : never;
+
 export async function createWineInstallProgram({
   // github:
   aria2,
@@ -100,6 +126,33 @@ export async function createWineInstallProgram({
   wineTag: string;
 }) {
   async function* program(): CommonUpdateProgram {
+    const wineBinaryDir = await resolve("./wine");
+    let existBackup = true;
+    try {
+      yield ["setStateText", "BACKUP_USER_DATA"];
+      await getKey("wine_tag");
+      // there is an existing wine
+      const wine = await createWine({
+        installDir: wineBinaryDir,
+        prefix: await resolve("./wineprefix"),
+      });
+      // backup
+      await wine.exec("reg", [
+        "export",
+        `"HKEY_CURRENT_USER\\Software\\${atob(
+          "bWlIb1lv"
+        )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
+        "backup1.reg",
+      ]);
+      await wine.exec("reg", [
+        "export",
+        `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
+        "backup2.reg",
+      ]);
+      await rmrf_dangerously(wineBinaryDir);
+      await rmrf_dangerously(wineAbsPrefix);
+      existBackup = true;
+    } catch {}
     yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
     const wineTarPath = await resolve("./wine.tar.gz");
     for await (const progress of aria2.doStreamingDownload({
@@ -110,17 +163,19 @@ export async function createWineInstallProgram({
         "setProgress",
         Number((progress.completedLength * BigInt(100)) / progress.totalLength),
       ];
-      yield ["setStateText", "DOWNLOADING_ENVIRONMENT_SPEED", `${humanFileSize(Number(progress.downloadSpeed))}`];
+      yield [
+        "setStateText",
+        "DOWNLOADING_ENVIRONMENT_SPEED",
+        `${humanFileSize(Number(progress.downloadSpeed))}`,
+      ];
     }
     yield ["setStateText", "EXTRACT_ENVIRONMENT"];
     yield ["setUndeterminedProgress"];
-
-    const wineBinaryDir = await resolve("./wine");
     await rmrf_dangerously(wineBinaryDir);
     await unixExec("mkdir", ["-p", wineBinaryDir]);
     await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
     await removeFile(wineTarPath);
-    
+
     yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
     await xattrRemove("com.apple.quarantine", wineBinaryDir);
@@ -133,11 +188,24 @@ export async function createWineInstallProgram({
     const g = await unixExec(wine64Bin, ["winecfg", "-v", "win10"], {
       WINEPREFIX: `"${wineAbsPrefix}"`,
     });
+
+    if (existBackup) {
+      yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
+      await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
+        WINEPREFIX: `"${wineAbsPrefix}"`,
+      });
+      await removeFile(await resolve("./backup1.reg"));
+      await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
+        WINEPREFIX: `"${wineAbsPrefix}"`,
+      });
+      await removeFile(await resolve("./backup2.reg"));
+    }
     await log(g.stdOut);
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);
     await setKey("wine_update_url", null);
     await setKey("wine_update_tag", null);
+    yield ["setStateText", "INSTALL_DONE"];
   }
 
   return createCommonUpdateUI(locale, program);

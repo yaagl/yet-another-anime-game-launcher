@@ -101,7 +101,7 @@ export async function createApp() {
       installDir: await resolve("./wine"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
-    return await createLauncher({ aria2, wine, locale });
+    return await createLauncher({ aria2, wine, locale, github });
   } else {
     return await createWineInstallProgram({
       aria2,

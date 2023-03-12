@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   FormControl,
   FormLabel,
   HStack,
@@ -21,8 +22,9 @@ import {
   SelectValue,
   VStack,
 } from "@hope-ui/solid";
-import { createSignal, For } from "solid-js";
-import { getKey, setKey } from "./utils";
+import { createSignal, For, onMount } from "solid-js";
+import { alert, getKey, setKey, _safeRelaunch } from "./utils";
+import { WineVersionChecker } from "./wine";
 
 export interface LauncherConfiguration {
   dxvkAsync: boolean;
@@ -36,7 +38,11 @@ const launcherDefaultOption: LauncherConfiguration = {
   dxvkHud: "fps",
 };
 
-export async function createConfiguration() {
+export async function createConfiguration({
+  wineVersionChecker,
+}: {
+  wineVersionChecker: WineVersionChecker;
+}) {
   let div: HTMLDivElement = null!;
   const config = { ...launcherDefaultOption };
   try {
@@ -48,12 +54,29 @@ export async function createConfiguration() {
   try {
     config.retina = (await getKey("config_retina")) == "true";
   } catch {}
+
+  const currentWineVersion = await getKey("wine_tag");
+  const [currentConfig, setCurrentConfig] = createSignal({
+    ...config,
+    wine_tag: currentWineVersion,
+  });
+  const [wineVersions, setwineVersions] = createSignal([
+    {
+      tag: currentWineVersion,
+      url: "not_applicable",
+    },
+  ]);
   return {
     UI: function (props: { onClose: () => void }) {
-      const [currentConfig, setCurrentConfig] = createSignal(config);
-
+      onMount(async () => {
+        const versions = await wineVersionChecker.getAllReleases();
+        if (versions.find((x) => x.tag === currentWineVersion)) {
+          setwineVersions(versions);
+        } else {
+          setwineVersions((x) => [...x, ...versions]);
+        }
+      });
       async function onSave() {
-        // if(currentConfig().)
         if (config.dxvkAsync != currentConfig().dxvkAsync) {
           config.dxvkAsync = currentConfig().dxvkAsync;
           await setKey("config_dxvkAsyc", config.dxvkAsync ? "true" : "false");
@@ -66,6 +89,19 @@ export async function createConfiguration() {
           config.retina = currentConfig().retina;
           await setKey("config_retina", config.retina ? "true" : "false");
         }
+        if (currentWineVersion != currentConfig().wine_tag) {
+          await alert("启动器需要重启", "需要重启以更新wine版本");
+          // await setKey("")
+          await setKey("wine_state", "update");
+          const tag = currentConfig().wine_tag;
+          await setKey("wine_update_tag", tag);
+          await setKey(
+            "wine_update_url",
+            wineVersions().find((x) => x.tag == tag)!.url
+          );
+          await _safeRelaunch();
+          return;
+        }
         props.onClose();
       }
       return (
@@ -73,6 +109,36 @@ export async function createConfiguration() {
           <ModalHeader>设置</ModalHeader>
           <ModalBody ref={div}>
             <VStack spacing={"$4"}>
+              <FormControl id="wineVersion">
+                <FormLabel>Wine 版本</FormLabel>
+                <Select
+                  value={currentConfig().wine_tag}
+                  onChange={(value) =>
+                    setCurrentConfig((x) => {
+                      return { ...x, wine_tag: value };
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectPlaceholder>Choose an option</SelectPlaceholder>
+                    <SelectValue />
+                    <SelectIcon />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectListbox>
+                      <For each={wineVersions()}>
+                        {(item) => (
+                          <SelectOption value={item.tag}>
+                            <SelectOptionText>{item.tag}</SelectOptionText>
+                            <SelectOptionIndicator />
+                          </SelectOption>
+                        )}
+                      </For>
+                    </SelectListbox>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <Divider />
               <FormControl id="dvxkAsync" mb="$4">
                 <FormLabel>dxvk shader 异步编译模式 (推荐开启)</FormLabel>
                 <Box>

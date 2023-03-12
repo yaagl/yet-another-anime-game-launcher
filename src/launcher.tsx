@@ -1,5 +1,5 @@
 import { Aria2 } from "./aria2";
-import { Wine } from "./wine";
+import { createWineVersionChecker, Wine } from "./wine";
 import {
   CN_SERVER,
   ServerContentData,
@@ -18,7 +18,6 @@ import {
   removeFile,
   humanFileSize,
   writeFile,
-  exec,
   resolve,
 } from "./utils";
 import {
@@ -47,6 +46,7 @@ import { doStreamUnzip, md5, mkdirp } from "./utils/unix";
 import { CommonUpdateProgram } from "./common-update-ui";
 import { Locale } from "./locale";
 import { createConfiguration, LauncherConfiguration } from "./config";
+import { Github } from "./github";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -99,10 +99,12 @@ export async function createLauncher({
   aria2,
   wine,
   locale,
+  github,
 }: {
   aria2: Aria2;
   wine: Wine;
   locale: Locale;
+  github: Github;
 }) {
   const server = CN_SERVER;
   const b: ServerContentData = await (await fetch(server.bg_url)).json();
@@ -114,7 +116,9 @@ export async function createLauncher({
     locale
   );
 
-  const { UI: ConfigurationUI, config } = await createConfiguration();
+  const { UI: ConfigurationUI, config } = await createConfiguration({
+    wineVersionChecker: await createWineVersionChecker(github),
+  });
 
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
@@ -347,7 +351,7 @@ regedit retina.reg
 YuanShen.exe`;
   await writeFile(join(gameDir, "config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, "cn");
-  await exec("mkdir", ["p", await resolve("./logs")]);
+  await mkdirp(await resolve("./logs"));
   try {
     yield ["setStateText", "GAME_RUNNING"];
     await wine.exec(

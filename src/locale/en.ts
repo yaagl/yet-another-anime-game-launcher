@@ -36,7 +36,11 @@ const en: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS:"Decompressing files",
   ALLOCATING_FILE: "Allocation files on disk",
-  DOWNLOADING_FILE_PROGRESS:"Downloading file: {0} ({2}/{3}) {1}/s"
+  DOWNLOADING_FILE_PROGRESS:"Downloading file: {0} ({2}/{3}) {1}/s",
 
+  BACKUP_USER_DATA: "Back up user data",
+  RECOVER_BACKUP_USER_DATA: "Recover backup",
+
+  INSTALL_DONE: "Done",
 };
 export default en;
