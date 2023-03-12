@@ -34,5 +34,10 @@ export default {
 
     DECOMPRESS_FILE_PROGRESS:"正在解压文件",
     ALLOCATING_FILE: "正在分配磁盘空间",
-    DOWNLOADING_FILE_PROGRESS:"正在下载游戏文件：{0} ({2}/{3}) 速度：每秒{1}"
+    DOWNLOADING_FILE_PROGRESS:"正在下载游戏文件：{0} ({2}/{3}) 速度：每秒{1}",
+
+    BACKUP_USER_DATA: "正在备份用户数据",
+    RECOVER_BACKUP_USER_DATA: "正在还原备份用户数据",
+
+    INSTALL_DONE: "安装成功",
 }

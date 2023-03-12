@@ -8,13 +8,9 @@ export async function createGithubEndpoint() {
     ...END_POINTS.map((prefix) =>
       fetch(`${prefix}https://api.github.com/octocat`)
         .then((x) => x.text())
-        .then(() => fetch(`${prefix}https://api.github.com/octocat`))
-        .then((x) => x.text())
-        .then(() => fetch(`${prefix}https://api.github.com/octocat`))
-        .then((x) => x.text())
         .then((x) => prefix)
     ),
-    timeout(20000),
+    timeout(5000),
   ]);
 
   fastest == "" || (await log(`Using github proxy ${fastest}`));
@@ -45,3 +41,31 @@ export type Github = ReturnType<typeof createGithubEndpoint> extends Promise<
 >
   ? T
   : never;
+
+
+
+export interface GithubReleaseInfo {
+  url: string;
+  html_url: string;
+  assets_url: string;
+  id: number;
+  tag_name: string;
+  name: string;
+  body: string;
+  draft: boolean;
+  prerelease: boolean;
+  created_at: string;
+  published_at: string;
+  author: {};
+  assets: GithubReleaseAssetsInfo[];
+}
+
+export interface GithubReleaseAssetsInfo {
+  url: string;
+  browser_download_url: string;
+  id: number;
+  name: string;
+  content_type: string;
+}
+
+export type GithubReleases = GithubReleaseInfo[]

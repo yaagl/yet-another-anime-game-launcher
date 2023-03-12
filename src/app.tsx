@@ -23,6 +23,7 @@ import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import zh_CN from "./locale/zh_CN";
+import { CROSSOVER_LOADER } from "./crossover";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -94,14 +95,19 @@ export async function createApp() {
     }
   }
 
-  const { wineReady, wineUpdate, wineUpdateTag } = await checkWine(github);
+  const { wineReady, wineUpdate, wineUpdateTag, wineTag } = await checkWine(
+    github
+  );
   const prefixPath = await resolve("./wineprefix"); // CHECK: hardcoded path?
   if (wineReady) {
     const wine = await createWine({
-      installDir: await resolve("./wine"), // CHECK: hardcoded path?
+      loaderBin:
+        wineTag == "crossover"
+          ? CROSSOVER_LOADER
+          : await resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
-    return await createLauncher({ aria2, wine, locale });
+    return await createLauncher({ aria2, wine, locale, github });
   } else {
     return await createWineInstallProgram({
       aria2,

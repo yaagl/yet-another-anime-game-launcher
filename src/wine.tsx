@@ -1,26 +1,24 @@
 import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
-import { Github } from "./github";
+import { CROSSOVER_LOADER } from "./crossover";
+import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
 import {
   exec as unixExec,
-  fatal,
   getKey,
   humanFileSize,
   log,
   removeFile,
   resolve,
-  restart,
   rmrf_dangerously,
   setKey,
   tar_extract,
-  wait,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
 
 export async function createWine(options: {
-  installDir: string;
+  loaderBin: string;
   prefix: string;
 }) {
   async function cmd(command: string, args: string[]) {
@@ -30,15 +28,18 @@ export async function createWine(options: {
   async function exec(
     program: string,
     args: string[],
-    env?: { [key: string]: string }
+    env?: { [key: string]: string },
+    log_file: string | undefined = undefined
   ) {
     return await unixExec(
-      join(options.installDir, "bin/wine64"),
+      options.loaderBin,
       program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
       {
         WINEPREFIX: `"${options.prefix}"`,
         ...(env ?? {}),
-      }
+      },
+      false,
+      log_file
     );
   }
 
@@ -59,7 +60,6 @@ export type Wine = ReturnType<typeof createWine> extends Promise<infer T>
   : never;
 
 export async function checkWine(github: Github) {
-  // TODO
   try {
     const wineState = await getKey("wine_state");
     if (wineState == "update") {
@@ -69,7 +69,7 @@ export async function checkWine(github: Github) {
         wineUpdateTag: await getKey("wine_update_tag"),
       } as const;
     }
-    return { wineReady: true } as const;
+    return { wineReady: true, wineTag: await getKey("wine_tag") } as const;
   } catch (e) {
     // FIXME:
     return {
@@ -81,6 +81,34 @@ export async function checkWine(github: Github) {
     } as const;
   }
 }
+
+export async function createWineVersionChecker(github: Github) {
+  function getAllReleases() {
+    return github
+      .api("/repos/3shain/winecx/releases")
+      .then((x: GithubReleases) => {
+        return x.map((x) => {
+          return {
+            tag: x.tag_name,
+            url: github.acceleratedPath(
+              x.assets.find((x) => x.name === "wine.tar.gz")!
+                .browser_download_url
+            ),
+          };
+        });
+      });
+  }
+
+  return {
+    getAllReleases,
+  };
+}
+
+export type WineVersionChecker = ReturnType<
+  typeof createWineVersionChecker
+> extends Promise<infer T>
+  ? T
+  : never;
 
 export async function createWineInstallProgram({
   // github:
@@ -97,32 +125,77 @@ export async function createWineInstallProgram({
   wineTag: string;
 }) {
   async function* program(): CommonUpdateProgram {
-    yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-    const wineTarPath = await resolve("./wine.tar.gz");
-    for await (const progress of aria2.doStreamingDownload({
-      uri: wineUpdateTarGzFile,
-      absDst: wineTarPath,
-    })) {
-      yield [
-        "setProgress",
-        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
-      ];
-      yield ["setStateText", "DOWNLOADING_ENVIRONMENT_SPEED", `${humanFileSize(Number(progress.downloadSpeed))}`];
-    }
-    yield ["setStateText", "EXTRACT_ENVIRONMENT"];
-    yield ["setUndeterminedProgress"];
-
     const wineBinaryDir = await resolve("./wine");
-    await rmrf_dangerously(wineBinaryDir);
-    await unixExec("mkdir", ["-p", wineBinaryDir]);
-    await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
-    await removeFile(wineTarPath);
-    
-    yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+    let existBackup = false;
+    try {
+      yield ["setStateText", "BACKUP_USER_DATA"];
+      const currentTag = await getKey("wine_tag");
+      // there is an existing wine
+      const wine = await createWine({
+        loaderBin:
+          currentTag === "crossover"
+            ? CROSSOVER_LOADER
+            : join(wineBinaryDir, "bin", "wine64"),
+        prefix: await resolve("./wineprefix"),
+      });
+      // backup
+      try {
+        await wine.exec("reg", [
+          "export",
+          `"HKEY_CURRENT_USER\\Software\\${atob(
+            "bWlIb1lv"
+          )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
+          "backup1.reg",
+        ]);
+        await wine.exec("reg", [
+          "export",
+          `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
+          "backup2.reg",
+        ]);
+        existBackup = true;
+      } catch {
+        //failed to backup
+      }
+      await rmrf_dangerously(wineBinaryDir);
+      await rmrf_dangerously(wineAbsPrefix);
+    } catch {}
+    if (wineTag === "crossover") {
+      yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+    } else {
+      yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
+      const wineTarPath = await resolve("./wine.tar.gz");
+      for await (const progress of aria2.doStreamingDownload({
+        uri: wineUpdateTarGzFile,
+        absDst: wineTarPath,
+      })) {
+        yield [
+          "setProgress",
+          Number(
+            (progress.completedLength * BigInt(100)) / progress.totalLength
+          ),
+        ];
+        yield [
+          "setStateText",
+          "DOWNLOADING_ENVIRONMENT_SPEED",
+          `${humanFileSize(Number(progress.downloadSpeed))}`,
+        ];
+      }
+      yield ["setStateText", "EXTRACT_ENVIRONMENT"];
+      yield ["setUndeterminedProgress"];
+      await rmrf_dangerously(wineBinaryDir);
+      await unixExec("mkdir", ["-p", wineBinaryDir]);
+      await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
+      await removeFile(wineTarPath);
 
-    await xattrRemove("com.apple.quarantine", wineBinaryDir);
+      yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
-    const wine64Bin = await resolve("./wine/bin/wine64");
+      await xattrRemove("com.apple.quarantine", wineBinaryDir);
+    }
+
+    const wine64Bin =
+      wineTag === "crossover"
+        ? CROSSOVER_LOADER
+        : await resolve("./wine/bin/wine64");
     const d = await unixExec(wine64Bin, ["wineboot", "-u"], {
       WINEPREFIX: `"${wineAbsPrefix}"`,
     });
@@ -130,11 +203,24 @@ export async function createWineInstallProgram({
     const g = await unixExec(wine64Bin, ["winecfg", "-v", "win10"], {
       WINEPREFIX: `"${wineAbsPrefix}"`,
     });
+
+    if (existBackup) {
+      yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
+      await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
+        WINEPREFIX: `"${wineAbsPrefix}"`,
+      });
+      await removeFile(await resolve("./backup1.reg"));
+      await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
+        WINEPREFIX: `"${wineAbsPrefix}"`,
+      });
+      await removeFile(await resolve("./backup2.reg"));
+    }
     await log(g.stdOut);
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);
     await setKey("wine_update_url", null);
     await setKey("wine_update_tag", null);
+    yield ["setStateText", "INSTALL_DONE"];
   }
 
   return createCommonUpdateUI(locale, program);

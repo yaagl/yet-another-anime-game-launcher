@@ -1,5 +1,5 @@
 import { Aria2 } from "./aria2";
-import { Wine } from "./wine";
+import { createWineVersionChecker, Wine } from "./wine";
 import {
   CN_SERVER,
   ServerContentData,
@@ -18,6 +18,7 @@ import {
   removeFile,
   humanFileSize,
   writeFile,
+  resolve,
 } from "./utils";
 import {
   Box,
@@ -45,6 +46,7 @@ import { doStreamUnzip, md5, mkdirp } from "./utils/unix";
 import { CommonUpdateProgram } from "./common-update-ui";
 import { Locale } from "./locale";
 import { createConfiguration, LauncherConfiguration } from "./config";
+import { Github } from "./github";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -97,10 +99,12 @@ export async function createLauncher({
   aria2,
   wine,
   locale,
+  github,
 }: {
   aria2: Aria2;
   wine: Wine;
   locale: Locale;
+  github: Github;
 }) {
   const server = CN_SERVER;
   const b: ServerContentData = await (await fetch(server.bg_url)).json();
@@ -112,7 +116,9 @@ export async function createLauncher({
     locale
   );
 
-  const { UI: ConfigurationUI, config } = await createConfiguration();
+  const { UI: ConfigurationUI, config } = await createConfiguration({
+    wineVersionChecker: await createWineVersionChecker(github),
+  });
 
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
@@ -329,51 +335,45 @@ async function* launchGameProgram({
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
-  yield* patchProgram(gameDir, wine.prefix, "cn");
 
+  await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  if (config.retina) {
+    await putLocal(retina_on, join(gameDir, "retina.reg"));
+  } else {
+    await putLocal(retina_off, join(gameDir, "retina.reg"));
+  }
+  const cmd = `@echo off
+cd "%~dp0"
+regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
+copy ${atob("bWh5cHJvdDMuc3lz")} "%TEMP%\\"
+copy ${atob("SG9Zb0tQcm90ZWN0LnN5cw==")} "%WINDIR%\\system32\\"
+regedit retina.reg
+${gameExecutable}`;
+  await writeFile(join(gameDir, "config.bat"), cmd);
+  yield* patchProgram(gameDir, wine.prefix, "cn");
+  await mkdirp(await resolve("./logs"));
   try {
-    await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    if (config.retina) {
-      await putLocal(retina_on, join(gameDir, "retina.reg"));
-    } else {
-      await putLocal(retina_off, join(gameDir, "retina.reg"));
-    }
-    const cmd = `@echo off
-  regedit "${wine.toWinePath(
-    join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg")
-  )}"
-  copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
-  copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
-  )} "%WINDIR%\\system32\\"
-  regedit "${wine.toWinePath(join(gameDir, "retina.reg"))}"
-  `;
-    await writeFile(join(gameDir, "config.bat"), cmd);
-    await wine.exec("cmd", [
-      "/c",
-      `"${wine.toWinePath(join(gameDir, "config.bat"))}"`,
-    ]);
+    yield ["setStateText", "GAME_RUNNING"];
+    await wine.exec(
+      "cmd",
+      ["/c", `"${wine.toWinePath(join(gameDir, "config.bat"))}"`],
+      {
+        WINEESYNC: "1",
+        WINEDEBUG: "-all",
+        LANG: "zh_CN.UTF-8",
+        DXVK_HUD: config.dxvkHud,
+        MVK_ALLOW_METAL_FENCES: "1",
+        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+        DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+      },
+      `logs/game_${Date.now()}.log`
+    );
     await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
     await removeFile(join(gameDir, "retina.reg"));
     await removeFile(join(gameDir, "config.bat"));
-  } catch (e) {
-    yield* patchRevertProgram(gameDir, wine.prefix, "cn");
-    throw e;
-  }
-  try {
-    yield ["setStateText", "GAME_RUNNING"];
-    await wine.exec(`"${wine.toWinePath(join(gameDir, gameExecutable))}"`, [], {
-      WINEESYNC: "1",
-      WINEDEBUG: "-all",
-      LANG: "zh_CN.UTF-8",
-      DXVK_HUD: config.dxvkHud,
-      MVK_ALLOW_METAL_FENCES: "1",
-      WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-      DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-    });
-  } catch (e) {
+  } catch (e: any) {
     // it seems game crashed?
-    await log(JSON.stringify(e));
+    await log(String(e));
   }
 
   yield ["setStateText", "REVERT_PATCHING"];

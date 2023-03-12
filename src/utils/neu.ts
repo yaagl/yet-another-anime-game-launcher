@@ -14,7 +14,8 @@ export async function exec(
   command: string,
   args: string[],
   env?: { [key: string]: string },
-  sudo: boolean = false
+  sudo: boolean = false,
+  log_redirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = `${
     env && typeof env == "object"
@@ -30,7 +31,8 @@ export async function exec(
       if (x.indexOf(" ") > -1) return `"${x}"`;
       return x;
     })
-    .join(" ")}`;
+    .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
+
   const ret = sudo
     ? await runInSudo(cmd)
     : await Neutralino.os.execCommand(cmd, {});
@@ -41,6 +43,60 @@ export async function exec(
   }
   return ret;
 }
+
+// export async function exec2(
+//   command: string,
+//   args: string[],
+//   env?: { [key: string]: string }
+// ): Promise<Neutralino.os.ExecCommandResult> {
+//   const cmd = `${
+//     env && typeof env == "object"
+//       ? Object.keys(env)
+//           .map((key) => {
+//             return `${key}=${env[key]} `;
+//           })
+//           .join("")
+//       : ""
+//   }("${await resolve(command)}" ${args
+//     .map((x) => {
+//       if (x.startsWith('"') || x.startsWith("'")) return x;
+//       if (x.indexOf(" ") > -1) return `"${x}"`;
+//       return x;
+//     })
+//     .join(" ")}) &> shut_the_fuck_up.log`;
+//   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
+//   return await new Promise((resolve, reject) => {
+//     const handler: Neutralino.events.Handler<
+//       Neutralino.os.SpawnProcessResult
+//     > = (event) => {
+//       log(JSON.stringify(event!.detail));
+//       if (event!.detail.id == id) {
+//         if ((event!.detail as any)["action"] == "exit") {
+//           const exit = Number((event!.detail as any)["data"]);
+//           if (exit == 0) {
+//             resolve({
+//               pid,
+//               exitCode: exit,
+//               stdErr: "",
+//               stdOut: "",
+//             });
+//           } else {
+//             reject(new Error("EXIT CODE NOT ZERO"));
+//           }
+
+//           Neutralino.events.off("spawnedProcess", handler);
+//         }
+//       }
+//     };
+//     Neutralino.events.on("spawnedProcess", handler);
+//     // if (ret.exitCode != 0) {
+//     //   throw new Error(
+//     //     `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
+//     //   );
+//     // }
+//     // return ret;
+//   });
+// }
 
 export async function runInSudo(command: string) {
   command = command.replaceAll('"', '\\\\\\"').replaceAll("'", "\\'");
@@ -57,11 +113,11 @@ export function tar_extract(src: string, dst: string) {
 
 export async function spawn(command: string, args: string[]) {
   const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
-  const { pid,id } = await Neutralino.os.spawnProcess(cmd);
+  const { pid, id } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");
   await log(cmd);
-  return {pid,id};
+  return { pid, id };
 }
 
 export async function getKey(key: string): Promise<string> {
@@ -182,5 +238,20 @@ export async function GLOBAL_onClose(forced: boolean) {
 export async function shutdown() {
   for (const hook of hooks.reverse()) {
     await hook(true);
+  }
+}
+
+export async function _safeRelaunch() {
+  await shutdown();
+  // await wait(1000);
+  // HACK
+  if (import.meta.env.PROD) {
+    const app = await Neutralino.os.getEnv("PATH_LAUNCH");
+    await Neutralino.os.execCommand(`open "${app}"`, {
+      background: true,
+    });
+    Neutralino.app.exit(0);
+  } else {
+    Neutralino.app.restartProcess();
   }
 }
