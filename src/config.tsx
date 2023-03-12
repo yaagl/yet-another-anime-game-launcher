@@ -23,7 +23,8 @@ import {
   VStack,
 } from "@hope-ui/solid";
 import { createSignal, For, onMount } from "solid-js";
-import { alert, getKey, setKey, _safeRelaunch } from "./utils";
+import { checkCrossover } from "./crossover";
+import { alert, getKey, prompt, setKey, _safeRelaunch } from "./utils";
 import { WineVersionChecker } from "./wine";
 
 export interface LauncherConfiguration {
@@ -56,6 +57,14 @@ export async function createConfiguration({
   } catch {}
 
   const currentWineVersion = await getKey("wine_tag");
+  const crossoverVersion = (await checkCrossover())
+    ? [
+        {
+          tag: "crossover",
+          url: "not_applicable",
+        },
+      ]
+    : [];
   const [currentConfig, setCurrentConfig] = createSignal({
     ...config,
     wine_tag: currentWineVersion,
@@ -90,16 +99,37 @@ export async function createConfiguration({
           await setKey("config_retina", config.retina ? "true" : "false");
         }
         if (currentWineVersion != currentConfig().wine_tag) {
-          await alert("启动器需要重启", "需要重启以更新wine版本");
-          // await setKey("")
-          await setKey("wine_state", "update");
-          const tag = currentConfig().wine_tag;
-          await setKey("wine_update_tag", tag);
-          await setKey(
-            "wine_update_url",
-            wineVersions().find((x) => x.tag == tag)!.url
-          );
-          await _safeRelaunch();
+          if (currentConfig().wine_tag == "crossover") {
+            if (
+              (await prompt(
+                "CrossOver",
+                `CrossOver自带的MoltenVK版本过低，无法正常运行。如果你没有手动更新过文件，请参考一下教程 https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%9C%80%E6%96%B0%E7%89%88MoltenVK
+如果不确定要如何操作，你现在可以取消。
+确认操作后启动器将重启`
+              )) == true
+            ) {
+              await setKey("wine_state", "update");
+              await setKey("wine_update_tag", "crossover");
+              await setKey("wine_update_url", "");
+              await _safeRelaunch();
+            } else {
+              setCurrentConfig((x) => {
+                return { ...x, wine_tag: currentWineVersion };
+              })
+            }
+          } else {
+            await alert("启动器需要重启", "需要重启以更新wine版本");
+            // await setKey("")
+            await setKey("wine_state", "update");
+            const tag = currentConfig().wine_tag;
+            await setKey("wine_update_tag", tag);
+            await setKey(
+              "wine_update_url",
+              wineVersions().find((x) => x.tag == tag)!.url
+            );
+            await _safeRelaunch();
+          }
+
           return;
         }
         props.onClose();
@@ -126,7 +156,7 @@ export async function createConfiguration({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectListbox>
-                      <For each={wineVersions()}>
+                      <For each={[...wineVersions(), ...crossoverVersion]}>
                         {(item) => (
                           <SelectOption value={item.tag}>
                             <SelectOptionText>{item.tag}</SelectOptionText>
