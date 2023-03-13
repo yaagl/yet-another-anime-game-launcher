@@ -146,11 +146,13 @@ export async function createWineInstallProgram({
             "bWlIb1lv"
           )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
           "backup1.reg",
+          "/y"
         ]);
         await wine.exec("reg", [
           "export",
           `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
           "backup2.reg",
+          "/y"
         ]);
         existBackup = true;
       } catch {
