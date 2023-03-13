@@ -1,3 +1,5 @@
+base64 -d -i ./src/constants/server_secret.b64 -o ./src/constants/server_secret.ts
+
 EXTERNAL="./external"
 
 rm -rf "$EXTERNAL"

@@ -1,7 +1,7 @@
 import { Aria2 } from "./aria2";
 import { createWineVersionChecker, Wine } from "./wine";
 import {
-  CN_SERVER,
+  Server,
   ServerContentData,
   ServerVersionData,
 } from "./constants/server";
@@ -63,7 +63,7 @@ const IconSetting = createIcon({
 
 const CURRENT_SUPPORTED_VERSION = "3.5.0";
 
-export async function checkGameState(locale: Locale) {
+export async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";
   try {
     gameDir = await getKey("game_install_dir");
@@ -76,7 +76,7 @@ export async function checkGameState(locale: Locale) {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, CN_SERVER.dataDir)), //FIXME:
+      gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
     } as const;
   } catch {
     await locale.alert("CANT_OPEN_GAME_FILE", "CANT_OPEN_GAME_FILE_DESC");
@@ -90,7 +90,7 @@ export async function checkGameState(locale: Locale) {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, CN_SERVER.dataDir)), //FIXME:
+      gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
     } as const;
   }
 }
@@ -100,20 +100,43 @@ export async function createLauncher({
   wine,
   locale,
   github,
+  server,
 }: {
   aria2: Aria2;
   wine: Wine;
   locale: Locale;
   github: Github;
+  server: Server;
 }) {
-  const server = CN_SERVER;
-  const b: ServerContentData = await (await fetch(server.bg_url)).json();
-  const c: ServerVersionData = await (await fetch(server.url)).json();
-  const GAME_LATEST_VERSION = c.data.game.latest.version;
-  await waitImageReady(b.data.adv.background);
+  const {
+    data: {
+      adv: { background, url, icon },
+    },
+  }: ServerContentData = await (
+    await fetch(
+      server.adv_url +
+        (server.id == "CN"
+          ? `&language=zh-cn` // CN server has no other language support
+          : `&language=${locale.get("CONTENT_LANG_ID")}`)
+    )
+  ).json();
+  const {
+    data: {
+      game: {
+        latest: {
+          version: GAME_LATEST_VERSION,
+          path,
+          decompressed_path,
+          voice_packs,
+        },
+      },
+    },
+  }: ServerVersionData = await (await fetch(server.update_url)).json();
+  await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
-    locale
+    locale,
+    server
   );
 
   const { UI: ConfigurationUI, config } = await createConfiguration({
@@ -175,8 +198,9 @@ export async function createLauncher({
           yield* launchGameProgram({
             gameDir: _gameInstallDir(),
             wine,
-            gameExecutable: atob("WXVhblNoZW4uZXhl"),
+            gameExecutable: server.executable,
             config,
+            server,
           });
         });
       } else {
@@ -192,11 +216,11 @@ export async function createLauncher({
             yield* downloadAndInstallGameProgram({
               aria2,
               gameDir: selection,
-              gameFileZip: c.data.game.latest.path,
-              gameAudioZip: c.data.game.latest.voice_packs.find(
-                (x) => x.language == "zh-cn"
-              )!.path,
+              gameFileZip: path,
+              // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
+              //   .path,
               gameVersion: GAME_LATEST_VERSION,
+              server,
             });
             // setGameInstalled
             batch(() => {
@@ -226,7 +250,7 @@ export async function createLauncher({
           yield* checkIntegrityProgram({
             aria2,
             gameDir: selection,
-            remoteDir: c.data.game.latest.decompressed_path,
+            remoteDir: decompressed_path,
           });
           // setGameInstalled
           batch(() => {
@@ -243,15 +267,15 @@ export async function createLauncher({
       <div
         class="background"
         style={{
-          "background-image": `url(${b.data.adv.background})`,
+          "background-image": `url(${background})`,
         }}
       >
         <div
-          onClick={() => Neutralino.os.open(b.data.adv.url)}
+          onClick={() => Neutralino.os.open(url)}
           role="button"
           class="version-icon"
           style={{
-            "background-image": `url(${b.data.adv.icon})`,
+            "background-image": `url(${icon})`,
             height: `${bh}px`,
             width: `${bw}px`, //fixme: responsive size
           }}
@@ -327,11 +351,13 @@ async function* launchGameProgram({
   gameExecutable,
   wine,
   config,
+  server,
 }: {
   gameDir: string;
   gameExecutable: string;
   wine: Wine;
   config: LauncherConfiguration;
+  server: Server;
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
@@ -349,7 +375,7 @@ copy %~dp0${atob("SG9Zb0tQcm90ZWN0LnN5cw==")} "%WINDIR%\\system32\\"
 regedit %~dp0retina.reg
 %~dp0${gameExecutable}`;
   await writeFile(join(gameDir, "config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, "cn");
+  yield* patchProgram(gameDir, wine.prefix, server);
   await mkdirp(await resolve("./logs"));
   try {
     yield ["setStateText", "GAME_RUNNING"];
@@ -359,7 +385,6 @@ regedit %~dp0retina.reg
       {
         WINEESYNC: "1",
         WINEDEBUG: "-all",
-        LANG: "zh_CN.UTF-8",
         DXVK_HUD: config.dxvkHud,
         MVK_ALLOW_METAL_FENCES: "1",
         WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
@@ -376,7 +401,7 @@ regedit %~dp0retina.reg
   }
 
   yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, "cn");
+  yield* patchRevertProgram(gameDir, wine.prefix, server);
 }
 
 async function* checkIntegrityProgram({
@@ -465,24 +490,21 @@ async function* checkIntegrityProgram({
 async function* downloadAndInstallGameProgram({
   aria2,
   gameFileZip,
-  gameAudioZip,
+  // gameAudioZip,
   gameDir,
   gameVersion,
+  server,
 }: {
   gameFileZip: string;
   gameDir: string;
-  gameAudioZip: string;
+  // gameAudioZip: string;
   gameVersion: string;
   aria2: Aria2;
+  server: Server;
 }): CommonUpdateProgram {
-  // FIXME: remove hardcoded data
-  const gameChannel = 1;
-  const gameSubchannel = 1;
-  const gameCps = "pcadbdpz";
-
   const downloadTmp = join(gameDir, ".ariatmp");
   const gameFileTmp = join(downloadTmp, "game.zip");
-  const audioFileTmp = join(downloadTmp, "audio.zip");
+  // const audioFileTmp = join(downloadTmp, "audio.zip");
   await mkdirp(downloadTmp);
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "ALLOCATING_FILE"];
@@ -515,44 +537,44 @@ async function* downloadAndInstallGameProgram({
     yield ["setProgress", (dec / total) * 100];
   }
   await removeFile(gameFileTmp);
-  yield ["setUndeterminedProgress"];
-  yield ["setStateText", "ALLOCATING_FILE"];
-  gameFileStart = false;
-  for await (const progress of aria2.doStreamingDownload({
-    uri: gameAudioZip,
-    absDst: audioFileTmp,
-  })) {
-    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-      continue;
-    }
-    gameFileStart = true;
-    yield [
-      "setStateText",
-      "DOWNLOADING_FILE_PROGRESS",
-      basename(gameAudioZip),
-      humanFileSize(Number(progress.downloadSpeed)),
-      humanFileSize(Number(progress.completedLength)),
-      humanFileSize(Number(progress.totalLength)),
-    ];
-    yield [
-      "setProgress",
-      Number(
-        (progress.completedLength * BigInt(10000)) / progress.totalLength
-      ) / 100,
-    ];
-  }
-  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
-  for await (const [dec, total] of doStreamUnzip(audioFileTmp, gameDir)) {
-    yield ["setProgress", (dec / total) * 100];
-  }
-  await removeFile(audioFileTmp);
+  // yield ["setUndeterminedProgress"];
+  // yield ["setStateText", "ALLOCATING_FILE"];
+  // gameFileStart = false;
+  // for await (const progress of aria2.doStreamingDownload({
+  //   uri: gameAudioZip,
+  //   absDst: audioFileTmp,
+  // })) {
+  //   if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+  //     continue;
+  //   }
+  //   gameFileStart = true;
+  //   yield [
+  //     "setStateText",
+  //     "DOWNLOADING_FILE_PROGRESS",
+  //     basename(gameAudioZip),
+  //     humanFileSize(Number(progress.downloadSpeed)),
+  //     humanFileSize(Number(progress.completedLength)),
+  //     humanFileSize(Number(progress.totalLength)),
+  //   ];
+  //   yield [
+  //     "setProgress",
+  //     Number(
+  //       (progress.completedLength * BigInt(10000)) / progress.totalLength
+  //     ) / 100,
+  //   ];
+  // }
+  // yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
+  // for await (const [dec, total] of doStreamUnzip(audioFileTmp, gameDir)) {
+  //   yield ["setProgress", (dec / total) * 100];
+  // }
+  // await removeFile(audioFileTmp);
   await writeFile(
     join(gameDir, "config.ini"),
     `[General]
 game_version=${gameVersion}
-channel=${gameChannel}
-sub_channel=${gameSubchannel}
-cps=${gameCps}`
+channel=${server.channel_id}
+sub_channel=${server.subchannel_id}
+cps=${server.cps}`
   );
 }
 

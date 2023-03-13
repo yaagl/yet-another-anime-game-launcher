@@ -1,5 +1,6 @@
 
 export default {
+    CONTENT_LANG_ID: "zh-cn",
     LAUNCH: "开始游戏",
     INSTALL: "安装游戏",
     UPDATING: "正在更新",
@@ -29,7 +30,6 @@ export default {
     DOWNLOADING_UPDATE_FILE: "正在下载更新文件",
 
     // FIXME
-    DOWNLOAD_FUNCTION_TBD: "启动器尚未实装下载游戏功能。",
     UPGRADE_FUNCTION_TBD: "启动器尚未实装升级功能。",
 
     DECOMPRESS_FILE_PROGRESS:"正在解压文件",

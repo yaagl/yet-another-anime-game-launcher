@@ -31,3 +31,5 @@ node_modules
 *.dxvk-cache
 
 .vscode
+
+server_secret.ts

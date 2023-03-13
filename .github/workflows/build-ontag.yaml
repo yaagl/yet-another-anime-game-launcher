@@ -49,20 +49,12 @@ jobs:
         run: |
           ./configure.sh
           node ./build-app.js
+          YAAGL_OVERSEA=1 node ./build-app.js
 
       - name: Tar app
         run: |
           tar -zcf Yaagl.app.tar.gz Yaagl.app
-      - name: Upload artifact - app
-        uses: actions/upload-artifact@v3
-        with:
-          name: app
-          path: Yaagl.app.tar.gz
-      - name: Upload artifact - neu
-        uses: actions/upload-artifact@v3
-        with:
-          name: neu
-          path: dist/Yaagl/resources.neu
+          tar -zcf "Yaagl OS.app.tar.gz" "Yaagl OS.app"
       - name: Generate prerelease
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -71,4 +63,5 @@ jobs:
           title: "Release ${{ github.ref_name }}"
           files: |
             Yaagl.app.tar.gz
+            "Yaagl OS.app.tar.gz"
             dist/Yaagl/resources.neu

@@ -1,6 +1,6 @@
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "./common-update-ui";
-import { CN_SERVER, OS_SERVER } from "./constants";
+import { Server } from "./constants";
 import {
   writeBinary,
   forceMove,
@@ -20,11 +20,6 @@ import dxgiu from "../dxvk/dxgi.dll?url";
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
 }
-
-const patchConfigs = {
-  cn: CN_SERVER,
-  os: OS_SERVER,
-};
 
 const dxvkFiles = [
   {
@@ -48,13 +43,13 @@ const dxvkFiles = [
 export async function* patchProgram(
   gameDir: string,
   winprefixDir: string,
-  server: "cn" | "os"
+  server: Server
 ): CommonUpdateProgram {
   try {
     await getKey("patched");
     return;
   } catch {}
-  for (const file of patchConfigs[server].patched) {
+  for (const file of server.patched) {
     await forceMove(
       join(gameDir, file.file),
       join(gameDir, file.file + ".bak")
@@ -68,17 +63,17 @@ export async function* patchProgram(
     await log("patched " + file.file);
     await removeFile(join(gameDir, file.file + ".diff"));
   }
-  for (const file of patchConfigs[server].removed.map(atob)) {
+  for (const file of server.removed.map(atob)) {
     await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
   }
   await forceMove(
-    join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers"),
-    join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers.bak")
+    join(gameDir, server.dataDir, "globalgamemanagers"),
+    join(gameDir, server.dataDir, "globalgamemanagers.bak")
   );
   writeBinary(
-    join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers"),
+    join(gameDir, server.dataDir, "globalgamemanagers"),
     await disableUnityFeature(
-      join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers.bak")
+      join(gameDir, server.dataDir, "globalgamemanagers.bak")
     )
   );
   const system32Dir = join(winprefixDir, "drive_c", "windows", "system32");
@@ -95,25 +90,25 @@ export async function* patchProgram(
 export async function* patchRevertProgram(
   gameDir: string,
   winprefixDir: string,
-  server: "cn" | "os"
+  server: Server
 ): CommonUpdateProgram {
   try {
     await getKey("patched");
   } catch {
     return;
   }
-  for (const file of patchConfigs[server].patched) {
+  for (const file of server.patched) {
     await forceMove(
       join(gameDir, file.file + ".bak"),
       join(gameDir, file.file)
     );
   }
-  for (const file of patchConfigs[server].removed.map(atob)) {
+  for (const file of server.removed.map(atob)) {
     await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
   }
   await forceMove(
-    join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers.bak"),
-    join(gameDir, patchConfigs[server].dataDir, "globalgamemanagers")
+    join(gameDir, server.dataDir, "globalgamemanagers.bak"),
+    join(gameDir, server.dataDir, "globalgamemanagers")
   );
   const system32Dir = join(winprefixDir, "drive_c", "windows", "system32");
   for (const f of dxvkFiles) {

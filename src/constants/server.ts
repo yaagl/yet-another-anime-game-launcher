@@ -1,17 +1,25 @@
-
 import b from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
 import c from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
 import d from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
 import e from "../../external/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url";
 import f from "../../external/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url";
-
-export interface Server {
-  id: string;
-  url: string;
-  channel_id: number;
-  subchannel_id: number;
-  bg_url: string;
-}
+import {
+  CN_ADV_URL,
+  CN_COMPANY_NAME,
+  CN_CPS,
+  CN_DATA_DIR,
+  CN_EXECUTABLE,
+  CN_PRODUCT_NAME,
+  CN_UPDATE_URL,
+  DLL1,
+  DLL2,
+  OS_ADV_URL,
+  OS_CPS,
+  OS_DATA_DIR,
+  OS_EXECUTABLE,
+  OS_PRODUCT_NAME,
+  OS_UPDATE_URL,
+} from "./server_secret";
 
 interface VoicePackDef {
   language: "zh-cn" | "en-us" | "ja-jp" | "ko-kr";
@@ -96,22 +104,22 @@ export interface ServerContentData {
 
 export const CN_SERVER = {
   id: "CN",
-  url: atob(
-    "aHR0cHM6Ly9zZGstc3RhdGljLm1paG95by5jb20vaGs0ZV9jbi9tZGsvbGF1bmNoZXIvYXBpL3Jlc291cmNlP2NoYW5uZWxfaWQ9MSZrZXk9ZVlkODlKbUombGF1bmNoZXJfaWQ9MTg="
-  ),
+  update_url: CN_UPDATE_URL,
   channel_id: 1,
   subchannel_id: 1,
-  bg_url: atob(
-    "aHR0cHM6Ly9zZGstc3RhdGljLm1paG95by5jb20vaGs0ZV9jbi9tZGsvbGF1bmNoZXIvYXBpL2NvbnRlbnQ/ZmlsdGVyX2Fkdj10cnVlJmtleT1lWWQ4OUptSiZsYXVuY2hlcl9pZD0xOCZsYW5ndWFnZT16aC1jbg=="
-  ),
-  dataDir: atob("WXVhblNoZW5fRGF0YQ=="),
+  cps: CN_CPS,
+  adv_url: CN_ADV_URL,
+  dataDir: CN_DATA_DIR,
+  executable: CN_EXECUTABLE,
+  THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,
+  product_name: CN_PRODUCT_NAME,
   patched: [
     {
-      file: atob("VW5pdHlQbGF5ZXIuZGxs"),
+      file: DLL1,
       diffUrl: c,
     },
     {
-      file: atob("WXVhblNoZW5fRGF0YS9QbHVnaW5zL3hsdWEuZGxs"),
+      file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
       diffUrl: e,
     },
   ],
@@ -123,24 +131,33 @@ export const CN_SERVER = {
   ],
 };
 
-export const OS_SERVER = {
+export type Server = typeof CN_SERVER;
+
+export const OS_SERVER: Server = {
   id: "OS",
-  url: atob(
-    "aHR0cHM6Ly9zZGstb3Mtc3RhdGljLm1paG95by5jb20vaGs0ZV9nbG9iYWwvbWRrL2xhdW5jaGVyL2FwaS9yZXNvdXJjZT9jaGFubmVsX2lkPTEma2V5PWdjU3RnYXJoJmxhdW5jaGVyX2lkPTEw"
-  ),
+  update_url: OS_UPDATE_URL,
   channel_id: 1,
   subchannel_id: 0,
-  bg_url: "",
-  dataDir: atob("R2Vuc2hpbkltcGFjdF9EYXRh"),
+  cps: OS_CPS,
+  adv_url: OS_ADV_URL,
+  dataDir: OS_DATA_DIR,
+  executable: OS_EXECUTABLE,
+  THE_REAL_COMPANY_NAME: CN_COMPANY_NAME, // that's correct 😎
+  product_name: OS_PRODUCT_NAME,
   patched: [
     {
-      file: atob("VW5pdHlQbGF5ZXIuZGxs"),
+      file: DLL1,
       diffUrl: d,
     },
     {
-      file: atob("R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMveGx1YS5kbGw="),
+      file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
       diffUrl: f,
     },
   ],
-  removed: [] //FIXME: todo
+  removed: [
+    "bWh5cGJhc2UuZGxs",
+    "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
+    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==",
+    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
+  ],
 };

@@ -3,27 +3,22 @@ import {
   log,
   spawn,
   timeout,
-  wait,
   resolve,
   appendFile,
-  prompt,
   addTerminationHook,
   GLOBAL_onClose,
-  getKey,
   setKey,
-  alert,
 } from "./utils";
 import { createAria2 } from "./aria2";
 import { checkWine, createWine, createWineInstallProgram } from "./wine";
 import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
 import "./app.css";
-import { CURRENT_YAAGL_VERSION } from "./constants";
 import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
-import zh_CN from "./locale/zh_CN";
 import { CROSSOVER_LOADER } from "./crossover";
+import { CN_SERVER, OS_SERVER } from "./constants";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -37,13 +32,12 @@ export async function createApp() {
     }
   });
 
-  const locale = createLocale(zh_CN);
+  const locale = await createLocale();
   const github = await createGithubEndpoint();
   const aria2_session = await resolve("./aria2.session");
   await appendFile(aria2_session, "");
   const pid = (await exec("echo", ["$PPID"])).stdOut.split("\n")[0];
   const { pid: apid } = await spawn("./sidecar/aria2/aria2c", [
-    // "-q",
     "-d",
     "/",
     "--no-conf",
@@ -51,7 +45,6 @@ export async function createApp() {
     `--rpc-listen-port=${aria2_port}`,
     `--rpc-listen-all=true`,
     `--rpc-allow-origin-all`,
-    // `-c`,
     `--input-file`,
     `"${aria2_session}"`,
     `--save-session`,
@@ -99,6 +92,8 @@ export async function createApp() {
     github
   );
   const prefixPath = await resolve("./wineprefix"); // CHECK: hardcoded path?
+  const isOverseaVersion = (await Neutralino.os.getEnv("YAAGL_OVERSEA")) == "1";
+  const server = isOverseaVersion ? OS_SERVER : CN_SERVER;
   if (wineReady) {
     const wine = await createWine({
       loaderBin:
@@ -107,7 +102,13 @@ export async function createApp() {
           : await resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
-    return await createLauncher({ aria2, wine, locale, github });
+    return await createLauncher({
+      aria2,
+      wine,
+      locale,
+      github,
+      server,
+    });
   } else {
     return await createWineInstallProgram({
       aria2,
@@ -115,6 +116,7 @@ export async function createApp() {
       wineAbsPrefix: prefixPath,
       wineTag: wineUpdateTag,
       locale,
+      server,
     });
   }
 }

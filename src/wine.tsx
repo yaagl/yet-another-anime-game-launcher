@@ -1,6 +1,7 @@
 import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
+import { Server } from "./constants";
 import { CROSSOVER_LOADER } from "./crossover";
 import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
@@ -117,12 +118,14 @@ export async function createWineInstallProgram({
   wineAbsPrefix,
   wineTag,
   locale,
+  server,
 }: {
   aria2: Aria2;
   locale: Locale;
   wineUpdateTarGzFile: string;
   wineAbsPrefix: string;
   wineTag: string;
+  server: Server;
 }) {
   async function* program(): CommonUpdateProgram {
     const wineBinaryDir = await resolve("./wine");
@@ -142,17 +145,15 @@ export async function createWineInstallProgram({
       try {
         await wine.exec("reg", [
           "export",
-          `"HKEY_CURRENT_USER\\Software\\${atob(
-            "bWlIb1lv"
-          )}\\${decodeURIComponent(atob("JUU1JThFJTlGJUU3JUE1JTlF"))}"`, //FIXME: server_dependent
+          `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}"`,
           "backup1.reg",
-          "/y"
+          "/y",
         ]);
         await wine.exec("reg", [
           "export",
-          `"HKEY_CURRENT_USER\\Software\\${atob("bWlIb1lv")}SDK"`,
+          `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK"`,
           "backup2.reg",
-          "/y"
+          "/y",
         ]);
         existBackup = true;
       } catch {
