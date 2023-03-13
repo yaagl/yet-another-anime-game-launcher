@@ -8,6 +8,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const icns = new IconIcns();
   const raw = true;
 
+  await execa("pnpm", ["exec", "tsc"]); // do typecheck first
   await execa("pnpm", ["exec", "vite", "build"]);
   await execa("pnpm", ["exec", "neu", "update"]);
   await execa("cp", ["-R", "neutralinojs/.", "bin/."])

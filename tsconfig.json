@@ -10,7 +10,8 @@
     "jsxImportSource": "solid-js",
     "types": ["vite/client", "neutralinojs-types"],
     "noEmit": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "skipLibCheck":true
   },
   "include": ["src/**/*.ts","src/**/*.tsx"]
 }
