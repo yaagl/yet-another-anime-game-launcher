@@ -63,5 +63,5 @@ jobs:
           title: "Release ${{ github.ref_name }}"
           files: |
             Yaagl.app.tar.gz
-            "Yaagl OS.app.tar.gz"
+            Yaagl OS.app.tar.gz
             dist/Yaagl/resources.neu
