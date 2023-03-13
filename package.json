@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "vite build --mode=\"development\" && cp './bin/neutralino.js' './dist/neutralino.js' && cp './bin/neutralino.js.map' './dist/neutralino.js.map' && neu run",
+    "start": "vite build --mode=\"development\" && neu update && cp './bin/neutralino.js.map' './dist/neutralino.js.map' && neu run",
     "dev": "vite",
     "build": "vite build",
     "build-dev": "vite build --mode=\"development\""
