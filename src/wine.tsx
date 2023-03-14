@@ -148,12 +148,16 @@ export async function createWineInstallProgram({
           `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}"`,
           "backup1.reg",
           "/y",
+          "&>",
+          "/dev/null" // lifesaver
         ]);
         await wine.exec("reg", [
           "export",
           `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK"`,
           "backup2.reg",
           "/y",
+          "&>",
+          "/dev/null"
         ]);
         existBackup = true;
       } catch {
