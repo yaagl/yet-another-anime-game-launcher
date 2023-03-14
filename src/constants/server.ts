@@ -156,8 +156,8 @@ export const OS_SERVER: Server = {
   ],
   removed: [
     "bWh5cGJhc2UuZGxs",
-    "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
+    "R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU=",
+    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl",
+    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
   ],
 };
