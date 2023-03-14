@@ -19,7 +19,7 @@ const en: typeof zh_CN = {
   PATH_INVALID: "Path is invalid",
   PLEASE_SELECT_A_DIR: "Please select a path",
   NOT_SUPPORTED_YET: "Feature not supported yet",
-  PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "The launcher doesn't support version {0} currently, plese wait for updates",
+  PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "The launcher doesn't support version {0} currently, please wait for updates",
   UNSUPPORTED_VERSION: "Not a supported version",
   SELECT_INSTALLATION_DIR: "Please select the game installation directory.\nIf you have already installed the game, select where the game executable file is located",
   CANT_OPEN_GAME_FILE: "Failed to access game file",
@@ -35,7 +35,7 @@ const en: typeof zh_CN = {
   UPGRADE_FUNCTION_TBD: "Currently upgrading is not implemented",
 
   DECOMPRESS_FILE_PROGRESS:"Decompressing files",
-  ALLOCATING_FILE: "Allocation files on disk",
+  ALLOCATING_FILE: "Allocating files on disk",
   DOWNLOADING_FILE_PROGRESS:"Downloading file: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Backing up user data",
