@@ -362,26 +362,29 @@ async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await putLocal(a, join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  await putLocal(a, await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   if (config.retina) {
-    await putLocal(retina_on, join(gameDir, "retina.reg"));
+    await putLocal(retina_on, await resolve("retina.reg"));
   } else {
-    await putLocal(retina_off, join(gameDir, "retina.reg"));
+    await putLocal(retina_off, await resolve("retina.reg"));
   }
   const cmd = `@echo off
-regedit "%~dp0bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"
-copy "%~dp0${atob("bWh5cHJvdDMuc3lz")}" "%TEMP%\\"
-copy "%~dp0${atob("SG9Zb0tQcm90ZWN0LnN5cw==")}" "%WINDIR%\\system32\\"
-regedit "%~dp0retina.reg"
-"%~dp0${gameExecutable}"`;
-  await writeFile(join(gameDir, "config.bat"), cmd);
+cd "%~dp0"
+regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
+copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
+copy "${wine.toWinePath(
+    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
+  )}" "%WINDIR%\\system32\\"
+regedit retina.reg
+"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+  await writeFile(await resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server);
   await mkdirp(await resolve("./logs"));
   try {
     yield ["setStateText", "GAME_RUNNING"];
     await wine.exec(
       "cmd",
-      ["/c", `"${wine.toWinePath(join(gameDir, "config.bat"))}"`],
+      ["/c", `"${wine.toWinePath(await resolve("config.bat"))}"`],
       {
         WINEESYNC: "1",
         WINEDEBUG: "-all",
@@ -392,9 +395,9 @@ regedit "%~dp0retina.reg"
       },
       `logs/game_${Date.now()}.log`
     );
-    await removeFile(join(gameDir, "bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    await removeFile(join(gameDir, "retina.reg"));
-    await removeFile(join(gameDir, "config.bat"));
+    await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+    await removeFile(await resolve("retina.reg"));
+    await removeFile(await resolve("config.bat"));
   } catch (e: any) {
     // it seems game crashed?
     await log(String(e));
