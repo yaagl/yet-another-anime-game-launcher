@@ -112,7 +112,12 @@ export function tar_extract(src: string, dst: string) {
 }
 
 export async function spawn(command: string, args: string[]) {
-  const cmd = `"${await resolve(command)}" ${args.join(" ")}`;
+  const cmd = `"${await resolve(command)}" ${args.map((x) => {
+    if (x.startsWith('"') || x.startsWith("'")) return x;
+    if (x.indexOf(" ") > -1) return `"${x}"`;
+    return x;
+  })
+  .join(" ")}`;
   const { pid, id } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");

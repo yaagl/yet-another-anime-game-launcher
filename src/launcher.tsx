@@ -369,11 +369,11 @@ async function* launchGameProgram({
     await putLocal(retina_off, join(gameDir, "retina.reg"));
   }
   const cmd = `@echo off
-regedit %~dp0bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
-copy %~dp0${atob("bWh5cHJvdDMuc3lz")} "%TEMP%\\"
-copy %~dp0${atob("SG9Zb0tQcm90ZWN0LnN5cw==")} "%WINDIR%\\system32\\"
-regedit %~dp0retina.reg
-%~dp0${gameExecutable}`;
+regedit "%~dp0bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"
+copy "%~dp0${atob("bWh5cHJvdDMuc3lz")}" "%TEMP%\\"
+copy "%~dp0${atob("SG9Zb0tQcm90ZWN0LnN5cw==")}" "%WINDIR%\\system32\\"
+regedit "%~dp0retina.reg"
+"%~dp0${gameExecutable}"`;
   await writeFile(join(gameDir, "config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server);
   await mkdirp(await resolve("./logs"));
