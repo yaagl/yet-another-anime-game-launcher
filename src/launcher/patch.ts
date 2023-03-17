@@ -1,6 +1,6 @@
 import { join } from "path-browserify";
-import { CommonUpdateProgram } from "./common-update-ui";
-import { Server } from "./constants";
+import { CommonUpdateProgram } from "../common-update-ui";
+import { Server } from "../constants";
 import {
   writeBinary,
   forceMove,
@@ -9,13 +9,13 @@ import {
   readBinary,
   getKey,
   setKey,
-} from "./utils";
-import { xdelta3 } from "./utils/unix";
+} from "../utils";
+import { xdelta3 } from "../utils/unix";
 
-import d3d9u from "../dxvk/d3d9.dll?url";
-import d3d10coreu from "../dxvk/d3d10core.dll?url";
-import d3d11u from "../dxvk/d3d11.dll?url";
-import dxgiu from "../dxvk/dxgi.dll?url";
+import d3d9u from "../../dxvk/d3d9.dll?url";
+import d3d10coreu from "../../dxvk/d3d10core.dll?url";
+import d3d11u from "../../dxvk/d3d11.dll?url";
+import dxgiu from "../../dxvk/dxgi.dll?url";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());

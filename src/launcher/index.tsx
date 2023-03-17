@@ -1,25 +1,20 @@
-import { Aria2 } from "./aria2";
-import { createWineVersionChecker, Wine } from "./wine";
+import { Aria2 } from "../aria2";
+import { createWineVersionChecker, Wine } from "../wine";
 import {
   Server,
   ServerContentData,
   ServerVersionData,
-} from "./constants/server";
+} from "../constants/server";
 import {
   getKey,
   log,
   openDir,
   waitImageReady,
   readBinary,
-  readAllLines,
   stats,
   fatal,
   setKey,
-  removeFile,
-  humanFileSize,
-  writeFile,
-  resolve,
-} from "./utils";
+} from "../utils";
 import {
   Box,
   Button,
@@ -34,19 +29,16 @@ import {
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
 import { batch, createSignal, Show } from "solid-js";
-import { basename, join } from "path-browserify";
+import { join } from "path-browserify";
 import { gt, lt } from "semver";
-import {
-  patchProgram,
-  patchRevertProgram,
-  patternSearch,
-  putLocal,
-} from "./patch";
-import { doStreamUnzip, md5, mkdirp } from "./utils/unix";
-import { CommonUpdateProgram } from "./common-update-ui";
-import { Locale } from "./locale";
-import { createConfiguration, LauncherConfiguration } from "./config";
-import { Github } from "./github";
+import { patternSearch } from "./patch";
+import { CommonUpdateProgram } from "../common-update-ui";
+import { Locale } from "../locale";
+import { createConfiguration } from "./config";
+import { Github } from "../github";
+import { downloadAndInstallGameProgram } from "./program-install-game";
+import { checkIntegrityProgram } from "./program-check-integrity";
+import { launchGameProgram } from "./program-launch-game";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -342,244 +334,6 @@ export async function createLauncher({
       </div>
     );
   };
-}
-
-import a from "../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
-import retina_on from "./constants/retina_on.reg?url";
-import retina_off from "./constants/retina_off.reg?url";
-async function* launchGameProgram({
-  gameDir,
-  gameExecutable,
-  wine,
-  config,
-  server,
-}: {
-  gameDir: string;
-  gameExecutable: string;
-  wine: Wine;
-  config: LauncherConfiguration;
-  server: Server;
-}): CommonUpdateProgram {
-  yield ["setUndeterminedProgress"];
-  yield ["setStateText", "PATCHING"];
-
-  await putLocal(a, await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  if (config.retina) {
-    await putLocal(retina_on, await resolve("retina.reg"));
-  } else {
-    await putLocal(retina_off, await resolve("retina.reg"));
-  }
-  const cmd = `@echo off
-cd "%~dp0"
-regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
-copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
-copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
-  )}" "%WINDIR%\\system32\\"
-regedit retina.reg
-"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
-  await writeFile(await resolve("config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, server);
-  await mkdirp(await resolve("./logs"));
-  try {
-    yield ["setStateText", "GAME_RUNNING"];
-    await wine.exec(
-      "cmd",
-      ["/c", `"${wine.toWinePath(await resolve("config.bat"))}"`],
-      {
-        WINEESYNC: "1",
-        WINEDEBUG: "-all",
-        DXVK_HUD: config.dxvkHud,
-        MVK_ALLOW_METAL_FENCES: "1",
-        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-        DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-      },
-      `logs/game_${Date.now()}.log`
-    );
-    await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    await removeFile(await resolve("retina.reg"));
-    await removeFile(await resolve("config.bat"));
-  } catch (e: any) {
-    // it seems game crashed?
-    await log(String(e));
-  }
-
-  yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, server);
-}
-
-async function* checkIntegrityProgram({
-  gameDir,
-  remoteDir,
-  aria2,
-}: {
-  gameDir: string;
-  remoteDir: string;
-  aria2: Aria2;
-}): CommonUpdateProgram {
-  const entries: {
-    remoteName: string;
-    md5: string;
-    fileSize: number;
-  }[] = (await readAllLines(join(gameDir, "pkg_version")))
-    .filter((x) => x.trim() != "")
-    .map((x) => JSON.parse(x));
-  const toFix: {
-    remoteName: string;
-    md5: string;
-  }[] = [];
-  let count = 0;
-  yield [
-    "setStateText",
-    "SCANNING_FILES",
-    String(count),
-    String(entries.length),
-  ];
-  for (const entry of entries) {
-    const localPath = join(gameDir, entry.remoteName);
-    try {
-      const fileStats = await stats(localPath);
-      if (fileStats.size !== entry.fileSize) {
-        throw new Error("Size not match");
-      }
-      const md5sum = await md5(localPath);
-      if (md5sum !== entry.md5) {
-        await log(`${md5sum} ${entry.md5} not match`);
-        throw new Error("Md5 not match");
-      }
-    } catch {
-      toFix.push(entry);
-    }
-    count++;
-    yield [
-      "setStateText",
-      "SCANNING_FILES",
-      String(count),
-      String(entries.length),
-    ];
-    yield ["setProgress", (count / entries.length) * 100];
-  }
-  if (toFix.length == 0) {
-    return;
-  }
-  yield ["setUndeterminedProgress"];
-
-  yield ["setStateText", "FIXING_FILES", String(count), String(toFix.length)];
-  count = 0;
-  for (const entry of toFix) {
-    const localPath = join(gameDir, entry.remoteName);
-    const remotePath = join(remoteDir, entry.remoteName).replace(":/", "://"); //....join: wtf?
-    await log(remotePath);
-    await log(localPath);
-    for await (const progress of aria2.doStreamingDownload({
-      uri: remotePath,
-      absDst: localPath,
-    })) {
-      yield [
-        "setStateText",
-        "FIXING_FILES",
-        String(count),
-        String(toFix.length),
-      ];
-      yield [
-        "setProgress",
-        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
-      ];
-    }
-    count++;
-    // yield ['setStateText', 'COMPLETE_FILE', count, toFix.length]
-  }
-}
-
-async function* downloadAndInstallGameProgram({
-  aria2,
-  gameFileZip,
-  // gameAudioZip,
-  gameDir,
-  gameVersion,
-  server,
-}: {
-  gameFileZip: string;
-  gameDir: string;
-  // gameAudioZip: string;
-  gameVersion: string;
-  aria2: Aria2;
-  server: Server;
-}): CommonUpdateProgram {
-  const downloadTmp = join(gameDir, ".ariatmp");
-  const gameFileTmp = join(downloadTmp, "game.zip");
-  // const audioFileTmp = join(downloadTmp, "audio.zip");
-  await mkdirp(downloadTmp);
-  yield ["setUndeterminedProgress"];
-  yield ["setStateText", "ALLOCATING_FILE"];
-  let gameFileStart = false;
-  for await (const progress of aria2.doStreamingDownload({
-    uri: gameFileZip,
-    absDst: gameFileTmp,
-  })) {
-    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-      continue;
-    }
-    gameFileStart = true;
-    yield [
-      "setStateText",
-      "DOWNLOADING_FILE_PROGRESS",
-      basename(gameFileZip),
-      humanFileSize(Number(progress.downloadSpeed)),
-      humanFileSize(Number(progress.completedLength)),
-      humanFileSize(Number(progress.totalLength)),
-    ];
-    yield [
-      "setProgress",
-      Number(
-        (progress.completedLength * BigInt(10000)) / progress.totalLength
-      ) / 100,
-    ];
-  }
-  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
-  for await (const [dec, total] of doStreamUnzip(gameFileTmp, gameDir)) {
-    yield ["setProgress", (dec / total) * 100];
-  }
-  await removeFile(gameFileTmp);
-  // yield ["setUndeterminedProgress"];
-  // yield ["setStateText", "ALLOCATING_FILE"];
-  // gameFileStart = false;
-  // for await (const progress of aria2.doStreamingDownload({
-  //   uri: gameAudioZip,
-  //   absDst: audioFileTmp,
-  // })) {
-  //   if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-  //     continue;
-  //   }
-  //   gameFileStart = true;
-  //   yield [
-  //     "setStateText",
-  //     "DOWNLOADING_FILE_PROGRESS",
-  //     basename(gameAudioZip),
-  //     humanFileSize(Number(progress.downloadSpeed)),
-  //     humanFileSize(Number(progress.completedLength)),
-  //     humanFileSize(Number(progress.totalLength)),
-  //   ];
-  //   yield [
-  //     "setProgress",
-  //     Number(
-  //       (progress.completedLength * BigInt(10000)) / progress.totalLength
-  //     ) / 100,
-  //   ];
-  // }
-  // yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
-  // for await (const [dec, total] of doStreamUnzip(audioFileTmp, gameDir)) {
-  //   yield ["setProgress", (dec / total) * 100];
-  // }
-  // await removeFile(audioFileTmp);
-  await writeFile(
-    join(gameDir, "config.ini"),
-    `[General]
-game_version=${gameVersion}
-channel=${server.channel_id}
-sub_channel=${server.subchannel_id}
-cps=${server.cps}`
-  );
 }
 
 async function getGameVersion(gameDataDir: string) {

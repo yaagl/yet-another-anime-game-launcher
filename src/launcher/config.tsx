@@ -23,10 +23,10 @@ import {
   VStack,
 } from "@hope-ui/solid";
 import { createSignal, For } from "solid-js";
-import { checkCrossover } from "./crossover";
-import { Locale } from "./locale";
-import { getKey, prompt, setKey, _safeRelaunch } from "./utils";
-import { WineVersionChecker } from "./wine";
+import { checkCrossover } from "../crossover";
+import { Locale } from "../locale";
+import { getKey, prompt, setKey, _safeRelaunch } from "../utils";
+import { WineVersionChecker } from "../wine";
 
 export interface LauncherConfiguration {
   dxvkAsync: boolean;
