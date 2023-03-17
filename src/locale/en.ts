@@ -1,6 +1,6 @@
-import zh_CN from "./zh_CN";
+import { zh_CN } from "./zh_CN";
 
-const en: typeof zh_CN = {
+export const en: typeof zh_CN = {
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Launch Game",
   INSTALL: "Install Game",
@@ -58,4 +58,3 @@ const en: typeof zh_CN = {
   SETTING_SAVE: "Save",
   SETTING_CANCEL: "Cancel"
 };
-export default en;

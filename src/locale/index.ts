@@ -1,5 +1,5 @@
-import zh_CN from "./zh_CN";
-import en from "./en";
+import { zh_CN } from "./zh_CN";
+import { en } from "./en";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -28,7 +28,7 @@ export async function createLocale() {
   } catch {
     lang = await Neutralino.os.getEnv("LANG");
     if (lang == "") {
-      lang = "zh_CN";
+      lang = "en";
     } else {
       lang = lang.split(".")[0];
     }
@@ -42,7 +42,7 @@ export async function createLocale() {
     // }
   }
   let locale =
-    lang in locales ? locales[lang as keyof typeof locales] : locales["zh_CN"];
+    lang in locales ? locales[lang as keyof typeof locales] : locales["en"];
 
   function alert(
     title: LocaleTextKey,

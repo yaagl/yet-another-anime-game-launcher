@@ -1,6 +1,7 @@
+import { SuppportedContentLangId } from "./supported-content-lang-id";
 
-export default {
-    CONTENT_LANG_ID: "zh-cn",
+export const zh_CN = {
+    CONTENT_LANG_ID: "zh-cn" as SuppportedContentLangId,
     LAUNCH: "开始游戏",
     INSTALL: "安装游戏",
     UPDATING: "正在更新",
