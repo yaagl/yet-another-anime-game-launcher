@@ -47,6 +47,10 @@ pnpm start
 node ./build-app.js
 ```
 
+## Uninstall (completely)
+1. Drag app to the bin
+2. Delete folder `~/Library/Application Support/Yaagl` or `~/Library/Application Support/Yaagl OS` if you are using oversea version
+
 ## Roadmap
 
 * Localization
