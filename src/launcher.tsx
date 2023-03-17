@@ -141,6 +141,7 @@ export async function createLauncher({
 
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wineVersionChecker: await createWineVersionChecker(github),
+    locale,
   });
 
   return function Laucnher() {

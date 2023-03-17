@@ -22,9 +22,10 @@ import {
   SelectValue,
   VStack,
 } from "@hope-ui/solid";
-import { createSignal, For, onMount } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { checkCrossover } from "./crossover";
-import { alert, getKey, prompt, setKey, _safeRelaunch } from "./utils";
+import { Locale } from "./locale";
+import { getKey, prompt, setKey, _safeRelaunch } from "./utils";
 import { WineVersionChecker } from "./wine";
 
 export interface LauncherConfiguration {
@@ -41,8 +42,10 @@ const launcherDefaultOption: LauncherConfiguration = {
 
 export async function createConfiguration({
   wineVersionChecker,
+  locale,
 }: {
   wineVersionChecker: WineVersionChecker;
+  locale: Locale;
 }) {
   let div: HTMLDivElement = null!;
   const config = { ...launcherDefaultOption };
@@ -120,7 +123,7 @@ export async function createConfiguration({
               });
             }
           } else {
-            await alert("启动器需要重启", "需要重启以更新wine版本");
+            await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
             // await setKey("")
             await setKey("wine_state", "update");
             const tag = currentConfig().wine_tag;
@@ -138,11 +141,11 @@ export async function createConfiguration({
       }
       return (
         <ModalContent>
-          <ModalHeader>设置</ModalHeader>
+          <ModalHeader>{locale.get("SETTING")}</ModalHeader>
           <ModalBody ref={div}>
             <VStack spacing={"$4"}>
               <FormControl id="wineVersion">
-                <FormLabel>Wine 版本</FormLabel>
+                <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
                 <Select
                   value={currentConfig().wine_tag}
                   onChange={(value) =>
@@ -172,7 +175,7 @@ export async function createConfiguration({
               </FormControl>
               <Divider />
               <FormControl id="dvxkAsync" mb="$4">
-                <FormLabel>dxvk shader 异步编译模式 (推荐开启)</FormLabel>
+                <FormLabel>{locale.get("SETTING_ASYNC_DXVK")}</FormLabel>
                 <Box>
                   <Checkbox
                     checked={currentConfig().dxvkAsync}
@@ -183,12 +186,12 @@ export async function createConfiguration({
                     }
                     size="md"
                   >
-                    启用
+                    {locale.get("SETTING_ENABLED")}
                   </Checkbox>
                 </Box>
               </FormControl>
               <FormControl id="dxvkHud">
-                <FormLabel>dxvk HUD</FormLabel>
+                <FormLabel>{locale.get("SETTING_DXVK_HUD")}</FormLabel>
                 <Select
                   value={currentConfig().dxvkHud}
                   onChange={(value) =>
@@ -206,9 +209,18 @@ export async function createConfiguration({
                     <SelectListbox>
                       <For
                         each={[
-                          { value: "", name: "不显示" },
-                          { value: "fps", name: "只显示fps" },
-                          { value: "full", name: "显示所有信息" },
+                          {
+                            value: "",
+                            name: locale.get("SETTING_DXVK_HUD_NONE"),
+                          },
+                          {
+                            value: "fps",
+                            name: locale.get("SETTING_DXVK_HUD_FPS"),
+                          },
+                          {
+                            value: "full",
+                            name: locale.get("SETTING_DXVK_HUD_ALL"),
+                          },
                         ]}
                       >
                         {(item) => (
@@ -223,7 +235,7 @@ export async function createConfiguration({
                 </Select>
               </FormControl>
               <FormControl id="retina">
-                <FormLabel>Retina 模式</FormLabel>
+                <FormLabel>{locale.get("SETTING_RETINA")}</FormLabel>
                 <Box>
                   <Checkbox
                     checked={currentConfig().retina}
@@ -234,7 +246,7 @@ export async function createConfiguration({
                       })
                     }
                   >
-                    启用
+                    {locale.get("SETTING_ENABLED")}
                   </Checkbox>
                 </Box>
               </FormControl>
@@ -243,14 +255,14 @@ export async function createConfiguration({
           <ModalFooter>
             <HStack spacing={"$4"}>
               <Button variant="outline" onClick={props.onClose}>
-                取消
+                {locale.get("SETTING_CANCEL")}
               </Button>
               <Button
                 onClick={() => {
                   onSave();
                 }}
               >
-                保存
+                {locale.get("SETTING_SAVE")}
               </Button>
             </HStack>
           </ModalFooter>

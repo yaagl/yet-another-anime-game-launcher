@@ -42,5 +42,20 @@ const en: typeof zh_CN = {
   RECOVER_BACKUP_USER_DATA: "Recovering backup",
 
   INSTALL_DONE: "Done",
+
+  RELAUNCH_REQUIRED: "Relaunch required",
+  RELAUNCH_REQUIRED_DESC: "The launcher will restart to process the wine installation.",
+
+  SETTING: "Settings",
+  SETTING_WINE_VERSION: "Wine Distribution",
+  SETTING_ASYNC_DXVK: "DXVK Asynchronous Shader Compiling",
+  SETTING_ENABLED: "Enabled",
+  SETTING_DXVK_HUD: "DXVK HUD",
+  SETTING_DXVK_HUD_NONE: "None",
+  SETTING_DXVK_HUD_FPS: "FPS only",
+  SETTING_DXVK_HUD_ALL: "Everything",
+  SETTING_RETINA: "Retina Mode",
+  SETTING_SAVE: "Save",
+  SETTING_CANCEL: "Cancel"
 };
 export default en;

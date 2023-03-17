@@ -40,4 +40,19 @@ export default {
     RECOVER_BACKUP_USER_DATA: "正在还原备份用户数据",
 
     INSTALL_DONE: "安装成功",
+
+    RELAUNCH_REQUIRED: "启动器需要重启",
+    RELAUNCH_REQUIRED_DESC: "需要重启以更新wine版本",
+
+    SETTING: "设置",
+    SETTING_WINE_VERSION: "Wine 版本",
+    SETTING_ASYNC_DXVK: "DXVK Shader异步编译",
+    SETTING_ENABLED: "启用",
+    SETTING_DXVK_HUD: "DXVK HUD",
+    SETTING_DXVK_HUD_NONE: "不显示",
+    SETTING_DXVK_HUD_FPS: "显示FPS",
+    SETTING_DXVK_HUD_ALL: "显示所有信息",
+    SETTING_RETINA: "Retina 模式",
+    SETTING_SAVE: "保存",
+    SETTING_CANCEL: "取消"
 }
