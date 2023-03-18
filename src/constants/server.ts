@@ -118,10 +118,10 @@ export const CN_SERVER = {
       file: DLL1,
       diffUrl: c,
     },
-    {
-      file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
-      diffUrl: e,
-    },
+    // {
+    //   file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
+    //   diffUrl: e,
+    // },
   ],
   removed: [
     "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
