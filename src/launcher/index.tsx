@@ -122,9 +122,13 @@ export async function createLauncher({
     server
   );
 
+  const [_gameInstallDir, setGameInstallDir] = createSignal(
+    gameInstallDir ?? ""
+  );
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wineVersionChecker: await createWineVersionChecker(github),
     locale,
+    gameInstallDir: _gameInstallDir
   });
 
   const { selectPath } = await createGameInstallationDirectorySanitizer({
@@ -142,9 +146,6 @@ export async function createLauncher({
     const [statusText, setStatusText] = createSignal("");
     const [progress, setProgress] = createSignal(0);
     const [_gameInstalled, setGameInstalled] = createSignal(gameInstalled);
-    const [_gameInstallDir, setGameInstallDir] = createSignal(
-      gameInstallDir ?? ""
-    );
     const [programBusy, setBusy] = createSignal(false);
     const [gameCurrentVersion, setGameCurrentVersion] = createSignal(
       gameVersion ?? "0.0.0"

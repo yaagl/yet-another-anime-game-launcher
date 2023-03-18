@@ -46,9 +46,11 @@ const launcherDefaultOption: LauncherConfiguration = {
 export async function createConfiguration({
   wineVersionChecker,
   locale,
+  gameInstallDir
 }: {
   wineVersionChecker: WineVersionChecker;
   locale: Locale;
+  gameInstallDir: () => string;
 }) {
   let div: HTMLDivElement = null!;
   const config = { ...launcherDefaultOption };
@@ -91,8 +93,6 @@ export async function createConfiguration({
       setwineVersions((x) => [...x, ...versions]);
     }
   })();
-
-  const gameInstallDir = await getKey("game_install_dir");
 
   return {
     UI: function (props: {
@@ -155,7 +155,7 @@ export async function createConfiguration({
               <FormControl id="wineVersion">
                 <FormLabel>{locale.get("SETTING_GAME_INSTALL_DIR")}</FormLabel>
                 <InputGroup>
-                  <Input disabled readOnly value={gameInstallDir} />
+                  <Input disabled readOnly value={gameInstallDir()} />
                   {/* <InputRightElement cursor={"pointer"} onClick={() => {}}>
                     <IconSetting boxSize="20px" color={"$blackAlpha9"} />
                   </InputRightElement> */}

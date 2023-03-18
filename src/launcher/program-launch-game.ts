@@ -90,9 +90,6 @@ regedit retina.reg
         // }
       })(),
     ]);
-    await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-    await removeFile(await resolve("retina.reg"));
-    await removeFile(await resolve("config.bat"));
   } catch (e: any) {
     // it seems game crashed?
     await log(String(e));
@@ -106,6 +103,9 @@ regedit retina.reg
   //   );
   // } catch {}
 
+  await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  await removeFile(await resolve("retina.reg"));
+  await removeFile(await resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine.prefix, server);
 }
