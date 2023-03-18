@@ -7,6 +7,7 @@ import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
 import {
   exec as unixExec,
+  exec2 as unixExec2,
   getKey,
   humanFileSize,
   log,
@@ -44,12 +45,31 @@ export async function createWine(options: {
     );
   }
 
+  async function exec2(
+    program: string,
+    args: string[],
+    env?: { [key: string]: string },
+    log_file: string | undefined = undefined
+  ) {
+    return await unixExec2(
+      options.loaderBin,
+      program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
+      {
+        WINEPREFIX: `"${options.prefix}"`,
+        ...(env ?? {}),
+      },
+      false,
+      log_file
+    );
+  }
+
   function toWinePath(absPath: string) {
     return "Z:" + absPath.replaceAll("/", "\\");
   }
 
   return {
     exec,
+    exec2,
     cmd,
     toWinePath,
     prefix: options.prefix,

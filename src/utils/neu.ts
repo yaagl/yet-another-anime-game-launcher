@@ -44,59 +44,65 @@ export async function exec(
   return ret;
 }
 
-// export async function exec2(
-//   command: string,
-//   args: string[],
-//   env?: { [key: string]: string }
-// ): Promise<Neutralino.os.ExecCommandResult> {
-//   const cmd = `${
-//     env && typeof env == "object"
-//       ? Object.keys(env)
-//           .map((key) => {
-//             return `${key}=${env[key]} `;
-//           })
-//           .join("")
-//       : ""
-//   }("${await resolve(command)}" ${args
-//     .map((x) => {
-//       if (x.startsWith('"') || x.startsWith("'")) return x;
-//       if (x.indexOf(" ") > -1) return `"${x}"`;
-//       return x;
-//     })
-//     .join(" ")}) &> shut_the_fuck_up.log`;
-//   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
-//   return await new Promise((resolve, reject) => {
-//     const handler: Neutralino.events.Handler<
-//       Neutralino.os.SpawnProcessResult
-//     > = (event) => {
-//       log(JSON.stringify(event!.detail));
-//       if (event!.detail.id == id) {
-//         if ((event!.detail as any)["action"] == "exit") {
-//           const exit = Number((event!.detail as any)["data"]);
-//           if (exit == 0) {
-//             resolve({
-//               pid,
-//               exitCode: exit,
-//               stdErr: "",
-//               stdOut: "",
-//             });
-//           } else {
-//             reject(new Error("EXIT CODE NOT ZERO"));
-//           }
+export async function exec2(
+  command: string,
+  args: string[],
+  env?: { [key: string]: string },
+  sudo: boolean = false,
+  log_redirect: string | undefined = undefined
+): Promise<Neutralino.os.ExecCommandResult> {
+  const cmd = `${
+    env && typeof env == "object"
+      ? Object.keys(env)
+          .map((key) => {
+            return `${key}=${env[key]} `;
+          })
+          .join("")
+      : ""
+  }"${await resolve(command)}" ${args
+    .map((x) => {
+      if (x.startsWith('"') || x.startsWith("'")) return x;
+      if (x.indexOf(" ") > -1) return `"${x}"`;
+      return x;
+    })
+    .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
 
-//           Neutralino.events.off("spawnedProcess", handler);
-//         }
-//       }
-//     };
-//     Neutralino.events.on("spawnedProcess", handler);
-//     // if (ret.exitCode != 0) {
-//     //   throw new Error(
-//     //     `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
-//     //   );
-//     // }
-//     // return ret;
-//   });
-// }
+  const { id, pid } = await Neutralino.os.spawnProcess(cmd);
+  return await new Promise((res, rej) => {
+    const handler: Neutralino.events.Handler<
+      Neutralino.os.SpawnProcessResult
+    > = (event) => {
+      let stdErr = "",
+        stdOut = "";
+      if (event!.detail.id == id) {
+        if ((event!.detail as any)["action"] == "exit") {
+          const exit = Number((event!.detail as any)["data"]);
+          if (exit == 0) {
+            res({
+              pid,
+              exitCode: exit,
+              stdErr,
+              stdOut,
+            });
+          } else {
+            rej(
+              new Error(
+                `Command return non-zero code\n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
+              )
+            );
+          }
+
+          Neutralino.events.off("spawnedProcess", handler);
+        } else if ((event!.detail as any)["action"] == "stdOut") {
+          stdOut += (event!.detail as any)["data"];
+        } else if ((event!.detail as any)["action"] == "stdErr") {
+          stdErr += (event!.detail as any)["data"];
+        }
+      }
+    };
+    Neutralino.events.on("spawnedProcess", handler);
+  });
+}
 
 export async function runInSudo(command: string) {
   command = command.replaceAll('"', '\\\\\\"').replaceAll("'", "\\'");
@@ -112,12 +118,13 @@ export function tar_extract(src: string, dst: string) {
 }
 
 export async function spawn(command: string, args: string[]) {
-  const cmd = `"${await resolve(command)}" ${args.map((x) => {
-    if (x.startsWith('"') || x.startsWith("'")) return x;
-    if (x.indexOf(" ") > -1) return `"${x}"`;
-    return x;
-  })
-  .join(" ")}`;
+  const cmd = `"${await resolve(command)}" ${args
+    .map((x) => {
+      if (x.startsWith('"') || x.startsWith("'")) return x;
+      if (x.indexOf(" ") > -1) return `"${x}"`;
+      return x;
+    })
+    .join(" ")}`;
   const { pid, id } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");

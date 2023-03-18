@@ -1,4 +1,5 @@
 import { Locale } from "./locale";
+import { log } from "./utils";
 
 export async function createGameInstallationDirectorySanitizer({
   openFolderDialog,
@@ -8,6 +9,7 @@ export async function createGameInstallationDirectorySanitizer({
   locale: Locale;
 }) {
   const HOME = await Neutralino.os.getEnv("HOME");
+  await log(`HOME:`+HOME);
 
   async function selectPath(): Promise<string> {
     retry: while (true) {
