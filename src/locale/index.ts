@@ -17,16 +17,16 @@ type Assertion = AssertKeysEqual<typeof zh_CN, typeof en>;
 export type LocaleTextKey = keyof typeof zh_CN;
 
 export const locales = {
-  zh_CN,
+  zh_cn: zh_CN,
   en,
 };
 
 export async function createLocale() {
-  let lang = "zh_CN";
+  let lang = "zh_cn";
   try {
-    lang = await getKey("config_lang");
+    lang = (await getKey("config_lang")).toLowerCase();
   } catch {
-    lang = await Neutralino.os.getEnv("LANG");
+    lang = navigator.language.replaceAll("-", "_").toLowerCase();
     if (lang == "") {
       lang = "en";
     } else {
@@ -36,10 +36,6 @@ export async function createLocale() {
     if (lang.startsWith("en_")) {
       lang = "en";
     }
-    // Traditional Chinese to be done
-    // if(["zh-MO","zh-HK"].indexOf(lang)>=0) {
-    //
-    // }
   }
   let locale =
     lang in locales ? locales[lang as keyof typeof locales] : locales["en"];
