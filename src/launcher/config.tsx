@@ -2,10 +2,13 @@ import {
   Box,
   Button,
   Checkbox,
+  createIcon,
   Divider,
   FormControl,
   FormLabel,
   HStack,
+  Input,
+  InputGroup,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -88,8 +91,13 @@ export async function createConfiguration({
       setwineVersions((x) => [...x, ...versions]);
     }
   })();
+
+  const gameInstallDir = await getKey("game_install_dir");
+
   return {
-    UI: function (props: { onClose: () => void }) {
+    UI: function (props: {
+      onClose: (action: "check-integrity" | "close") => void;
+    }) {
       async function onSave() {
         if (config.dxvkAsync != currentConfig().dxvkAsync) {
           config.dxvkAsync = currentConfig().dxvkAsync;
@@ -137,13 +145,22 @@ export async function createConfiguration({
 
           return;
         }
-        props.onClose();
+        props.onClose("close");
       }
       return (
         <ModalContent>
           <ModalHeader>{locale.get("SETTING")}</ModalHeader>
           <ModalBody ref={div}>
             <VStack spacing={"$4"}>
+              <FormControl id="wineVersion">
+                <FormLabel>{locale.get("SETTING_GAME_INSTALL_DIR")}</FormLabel>
+                <InputGroup>
+                  <Input disabled readOnly value={gameInstallDir} />
+                  {/* <InputRightElement cursor={"pointer"} onClick={() => {}}>
+                    <IconSetting boxSize="20px" color={"$blackAlpha9"} />
+                  </InputRightElement> */}
+                </InputGroup>
+              </FormControl>
               <FormControl id="wineVersion">
                 <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
                 <Select
@@ -174,7 +191,7 @@ export async function createConfiguration({
                 </Select>
               </FormControl>
               <Divider />
-              <FormControl id="dvxkAsync" mb="$4">
+              <FormControl id="dvxkAsync">
                 <FormLabel>{locale.get("SETTING_ASYNC_DXVK")}</FormLabel>
                 <Box>
                   <Checkbox
@@ -254,7 +271,13 @@ export async function createConfiguration({
           </ModalBody>
           <ModalFooter>
             <HStack spacing={"$4"}>
-              <Button variant="outline" onClick={props.onClose}>
+              <Button
+                variant="outline"
+                onClick={() => props.onClose("check-integrity")}
+              >
+                {locale.get("SETTING_CHECK_INTEGRITY")}
+              </Button>
+              <Button variant="outline" onClick={() => props.onClose("close")}>
                 {locale.get("SETTING_CANCEL")}
               </Button>
               <Button
@@ -272,3 +295,23 @@ export async function createConfiguration({
     config,
   };
 }
+
+const IconSetting = createIcon({
+  viewBox: "0 0 1024 1024",
+  path() {
+    return (
+      <>
+        <path
+          fill="currentColor"
+          d="M848 421.2c-16.6 0-30 13.4-30 30V770c0 38.6-31.4 70-70 70H272.1c-38.6 0-70-31.4-70-70V294.8c0-38.6 31.4-70 70-70h317.7c16.6 0 30-13.4 30-30s-13.4-30-30-30H272.1c-71.7 0-130.1 58.3-130.1 129.9v475.2c0 71.6 58.4 129.9 130.1 129.9h475.8c71.7 0 130.1-58.3 130.1-129.9V451.2c0-16.6-13.4-30-30-30z"
+          p-id="2764"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M443.7 572.5c11.7 11.7 30.8 11.7 42.4 0l383.4-383.4c11.7-11.7 11.7-30.8 0-42.4-11.7-11.7-30.8-11.7-42.4 0L443.7 530.1c-11.7 11.7-11.7 30.8 0 42.4z"
+          p-id="2765"
+        ></path>
+      </>
+    );
+  },
+});

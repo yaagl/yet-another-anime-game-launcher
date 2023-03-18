@@ -72,18 +72,8 @@ export async function checkGameState(locale: Locale, server: Server) {
       gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
     } as const;
   } catch {
-    await locale.alert("CANT_OPEN_GAME_FILE", "CANT_OPEN_GAME_FILE_DESC");
-    const selection = await openDir(locale.get("SELECT_INSTALLATION_DIR"));
-    if (selection != gameDir) {
-      await locale.alert("GAME_DIR_CHANGED", "GAME_DIR_CHANGED_DESC");
-      return {
-        gameInstalled: false,
-      } as const;
-    }
     return {
-      gameInstalled: true,
-      gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
+      gameInstalled: false,
     } as const;
   }
 }
@@ -331,7 +321,20 @@ export async function createLauncher({
             </Box>
             <Modal centered opened={isOpen()} onClose={onClose}>
               <ModalOverlay />
-              <ConfigurationUI onClose={onClose}></ConfigurationUI>
+              <ConfigurationUI
+                onClose={(action) => {
+                  onClose();
+                  if (action == "check-integrity") {
+                    taskQueue.next(async function* () {
+                      yield* checkIntegrityProgram({
+                        aria2,
+                        gameDir: _gameInstallDir(),
+                        remoteDir: decompressed_path,
+                      });
+                    });
+                  }
+                }}
+              ></ConfigurationUI>
             </Modal>
           </Flex>
         </Flex>

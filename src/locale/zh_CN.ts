@@ -57,5 +57,8 @@ export const zh_CN = {
     SETTING_DXVK_HUD_ALL: "显示所有信息",
     SETTING_RETINA: "Retina 模式",
     SETTING_SAVE: "保存",
-    SETTING_CANCEL: "取消"
+    SETTING_CANCEL: "取消",
+
+    SETTING_GAME_INSTALL_DIR: "游戏安装路径",
+    SETTING_CHECK_INTEGRITY: "检查文件完整性",
 }

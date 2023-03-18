@@ -10,7 +10,7 @@ export const en: typeof zh_CN = {
   PATCHING: "Patching game files",
   GAME_RUNNING: "Game is running (DO NOT CLOSE THE LAUNCHER)",
   REVERT_PATCHING: "Reverting patches",
-  SCANNING_FILES: "Checking game integrity. Completed files {0}/{1}",
+  SCANNING_FILES: "Checking game file integrity. Completed files {0}/{1}",
   DOWNLOADING_ENVIRONMENT: "Downloading environment files",
   DOWNLOADING_ENVIRONMENT_SPEED: "Downloading environment files ({0}/s)",
   EXTRACT_ENVIRONMENT: "Extracting environment",
@@ -58,5 +58,8 @@ export const en: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Everything",
   SETTING_RETINA: "Retina Mode",
   SETTING_SAVE: "Save",
-  SETTING_CANCEL: "Cancel"
+  SETTING_CANCEL: "Cancel",
+
+  SETTING_CHECK_INTEGRITY: "Check Integrity",
+  SETTING_GAME_INSTALL_DIR: "Game Installation Directory",
 };
