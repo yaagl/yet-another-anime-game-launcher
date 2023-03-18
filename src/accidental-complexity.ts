@@ -27,7 +27,7 @@ export async function createGameInstallationDirectorySanitizer({
         }
       }
       for (const seg of segments) {
-        if (/^[\x00-\x7F]*$/.test(seg)) {
+        if (!/^[\x00-\x7F]*$/.test(seg)) {
           await locale.alert("PATH_INVALID", "PATH_INVALID_ASCII_ONLY")
           continue retry;
         }
