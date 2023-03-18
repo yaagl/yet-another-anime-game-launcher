@@ -39,6 +39,7 @@ import { Github } from "../github";
 import { downloadAndInstallGameProgram } from "./program-install-game";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import { launchGameProgram } from "./program-launch-game";
+import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -136,6 +137,12 @@ export async function createLauncher({
     locale,
   });
 
+  const { selectPath } = await createGameInstallationDirectorySanitizer({
+    openFolderDialog: async () =>
+      await openDir(locale.get("SELECT_INSTALLATION_DIR")),
+    locale,
+  });
+
   return function Laucnher() {
     // const bh = 40 / window.devicePixelRatio;
     // const bw = 136 / window.devicePixelRatio;
@@ -197,11 +204,8 @@ export async function createLauncher({
           });
         });
       } else {
-        const selection = await openDir(locale.get("SELECT_INSTALLATION_DIR"));
-        if (!selection.startsWith("/")) {
-          await locale.alert("PATH_INVALID", "PLEASE_SELECT_A_DIR");
-          return;
-        }
+        const selection = await selectPath();
+        if (!selection) return;
         try {
           await stats(join(selection, "pkg_version"));
         } catch {

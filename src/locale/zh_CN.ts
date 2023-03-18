@@ -18,6 +18,8 @@ export const zh_CN = {
     RESTART_TO_INSTALL:"重启以完成更新",
     PATH_INVALID: "路径无效",
     PLEASE_SELECT_A_DIR: "请选择一个路径",
+    PATH_INVALID_ASCII_ONLY: "请选择只包含ASCII字符（英文+半角符号）的路径",
+    PATH_INVALID_FORBIDDEN_DIR: '请选择不存在于「桌面」「文档」或「下载」目录之下的路径',
     NOT_SUPPORTED_YET:"尚未支持",
     PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "当前启动器还不支持启动{0}版本。请等待后续更新。",
     UNSUPPORTED_VERSION: "不支持的版本",

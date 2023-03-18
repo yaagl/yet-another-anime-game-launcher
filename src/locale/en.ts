@@ -18,6 +18,8 @@ export const en: typeof zh_CN = {
   RESTART_TO_INSTALL: "Restart the program",
   PATH_INVALID: "Path is invalid",
   PLEASE_SELECT_A_DIR: "Please select a path",
+  PATH_INVALID_ASCII_ONLY: "Please ensure that the path contains only ASCII characters",
+  PATH_INVALID_FORBIDDEN_DIR: 'Please choose a path that is not inside "Desktop","Downloads" or "Documents"',
   NOT_SUPPORTED_YET: "Feature not supported yet",
   PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "The launcher doesn't support version {0} currently, please wait for updates",
   UNSUPPORTED_VERSION: "Not a supported version",
