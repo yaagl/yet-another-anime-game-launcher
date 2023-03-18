@@ -1,6 +1,6 @@
 import { zh_CN } from "./zh_CN";
 import { en } from "./en";
-import { vi_VN } from "./vi_VN"
+import { vi_VN } from "./vi_VN";
 import {
   alert as ualert,
   prompt as uprompt,
