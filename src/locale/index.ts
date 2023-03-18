@@ -1,5 +1,6 @@
 import { zh_CN } from "./zh_CN";
 import { en } from "./en";
+import { vi_VN } from "./vi_VN";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -19,6 +20,7 @@ export type LocaleTextKey = keyof typeof zh_CN;
 export const locales = {
   zh_cn: zh_CN,
   en,
+  vi_vn: vi_VN,
 };
 
 export async function createLocale() {
