@@ -1,6 +1,6 @@
-import { SuppportedContentLangId } from "./supported-content-lang-id";
+import { zh_CN } from "./zh_CN";
 
-export const vi_VN = {
+export const vi_VN: typeof zh_CN = {
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Chạy Game",
   INSTALL: "Cài đặt Game",
