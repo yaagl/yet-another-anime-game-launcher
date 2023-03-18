@@ -58,10 +58,10 @@ regedit retina.reg
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = `logs/game_${Date.now()}.log`;
-    await forceMove(
-      join(gameDir, atob("bWh5cGJhc2UuZGxs")),
-      join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak")
-    );
+    // await forceMove(
+    //   join(gameDir, atob("bWh5cGJhc2UuZGxs")),
+    //   join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak")
+    // );
     await Promise.all([
       wine.exec2(
         "cmd",
@@ -77,17 +77,17 @@ regedit retina.reg
         logfile
       ),
       (async () => {
-        while (processRunning) {
-          if ((await exec("cat",[logfile])).stdOut.includes("GCGMAH active")) {
-            await log("Game Launch Successful");
-            await forceMove(
-              join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
-              join(gameDir, atob("bWh5cGJhc2UuZGxs"))
-            );
-            break;
-          }
-          await wait(200);
-        }
+        // while (processRunning) {
+        //   if ((await exec("cat",[logfile])).stdOut.includes("GCGMAH active")) {
+        //     await log("Game Launch Successful");
+        //     await forceMove(
+        //       join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
+        //       join(gameDir, atob("bWh5cGJhc2UuZGxs"))
+        //     );
+        //     break;
+        //   }
+        //   await wait(200);
+        // }
       })(),
     ]);
     await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
@@ -98,13 +98,13 @@ regedit retina.reg
     await log(String(e));
   }
   processRunning = false;
-  try {
-    await stats(join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"));
-    await forceMove(
-      join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
-      join(gameDir, atob("bWh5cGJhc2UuZGxs"))
-    );
-  } catch {}
+  // try {
+  //   await stats(join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"));
+  //   await forceMove(
+  //     join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
+  //     join(gameDir, atob("bWh5cGJhc2UuZGxs"))
+  //   );
+  // } catch {}
 
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine.prefix, server);
