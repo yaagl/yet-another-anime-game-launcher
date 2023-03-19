@@ -17,7 +17,7 @@ import {
   exec,
 } from "../utils";
 import { Wine } from "../wine";
-import { LauncherConfiguration } from "./config";
+import { Config } from "./config";
 import { putLocal, patchProgram, patchRevertProgram } from "./patch";
 
 export async function* launchGameProgram({
@@ -30,7 +30,7 @@ export async function* launchGameProgram({
   gameDir: string;
   gameExecutable: string;
   wine: Wine;
-  config: LauncherConfiguration;
+  config: Config;
   server: Server;
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
