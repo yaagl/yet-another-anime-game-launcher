@@ -1,7 +1,7 @@
 import { zh_CN } from "./zh_CN";
 
  export const es_ES: typeof zh_CN = {
-    CONTENT_LANG_ID: "en-us",
+    CONTENT_LANG_ID: "es-es",
     LAUNCH: "Iniciar el juego",
     INSTALL: "Instalar el juego",
     UPDATING: "Actualizando",
