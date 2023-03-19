@@ -1,6 +1,7 @@
 import { zh_CN } from "./zh_CN";
 import { en } from "./en";
 import { vi_VN } from "./vi_VN";
+import { es_ES } from "./es_ES";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -21,6 +22,7 @@ export const locales = {
   zh_cn: zh_CN,
   en,
   vi_vn: vi_VN,
+  es_es: es_ES,
 };
 
 export async function createLocale() {
