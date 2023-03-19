@@ -16,6 +16,7 @@ import d3d9u from "../../dxvk/d3d9.dll?url";
 import d3d10coreu from "../../dxvk/d3d10core.dll?url";
 import d3d11u from "../../dxvk/d3d11.dll?url";
 import dxgiu from "../../dxvk/dxgi.dll?url";
+import { Config } from "./config";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -43,13 +44,17 @@ const dxvkFiles = [
 export async function* patchProgram(
   gameDir: string,
   winprefixDir: string,
-  server: Server
+  server: Server,
+  config: Config
 ): CommonUpdateProgram {
   try {
     await getKey("patched");
     return;
   } catch {}
-  for (const file of server.patched) {
+  for (const file of [
+    ...server.patched,
+    ...(config.workaround3 ? [] : server.patched2),
+  ]) {
     await forceMove(
       join(gameDir, file.file),
       join(gameDir, file.file + ".bak")
@@ -63,7 +68,10 @@ export async function* patchProgram(
     await log("patched " + file.file);
     await removeFile(join(gameDir, file.file + ".diff"));
   }
-  for (const file of server.removed.map(atob)) {
+  for (const file of [
+    ...server.removed,
+    ...(config.workaround3 ? [] : server.removed2),
+  ].map(atob)) {
     await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
   }
   await forceMove(
@@ -90,20 +98,27 @@ export async function* patchProgram(
 export async function* patchRevertProgram(
   gameDir: string,
   winprefixDir: string,
-  server: Server
+  server: Server,
+  config: Config
 ): CommonUpdateProgram {
   try {
     await getKey("patched");
   } catch {
     return;
   }
-  for (const file of server.patched) {
+  for (const file of [
+    ...server.patched,
+    ...(config.workaround3 ? [] : server.patched2),
+  ]) {
     await forceMove(
       join(gameDir, file.file + ".bak"),
       join(gameDir, file.file)
     );
   }
-  for (const file of server.removed.map(atob)) {
+  for (const file of [
+    ...server.removed,
+    ...(config.workaround3 ? [] : server.removed2),
+  ].map(atob)) {
     await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
   }
   await forceMove(

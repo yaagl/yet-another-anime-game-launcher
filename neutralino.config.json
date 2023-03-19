@@ -19,7 +19,8 @@
     "storage.*",
     "debug.log",
     "window.*",
-    "filesystem.*"
+    "filesystem.*",
+    "computer.*"
   ],
   "globalVariables": {},
   "modes": {

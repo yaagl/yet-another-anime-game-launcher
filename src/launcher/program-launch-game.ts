@@ -52,7 +52,7 @@ copy "${wine.toWinePath(
 regedit retina.reg
 "${wine.toWinePath(join(gameDir, gameExecutable))}"`;
   await writeFile(await resolve("config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, server);
+  yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(await resolve("./logs"));
   let processRunning = true;
   try {
@@ -107,5 +107,5 @@ regedit retina.reg
   await removeFile(await resolve("retina.reg"));
   await removeFile(await resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, server);
+  yield* patchRevertProgram(gameDir, wine.prefix, server, config);
 }

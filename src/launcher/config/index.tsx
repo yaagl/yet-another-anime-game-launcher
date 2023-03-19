@@ -16,6 +16,7 @@ import { createDxvkHUDConfig } from "./dxvk-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createWineDistroConfig } from "./wine-distribution";
+import { createWorkaround3Config } from "./workaround-3";
 
 export async function createConfiguration({
   wineVersionChecker,
@@ -41,6 +42,9 @@ export async function createConfiguration({
     gameInstallDir,
   });
 
+
+  const [W3, saveW3] = await createWorkaround3Config({ locale, config });
+
   return {
     UI: function (props: {
       onClose: (action: "check-integrity" | "close") => void;
@@ -52,6 +56,7 @@ export async function createConfiguration({
           saveDH(apply),
           saveRetina(apply),
           saveGID(apply),
+          saveW3(apply)
         ]);
         await Promise.all(postAction.map((x) => x()));
       }
@@ -66,6 +71,8 @@ export async function createConfiguration({
               <DA />
               <DH />
               <R />
+              <Divider />
+              <W3 />
             </VStack>
           </ModalBody>
           <ModalFooter>

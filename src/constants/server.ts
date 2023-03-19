@@ -118,16 +118,19 @@ export const CN_SERVER = {
       file: DLL1,
       diffUrl: c,
     },
-    // {
-    //   file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
-    //   diffUrl: e,
-    // },
+  ],
+  patched2: [
+    {
+      file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
+      diffUrl: e,
+    },
   ],
   removed: [
     "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
     "WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==",
     "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
   ],
+  removed2: ["bWh5cGJhc2UuZGxs"],
 };
 
 export type Server = typeof CN_SERVER;
@@ -148,15 +151,17 @@ export const OS_SERVER: Server = {
       file: DLL1,
       diffUrl: d,
     },
+  ],
+  patched2: [
     {
       file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
       diffUrl: f,
     },
   ],
   removed: [
-    "bWh5cGJhc2UuZGxs",
     "R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU=",
     "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl",
     "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
   ],
+  removed2: ["bWh5cGJhc2UuZGxs"],
 };
