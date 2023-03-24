@@ -1,4 +1,5 @@
 import {
+  Button,
   FormControl,
   FormLabel,
   Select,
@@ -12,11 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@hope-ui/solid";
-import { createSignal, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { Locale } from "../../locale";
 import { getKey, setKey, _safeRelaunch } from "../../utils";
 import { WineVersionChecker } from "../../wine";
-import { Config, NOOP } from "./config-def";
+import { Config } from "./config-def";
 
 declare module "./config-def" {
   interface Config {
@@ -54,36 +55,23 @@ export async function createWineDistroConfig({
     }
   })();
 
-  async function onSave(apply: boolean) {
-    if(!apply) {
-      setValue(config.wineDistro!);
-      return NOOP;
-    }
-    if (config.wineDistro! != value()) {
-      if (value() == "crossover") {
-        // FIXME: no op
-        return NOOP;
-      } else {
-        const tag = (config.wineDistro! = value());
-        await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
-        return async () => {
-          await setKey("wine_state", "update");
-          await setKey("wine_update_tag", tag);
-          await setKey(
-            "wine_update_url",
-            wineVersions().find((x) => x.tag == tag)!.url
-          );
-          await _safeRelaunch();
-        };
-      }
-    } else {
-      return async () => {};
+  async function applyChanges() {
+    const tag = (config.wineDistro! = value());
+    await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
+    {
+      await setKey("wine_state", "update");
+      await setKey("wine_update_tag", tag);
+      await setKey(
+        "wine_update_url",
+        wineVersions().find((x) => x.tag == tag)!.url
+      );
+      await _safeRelaunch();
     }
   }
 
   return [
     function UI() {
-      return (
+      return [
         <FormControl id="wineVersion">
           <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
           <Select value={value()} onChange={setValue}>
@@ -105,9 +93,11 @@ export async function createWineDistroConfig({
               </SelectListbox>
             </SelectContent>
           </Select>
-        </FormControl>
-      );
+        </FormControl>,
+        <Show when={value() != config.wineDistro}>
+          <Button size="sm" colorScheme="danger" onClick={applyChanges}>{locale.get('SETTING_WINE_VERSION_CONFIRM')}</Button>
+        </Show>,
+      ];
     },
-    onSave,
   ] as const;
 }

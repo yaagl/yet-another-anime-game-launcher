@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@hope-ui/solid";
-import { createSignal, For } from "solid-js";
+import { createEffect, createSignal, For } from "solid-js";
 import { Locale } from "../../locale";
 import { getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
@@ -48,6 +48,11 @@ export async function createDxvkHUDConfig({
     await setKey("config_dxvkHud", config.dxvkHud!);
     return NOOP;
   }
+
+  createEffect(()=>{
+    value();
+    onSave(true);
+  });
 
   return [
     function UI() {
@@ -91,6 +96,5 @@ export async function createDxvkHUDConfig({
         </FormControl>
       );
     },
-    onSave,
   ] as const;
 }

@@ -320,7 +320,7 @@ export async function createLauncher({
                 </Show>
               </ButtonGroup>
             </Box>
-            <Modal centered opened={isOpen()} onClose={onClose} scrollBehavior="inside">
+            <Modal opened={isOpen()} onClose={onClose} scrollBehavior="inside">
               <ModalOverlay />
               <ConfigurationUI
                 onClose={(action) => {

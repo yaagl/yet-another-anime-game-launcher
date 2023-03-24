@@ -1,3 +1,4 @@
+import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
  export const es_ES: typeof zh_CN = {
@@ -62,5 +63,9 @@ import { zh_CN } from "./zh_CN";
   
     SETTING_CHECK_INTEGRITY: "Revisar Integridad",
     SETTING_GAME_INSTALL_DIR: "Directorio de Instalación del Juego",
+    // 0.0.27
+    SETTING_WINE_VERSION_CONFIRM: en.SETTING_WINE_VERSION_CONFIRM,
+    SETTING_QUICK_ACTIONS: en.SETTING_QUICK_ACTIONS,
+    SETTING_GENERAL: en.SETTING_GENERAL,
   };
   

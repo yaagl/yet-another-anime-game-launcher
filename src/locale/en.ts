@@ -62,4 +62,8 @@ export const en: typeof zh_CN = {
 
   SETTING_CHECK_INTEGRITY: "Check Integrity",
   SETTING_GAME_INSTALL_DIR: "Game Installation Directory",
+  // 0.0.27
+  SETTING_WINE_VERSION_CONFIRM: "Click me to confirm the change",
+  SETTING_QUICK_ACTIONS: "Quick Actions",
+  SETTING_GENERAL: "General",
 };

@@ -1,13 +1,23 @@
 import {
+  Box,
   Button,
   Divider,
+  FormControl,
+  FormLabel,
+  Heading,
   HStack,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
+  Tab,
+  TabList,
+  TabPanel,
+  Tabs,
+  Text,
   VStack,
 } from "@hope-ui/solid";
+import { CURRENT_YAAGL_VERSION } from "../../constants";
 import { Locale } from "../../locale";
 import { WineVersionChecker } from "../../wine";
 import { Config } from "./config-def";
@@ -28,80 +38,79 @@ export async function createConfiguration({
   gameInstallDir: () => string;
 }) {
   const config: Partial<Config> = {};
-  const [WD, saveWD] = await createWineDistroConfig({
+  const [WD] = await createWineDistroConfig({
     locale,
     config,
     wineVersionChecker,
   });
-  const [DA, saveDA] = await createDxvkAsyncConfig({ locale, config });
-  const [DH, saveDH] = await createDxvkHUDConfig({ locale, config });
-  const [R, saveRetina] = await createRetinaConfig({ locale, config });
-  const [GID, saveGID] = await createGameInstallDirConfig({
+  const [DA] = await createDxvkAsyncConfig({ locale, config });
+  const [DH] = await createDxvkHUDConfig({ locale, config });
+  const [R] = await createRetinaConfig({ locale, config });
+  const [GID] = await createGameInstallDirConfig({
     locale,
     config,
     gameInstallDir,
   });
 
-
-  const [W3, saveW3] = await createWorkaround3Config({ locale, config });
+  const [W3] = await createWorkaround3Config({ locale, config });
 
   return {
     UI: function (props: {
       onClose: (action: "check-integrity" | "close") => void;
     }) {
-      async function onSave(apply: boolean) {
-        const postAction = await Promise.all([
-          saveWD(apply),
-          saveDA(apply),
-          saveDH(apply),
-          saveRetina(apply),
-          saveGID(apply),
-          saveW3(apply)
-        ]);
-        await Promise.all(postAction.map((x) => x()));
-      }
       return (
-        <ModalContent>
+        <ModalContent height={570} width={1000} maxWidth={1000}>
+          <ModalCloseButton />
           <ModalHeader>{locale.get("SETTING")}</ModalHeader>
-          <ModalBody>
-            <VStack spacing={"$4"}>
-              <GID />
-              <WD />
-              <Divider />
-              <DA />
-              <DH />
-              <R />
-              <Divider />
-              <W3 />
-            </VStack>
+          <ModalBody pb={20}>
+            <Tabs orientation="vertical" h="100%">
+              <TabList>
+                <Tab>{locale.get("SETTING_GENERAL")}</Tab>
+                <Tab>Wine</Tab>
+              </TabList>
+              <TabPanel flex={1} pt={0} h="100%">
+                <HStack spacing={"$4"}>
+                  <VStack spacing={"$4"} width="40%">
+                    <GID />
+                    <Divider />
+                    <DA />
+                    <DH />
+                    <R />
+                    <Divider />
+                    <W3 />
+                    <Divider />
+                    <FormControl id="dvxkAsync">
+                      <FormLabel>Yaagl version</FormLabel>
+                      <Text>{CURRENT_YAAGL_VERSION}</Text>
+                    </FormControl>
+                  </VStack>
+                  <Box flex={1} />
+                  <VStack
+                    spacing={"$4"}
+                    width="30%"
+                    alignItems="start"
+                    alignSelf="start"
+                  >
+                    <Heading level="1" ml={12}>
+                      {locale.get("SETTING_QUICK_ACTIONS")}
+                    </Heading>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => props.onClose("check-integrity")}
+                    >
+                      {locale.get("SETTING_CHECK_INTEGRITY")}
+                    </Button>
+                  </VStack>
+                </HStack>
+              </TabPanel>
+              <TabPanel flex={1} pt={0} h="100%">
+                <VStack spacing={"$4"} w="40%" alignItems="start">
+                  <WD />
+                </VStack>
+              </TabPanel>
+            </Tabs>
           </ModalBody>
-          <ModalFooter>
-            <HStack spacing={"$4"}>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  onSave(false).then(() => props.onClose("check-integrity"))
-                }
-              >
-                {locale.get("SETTING_CHECK_INTEGRITY")}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onSave(false).then(() => props.onClose("close"));
-                }}
-              >
-                {locale.get("SETTING_CANCEL")}
-              </Button>
-              <Button
-                onClick={() => {
-                  onSave(true).then(() => props.onClose("close"));
-                }}
-              >
-                {locale.get("SETTING_SAVE")}
-              </Button>
-            </HStack>
-          </ModalFooter>
         </ModalContent>
       );
     },

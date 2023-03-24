@@ -61,4 +61,8 @@ export const zh_CN = {
 
     SETTING_GAME_INSTALL_DIR: "游戏安装路径",
     SETTING_CHECK_INTEGRITY: "检查文件完整性",
+
+    SETTING_WINE_VERSION_CONFIRM: "点击确认修改",
+    SETTING_QUICK_ACTIONS: "快速操作",
+    SETTING_GENERAL: "通用",
 }

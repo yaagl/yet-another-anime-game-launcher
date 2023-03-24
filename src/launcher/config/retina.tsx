@@ -1,5 +1,5 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../../locale";
 import { getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
@@ -35,6 +35,11 @@ export async function createRetinaConfig({
     await setKey("config_retina", config.retina! ? "true" : "false");
     return NOOP;
   }
+  
+  createEffect(()=>{
+    value();
+    onSave(true);
+  });
 
   return [
     function UI() {
@@ -53,6 +58,5 @@ export async function createRetinaConfig({
         </FormControl>
       );
     },
-    onSave,
   ] as const;
 }

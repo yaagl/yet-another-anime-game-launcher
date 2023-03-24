@@ -1,5 +1,5 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../../locale";
 import { getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
@@ -44,6 +44,11 @@ export async function createWorkaround3Config({
     return NOOP;
   }
 
+  createEffect(() => {
+    value();
+    onSave(true);
+  });
+
   return [
     function UI() {
       return (
@@ -61,6 +66,5 @@ export async function createWorkaround3Config({
         </FormControl>
       );
     },
-    onSave,
   ] as const;
 }
