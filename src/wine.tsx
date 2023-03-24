@@ -162,27 +162,27 @@ export async function createWineInstallProgram({
         prefix: await resolve("./wineprefix"),
       });
       // backup
-      try {
-        await wine.exec("reg", [
-          "export",
-          `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}"`,
-          "backup1.reg",
-          "/y",
-          "&>",
-          "/dev/null" // lifesaver
-        ]);
-        await wine.exec("reg", [
-          "export",
-          `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK"`,
-          "backup2.reg",
-          "/y",
-          "&>",
-          "/dev/null"
-        ]);
-        existBackup = true;
-      } catch {
-        //failed to backup
-      }
+      // try {
+      //   await wine.exec("reg", [
+      //     "export",
+      //     `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}"`,
+      //     "backup1.reg",
+      //     "/y",
+      //     "&>",
+      //     "/dev/null", // lifesaver
+      //   ]);
+      //   await wine.exec("reg", [
+      //     "export",
+      //     `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK"`,
+      //     "backup2.reg",
+      //     "/y",
+      //     "&>",
+      //     "/dev/null",
+      //   ]);
+      //   existBackup = true;
+      // } catch {
+      //   //failed to backup
+      // }
       await rmrf_dangerously(wineBinaryDir);
       await rmrf_dangerously(wineAbsPrefix);
     } catch {}
@@ -231,17 +231,17 @@ export async function createWineInstallProgram({
       WINEPREFIX: `"${wineAbsPrefix}"`,
     });
 
-    if (existBackup) {
-      yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
-      await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
-        WINEPREFIX: `"${wineAbsPrefix}"`,
-      });
-      await removeFile(await resolve("./backup1.reg"));
-      await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
-        WINEPREFIX: `"${wineAbsPrefix}"`,
-      });
-      await removeFile(await resolve("./backup2.reg"));
-    }
+    // if (existBackup) {
+    //   yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
+    //   await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
+    //     WINEPREFIX: `"${wineAbsPrefix}"`,
+    //   });
+    //   await removeFile(await resolve("./backup1.reg"));
+    //   await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
+    //     WINEPREFIX: `"${wineAbsPrefix}"`,
+    //   });
+    //   await removeFile(await resolve("./backup2.reg"));
+    // }
     await log(g.stdOut);
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);
