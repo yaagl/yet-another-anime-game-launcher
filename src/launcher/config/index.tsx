@@ -27,6 +27,7 @@ import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createWorkaround3Config } from "./workaround-3";
+import createLocaleConfig from "./ui-locale";
 
 export async function createConfiguration({
   wineVersionChecker,
@@ -53,6 +54,7 @@ export async function createConfiguration({
   });
 
   const [W3] = await createWorkaround3Config({ locale, config });
+  const [UL] = await createLocaleConfig({ locale, config });
 
   return {
     UI: function (props: {
@@ -68,22 +70,25 @@ export async function createConfiguration({
                 <Tab>{locale.get("SETTING_GENERAL")}</Tab>
                 <Tab>Wine</Tab>
               </TabList>
-              <TabPanel flex={1} pt={0} h="100%">
-                <HStack spacing={"$4"}>
-                  <VStack spacing={"$4"} width="40%">
-                    <GID />
-                    <Divider />
-                    <DA />
-                    <DH />
-                    <R />
-                    <Divider />
-                    <W3 />
-                    <Divider />
-                    <FormControl id="dvxkAsync">
-                      <FormLabel>Yaagl version</FormLabel>
-                      <Text>{CURRENT_YAAGL_VERSION}</Text>
-                    </FormControl>
-                  </VStack>
+              <TabPanel flex={1} pt={0} pb={0}>
+                <HStack spacing={"$4"} h="100%">
+                  <Box width="40%" alignSelf="stretch" overflowY="scroll" pr={16}>
+                    <VStack spacing={"$4"}>
+                      <GID />
+                      <Divider />
+                      <DA />
+                      <DH />
+                      <R />
+                      <Divider />
+                      <W3 />
+                      <Divider />
+                      <UL />
+                      <FormControl>
+                        <FormLabel>Yaagl version</FormLabel>
+                        <Text>{CURRENT_YAAGL_VERSION}</Text>
+                      </FormControl>
+                    </VStack>
+                  </Box>
                   <Box flex={1} />
                   <VStack
                     spacing={"$4"}
@@ -104,7 +109,7 @@ export async function createConfiguration({
                   </VStack>
                 </HStack>
               </TabPanel>
-              <TabPanel flex={1} pt={0} h="100%">
+              <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <WD />
                 </VStack>

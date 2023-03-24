@@ -28,7 +28,7 @@ export const locales = {
 export async function createLocale() {
   let lang = "zh_cn";
   try {
-    lang = (await getKey("config_lang")).toLowerCase();
+    lang = (await getKey("config_uiLocale")).toLowerCase();
   } catch {
     lang = navigator.language.replaceAll("-", "_").toLowerCase();
     if (lang == "") {
@@ -41,8 +41,9 @@ export async function createLocale() {
       lang = "en";
     }
   }
-  let locale =
-    lang in locales ? locales[lang as keyof typeof locales] : locales["en"];
+  // @ts-ignore THIS IS A BUG
+  const currentLanguage: keyof typeof locales = lang in locales ? lang : "en";
+  let locale = locales[currentLanguage];
 
   function alert(
     title: LocaleTextKey,
@@ -73,6 +74,15 @@ export async function createLocale() {
     prompt,
     format,
     get,
+    supportedLanguages: Object.entries(locales).map(
+      ([id, { LANGUAGE_LOCALE_NAME }]) => {
+        return {
+          id,
+          name: LANGUAGE_LOCALE_NAME,
+        };
+      }
+    ),
+    currentLanguage
   };
 }
 

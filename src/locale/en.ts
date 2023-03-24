@@ -66,4 +66,7 @@ export const en: typeof zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "Click me to confirm the change",
   SETTING_QUICK_ACTIONS: "Quick Actions",
   SETTING_GENERAL: "General",
+  LANGUAGE_LOCALE_NAME: "English",
+  SETTING_UI_LOCALE: "Launcher UI Language",
+  SETTING_RESTART_TO_TAKE_EFFECT: "It will take effect after restart.",
 };

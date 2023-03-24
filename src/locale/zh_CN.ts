@@ -65,4 +65,7 @@ export const zh_CN = {
     SETTING_WINE_VERSION_CONFIRM: "点击确认修改",
     SETTING_QUICK_ACTIONS: "快速操作",
     SETTING_GENERAL: "通用",
+    LANGUAGE_LOCALE_NAME: "简体中文",
+    SETTING_UI_LOCALE: "启动器界面语言",
+    SETTING_RESTART_TO_TAKE_EFFECT: "此设置将从下次启动生效",
 }
