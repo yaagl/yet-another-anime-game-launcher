@@ -13,11 +13,13 @@ import {
   log,
   removeFile,
   resolve,
+  resolveSpace,
   rmrf_dangerously,
   setKey,
   tar_extract,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
+import cpu_db from "./constants/cpu_db";
 
 export async function createWine(options: {
   loaderBin: string;
@@ -37,7 +39,7 @@ export async function createWine(options: {
       options.loaderBin,
       program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
       {
-        WINEPREFIX: `"${options.prefix}"`,
+        ...getEnvironmentVariables(),
         ...(env ?? {}),
       },
       false,
@@ -55,7 +57,7 @@ export async function createWine(options: {
       options.loaderBin,
       program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
       {
-        WINEPREFIX: `"${options.prefix}"`,
+        ...getEnvironmentVariables(),
         ...(env ?? {}),
       },
       false,
@@ -67,12 +69,75 @@ export async function createWine(options: {
     return "Z:" + absPath.replaceAll("/", "\\");
   }
 
+  function getEnvironmentVariables() {
+    return {
+      WINEESYNC: "1",
+      WINEDEBUG: "fixme-all,error-unwind",
+      WINEPREFIX: options.prefix,
+      GIWINEPCNAME: netbiosname,
+      ...fakeCpu,
+      GIWINESYSMANU: "OEM",
+      GIWINESYSPRODNAME: "Generic x86-64",
+      GIWINESYSFAML: "B350", // I made it up
+    };
+  }
+
+  async function openCmdWindow({ gameDir }: { gameDir: string }) {
+    // 这逼转义我吐了真的
+    return await unixExec2(
+      `osascript`,
+      [
+        "-e",
+        `'tell app "Terminal" to do script "cd ${(
+          await resolve("./")
+        ).replaceAll(" ", "\\\\ ")} && ${Object.entries({
+          ...getEnvironmentVariables(),
+          WINEPATH: toWinePath(gameDir).replaceAll('\\','\\\\'),
+        })
+          .map(([key, value]) => {
+            return `${key}=${resolveSpace(value)} `;
+          })
+          .join("")
+          .replaceAll("\\", "\\\\")} ${options.loaderBin.replaceAll(
+          " ",
+          "\\\\ "
+        )} cmd"'`,
+        "-e",
+        `'tell app "Terminal" to activate'`,
+      ],
+      {},
+      false,
+      "/dev/null"
+    );
+  }
+
+  let netbiosname: string;
+  try {
+    netbiosname = await getKey("wine_netbiosname");
+  } catch {
+    netbiosname = `DESKTOP-${generateRandomString(6)}`; // exactly 15 chars
+    await setKey("wine_netbiosname", netbiosname);
+  }
+
+  const cpuInfo = await Neutralino.computer.getCPUInfo();
+  const fakeCpu: {} =
+    cpuInfo.model.indexOf("VirtualApple") >= 0
+      ? cpuInfo.logicalThreads in cpu_db
+        ? {
+            GIWINECPUNAME: cpu_db[cpuInfo.logicalThreads as 8][0].name,
+            GIWINECPUFREQ: cpu_db[cpuInfo.logicalThreads as 8][0].frequency,
+            GIWINECPUVID: cpu_db[cpuInfo.logicalThreads as 8][0].vendor,
+          }
+        : {}
+      : {};
+
   return {
     exec,
     exec2,
     cmd,
     toWinePath,
     prefix: options.prefix,
+    openCmdWindow,
   };
 }
 
@@ -96,9 +161,9 @@ export async function checkWine(github: Github) {
     return {
       wineReady: false,
       wineUpdate: github.acceleratedPath(
-        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/wine.tar.gz"
+        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.1/wine.tar.gz"
       ),
-      wineUpdateTag: "gi-wine-1.0",
+      wineUpdateTag: "gi-wine-1.1",
     } as const;
   }
 }
@@ -251,4 +316,16 @@ export async function createWineInstallProgram({
   }
 
   return createCommonUpdateUI(locale, program);
+}
+
+// by New Bing
+function generateRandomString(n: number) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (var i = 0; i < n; i++) {
+    const index = Math.floor(Math.random() * chars.length);
+    const char = chars.charAt(index);
+    result += char;
+  }
+  return result;
 }

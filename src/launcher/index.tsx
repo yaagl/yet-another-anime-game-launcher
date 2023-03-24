@@ -126,6 +126,7 @@ export async function createLauncher({
     gameInstallDir ?? ""
   );
   const { UI: ConfigurationUI, config } = await createConfiguration({
+    wine,
     wineVersionChecker: await createWineVersionChecker(github),
     locale,
     gameInstallDir: _gameInstallDir

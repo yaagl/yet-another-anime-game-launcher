@@ -68,4 +68,7 @@ export const zh_CN = {
     LANGUAGE_LOCALE_NAME: "简体中文",
     SETTING_UI_LOCALE: "启动器界面语言",
     SETTING_RESTART_TO_TAKE_EFFECT: "此设置将从下次启动生效",
+    SETTING_OPEN_CMD: "打开Wine命令行工具",
+    SETTING_OPEN_GAME_INSTALL_DIR: "打开游戏安装目录",
+    SETTING_OPEN_YAAGL_DIR: "打开Yaagl数据目录",
 }

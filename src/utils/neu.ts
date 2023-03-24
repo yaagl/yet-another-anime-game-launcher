@@ -10,6 +10,11 @@ export async function resolve(path: string) {
   return path;
 }
 
+export function resolveSpace(x: string) {
+  if (x.startsWith('"') || x.startsWith("'")) return x;
+  return x.replaceAll(" ", "\\ ");
+}
+
 export async function exec(
   command: string,
   args: string[],
@@ -21,17 +26,13 @@ export async function exec(
     env && typeof env == "object"
       ? Object.keys(env)
           .map((key) => {
-            return `${key}=${env[key]} `;
+            return `${key}=${resolveSpace(env[key])} `;
           })
           .join("")
       : ""
-  }"${await resolve(command)}" ${args
-    .map((x) => {
-      if (x.startsWith('"') || x.startsWith("'")) return x;
-      if (x.indexOf(" ") > -1) return `"${x}"`;
-      return x;
-    })
-    .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
+  }"${await resolve(command)}" ${args.map(resolveSpace).join(" ")}${
+    log_redirect ? ` &> ${log_redirect}` : ""
+  }`;
 
   const ret = sudo
     ? await runInSudo(cmd)
@@ -55,18 +56,15 @@ export async function exec2(
     env && typeof env == "object"
       ? Object.keys(env)
           .map((key) => {
-            return `${key}=${env[key]} `;
+            return `${key}=${resolveSpace(env[key])} `;
           })
           .join("")
       : ""
   }"${await resolve(command)}" ${args
-    .map((x) => {
-      if (x.startsWith('"') || x.startsWith("'")) return x;
-      if (x.indexOf(" ") > -1) return `"${x}"`;
-      return x;
-    })
+    .map(resolveSpace)
     .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
 
+  await log(cmd);
   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
   return await new Promise((res, rej) => {
     const handler: Neutralino.events.Handler<

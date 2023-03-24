@@ -7,6 +7,7 @@ import {
   CN_ADV_URL,
   CN_COMPANY_NAME,
   CN_CPS,
+  CN_CUSTOM_HOSTS,
   CN_DATA_DIR,
   CN_EXECUTABLE,
   CN_PRODUCT_NAME,
@@ -15,6 +16,7 @@ import {
   DLL2,
   OS_ADV_URL,
   OS_CPS,
+  OS_CUSTOM_HOSTS,
   OS_DATA_DIR,
   OS_EXECUTABLE,
   OS_PRODUCT_NAME,
@@ -131,6 +133,7 @@ export const CN_SERVER = {
     "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
   ],
   removed2: ["bWh5cGJhc2UuZGxs"],
+  hosts: CN_CUSTOM_HOSTS
 };
 
 export type Server = typeof CN_SERVER;
@@ -164,4 +167,5 @@ export const OS_SERVER: Server = {
     "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
   ],
   removed2: ["bWh5cGJhc2UuZGxs"],
+  hosts: OS_CUSTOM_HOSTS
 };

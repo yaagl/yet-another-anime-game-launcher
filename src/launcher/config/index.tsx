@@ -19,7 +19,7 @@ import {
 } from "@hope-ui/solid";
 import { CURRENT_YAAGL_VERSION } from "../../constants";
 import { Locale } from "../../locale";
-import { WineVersionChecker } from "../../wine";
+import { Wine, WineVersionChecker } from "../../wine";
 import { Config } from "./config-def";
 import { createDxvkAsyncConfig } from "./dxvk-async";
 import { createDxvkHUDConfig } from "./dxvk-hud";
@@ -28,12 +28,15 @@ import { createRetinaConfig } from "./retina";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
+import { exec2, resolve } from "../../utils";
 
 export async function createConfiguration({
+  wine,
   wineVersionChecker,
   locale,
   gameInstallDir,
 }: {
+  wine: Wine;
   wineVersionChecker: WineVersionChecker;
   locale: Locale;
   gameInstallDir: () => string;
@@ -72,7 +75,12 @@ export async function createConfiguration({
               </TabList>
               <TabPanel flex={1} pt={0} pb={0}>
                 <HStack spacing={"$4"} h="100%">
-                  <Box width="40%" alignSelf="stretch" overflowY="scroll" pr={16}>
+                  <Box
+                    width="40%"
+                    alignSelf="stretch"
+                    overflowY="scroll"
+                    pr={16}
+                  >
                     <VStack spacing={"$4"}>
                       <GID />
                       <Divider />
@@ -91,12 +99,12 @@ export async function createConfiguration({
                   </Box>
                   <Box flex={1} />
                   <VStack
-                    spacing={"$4"}
+                    spacing={"$1"}
                     width="30%"
                     alignItems="start"
                     alignSelf="start"
                   >
-                    <Heading level="1" ml={12}>
+                    <Heading level="1" ml={12} mb={"$4"}>
                       {locale.get("SETTING_QUICK_ACTIONS")}
                     </Heading>
                     <Button
@@ -105,6 +113,48 @@ export async function createConfiguration({
                       onClick={() => props.onClose("check-integrity")}
                     >
                       {locale.get("SETTING_CHECK_INTEGRITY")}
+                    </Button>
+                    <Divider />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        wine.openCmdWindow({
+                          gameDir: gameInstallDir(),
+                        })
+                      }
+                    >
+                      {locale.get("SETTING_OPEN_CMD")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        exec2(
+                          "open",
+                          [gameInstallDir()],
+                          {},
+                          false,
+                          "/dev/null"
+                        )
+                      }
+                    >
+                      {locale.get("SETTING_OPEN_GAME_INSTALL_DIR")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () =>
+                        await exec2(
+                          "open",
+                          [await resolve("./")],
+                          {},
+                          false,
+                          "/dev/null"
+                        )
+                      }
+                    >
+                      {locale.get("SETTING_OPEN_YAAGL_DIR")}
                     </Button>
                   </VStack>
                 </HStack>

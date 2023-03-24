@@ -69,4 +69,7 @@ export const en: typeof zh_CN = {
   LANGUAGE_LOCALE_NAME: "English",
   SETTING_UI_LOCALE: "Launcher UI Language",
   SETTING_RESTART_TO_TAKE_EFFECT: "It will take effect after restart.",
+  SETTING_OPEN_CMD: "Open Wine Command Line Tool",
+  SETTING_OPEN_GAME_INSTALL_DIR: "Open Game Install Directory",
+  SETTING_OPEN_YAAGL_DIR: "Open Yaagl Data Directory",
 };

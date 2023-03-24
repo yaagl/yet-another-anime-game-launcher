@@ -50,7 +50,8 @@ copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 regedit retina.reg
-"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+cd "${wine.toWinePath(gameDir)}"
+${gameExecutable}`;
   await writeFile(await resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(await resolve("./logs"));
@@ -67,12 +68,15 @@ regedit retina.reg
         "cmd",
         ["/c", `"${wine.toWinePath(await resolve("config.bat"))}"`],
         {
-          WINEESYNC: "1",
-          WINEDEBUG: "-all",
-          DXVK_HUD: config.dxvkHud,
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
           DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+          ...(config.dxvkHud == "none"
+            ? {}
+            : {
+                DXVK_HUD: config.dxvkHud,
+              }),
+          GIWINEHOSTS: server.hosts,
         },
         logfile
       ),
