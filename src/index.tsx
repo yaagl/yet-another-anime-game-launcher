@@ -3,7 +3,6 @@ import { createApp } from "./app";
 import { HopeProvider } from "@hope-ui/solid";
 import { amber } from "@radix-ui/colors";
 
-import "./styles.css";
 import { fatal } from "./utils";
 
 function createPlates(tag: string, color: any, colortag:string) {

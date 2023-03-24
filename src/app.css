@@ -20,25 +20,11 @@ body {
     position: absolute;
     cursor: pointer;
     right: 10vw;
-    bottom: 23vh;
+    bottom: calc( 23vh - 2px );
     background-size: contain;
 }
 
-.launch-button {
-    display: block;
-    position: absolute;
-    cursor: pointer;
-    right: 10vw;
-    bottom: 10vh;
-    width: 15vw;
-    height: 7vh;
-    border-radius: 8px;
-    background-color: #fdc606;
-    text-align: center;
-    line-height: 11vh;
-    color: #333;
-}
-.launch-button.disabled {
-    cursor: progress;
+.launch-button button {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 

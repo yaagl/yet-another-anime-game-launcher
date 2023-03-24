@@ -270,7 +270,7 @@ export async function createLauncher({
         ></div>
         <Flex h="100vh" direction={"column-reverse"}>
           <Flex
-            mr={"10vw"}
+            mr={"calc(10vw + 2px)"} // 微操大师
             ml={"10vw"}
             mb={50}
             columnGap="10vw"
@@ -299,7 +299,7 @@ export async function createLauncher({
               </Show>
             </Box>
             <Box>
-              <ButtonGroup size="xl" attached minWidth={150}>
+              <ButtonGroup class="launch-button" size="xl" attached minWidth={150}>
                 <Button
                   mr="-1px"
                   disabled={programBusy()}
