@@ -64,7 +64,6 @@ export async function exec2(
     .map(resolveSpace)
     .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
 
-  await log(cmd);
   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
   return await new Promise((res, rej) => {
     const handler: Neutralino.events.Handler<

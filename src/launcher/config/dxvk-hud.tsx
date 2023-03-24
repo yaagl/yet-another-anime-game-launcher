@@ -19,7 +19,7 @@ import { Config, NOOP } from "./config-def";
 
 declare module "./config-def" {
   interface Config {
-    dxvkHud: "none" | "fps" | "all";
+    dxvkHud: "" | "fps" | "all";
   }
 }
 
