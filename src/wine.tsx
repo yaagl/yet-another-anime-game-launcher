@@ -13,13 +13,13 @@ import {
   log,
   removeFile,
   resolve,
-  resolveSpace,
   rmrf_dangerously,
   setKey,
   tar_extract,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
 import cpu_db from "./constants/cpu_db";
+import { build, rawString } from "./command-builder";
 
 export async function createWine(options: {
   loaderBin: string;
@@ -36,8 +36,9 @@ export async function createWine(options: {
     log_file: string | undefined = undefined
   ) {
     return await unixExec(
-      options.loaderBin,
-      program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
+      program == "copy"
+        ? [options.loaderBin, "cmd", "/c", program, ...args]
+        : [options.loaderBin, program, ...args],
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -54,8 +55,9 @@ export async function createWine(options: {
     log_file: string | undefined = undefined
   ) {
     return await unixExec2(
-      options.loaderBin,
-      program == "copy" ? ["cmd", "/c", program, ...args] : [program, ...args],
+      program == "copy"
+        ? [options.loaderBin, "cmd", "/c", program, ...args]
+        : [options.loaderBin, program, ...args],
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -74,7 +76,7 @@ export async function createWine(options: {
       WINEESYNC: "1",
       WINEDEBUG: "fixme-all,error-unwind",
       WINEPREFIX: options.prefix,
-      GIWINEPCNAME: netbiosname,
+      GIWINEPCNAME: `${netbiosname}`,
       ...fakeCpu,
       GIWINESYSMANU: "OEM",
       GIWINESYSPRODNAME: "Generic x86-64",
@@ -83,27 +85,26 @@ export async function createWine(options: {
   }
 
   async function openCmdWindow({ gameDir }: { gameDir: string }) {
-    // 这逼转义我吐了真的
     return await unixExec2(
-      `osascript`,
       [
+        `osascript`,
         "-e",
-        `'tell app "Terminal" to do script "cd ${(
-          await resolve("./")
-        ).replaceAll(" ", "\\\\ ")} && ${Object.entries({
-          ...getEnvironmentVariables(),
-          WINEPATH: toWinePath(gameDir).replaceAll('\\','\\\\'),
-        })
-          .map(([key, value]) => {
-            return `${key}=${resolveSpace(value)} `;
+        [
+          "tell",
+          "app",
+          '"Terminal"',
+          "to",
+          "do",
+          "script",
+          `"${build([options.loaderBin, "cmd"], {
+            ...getEnvironmentVariables(),
+            WINEPATH: toWinePath(gameDir),
           })
-          .join("")
-          .replaceAll("\\", "\\\\")} ${options.loaderBin.replaceAll(
-          " ",
-          "\\\\ "
-        )} cmd"'`,
+            .replaceAll("\\", "\\\\")
+            .replaceAll('"', '\\"')}"`,
+        ].join(" "),
         "-e",
-        `'tell app "Terminal" to activate'`,
+        ["tell", "app", '"Terminal"', "to", "activate"].join(" "),
       ],
       {},
       false,
@@ -230,7 +231,7 @@ export async function createWineInstallProgram({
       // try {
       //   await wine.exec("reg", [
       //     "export",
-      //     `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}"`,
+      //     `HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}`,
       //     "backup1.reg",
       //     "/y",
       //     "&>",
@@ -238,7 +239,7 @@ export async function createWineInstallProgram({
       //   ]);
       //   await wine.exec("reg", [
       //     "export",
-      //     `"HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK"`,
+      //     `HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK`,
       //     "backup2.reg",
       //     "/y",
       //     "&>",
@@ -275,7 +276,7 @@ export async function createWineInstallProgram({
       yield ["setStateText", "EXTRACT_ENVIRONMENT"];
       yield ["setUndeterminedProgress"];
       await rmrf_dangerously(wineBinaryDir);
-      await unixExec("mkdir", ["-p", wineBinaryDir]);
+      await unixExec(["mkdir", "-p", wineBinaryDir]);
       await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
       await removeFile(wineTarPath);
 
@@ -288,22 +289,22 @@ export async function createWineInstallProgram({
       wineTag === "crossover"
         ? CROSSOVER_LOADER
         : await resolve("./wine/bin/wine64");
-    const d = await unixExec(wine64Bin, ["wineboot", "-u"], {
-      WINEPREFIX: `"${wineAbsPrefix}"`,
+    const d = await unixExec([wine64Bin, "wineboot", "-u"], {
+      WINEPREFIX: wineAbsPrefix,
     });
     await log(d.stdOut);
-    const g = await unixExec(wine64Bin, ["winecfg", "-v", "win10"], {
-      WINEPREFIX: `"${wineAbsPrefix}"`,
+    const g = await unixExec([wine64Bin, "winecfg", "-v", "win10"], {
+      WINEPREFIX: wineAbsPrefix,
     });
 
     // if (existBackup) {
     //   yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
     //   await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
-    //     WINEPREFIX: `"${wineAbsPrefix}"`,
+    //     WINEPREFIX: `${wineAbsPrefix}`,
     //   });
     //   await removeFile(await resolve("./backup1.reg"));
     //   await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
-    //     WINEPREFIX: `"${wineAbsPrefix}"`,
+    //     WINEPREFIX: `${wineAbsPrefix}`,
     //   });
     //   await removeFile(await resolve("./backup2.reg"));
     // }

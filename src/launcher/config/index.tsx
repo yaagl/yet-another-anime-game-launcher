@@ -131,8 +131,7 @@ export async function createConfiguration({
                       size="sm"
                       onClick={() =>
                         exec2(
-                          "open",
-                          [gameInstallDir()],
+                          ["open", gameInstallDir()],
                           {},
                           false,
                           "/dev/null"
@@ -146,8 +145,7 @@ export async function createConfiguration({
                       size="sm"
                       onClick={async () =>
                         await exec2(
-                          "open",
-                          [await resolve("./")],
+                          ["open", await resolve("./")],
                           {},
                           false,
                           "/dev/null"

@@ -65,7 +65,7 @@ regedit retina.reg
     await Promise.all([
       wine.exec2(
         "cmd",
-        ["/c", `"${wine.toWinePath(await resolve("./config.bat"))}"`],
+        ["/c", `${wine.toWinePath(await resolve("./config.bat"))}`],
         {
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
@@ -75,7 +75,7 @@ regedit retina.reg
             : {
                 DXVK_HUD: config.dxvkHud,
               }),
-          GIWINEHOSTS: `"${server.hosts}"`,
+          GIWINEHOSTS: `${server.hosts}`,
         },
         logfile
       ),

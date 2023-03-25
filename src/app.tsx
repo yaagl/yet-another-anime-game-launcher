@@ -19,6 +19,7 @@ import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { CROSSOVER_LOADER } from "./crossover";
 import { CN_SERVER, OS_SERVER } from "./constants";
+import { rawString } from "./command-builder";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -36,8 +37,9 @@ export async function createApp() {
   const github = await createGithubEndpoint();
   const aria2_session = await resolve("./aria2.session");
   await appendFile(aria2_session, "");
-  const pid = (await exec("echo", ["$PPID"])).stdOut.split("\n")[0];
-  const { pid: apid } = await spawn("./sidecar/aria2/aria2c", [
+  const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
+  const { pid: apid } = await spawn([
+    "./sidecar/aria2/aria2c",
     "-d",
     "/",
     "--no-conf",
@@ -46,9 +48,9 @@ export async function createApp() {
     `--rpc-listen-all=true`,
     `--rpc-allow-origin-all`,
     `--input-file`,
-    `"${aria2_session}"`,
+    `${aria2_session}`,
     `--save-session`,
-    `"${aria2_session}"`,
+    `${aria2_session}`,
     `--pause`,
     `true`,
     "--stop-with-process",
@@ -58,7 +60,7 @@ export async function createApp() {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
     try {
-      await exec("kill", [apid + ""]);
+      await exec(["kill", apid + ""]);
     } catch {
       await log("killing process failed?");
     }

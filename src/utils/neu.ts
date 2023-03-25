@@ -1,4 +1,5 @@
 import { join } from "path-browserify";
+import { build, CommandSegments, rawString } from "../command-builder";
 
 export async function resolve(path: string) {
   if (path.startsWith("./")) {
@@ -10,33 +11,18 @@ export async function resolve(path: string) {
   return path;
 }
 
-export function resolveSpace(x: string) {
-  if (x.startsWith('"') || x.startsWith("'")) return x;
-  return x.replaceAll(" ", "\\ ");
-}
-
 export async function exec(
-  command: string,
-  args: string[],
+  segments: CommandSegments,
   env?: { [key: string]: string },
   sudo: boolean = false,
   log_redirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = `${
-    env && typeof env == "object"
-      ? Object.keys(env)
-          .map((key) => {
-            return `${key}=${resolveSpace(env[key])} `;
-          })
-          .join("")
-      : ""
-  }"${await resolve(command)}" ${args.map(resolveSpace).join(" ")}${
-    log_redirect ? ` &> ${log_redirect}` : ""
-  }`;
-
-  const ret = sudo
-    ? await runInSudo(cmd)
-    : await Neutralino.os.execCommand(cmd, {});
+  const cmd = build(
+    [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
+    env
+  );
+  await log(sudo ? runInSudo(cmd) : cmd);
+  const ret = await Neutralino.os.execCommand(sudo ? runInSudo(cmd) : cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
       `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
@@ -46,24 +32,16 @@ export async function exec(
 }
 
 export async function exec2(
-  command: string,
-  args: string[],
+  segments: CommandSegments,
   env?: { [key: string]: string },
   sudo: boolean = false,
   log_redirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = `${
-    env && typeof env == "object"
-      ? Object.keys(env)
-          .map((key) => {
-            return `${key}=${resolveSpace(env[key])} `;
-          })
-          .join("")
-      : ""
-  }"${await resolve(command)}" ${args
-    .map(resolveSpace)
-    .join(" ")}${log_redirect ? ` &> ${log_redirect}` : ""}`;
-
+  const cmd = build(
+    [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
+    env
+  );
+  await log(cmd);
   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
   return await new Promise((res, rej) => {
     const handler: Neutralino.events.Handler<
@@ -101,27 +79,32 @@ export async function exec2(
   });
 }
 
-export async function runInSudo(command: string) {
-  command = command.replaceAll('"', '\\\\\\"').replaceAll("'", "\\'");
-  await log(command);
-  return await Neutralino.os.execCommand(
-    `osascript -e $'do shell script "${command}" with administrator privileges'`,
-    {}
-  );
+export function runInSudo(cmd: string) {
+  return build([
+    "osascript",
+    "-e",
+    [
+      "do",
+      "shell",
+      "script",
+      `"${cmd.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`,
+      "with",
+      "administrator",
+      "privileges",
+    ].join(" "),
+  ]);
 }
 
 export function tar_extract(src: string, dst: string) {
-  return exec("tar", ["-zxvf", src, "-C", dst]);
+  return exec(["tar", "-zxvf", src, "-C", dst]);
 }
 
-export async function spawn(command: string, args: string[]) {
-  const cmd = `"${await resolve(command)}" ${args
-    .map((x) => {
-      if (x.startsWith('"') || x.startsWith("'")) return x;
-      if (x.indexOf(" ") > -1) return `"${x}"`;
-      return x;
-    })
-    .join(" ")}`;
+export async function spawn(
+  segments: CommandSegments,
+  env?: { [key: string]: string }
+) {
+  const cmd = build(segments, env);
+  await log(cmd);
   const { pid, id } = await Neutralino.os.spawnProcess(cmd);
   // await Neutralino.os.
   await log(pid + "");
@@ -168,15 +151,16 @@ export async function appendFile(path: string, content: string) {
 }
 
 export async function forceMove(source: string, destination: string) {
-  return await exec("mv", [
+  return await exec([
+    "mv",
     "-f",
-    `"${await resolve(source)}"`,
-    `"${await resolve(destination)}"`,
+    `${await resolve(source)}`,
+    `${await resolve(destination)}`,
   ]);
 }
 
 export async function rmrf_dangerously(target: string) {
-  return await exec("rm", ["-rf", target]);
+  return await exec(["rm", "-rf", target]);
 }
 
 export async function prompt(title: string, message: string) {

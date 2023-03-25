@@ -1,17 +1,17 @@
+import { rawString } from "../command-builder";
 import { wait } from "./helper";
 import { exec, spawn, resolve, log } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
   return await exec(
-    `xattr`,
-    ["-r", "-d", attr, `"${await resolve(path)}"`],
+    [`xattr`, "-r", "-d", attr, `${await resolve(path)}`],
     {},
     true
   );
 }
 
 export async function md5(path: string): Promise<string> {
-  const p = await exec("md5", ["-q", await resolve(path)]);
+  const p = await exec(["md5", "-q", await resolve(path)]);
   return p.stdOut.split("\n")[0];
 }
 
@@ -20,7 +20,8 @@ export async function xdelta3(
   patchFile: string,
   targetFile: string
 ): Promise<Neutralino.os.ExecCommandResult> {
-  return await exec(await resolve("./sidecar/xdelta/xdelta3"), [
+  return await exec([
+    await resolve("./sidecar/xdelta/xdelta3"),
     "-d",
     "-s",
     originalFile,
@@ -34,7 +35,8 @@ export async function hpatchz(
   patchFile: string,
   targetFile: string
 ) {
-  return await exec(await resolve("./sidecar/hpatchz/hpatchz"), [
+  return await exec([
+    await resolve("./sidecar/hpatchz/hpatchz"),
     "-f",
     originalFile,
     patchFile,
@@ -43,7 +45,7 @@ export async function hpatchz(
 }
 
 export function mkdirp(dir: string) {
-  return exec("mkdir",["-p", dir]);
+  return exec(["mkdir", "-p", dir]);
 }
 
 // not so accurate progress
@@ -57,20 +59,31 @@ export async function* doStreamUnzip(
 
   const totalLines = Number(
     (
-      await exec("unzip", ["-l", source, "|", "tee", logFile, "|", "wc", "-l"])
+      await exec([
+        "unzip",
+        "-l",
+        source,
+        rawString("|"),
+        "tee",
+        logFile,
+        rawString("|"),
+        "wc",
+        "-l",
+      ])
     ).stdOut
       .trim()
       .split(" ")[0]
   );
-  const { id } = await spawn("unzip", [
+  const { id } = await spawn([
+    "unzip",
     "-o",
     source,
     "-d",
     destination,
-    "|",
+    rawString("|"),
     "tee",
     logFile,
-    "&>",
+    rawString("&>"),
     "/dev/null",
   ]);
   const handler: Neutralino.events.Handler<Neutralino.os.SpawnProcessResult> = (
@@ -88,7 +101,7 @@ export async function* doStreamUnzip(
   while (processExit == false) {
     await wait(200);
     const dNumber = Number(
-      (await exec("wc", ["-l", "<", logFile])).stdOut.trim().split(" ")[0]
+      (await exec(["wc", "-l", rawString("<"), logFile])).stdOut.trim().split(" ")[0]
     );
     yield [dNumber, totalLines] as const;
   }
