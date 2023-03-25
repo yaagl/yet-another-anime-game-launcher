@@ -74,7 +74,7 @@ export async function createWine(options: {
   function getEnvironmentVariables() {
     return {
       WINEESYNC: "1",
-      WINEDEBUG: "fixme-all,error-unwind",
+      WINEDEBUG: "fixme-all,error-unwind,+timestamp",
       WINEPREFIX: options.prefix,
       GIWINEPCNAME: `${netbiosname}`,
       ...fakeCpu,
@@ -163,9 +163,9 @@ export async function checkWine(github: Github) {
     return {
       wineReady: false,
       wineUpdate: github.acceleratedPath(
-        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.1/wine.tar.gz"
+        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.1.2-slim/wine.tar.gz"
       ),
-      wineUpdateTag: "gi-wine-1.1",
+      wineUpdateTag: "gi-wine-1.1.2-slim",
     } as const;
   }
 }
@@ -314,6 +314,8 @@ export async function createWineInstallProgram({
     await setKey("wine_tag", wineTag);
     await setKey("wine_update_url", null);
     await setKey("wine_update_tag", null);
+    const netbiosname = `DESKTOP-${generateRandomString(6)}`; // exactly 15 chars
+    await setKey("wine_netbiosname", netbiosname);
     yield ["setStateText", "INSTALL_DONE"];
   }
 
