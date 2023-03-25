@@ -121,8 +121,9 @@ export async function createWine(options: {
   }
 
   const cpuInfo = await Neutralino.computer.getCPUInfo();
+  await log(JSON.stringify(cpuInfo));
   const fakeCpu: {} =
-    cpuInfo.model.indexOf("VirtualApple") >= 0
+    cpuInfo.model.indexOf("Apple") >= 0
       ? cpuInfo.logicalThreads in cpu_db
         ? {
             GIWINECPUNAME: cpu_db[cpuInfo.logicalThreads as 8][0].name,

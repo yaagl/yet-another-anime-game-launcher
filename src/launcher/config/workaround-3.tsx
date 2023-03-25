@@ -26,7 +26,7 @@ export async function createWorkaround3Config({
     config.workaround3 =
       (await Neutralino.os.getEnv("YAAGL_OVERSEA")) == "1"
         ? false
-        : model.includes("VirtualApple") // HACK: the app runs on rosetta
+        : model.includes("Apple") // HACK: the app runs on rosetta
         ? true
         : false; // default value
   }
