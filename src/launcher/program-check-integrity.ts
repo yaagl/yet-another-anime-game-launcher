@@ -55,6 +55,7 @@ async function* checkIntegrityProgram({
     ];
     yield ["setProgress", (count / entries.length) * 100];
   }
+  setKey("patched", null);
   if (toFix.length == 0) {
     return;
   }
@@ -83,7 +84,6 @@ async function* checkIntegrityProgram({
       ];
     }
     count++;
-    setKey("patched", null);
     // yield ['setStateText', 'COMPLETE_FILE', count, toFix.length]
   }
 }
