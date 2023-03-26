@@ -8,6 +8,7 @@ import { Locale } from "./locale";
 import {
   exec as unixExec,
   exec2 as unixExec2,
+  forceMove,
   getKey,
   humanFileSize,
   log,
@@ -244,12 +245,17 @@ export async function createWineInstallProgram({
 
       const CROSSOVER_LIBDIR =
         "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib64";
+      
       await unixExec([
         "mv",
         "-n",
-        await resolve("./moltenvk/libMoltenVK.dylib"),
+        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
         join(CROSSOVER_LIBDIR, "libMoltenVK.dylib.bak"),
       ]);
+      await forceMove(
+        await resolve("./moltenvk/libMoltenVK.dylib"),
+        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
+      )
       await unixExec([
         "printf",
         "libMoltenVK.dylib is modified by Yaagl. You can restore it from libMoltenVK.dylib.bak\n",
