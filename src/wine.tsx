@@ -78,11 +78,6 @@ export async function createWine(options: {
       WINEESYNC: "1",
       WINEDEBUG: "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
-      GIWINEPCNAME: `${netbiosname}`,
-      ...fakeCpu,
-      GIWINESYSMANU: "OEM",
-      GIWINESYSPRODNAME: "Generic x86-64",
-      GIWINESYSFAML: "B350", // I made it up
     };
   }
 
@@ -114,26 +109,8 @@ export async function createWine(options: {
     );
   }
 
-  let netbiosname: string;
-  try {
-    netbiosname = await getKey("wine_netbiosname");
-  } catch {
-    netbiosname = `DESKTOP-${generateRandomString(6)}`; // exactly 15 chars
-    await setKey("wine_netbiosname", netbiosname);
-  }
-
   const cpuInfo = await Neutralino.computer.getCPUInfo();
   await log(JSON.stringify(cpuInfo));
-  const fakeCpu: {} =
-    cpuInfo.model.indexOf("Apple") >= 0
-      ? cpuInfo.logicalThreads in cpu_db
-        ? {
-            GIWINECPUNAME: cpu_db[cpuInfo.logicalThreads as 8][0].name,
-            GIWINECPUFREQ: cpu_db[cpuInfo.logicalThreads as 8][0].frequency,
-            GIWINECPUVID: cpu_db[cpuInfo.logicalThreads as 8][0].vendor,
-          }
-        : {}
-      : {};
 
   return {
     exec,
