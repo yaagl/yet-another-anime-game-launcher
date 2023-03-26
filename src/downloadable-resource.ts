@@ -68,5 +68,5 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
     }
   }
 
-  setKey("installed_dxvk_version", CURRENT_MVK_VERSION);
+  setKey("installed_dxvk_version", CURRENT_DXVK_VERSION);
 }

@@ -2,7 +2,7 @@ import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
 import { Server } from "./constants";
-import { CROSSOVER_DATA, CROSSOVER_LOADER } from "./crossover";
+import { checkCrossover, CROSSOVER_DATA, CROSSOVER_LOADER } from "./crossover";
 import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
 import {
@@ -229,9 +229,8 @@ export async function createWineInstallProgram({
       // } catch {
       //   //failed to backup
       // }
-      await rmrf_dangerously(wineBinaryDir);
-      await rmrf_dangerously(wineAbsPrefix);
     } catch {}
+    await rmrf_dangerously(wineAbsPrefix);
     if (wineTag === "crossover") {
       yield* checkAndDownloadMoltenVK(aria2);
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];

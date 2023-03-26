@@ -41,12 +41,14 @@ export async function createWineDistroConfig({
 
   const [value, setValue] = createSignal(config.wineDistro!);
 
-  const [wineVersions, setwineVersions] = createSignal([
-    {
-      tag: config.wineDistro!,
-      url: "not_applicable",
-    },
-  ]);
+  const [wineVersions, setwineVersions] = createSignal(
+    [
+      {
+        tag: config.wineDistro!,
+        url: "not_applicable",
+      },
+    ].filter((x) => x.tag != "crossover")
+  );
   (async () => {
     const versions = await wineVersionChecker.getAllReleases();
     if (versions.find((x) => x.tag === config.wineDistro!)) {
