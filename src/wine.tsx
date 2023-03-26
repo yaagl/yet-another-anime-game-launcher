@@ -2,7 +2,7 @@ import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
 import { Server } from "./constants";
-import { CROSSOVER_LOADER } from "./crossover";
+import { CROSSOVER_DATA, CROSSOVER_LOADER } from "./crossover";
 import { Github, GithubReleases } from "./github";
 import { Locale } from "./locale";
 import {
@@ -18,8 +18,10 @@ import {
   tar_extract,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
-import cpu_db from "./constants/cpu_db";
 import { build, rawString } from "./command-builder";
+import { checkAndDownloadMoltenVK } from "./downloadable-resource";
+import { ensureHosts } from "./hosts";
+import { ENSURE_HOSTS } from "./constants/server_secret";
 
 export async function createWine(options: {
   loaderBin: string;
@@ -254,7 +256,25 @@ export async function createWineInstallProgram({
       await rmrf_dangerously(wineAbsPrefix);
     } catch {}
     if (wineTag === "crossover") {
+      yield* checkAndDownloadMoltenVK(aria2);
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+
+      const CROSSOVER_LIBDIR =
+        "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib64";
+      await unixExec([
+        "mv",
+        "-n",
+        await resolve("./moltenvk/libMoltenVK.dylib"),
+        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib.bak"),
+      ]);
+      await unixExec([
+        "printf",
+        "libMoltenVK.dylib is modified by Yaagl. You can restore it from libMoltenVK.dylib.bak\n",
+        rawString(">"),
+        join(CROSSOVER_LIBDIR, "libMoltenVK-Modified-By-Yaagl"),
+      ]);
+      await ensureHosts(ENSURE_HOSTS);
+      yield ["setUndeterminedProgress"];
     } else {
       yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
       const wineTarPath = await resolve("./wine.tar.gz");
@@ -290,13 +310,30 @@ export async function createWineInstallProgram({
       wineTag === "crossover"
         ? CROSSOVER_LOADER
         : await resolve("./wine/bin/wine64");
-    const d = await unixExec([wine64Bin, "wineboot", "-u"], {
+    await unixExec([wine64Bin, "wineboot", "-u"], {
       WINEPREFIX: wineAbsPrefix,
     });
-    await log(d.stdOut);
-    const g = await unixExec([wine64Bin, "winecfg", "-v", "win10"], {
+    await unixExec([wine64Bin, "winecfg", "-v", "win10"], {
       WINEPREFIX: wineAbsPrefix,
     });
+    if (wineTag === "crossover") {
+      await unixExec(
+        [
+          wine64Bin,
+          "rundll32",
+          "setupapi.dll,InstallHinfSection",
+          "Win10Install",
+          "128",
+          "Z:" + `${CROSSOVER_DATA}/crossover.inf`.replaceAll("/", "\\"),
+        ],
+        {
+          WINEPREFIX: wineAbsPrefix,
+        }
+      );
+      await unixExec([wine64Bin, "rundll32", "mscoree.dll,wine_install_mono"], {
+        WINEPREFIX: wineAbsPrefix,
+      });
+    }
 
     // if (existBackup) {
     //   yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
@@ -309,7 +346,6 @@ export async function createWineInstallProgram({
     //   });
     //   await removeFile(await resolve("./backup2.reg"));
     // }
-    await log(g.stdOut);
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);
     await setKey("wine_update_url", null);

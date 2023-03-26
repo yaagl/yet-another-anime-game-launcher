@@ -159,6 +159,15 @@ export async function forceMove(source: string, destination: string) {
   ]);
 }
 
+export async function cp(source: string, destination: string) {
+  return await exec([
+    "cp",
+    "-p",
+    `${await resolve(source)}`,
+    `${await resolve(destination)}`,
+  ]);
+}
+
 export async function rmrf_dangerously(target: string) {
   return await exec(["rm", "-rf", target]);
 }

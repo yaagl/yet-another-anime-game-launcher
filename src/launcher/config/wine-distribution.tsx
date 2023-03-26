@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@hope-ui/solid";
 import { createSignal, For, Show } from "solid-js";
+import { checkCrossover } from "../../crossover";
 import { Locale } from "../../locale";
 import { getKey, setKey, _safeRelaunch } from "../../utils";
 import { WineVersionChecker } from "../../wine";
@@ -36,16 +37,16 @@ export async function createWineDistroConfig({
 }) {
   config.wineDistro = await getKey("wine_tag");
 
+  const crossoverPresent = await checkCrossover();
+
   const [value, setValue] = createSignal(config.wineDistro!);
 
-  const [wineVersions, setwineVersions] = createSignal(
-    [
-      {
-        tag: config.wineDistro!,
-        url: "not_applicable",
-      },
-    ].filter((x) => x.tag !== "crossover")
-  );
+  const [wineVersions, setwineVersions] = createSignal([
+    {
+      tag: config.wineDistro!,
+      url: "not_applicable",
+    },
+  ]);
   (async () => {
     const versions = await wineVersionChecker.getAllReleases();
     if (versions.find((x) => x.tag === config.wineDistro!)) {
@@ -63,7 +64,9 @@ export async function createWineDistroConfig({
       await setKey("wine_update_tag", tag);
       await setKey(
         "wine_update_url",
-        wineVersions().find((x) => x.tag == tag)!.url
+        tag == "crossover"
+          ? "not_appliable"
+          : wineVersions().find((x) => x.tag == tag)!.url
       );
       await _safeRelaunch();
     }
@@ -82,7 +85,14 @@ export async function createWineDistroConfig({
             </SelectTrigger>
             <SelectContent>
               <SelectListbox>
-                <For each={[...wineVersions()]}>
+                <For
+                  each={[
+                    ...wineVersions(),
+                    ...(crossoverPresent
+                      ? [{ tag: "crossover", url: "not_appliable" }]
+                      : []),
+                  ]}
+                >
                   {(item) => (
                     <SelectOption value={item.tag}>
                       <SelectOptionText>{item.tag}</SelectOptionText>
@@ -95,7 +105,9 @@ export async function createWineDistroConfig({
           </Select>
         </FormControl>,
         <Show when={value() != config.wineDistro}>
-          <Button size="sm" colorScheme="danger" onClick={applyChanges}>{locale.get('SETTING_WINE_VERSION_CONFIRM')}</Button>
+          <Button size="sm" colorScheme="danger" onClick={applyChanges}>
+            {locale.get("SETTING_WINE_VERSION_CONFIRM")}
+          </Button>
         </Show>,
       ];
     },

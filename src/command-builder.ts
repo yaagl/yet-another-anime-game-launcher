@@ -27,7 +27,9 @@ const sanitize = (str: string) =>
     .replaceAll("$", "\\$")
     .replaceAll("(", "\\(")
     .replaceAll(")", "\\)")
-    .replaceAll(";", "\\;");
+    .replaceAll(";", "\\;")
+    .replaceAll("\n","\\\\n")
+    .replaceAll("\t","\\\\t");
 
 export function build(
   command: CommandSegments,

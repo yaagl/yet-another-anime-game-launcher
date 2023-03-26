@@ -40,6 +40,7 @@ import { downloadAndInstallGameProgram } from "./program-install-game";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
+import { checkAndDownloadDXVK } from "../downloadable-resource";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -187,6 +188,8 @@ export async function createLauncher({
       if (_gameInstalled()) {
         // assert:
         taskQueue.next(async function* () {
+
+          yield* checkAndDownloadDXVK(aria2);
           yield* launchGameProgram({
             gameDir: _gameInstallDir(),
             wine,

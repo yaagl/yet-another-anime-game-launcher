@@ -9,13 +9,10 @@ import {
   readBinary,
   getKey,
   setKey,
+  cp,
 } from "../utils";
 import { xdelta3 } from "../utils/unix";
 
-import d3d9u from "../../dxvk/d3d9.dll?url";
-import d3d10coreu from "../../dxvk/d3d10core.dll?url";
-import d3d11u from "../../dxvk/d3d11.dll?url";
-import dxgiu from "../../dxvk/dxgi.dll?url";
 import { Config } from "./config";
 
 export async function putLocal(url: string, dest: string) {
@@ -25,19 +22,15 @@ export async function putLocal(url: string, dest: string) {
 const dxvkFiles = [
   {
     name: "dxgi",
-    url: dxgiu,
   },
   {
     name: "d3d9",
-    url: d3d9u,
   },
   {
     name: "d3d10core",
-    url: d3d10coreu,
   },
   {
     name: "d3d11",
-    url: d3d11u,
   },
 ];
 
@@ -90,7 +83,7 @@ export async function* patchProgram(
       join(system32Dir, f.name + ".dll"),
       join(system32Dir, f.name + ".dll.bak")
     );
-    await putLocal(f.url, join(system32Dir, f.name + ".dll"));
+    await cp(`./dxvk/${f.name}.dll`, join(system32Dir, f.name + ".dll"));
   }
   setKey("patched", "1");
 }
