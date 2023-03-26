@@ -18,6 +18,7 @@ export async function* checkAndDownloadMoltenVK(
   } catch {}
 
   await mkdirp("./moltenvk");
+  yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
     uri: "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/libMoltenVK.dylib",
     absDst: await resolve("./moltenvk/libMoltenVK.dylib"),
@@ -51,6 +52,7 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   } catch {}
 
   await mkdirp("./dxvk");
+  yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for (const file of dxvkFiles) {
     for await (const progress of aria2.doStreamingDownload({
       uri: `https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/${file}`,
