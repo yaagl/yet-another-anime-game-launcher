@@ -138,6 +138,13 @@ export async function checkWine(github: Github) {
     }
     return { wineReady: true, wineTag: await getKey("wine_tag") } as const;
   } catch (e) {
+    if (await checkCrossover()) {
+      return {
+        wineReady: false,
+        wineUpdate: "not_applicable",
+        wineUpdateTag: "crossover",
+      } as const;
+    }
     // FIXME:
     return {
       wineReady: false,
