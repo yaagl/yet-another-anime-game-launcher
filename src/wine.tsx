@@ -23,6 +23,7 @@ import { build, rawString } from "./command-builder";
 import { checkAndDownloadMoltenVK } from "./downloadable-resource";
 import { ensureHosts } from "./hosts";
 import { ENSURE_HOSTS } from "./constants/server_secret";
+import cpu_db from "./constants/cpu_db";
 
 export async function createWine(options: {
   loaderBin: string;

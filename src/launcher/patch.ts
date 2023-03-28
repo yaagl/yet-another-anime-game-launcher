@@ -44,28 +44,30 @@ export async function* patchProgram(
     await getKey("patched");
     return;
   } catch {}
-  for (const file of [
-    ...server.patched,
-    ...(config.workaround3 ? [] : server.patched2),
-  ]) {
-    await forceMove(
-      join(gameDir, file.file),
-      join(gameDir, file.file + ".bak")
-    );
-    await putLocal(file.diffUrl, join(gameDir, file.file + ".diff"));
-    await xdelta3(
-      join(gameDir, file.file + ".bak"),
-      join(gameDir, file.file + ".diff"),
-      join(gameDir, file.file)
-    );
-    await log("patched " + file.file);
-    await removeFile(join(gameDir, file.file + ".diff"));
-  }
-  for (const file of [
-    ...server.removed,
-    ...(config.workaround3 ? [] : server.removed2),
-  ].map(atob)) {
-    await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
+  if (!config.patchOff) {
+    for (const file of [
+      ...server.patched,
+      ...(config.workaround3 ? [] : server.patched2),
+    ]) {
+      await forceMove(
+        join(gameDir, file.file),
+        join(gameDir, file.file + ".bak")
+      );
+      await putLocal(file.diffUrl, join(gameDir, file.file + ".diff"));
+      await xdelta3(
+        join(gameDir, file.file + ".bak"),
+        join(gameDir, file.file + ".diff"),
+        join(gameDir, file.file)
+      );
+      await log("patched " + file.file);
+      await removeFile(join(gameDir, file.file + ".diff"));
+    }
+    for (const file of [
+      ...server.removed,
+      ...(config.workaround3 ? [] : server.removed2),
+    ].map(atob)) {
+      await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
+    }
   }
   await forceMove(
     join(gameDir, server.dataDir, "globalgamemanagers"),
@@ -99,20 +101,22 @@ export async function* patchRevertProgram(
   } catch {
     return;
   }
-  for (const file of [
-    ...server.patched,
-    ...(config.workaround3 ? [] : server.patched2),
-  ]) {
-    await forceMove(
-      join(gameDir, file.file + ".bak"),
-      join(gameDir, file.file)
-    );
-  }
-  for (const file of [
-    ...server.removed,
-    ...(config.workaround3 ? [] : server.removed2),
-  ].map(atob)) {
-    await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
+  if (!config.patchOff) {
+    for (const file of [
+      ...server.patched,
+      ...(config.workaround3 ? [] : server.patched2),
+    ]) {
+      await forceMove(
+        join(gameDir, file.file + ".bak"),
+        join(gameDir, file.file)
+      );
+    }
+    for (const file of [
+      ...server.removed,
+      ...(config.workaround3 ? [] : server.removed2),
+    ].map(atob)) {
+      await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
+    }
   }
   await forceMove(
     join(gameDir, server.dataDir, "globalgamemanagers.bak"),
