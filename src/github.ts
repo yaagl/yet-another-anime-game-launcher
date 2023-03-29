@@ -9,6 +9,7 @@ export async function createGithubEndpoint() {
       fetch(`${prefix}https://api.github.com/octocat`)
         .then((x) => x.text())
         .then((x) => prefix)
+        .catch(() => timeout(5000))
     ),
     timeout(5000),
   ]);
@@ -42,8 +43,6 @@ export type Github = ReturnType<typeof createGithubEndpoint> extends Promise<
   ? T
   : never;
 
-
-
 export interface GithubReleaseInfo {
   url: string;
   html_url: string;
@@ -68,4 +67,4 @@ export interface GithubReleaseAssetsInfo {
   content_type: string;
 }
 
-export type GithubReleases = GithubReleaseInfo[]
+export type GithubReleases = GithubReleaseInfo[];
