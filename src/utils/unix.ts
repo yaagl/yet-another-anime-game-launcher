@@ -2,7 +2,7 @@ import { rawString } from '../command-builder'
 import { wait } from './helper'
 import { exec, spawn, resolve, log } from './neu'
 
-export async function xattrRemove (attr: string, path: string) {
+export async function xattrRemove (attr: string, path: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec(
     ['xattr', '-r', '-d', attr, `${await resolve(path)}`],
     {},
@@ -89,7 +89,7 @@ export async function * doStreamUnzip (
   const handler: Neutralino.events.Handler<Neutralino.os.SpawnProcessResult> = (
     event
   ) => {
-    log(JSON.stringify(event!.detail))
+    void log(JSON.stringify(event!.detail))
     if (event!.detail.id === id) {
       if ((event!.detail as any).action === 'exit') {
         processExit = true

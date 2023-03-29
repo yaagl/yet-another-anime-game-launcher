@@ -42,7 +42,7 @@ export async function exec2 (
   )
   await log(cmd)
   const { id, pid } = await Neutralino.os.spawnProcess(cmd)
-  return await new Promise((res, rej) => {
+  return await new Promise((resolve, reject) => {
     const handler: Neutralino.events.Handler<
     Neutralino.os.SpawnProcessResult
     > = (event) => {
@@ -52,14 +52,14 @@ export async function exec2 (
         if ((event!.detail as any).action === 'exit') {
           const exit = Number((event!.detail as any).data)
           if (exit === 0) {
-            res({
+            resolve({
               pid,
               exitCode: exit,
               stdErr,
               stdOut
             })
           } else {
-            rej(
+            reject(
               new Error(
                 `Command return non-zero code\n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
               )
@@ -94,7 +94,7 @@ export function runInSudo (cmd: string): string {
   ])
 }
 
-export async function tar_extract (src: string, dst: string): Promise<Neutralino.os.ExecCommandResult> {
+export async function tarExtract (src: string, dst: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec(['tar', '-zxvf', src, '-C', dst])
 }
 
@@ -142,14 +142,14 @@ export async function fatal (error: any): Promise<void> {
     'OK'
   )
   await shutdown()
-  Neutralino.app.exit(-1)
+  void Neutralino.app.exit(-1)
 }
 
 export async function appendFile (path: string, content: string): Promise<void> {
   await Neutralino.filesystem.appendFile(await resolve(path), content)
 }
 
-export async function forceMove (source: string, destination: string) {
+export async function forceMove (source: string, destination: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec([
     'mv',
     '-f',
@@ -158,7 +158,7 @@ export async function forceMove (source: string, destination: string) {
   ])
 }
 
-export async function cp (source: string, destination: string) {
+export async function cp (source: string, destination: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec([
     'cp',
     '-p',
@@ -167,7 +167,7 @@ export async function cp (source: string, destination: string) {
   ])
 }
 
-export async function rmrfDangerously (target: string) {
+export async function rmrfDangerously (target: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec(['rm', '-rf', target])
 }
 
@@ -227,7 +227,7 @@ export function addTerminationHook (fn: (forced: boolean) => Promise<boolean>): 
 }
 
 // ??
-export async function GLOBAL_onClose (forced: boolean): Promise<boolean> {
+export async function globalOnClose (forced: boolean): Promise<boolean> {
   for (const hook of hooks.reverse()) {
     if (!(await hook(forced)) && !forced) {
       return false // aborted
@@ -251,8 +251,8 @@ export async function _safeRelaunch (): Promise<void> {
     await Neutralino.os.execCommand(`open "${app}"`, {
       background: true
     })
-    Neutralino.app.exit(0)
+    void Neutralino.app.exit(0)
   } else {
-    Neutralino.app.restartProcess()
+    void Neutralino.app.restartProcess()
   }
 }

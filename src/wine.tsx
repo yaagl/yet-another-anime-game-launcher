@@ -16,7 +16,7 @@ import {
   resolve,
   rmrfDangerously,
   setKey,
-  tar_extract
+  tarExtract
 } from './utils'
 import { xattrRemove } from './utils/unix'
 import { build, rawString } from './command-builder'
@@ -56,7 +56,7 @@ export async function createWine (options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    logFile: string | undefined = undefined
   ): Promise<Neutralino.os.ExecCommandResult> {
     return await unixExec2(
       program === 'copy'
@@ -67,7 +67,7 @@ export async function createWine (options: {
         ...(env ?? {})
       },
       false,
-      log_file
+      logFile
     )
   }
 
@@ -311,7 +311,7 @@ export async function createWineInstallProgram ({
       yield ['setUndeterminedProgress']
       await rmrfDangerously(wineBinaryDir)
       await unixExec(['mkdir', '-p', wineBinaryDir])
-      await tar_extract(await resolve('./wine.tar.gz'), wineBinaryDir)
+      await tarExtract(await resolve('./wine.tar.gz'), wineBinaryDir)
       await removeFile(wineTarPath)
 
       yield ['setStateText', 'CONFIGURING_ENVIRONMENT']

@@ -6,7 +6,7 @@ import {
   resolve,
   appendFile,
   addTerminationHook,
-  GLOBAL_onClose,
+  globalOnClose,
   setKey
 } from './utils'
 import { createAria2 } from './aria2'
@@ -24,11 +24,11 @@ import { rawString } from './command-builder'
 export async function createApp () {
   await setKey('singleton', null)
 
-  const aria2_port = 6868
+  const aria2Port = 6868
 
   await Neutralino.events.on('ready', async () => {})
   await Neutralino.events.on('windowClose', async () => {
-    if (await GLOBAL_onClose(false)) {
+    if (await globalOnClose(false)) {
       Neutralino.app.exit(0)
     }
   })
@@ -44,7 +44,7 @@ export async function createApp () {
     '/',
     '--no-conf',
     '--enable-rpc',
-    `--rpc-listen-port=${aria2_port}`,
+    `--rpc-listen-port=${aria2Port}`,
     '--rpc-listen-all=true',
     '--rpc-allow-origin-all',
     '--input-file',
@@ -67,7 +67,7 @@ export async function createApp () {
     return true
   })
   const aria2 = await Promise.race([
-    createAria2({ host: '127.0.0.1', port: aria2_port }),
+    createAria2({ host: '127.0.0.1', port: aria2Port }),
     timeout(10000)
   ]).catch(async () => await Promise.reject(new Error('Fail to launch aria2.')))
   await log(`Launched aria2 version ${aria2.version.version}`)

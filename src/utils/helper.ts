@@ -1,24 +1,24 @@
 export async function waitImageReady (url: string) {
-  return await new Promise((res, rej) => {
+  return await new Promise((resolve, reject) => {
     const image = new Image()
     image.src = url
-    image.onload = res
-    image.onerror = rej
+    image.onload = resolve
+    image.onerror = reject
   })
 }
 
 export async function timeout (ms: number): Promise<never> {
-  return await new Promise((_, rej) => {
+  return await new Promise((resolve, reject) => {
     setTimeout(() => {
-      rej('TIMEOUT')
+      reject('TIMEOUT')
     }, ms)
   })
 }
 
 export async function wait (ms: number): Promise<number> {
-  return await new Promise((res, rej) => {
+  return await new Promise((resolve, reject) => {
     setTimeout(() => {
-      res(ms)
+      resolve(ms)
     }, ms)
   })
 }

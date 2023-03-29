@@ -3,12 +3,12 @@ import { build, rawString } from './command-builder'
 import { exec as exec_callback } from 'child_process'
 
 async function exec (cmd: string): Promise<string[]> {
-  return await new Promise((result, error) => {
+  return await new Promise((resolve, reject) => {
     exec_callback(cmd, (err, stdout, stderr) => {
       if (err !== null) {
-        error(stderr)
+        reject(stderr)
       } else {
-        result(stdout.split('\n'))
+        resolve(stdout.split('\n'))
       }
     })
   })
