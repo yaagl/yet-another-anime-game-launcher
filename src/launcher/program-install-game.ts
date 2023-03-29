@@ -1,65 +1,65 @@
-import { join, basename } from "path-browserify";
-import { Aria2 } from "../aria2";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { Server } from "../constants";
+import { join, basename } from 'path-browserify'
+import { Aria2 } from '../aria2'
+import { CommonUpdateProgram } from '../common-update-ui'
+import { Server } from '../constants'
 import {
   mkdirp,
   humanFileSize,
   doStreamUnzip,
   removeFile,
-  writeFile,
-} from "../utils";
+  writeFile
+} from '../utils'
 
-export async function* downloadAndInstallGameProgram({
+export async function * downloadAndInstallGameProgram ({
   aria2,
   gameFileZip,
   // gameAudioZip,
   gameDir,
   gameVersion,
-  server,
+  server
 }: {
-  gameFileZip: string;
-  gameDir: string;
+  gameFileZip: string
+  gameDir: string
   // gameAudioZip: string;
-  gameVersion: string;
-  aria2: Aria2;
-  server: Server;
+  gameVersion: string
+  aria2: Aria2
+  server: Server
 }): CommonUpdateProgram {
-  const downloadTmp = join(gameDir, ".ariatmp");
-  const gameFileTmp = join(downloadTmp, "game.zip");
+  const downloadTmp = join(gameDir, '.ariatmp')
+  const gameFileTmp = join(downloadTmp, 'game.zip')
   // const audioFileTmp = join(downloadTmp, "audio.zip");
-  await mkdirp(downloadTmp);
-  yield ["setUndeterminedProgress"];
-  yield ["setStateText", "ALLOCATING_FILE"];
-  let gameFileStart = false;
+  await mkdirp(downloadTmp)
+  yield ['setUndeterminedProgress']
+  yield ['setStateText', 'ALLOCATING_FILE']
+  let gameFileStart = false
   for await (const progress of aria2.doStreamingDownload({
     uri: gameFileZip,
-    absDst: gameFileTmp,
+    absDst: gameFileTmp
   })) {
     if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-      continue;
+      continue
     }
-    gameFileStart = true;
+    gameFileStart = true
     yield [
-      "setStateText",
-      "DOWNLOADING_FILE_PROGRESS",
+      'setStateText',
+      'DOWNLOADING_FILE_PROGRESS',
       basename(gameFileZip),
       humanFileSize(Number(progress.downloadSpeed)),
       humanFileSize(Number(progress.completedLength)),
-      humanFileSize(Number(progress.totalLength)),
-    ];
+      humanFileSize(Number(progress.totalLength))
+    ]
     yield [
-      "setProgress",
+      'setProgress',
       Number(
         (progress.completedLength * BigInt(10000)) / progress.totalLength
-      ) / 100,
-    ];
+      ) / 100
+    ]
   }
-  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
+  yield ['setStateText', 'DECOMPRESS_FILE_PROGRESS']
   for await (const [dec, total] of doStreamUnzip(gameFileTmp, gameDir)) {
-    yield ["setProgress", (dec / total) * 100];
+    yield ['setProgress', (dec / total) * 100]
   }
-  await removeFile(gameFileTmp);
+  await removeFile(gameFileTmp)
   // yield ["setUndeterminedProgress"];
   // yield ["setStateText", "ALLOCATING_FILE"];
   // gameFileStart = false;
@@ -92,11 +92,11 @@ export async function* downloadAndInstallGameProgram({
   // }
   // await removeFile(audioFileTmp);
   await writeFile(
-    join(gameDir, "config.ini"),
+    join(gameDir, 'config.ini'),
     `[General]
   game_version=${gameVersion}
   channel=${server.channel_id}
   sub_channel=${server.subchannel_id}
   cps=${server.cps}`
-  );
+  )
 }

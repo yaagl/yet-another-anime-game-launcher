@@ -1,118 +1,118 @@
-const execa = require("execa");
-const fs = require("fs-extra");
-const path = require("path");
-const { rimraf } = require("rimraf");
-const { IconIcns } = require("@shockpkg/icon-encoder");
+const execa = require('execa')
+const fs = require('fs-extra')
+const path = require('path')
+const { rimraf } = require('rimraf')
+const { IconIcns } = require('@shockpkg/icon-encoder');
 
 (async () => {
-  const icns = new IconIcns();
-  const raw = true;
+  const icns = new IconIcns()
+  const raw = true
 
-  await execa("pnpm", ["exec", "tsc"]); // do typecheck first
-  await execa("pnpm", ["exec", "vite", "build"]);
-  await execa("pnpm", ["exec", "neu", "update"]);
-  await execa("cp", ["-R", "neutralinojs/.", "bin/."]);
+  await execa('pnpm', ['exec', 'tsc']) // do typecheck first
+  await execa('pnpm', ['exec', 'vite', 'build'])
+  await execa('pnpm', ['exec', 'neu', 'update'])
+  await execa('cp', ['-R', 'neutralinojs/.', 'bin/.'])
   // run neu build command
-  await execa("pnpm", ["exec", "neu", "build"]);
+  await execa('pnpm', ['exec', 'neu', 'build'])
 
   // build done read neutralino.config.js file
   const config = await fs.readJSON(
-    path.resolve(process.cwd(), "neutralino.config.json")
-  );
-  const isOverseaVersion = process.env["YAAGL_OVERSEA"] == "1";
+    path.resolve(process.cwd(), 'neutralino.config.json')
+  )
+  const isOverseaVersion = process.env.YAAGL_OVERSEA == '1'
   const bundleId = isOverseaVersion
-    ? config.applicationId + ".os"
-    : config.applicationId;
-  const appname = config.cli.binaryName;
+    ? config.applicationId + '.os'
+    : config.applicationId
+  const appname = config.cli.binaryName
   const appDistributionName = isOverseaVersion
-    ? config.cli.binaryName + " OS"
-    : config.cli.binaryName;
-  const binaryName = `${config.cli.binaryName}-mac_x64`;
+    ? config.cli.binaryName + ' OS'
+    : config.cli.binaryName
+  const binaryName = `${config.cli.binaryName}-mac_x64`
 
   // read package.json
-  const pkg = await fs.readJSON(path.resolve(process.cwd(), "package.json"));
+  const pkg = await fs.readJSON(path.resolve(process.cwd(), 'package.json'))
   // remove old app folder
-  await rimraf(path.resolve(process.cwd(), `${appDistributionName}.app`));
+  await rimraf(path.resolve(process.cwd(), `${appDistributionName}.app`))
   // create app folder
-  await fs.mkdir(path.resolve(process.cwd(), `${appDistributionName}.app`));
+  await fs.mkdir(path.resolve(process.cwd(), `${appDistributionName}.app`))
   await fs.mkdir(
-    path.resolve(process.cwd(), `${appDistributionName}.app`, "Contents")
-  );
-  await fs.mkdir(
-    path.resolve(
-      process.cwd(),
-      `${appDistributionName}.app`,
-      "Contents",
-      "MacOS"
-    )
-  );
+    path.resolve(process.cwd(), `${appDistributionName}.app`, 'Contents')
+  )
   await fs.mkdir(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "Resources"
+      'Contents',
+      'MacOS'
     )
-  );
+  )
   await fs.mkdir(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "Resources",
-      ".storage"
+      'Contents',
+      'Resources'
     )
-  );
+  )
+  await fs.mkdir(
+    path.resolve(
+      process.cwd(),
+      `${appDistributionName}.app`,
+      'Contents',
+      'Resources',
+      '.storage'
+    )
+  )
   // move binary to app folder
   await fs.move(
-    path.resolve(process.cwd(), "dist", appname, binaryName),
+    path.resolve(process.cwd(), 'dist', appname, binaryName),
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
+      'Contents',
+      'MacOS',
       binaryName
     )
-  );
+  )
   await fs.rename(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
+      'Contents',
+      'MacOS',
       binaryName
     ),
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
+      'Contents',
+      'MacOS',
       appname
     )
-  );
+  )
 
   // move res.neu or resources.neu to app folder
   const resources = fs.readdirSync(
-    path.resolve(process.cwd(), "dist", appname)
-  );
-  const resourcesFile = resources.find((file) => /res(ources)?/.test(file));
+    path.resolve(process.cwd(), 'dist', appname)
+  )
+  const resourcesFile = resources.find((file) => /res(ources)?/.test(file))
   await fs.copy(
-    path.resolve(process.cwd(), "dist", appname, resourcesFile),
+    path.resolve(process.cwd(), 'dist', appname, resourcesFile),
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "Resources",
+      'Contents',
+      'Resources',
       resourcesFile
     )
-  );
+  )
 
   // check if file exists
   if (fs.existsSync(path.join(process.cwd(), config.modes.window.icon))) {
     const iconFile = await fs.readFile(
       path.join(process.cwd(), config.modes.window.icon)
-    );
-    icns.addFromPng(iconFile, ["ic09"], raw);
+    )
+    icns.addFromPng(iconFile, ['ic09'], raw)
     // icns.addFromPng(iconFile, ['ic07'], raw);
     // icns.addFromPng(iconFile, ['ic08'], raw);
     // icns.addFromPng(iconFile, ['ic04'], raw);
@@ -129,26 +129,26 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "Resources",
-      "icon.icns"
+      'Contents',
+      'Resources',
+      'icon.icns'
     ),
     icns.encode()
-  );
+  )
 
   // create an empty icon file in the app folder
   await fs.ensureFile(
-    path.resolve(process.cwd(), `${appDistributionName}.app`, "Icon")
-  );
+    path.resolve(process.cwd(), `${appDistributionName}.app`, 'Icon')
+  )
 
   //
   await fs.writeFile(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
-      "parameterized"
+      'Contents',
+      'MacOS',
+      'parameterized'
     ),
     `#!/usr/bin/env bash
 SCRIPT_DIR="$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -159,59 +159,59 @@ CONTENTS_DIR="$(dirname "$SCRIPT_DIR")"
 rsync -rlptu "$CONTENTS_DIR/Resources/." "$APST_DIR"
 cd "$APST_DIR"
 PATH_LAUNCH="$(dirname "$CONTENTS_DIR")"${
-      isOverseaVersion ? " YAAGL_OVERSEA=1" : ""
+      isOverseaVersion ? ' YAAGL_OVERSEA=1' : ''
     } exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
-  );
+  )
 
   await fs.chmod(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
-      "parameterized"
+      'Contents',
+      'MacOS',
+      'parameterized'
     ),
     0o755
-  );
+  )
   await fs.chmod(
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "MacOS",
+      'Contents',
+      'MacOS',
       appname
     ),
     0o755
-  );
+  )
   // copy sidecar
   const sidecarDst = path.resolve(
     process.cwd(),
     `${appDistributionName}.app`,
-    `Contents`,
-    `Resources`,
-    `sidecar`
-  );
-  await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
-    preserveTimestamps: true,
+    'Contents',
+    'Resources',
+    'sidecar'
+  )
+  await fs.copy(path.resolve(process.cwd(), 'sidecar'), sidecarDst, {
+    preserveTimestamps: true
   });
 
-  (async function getFiles(dir) {
-    const dirents = await fs.readdir(dir, { withFileTypes: true });
+  (async function getFiles (dir) {
+    const dirents = await fs.readdir(dir, { withFileTypes: true })
     await Promise.all(
       dirents.map((dirent) => {
-        const res = path.resolve(dir, dirent.name);
+        const res = path.resolve(dir, dirent.name)
         return dirent.isDirectory()
           ? getFiles(res)
           : dirent.isFile()
-          ? dirent.name.split(".").length == 1
-            ? fs.chmod(res, 0o755).then(() => {
-                console.log("chmod +x " + res);
+            ? dirent.name.split('.').length == 1
+              ? fs.chmod(res, 0o755).then(() => {
+                console.log('chmod +x ' + res)
               })
+              : Promise.resolve()
             : Promise.resolve()
-          : Promise.resolve();
       })
-    );
-  })(sidecarDst);
+    )
+  })(sidecarDst)
 
   // chmod executable
   // create info.plist file
@@ -219,8 +219,8 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")"${
     path.resolve(
       process.cwd(),
       `${appDistributionName}.app`,
-      "Contents",
-      "info.plist"
+      'Contents',
+      'info.plist'
     ),
     `<?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -255,5 +255,5 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")"${
         </dict>
     </dict>
     </plist>`
-  );
-})();
+  )
+})()

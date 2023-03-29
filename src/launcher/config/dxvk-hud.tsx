@@ -10,55 +10,55 @@ import {
   SelectOptionText,
   SelectPlaceholder,
   SelectTrigger,
-  SelectValue,
-} from "@hope-ui/solid";
-import { createEffect, createSignal, For } from "solid-js";
-import { Locale } from "../../locale";
-import { getKey, setKey } from "../../utils";
-import { Config, NOOP } from "./config-def";
+  SelectValue
+} from '@hope-ui/solid'
+import { createEffect, createSignal, For } from 'solid-js'
+import { Locale } from '../../locale'
+import { getKey, setKey } from '../../utils'
+import { Config, NOOP } from './config-def'
 
-declare module "./config-def" {
+declare module './config-def' {
   interface Config {
-    dxvkHud: "" | "fps" | "all";
+    dxvkHud: '' | 'fps' | 'all'
   }
 }
 
-export async function createDxvkHUDConfig({
+export async function createDxvkHUDConfig ({
   locale,
-  config,
+  config
 }: {
-  config: Partial<Config>;
-  locale: Locale;
+  config: Partial<Config>
+  locale: Locale
 }) {
   try {
-    config.dxvkHud = (await getKey("config_dxvkHud")) as any;
+    config.dxvkHud = (await getKey('config_dxvkHud')) as any
   } catch {
-    config.dxvkHud = "fps"; // default value
+    config.dxvkHud = 'fps' // default value
   }
 
-  const [value, setValue] = createSignal(config.dxvkHud);
+  const [value, setValue] = createSignal(config.dxvkHud)
 
-  async function onSave(apply: boolean) {
-    if(!apply) {
-      setValue(config.dxvkHud!);
-      return NOOP;
+  async function onSave (apply: boolean) {
+    if (!apply) {
+      setValue(config.dxvkHud!)
+      return NOOP
     }
-    if(config.dxvkHud! == value()) return NOOP;
-    config.dxvkHud = value();
-    await setKey("config_dxvkHud", config.dxvkHud!);
-    return NOOP;
+    if (config.dxvkHud! == value()) return NOOP
+    config.dxvkHud = value()
+    await setKey('config_dxvkHud', config.dxvkHud!)
+    return NOOP
   }
 
-  createEffect(()=>{
-    value();
-    onSave(true);
-  });
+  createEffect(() => {
+    value()
+    onSave(true)
+  })
 
   return [
-    function UI() {
+    function UI () {
       return (
-        <FormControl id="dxvkHud">
-          <FormLabel>{locale.get("SETTING_DXVK_HUD")}</FormLabel>
+        <FormControl id='dxvkHud'>
+          <FormLabel>{locale.get('SETTING_DXVK_HUD')}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
               <SelectPlaceholder>Choose an option</SelectPlaceholder>
@@ -70,17 +70,17 @@ export async function createDxvkHUDConfig({
                 <For
                   each={[
                     {
-                      value: "",
-                      name: locale.get("SETTING_DXVK_HUD_NONE"),
+                      value: '',
+                      name: locale.get('SETTING_DXVK_HUD_NONE')
                     },
                     {
-                      value: "fps",
-                      name: locale.get("SETTING_DXVK_HUD_FPS"),
+                      value: 'fps',
+                      name: locale.get('SETTING_DXVK_HUD_FPS')
                     },
                     {
-                      value: "full",
-                      name: locale.get("SETTING_DXVK_HUD_ALL"),
-                    },
+                      value: 'full',
+                      name: locale.get('SETTING_DXVK_HUD_ALL')
+                    }
                   ]}
                 >
                   {(item) => (
@@ -94,7 +94,7 @@ export async function createDxvkHUDConfig({
             </SelectContent>
           </Select>
         </FormControl>
-      );
-    },
-  ] as const;
+      )
+    }
+  ] as const
 }

@@ -1,8 +1,8 @@
-import b from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
-import c from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
-import d from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
-import e from "../../external/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url";
-import f from "../../external/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url";
+import b from '../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url'
+import c from '../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url'
+import d from '../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url'
+import e from '../../external/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url'
+import f from '../../external/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url'
 import {
   CN_ADV_URL,
   CN_COMPANY_NAME,
@@ -20,92 +20,92 @@ import {
   OS_DATA_DIR,
   OS_EXECUTABLE,
   OS_PRODUCT_NAME,
-  OS_UPDATE_URL,
-} from "./server_secret";
+  OS_UPDATE_URL
+} from './server_secret'
 
 interface VoicePackDef {
-  language: "zh-cn" | "en-us" | "ja-jp" | "ko-kr";
-  name: string;
-  package_size: string;
-  size: string;
-  path: string;
-  md5: string;
+  language: 'zh-cn' | 'en-us' | 'ja-jp' | 'ko-kr'
+  name: string
+  package_size: string
+  size: string
+  path: string
+  md5: string
 }
 
 interface GameDef {
-  name: string;
-  path: string;
-  package_size: string;
-  md5: string;
-  version: string;
-  size: string;
-  entry: string;
-  decompressed_path: string;
-  voice_packs: VoicePackDef[];
-  segments: {
-    md5: string;
-    path: string;
-  }[];
+  name: string
+  path: string
+  package_size: string
+  md5: string
+  version: string
+  size: string
+  entry: string
+  decompressed_path: string
+  voice_packs: VoicePackDef[]
+  segments: Array<{
+    md5: string
+    path: string
+  }>
 }
 
 export interface ServerVersionData {
   data: {
-    deprecated_files: {
-      name: string;
-      md5: string;
-    }[];
-    deprecated_packages: [];
-    force_update: null;
+    deprecated_files: Array<{
+      name: string
+      md5: string
+    }>
+    deprecated_packages: []
+    force_update: null
     game: {
-      latest: GameDef;
-      diffs: {
-        is_recommended_update: boolean;
-        md5: string;
-        name: string;
-        package_size: string;
-        path: string;
-        size: string;
-        version: string;
-        voice_packs: VoicePackDef[];
-      }[];
-    };
+      latest: GameDef
+      diffs: Array<{
+        is_recommended_update: boolean
+        md5: string
+        name: string
+        package_size: string
+        path: string
+        size: string
+        version: string
+        voice_packs: VoicePackDef[]
+      }>
+    }
     plugin: {
-      plugins: {}[]; // not necessary
-      version: string;
-    };
-    pre_download_game: null; // fixme:
-    sdk: null;
-    web_url: string;
-  };
-  message: string;
-  retcode: number;
+      plugins: Array<{}> // not necessary
+      version: string
+    }
+    pre_download_game: null // fixme:
+    sdk: null
+    web_url: string
+  }
+  message: string
+  retcode: number
 }
 
 export interface ServerContentData {
   data: {
     adv: {
-      background: string;
-      bg_checksum: string;
-      icon: string;
-      url: string;
-      version: string;
-    };
-    banner: [];
-    icon: [];
+      background: string
+      bg_checksum: string
+      icon: string
+      url: string
+      version: string
+    }
+    banner: []
+    icon: []
     links: {
-      faq: string;
-      version: string;
-    };
-    more: null;
-    post: [];
-    qq: [];
-  };
-  message: string;
-  retcode: number;
+      faq: string
+      version: string
+    }
+    more: null
+    post: []
+    qq: []
+  }
+  message: string
+  retcode: number
 }
 
 export const CN_SERVER = {
-  id: "CN",
+  id: 'CN',
   update_url: CN_UPDATE_URL,
   channel_id: 1,
   subchannel_id: 1,
@@ -118,28 +118,28 @@ export const CN_SERVER = {
   patched: [
     {
       file: DLL1,
-      diffUrl: c,
-    },
+      diffUrl: c
+    }
   ],
   patched2: [
     {
       file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
-      diffUrl: e,
-    },
+      diffUrl: e
+    }
   ],
   removed: [
-    "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
+    'WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl',
+    'WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==',
+    'WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA=='
   ],
-  removed2: ["bWh5cGJhc2UuZGxs"],
+  removed2: ['bWh5cGJhc2UuZGxs'],
   hosts: CN_CUSTOM_HOSTS
-};
+}
 
-export type Server = typeof CN_SERVER;
+export type Server = typeof CN_SERVER
 
 export const OS_SERVER: Server = {
-  id: "OS",
+  id: 'OS',
   update_url: OS_UPDATE_URL,
   channel_id: 1,
   subchannel_id: 0,
@@ -152,20 +152,20 @@ export const OS_SERVER: Server = {
   patched: [
     {
       file: DLL1,
-      diffUrl: d,
-    },
+      diffUrl: d
+    }
   ],
   patched2: [
     {
       file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
-      diffUrl: f,
-    },
+      diffUrl: f
+    }
   ],
   removed: [
-    "R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU=",
-    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl",
-    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
+    'R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU=',
+    'R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl',
+    'R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs'
   ],
-  removed2: ["bWh5cGJhc2UuZGxs"],
+  removed2: ['bWh5cGJhc2UuZGxs'],
   hosts: OS_CUSTOM_HOSTS
-};
+}

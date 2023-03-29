@@ -1,33 +1,33 @@
-import { gte, coerce } from "semver";
-import { rawString } from "./command-builder";
-import { exec, log, stats } from "./utils";
+import { gte, coerce } from 'semver'
+import { rawString } from './command-builder'
+import { exec, log, stats } from './utils'
 
 export const CROSSOVER_LOADER =
-  "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader64";
+  '/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader64'
 
 export const CROSSOVER_DATA =
-  "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/share/crossover/bottle_data";
+  '/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/share/crossover/bottle_data'
 
-export async function checkCrossover() {
-  return false; // FIXME
+export async function checkCrossover () {
+  return false // FIXME
   try {
-    await stats(CROSSOVER_LOADER);
+    await stats(CROSSOVER_LOADER)
     const { stdOut } = await exec([
-      "cat",
-      "/Applications/CrossOver.app/Contents/Info.plist",
-      rawString("|"),
-      "grep",
-      "-A1",
-      "CFBundleShortVersionString",
-      rawString("|"),
-      "grep",
-      "string",
-      rawString("|"),
-      "sed",
-      "s/<[^>]*>//g",
-    ]);
-    return gte(coerce(stdOut.split("\n")[0].trim())!, "22.1.0", { loose: true });
+      'cat',
+      '/Applications/CrossOver.app/Contents/Info.plist',
+      rawString('|'),
+      'grep',
+      '-A1',
+      'CFBundleShortVersionString',
+      rawString('|'),
+      'grep',
+      'string',
+      rawString('|'),
+      'sed',
+      's/<[^>]*>//g'
+    ])
+    return gte(coerce(stdOut.split('\n')[0].trim())!, '22.1.0', { loose: true })
   } catch {
-    return false;
+    return false
   }
 }

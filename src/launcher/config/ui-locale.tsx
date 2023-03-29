@@ -11,36 +11,35 @@ import {
   SelectPlaceholder,
   SelectTrigger,
   SelectValue,
-  Text,
-} from "@hope-ui/solid";
-import { createEffect, createSignal, For, Show } from "solid-js";
-import { Locale } from "../../locale";
-import { setKey } from "../../utils";
-import { Config } from "./config-def";
+  Text
+} from '@hope-ui/solid'
+import { createEffect, createSignal, For, Show } from 'solid-js'
+import { Locale } from '../../locale'
+import { setKey } from '../../utils'
+import { Config } from './config-def'
 
-export default async function({
-  locale,
+export default async function ({
+  locale
 }: {
-  config: Partial<Config>;
-  locale: Locale;
+  config: Partial<Config>
+  locale: Locale
 }) {
+  const [value, setValue] = createSignal(locale.currentLanguage)
 
-  const [value, setValue] = createSignal(locale.currentLanguage);
-
-  async function onSave(apply: boolean) {
-    await setKey("config_uiLocale", value());
+  async function onSave (apply: boolean) {
+    await setKey('config_uiLocale', value())
   }
 
-  createEffect(()=>{
-    value();
-    onSave(true);
-  });
+  createEffect(() => {
+    value()
+    onSave(true)
+  })
 
   return [
-    function UI() {
+    function UI () {
       return [
-        <FormControl id="uiLOCALE">
-          <FormLabel>{locale.get("SETTING_UI_LOCALE")}</FormLabel>
+        <FormControl id='uiLOCALE'>
+          <FormLabel>{locale.get('SETTING_UI_LOCALE')}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
               <SelectPlaceholder>Choose an option</SelectPlaceholder>
@@ -63,10 +62,10 @@ export default async function({
             </SelectContent>
           </Select>
         </FormControl>,
-        <Show when={locale.currentLanguage!=value()}>
-          <Text fontSize={11} color={"$blackAlpha8"}>{locale.get("SETTING_RESTART_TO_TAKE_EFFECT")}</Text>
+        <Show when={locale.currentLanguage != value()}>
+          <Text fontSize={11} color='$blackAlpha8'>{locale.get('SETTING_RESTART_TO_TAKE_EFFECT')}</Text>
         </Show>
-      ];
-    },
-  ] as const;
+      ]
+    }
+  ] as const
 }

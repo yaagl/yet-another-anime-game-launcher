@@ -1,61 +1,59 @@
-export type CommandSegments = (
-  | string
-  | CommandSegments
-  | {
-      _rawString_: string;
-    }
-)[];
+export type CommandSegments = Array< | string
+| CommandSegments
+| {
+  _rawString_: string
+}>
 
 const sanitize = (str: string) =>
   str
-    .replaceAll("\\", "\\\\")
-    .replaceAll(" ", "\\ ")
+    .replaceAll('\\', '\\\\')
+    .replaceAll(' ', '\\ ')
     .replaceAll('"', '\\"')
     .replaceAll("'", "\\'")
-    .replaceAll("&", "\\&")
-    .replaceAll("#", "\\#")
-    .replaceAll("~", "\\~")
-    .replaceAll("`", "\\`")
-    .replaceAll("|", "\\|")
-    .replaceAll("[", "\\[")
-    .replaceAll("]", "\\]")
-    .replaceAll("<", "\\<")
-    .replaceAll(">", "\\>")
-    .replaceAll("{", "\\{")
-    .replaceAll("}", "\\}")
-    .replaceAll("*", "\\*")
-    .replaceAll("$", "\\$")
-    .replaceAll("(", "\\(")
-    .replaceAll(")", "\\)")
-    .replaceAll(";", "\\;")
-    .replaceAll("\n","\\\\n")
-    .replaceAll("\t","\\\\t");
+    .replaceAll('&', '\\&')
+    .replaceAll('#', '\\#')
+    .replaceAll('~', '\\~')
+    .replaceAll('`', '\\`')
+    .replaceAll('|', '\\|')
+    .replaceAll('[', '\\[')
+    .replaceAll(']', '\\]')
+    .replaceAll('<', '\\<')
+    .replaceAll('>', '\\>')
+    .replaceAll('{', '\\{')
+    .replaceAll('}', '\\}')
+    .replaceAll('*', '\\*')
+    .replaceAll('$', '\\$')
+    .replaceAll('(', '\\(')
+    .replaceAll(')', '\\)')
+    .replaceAll(';', '\\;')
+    .replaceAll('\n', '\\\\n')
+    .replaceAll('\t', '\\\\t')
 
-export function build(
+export function build (
   command: CommandSegments,
   env?: { [key: string]: string }
 ): string {
   const ret =
     Object.entries(env ?? {})
       .map(([key, value]) => {
-        return `${key}=${sanitize(value)} `; // I can trust key has no space right?
+        return `${key}=${sanitize(value)} ` // I can trust key has no space right?
       })
-      .join("") +
+      .join('') +
     command
       .map((segment) => {
         if (segment instanceof Array) {
-          return `$(${build(segment)})`; // TODO: special handling
-        } else if (typeof segment == "string") {
-          return sanitize(segment);
+          return `$(${build(segment)})` // TODO: special handling
+        } else if (typeof segment === 'string') {
+          return sanitize(segment)
         } else {
-          return segment._rawString_;
+          return segment._rawString_
         }
       })
-      .join(" ");
-  return ret;
+      .join(' ')
+  return ret
 }
 
-export function rawString(str: string) {
+export function rawString (str: string) {
   return {
     _rawString_: str
   }
