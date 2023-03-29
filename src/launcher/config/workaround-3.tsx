@@ -20,11 +20,11 @@ export async function createWorkaround3Config ({
   locale: Locale
 }) {
   try {
-    config.workaround3 = (await getKey(CONFIG_KEY)) == 'true'
+    config.workaround3 = (await getKey(CONFIG_KEY)) === 'true'
   } catch {
     const { model } = await Neutralino.computer.getCPUInfo()
     config.workaround3 =
-      (await Neutralino.os.getEnv('YAAGL_OVERSEA')) == '1'
+      (await Neutralino.os.getEnv('YAAGL_OVERSEA')) === '1'
         ? false
         : !!model.includes('Apple') // default value
   }
@@ -36,7 +36,7 @@ export async function createWorkaround3Config ({
       setValue(config.workaround3!)
       return NOOP
     }
-    if (config.workaround3! == value()) return NOOP
+    if (config.workaround3! === value()) return NOOP
     config.workaround3 = value()
     await setKey(CONFIG_KEY, config.workaround3 ? 'true' : 'false')
     return NOOP

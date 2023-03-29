@@ -19,7 +19,7 @@ const { IconIcns } = require('@shockpkg/icon-encoder');
   const config = await fs.readJSON(
     path.resolve(process.cwd(), 'neutralino.config.json')
   )
-  const isOverseaVersion = process.env.YAAGL_OVERSEA == '1'
+  const isOverseaVersion = process.env.YAAGL_OVERSEA === '1'
   const bundleId = isOverseaVersion
     ? config.applicationId + '.os'
     : config.applicationId
@@ -203,7 +203,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")"${
         return dirent.isDirectory()
           ? getFiles(res)
           : dirent.isFile()
-            ? dirent.name.split('.').length == 1
+            ? dirent.name.split('.').length === 1
               ? fs.chmod(res, 0o755).then(() => {
                 console.log('chmod +x ' + res)
               })

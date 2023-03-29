@@ -35,8 +35,8 @@ export async function createApp () {
 
   const locale = await createLocale()
   const github = await createGithubEndpoint()
-  const aria2_session = await resolve('./aria2.session')
-  await appendFile(aria2_session, '')
+  const aria2Session = await resolve('./aria2.session')
+  await appendFile(aria2Session, '')
   const pid = (await exec(['echo', rawString('$PPID')])).stdOut.split('\n')[0]
   const { pid: apid } = await spawn([
     './sidecar/aria2/aria2c',
@@ -48,9 +48,9 @@ export async function createApp () {
     '--rpc-listen-all=true',
     '--rpc-allow-origin-all',
     '--input-file',
-    `${aria2_session}`,
+    `${aria2Session}`,
     '--save-session',
-    `${aria2_session}`,
+    `${aria2Session}`,
     '--pause',
     'true',
     '--stop-with-process',
@@ -94,12 +94,12 @@ export async function createApp () {
     github
   )
   const prefixPath = await resolve('./wineprefix') // CHECK: hardcoded path?
-  const isOverseaVersion = (await Neutralino.os.getEnv('YAAGL_OVERSEA')) == '1'
+  const isOverseaVersion = (await Neutralino.os.getEnv('YAAGL_OVERSEA')) === '1'
   const server = isOverseaVersion ? OS_SERVER : CN_SERVER
   if (wineReady) {
     const wine = await createWine({
       loaderBin:
-        wineTag == 'crossover'
+        wineTag === 'crossover'
           ? CROSSOVER_LOADER
           : await resolve('./wine/bin/wine64'), // CHECK: hardcoded path?
       prefix: prefixPath

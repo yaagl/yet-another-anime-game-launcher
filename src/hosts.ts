@@ -4,11 +4,11 @@ import { exec, readAllLines } from './utils'
 export async function ensureHosts (hosts: Array<[string, string]>) {
   const content = await readAllLines('/etc/hosts')
   let start = 0
-  while (start < content.length && content[start] != '# Added by Yaagl') {
+  while (start < content.length && content[start] !== '# Added by Yaagl') {
     start++
   }
   let end = start
-  while (end < content.length && content[end] != '# End of section') {
+  while (end < content.length && content[end] !== '# End of section') {
     end++
   }
   const newContentPre = content.filter((_, index) => {

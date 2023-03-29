@@ -62,7 +62,7 @@ export default async function ({
             </SelectContent>
           </Select>
         </FormControl>,
-        <Show when={locale.currentLanguage != value()}>
+        <Show when={locale.currentLanguage !== value()}>
           <Text fontSize={11} color='$blackAlpha8'>{locale.get('SETTING_RESTART_TO_TAKE_EFFECT')}</Text>
         </Show>
       ]

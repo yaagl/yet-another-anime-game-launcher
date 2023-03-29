@@ -141,7 +141,7 @@ async function disableUnityFeature (ggmPath: string) {
       0x6f, 0x72, 0x79, 0x2e
     ]
   )
-  if (index == -1) {
+  if (index === -1) {
     throw new Error('pattern not found') // FIXME
   } else {
     const len = index + 8
@@ -154,7 +154,7 @@ async function disableUnityFeature (ggmPath: string) {
 export function patternSearch (view: Uint8Array, pattern: number[]) {
   retry: for (let i = 0; i < view.byteLength - pattern.length; i++) {
     for (let j = 0; j < pattern.length; j++) {
-      if (view[i + j] != pattern[j]) continue retry
+      if (view[i + j] !== pattern[j]) continue retry
     }
     return i + pattern.length
   }

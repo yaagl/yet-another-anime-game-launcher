@@ -56,7 +56,7 @@ export function createCommonUpdateUI (
                 </Center>
               }
             >
-              <Progress value={progress()} indeterminate={progress() == 0}>
+              <Progress value={progress()} indeterminate={progress() === 0}>
                 <ProgressIndicator animated striped />
               </Progress>
             </Show>

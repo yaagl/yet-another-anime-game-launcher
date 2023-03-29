@@ -99,7 +99,7 @@ export async function createLauncher ({
   }: ServerContentData = await (
     await fetch(
       server.adv_url +
-        (server.id == 'CN'
+        (server.id === 'CN'
           ? '&language=zh-cn' // CN server has no other language support
           : `&language=${locale.get('CONTENT_LANG_ID')}`)
     )
@@ -110,8 +110,7 @@ export async function createLauncher ({
         latest: {
           version: GAME_LATEST_VERSION,
           path,
-          decompressed_path,
-          voice_packs
+          decompressed_path: decompressedPath
         }
       }
     }
@@ -208,7 +207,7 @@ export async function createLauncher ({
               aria2,
               gameDir: selection,
               gameFileZip: path,
-              // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
+              // gameAudioZip: voice_packs.find((x) => x.language === "zh-cn")!
               //   .path,
               gameVersion: GAME_LATEST_VERSION,
               server
@@ -241,7 +240,7 @@ export async function createLauncher ({
           yield * checkIntegrityProgram({
             aria2,
             gameDir: selection,
-            remoteDir: decompressed_path
+            remoteDir: decompressedPath
           })
           // setGameInstalled
           batch(() => {
@@ -288,7 +287,7 @@ export async function createLauncher ({
                 </h3>
                 <Progress
                   value={progress()}
-                  indeterminate={progress() == 0}
+                  indeterminate={progress() === 0}
                   size='sm'
                   borderRadius={8}
                 >
@@ -326,12 +325,12 @@ export async function createLauncher ({
               <ConfigurationUI
                 onClose={(action) => {
                   onClose()
-                  if (action == 'check-integrity') {
+                  if (action === 'check-integrity') {
                     taskQueue.next(async function * () {
                       yield * checkIntegrityProgram({
                         aria2,
                         gameDir: _gameInstallDir(),
-                        remoteDir: decompressed_path
+                        remoteDir: decompressedPath
                       })
                     })
                   }
@@ -357,7 +356,7 @@ async function getGameVersion (gameDataDir: string) {
       0x6f, 0x72, 0x79, 0x2e
     ]
   )
-  if (index == -1) {
+  if (index === -1) {
     throw new Error('pattern not found') // FIXME
   } else {
     const len = index + 120

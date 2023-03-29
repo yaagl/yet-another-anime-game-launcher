@@ -20,7 +20,7 @@ export default async function ({
   locale: Locale
 }) {
   try {
-    config.patchOff = (await getKey(CONFIG_KEY)) == 'true'
+    config.patchOff = (await getKey(CONFIG_KEY)) === 'true'
   } catch {
     config.patchOff = false // default value
   }
@@ -32,7 +32,7 @@ export default async function ({
       setValue(config.patchOff!)
       return NOOP
     }
-    if (config.patchOff! == value()) return NOOP
+    if (config.patchOff! === value()) return NOOP
     config.patchOff = value()
     await setKey(CONFIG_KEY, config.patchOff ? 'true' : 'false')
     return NOOP

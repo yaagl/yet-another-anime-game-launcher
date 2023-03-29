@@ -18,7 +18,7 @@ export async function createDxvkAsyncConfig ({
   locale: Locale
 }) {
   try {
-    config.dxvkAsync = (await getKey('config_dxvkAsync')) == 'true'
+    config.dxvkAsync = (await getKey('config_dxvkAsync')) === 'true'
   } catch {
     config.dxvkAsync = true // default value
   }
@@ -30,7 +30,7 @@ export async function createDxvkAsyncConfig ({
       setValue(config.dxvkAsync!)
       return NOOP
     }
-    if (config.dxvkAsync! == value()) return NOOP
+    if (config.dxvkAsync! === value()) return NOOP
     config.dxvkAsync = value()
     await setKey('config_dxvkAsync', config.dxvkAsync ? 'true' : 'false')
     return NOOP

@@ -47,11 +47,11 @@ export async function createWineDistroConfig ({
         tag: config.wineDistro,
         url: 'not_applicable'
       }
-    ].filter((x) => x.tag != 'crossover')
+    ].filter((x) => x.tag !== 'crossover')
   );
   (async () => {
     const versions = await wineVersionChecker.getAllReleases()
-    if (versions.find((x) => x.tag === config.wineDistro!) != null) {
+    if (versions.find((x) => x.tag === config.wineDistro!) !== null) {
       setwineVersions(versions)
     } else {
       setwineVersions((x) => [...x, ...versions])
@@ -66,9 +66,9 @@ export async function createWineDistroConfig ({
       await setKey('wine_update_tag', tag)
       await setKey(
         'wine_update_url',
-        tag == 'crossover'
+        tag === 'crossover'
           ? 'not_appliable'
-          : wineVersions().find((x) => x.tag == tag)!.url
+          : wineVersions().find((x) => x.tag === tag)!.url
       )
       await _safeRelaunch()
     }
@@ -106,7 +106,7 @@ export async function createWineDistroConfig ({
             </SelectContent>
           </Select>
         </FormControl>,
-        <Show when={value() != config.wineDistro}>
+        <Show when={value() !== config.wineDistro}>
           <Button size='sm' colorScheme='danger' onClick={applyChanges}>
             {locale.get('SETTING_WINE_VERSION_CONFIRM')}
           </Button>

@@ -90,8 +90,8 @@ export async function * doStreamUnzip (
     event
   ) => {
     log(JSON.stringify(event!.detail))
-    if (event!.detail.id == id) {
-      if ((event!.detail as any).action == 'exit') {
+    if (event!.detail.id === id) {
+      if ((event!.detail as any).action === 'exit') {
         processExit = true
         processExitCode = Number((event!.detail as any).data)
       }
@@ -106,7 +106,7 @@ export async function * doStreamUnzip (
     yield [dNumber, totalLines] as const
   }
   await Neutralino.events.off('spawnedProcess', handler)
-  if (processExitCode == 0) {
+  if (processExitCode === 0) {
     return
   }
   throw new Error('unzip exited with code ' + processExitCode)

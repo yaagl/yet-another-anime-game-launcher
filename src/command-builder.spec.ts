@@ -3,26 +3,26 @@ import { build, rawString } from './command-builder'
 import { exec as exec_callback } from 'child_process'
 
 async function exec (cmd: string): Promise<string[]> {
-  return await new Promise((res, rej) => {
+  return await new Promise((result, error) => {
     exec_callback(cmd, (err, stdout, stderr) => {
-      if (err != null) {
-        rej(stderr)
+      if (err !== null) {
+        error(stderr)
       } else {
-        res(stdout.split('\n'))
+        result(stdout.split('\n'))
       }
     })
   })
 }
 
-async function exec_eval (cmd: string): Promise<string[]> {
+async function execEval (cmd: string): Promise<string[]> {
   return await exec(build(['eval', cmd]))
 }
 
-async function exec_sh (cmd: string): Promise<string[]> {
+async function execSh (cmd: string): Promise<string[]> {
   return await exec(build(['sh', '-c', cmd]))
 }
 
-async function exec_osa (cmd: string): Promise<string[]> {
+async function execOsa (cmd: string): Promise<string[]> {
   //     const embeded = build(["echo", "Hello ' World"]);
   //     console.log(embeded);
   //     console.log(embeded.replaceAll("\\", "\\\\").replaceAll('"', '\\\\"'));
@@ -140,6 +140,6 @@ function buildTest (name: string, exec: (cmd: string) => Promise<string[]>) {
 }
 
 buildTest('normal shell', exec)
-buildTest('`eval`', exec_eval)
-buildTest('`osascript -e`', exec_osa)
-buildTest('`sh -c`', exec_sh)
+buildTest('`eval`', execEval)
+buildTest('`osascript -e`', execOsa)
+buildTest('`sh -c`', execSh)

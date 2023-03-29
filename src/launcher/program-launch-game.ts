@@ -10,11 +10,7 @@ import {
   removeFile,
   writeFile,
   resolve,
-  log,
-  wait,
-  forceMove,
-  stats,
-  exec
+  log
 } from '../utils'
 import { Wine } from '../wine'
 import { Config } from './config'
@@ -70,7 +66,7 @@ regedit retina.reg
           MVK_ALLOW_METAL_FENCES: '1',
           WINEDLLOVERRIDES: 'd3d11,dxgi=n,b',
           DXVK_ASYNC: config.dxvkAsync ? '1' : '',
-          ...(config.dxvkHud == ''
+          ...(config.dxvkHud === ''
             ? {}
             : {
                 DXVK_HUD: config.dxvkHud

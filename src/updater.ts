@@ -17,7 +17,7 @@ export async function createUpdater (deps: { github: Github, aria2: Aria2 }) {
   const latest: GithubReleaseInfo = await deps.github.api(
     `/repos/${owner}/${repo}/releases/latest`
   )
-  const neu = latest.assets.find((x) => x.name == 'resources.neu')
+  const neu = latest.assets.find((x) => x.name === 'resources.neu')
   if (gt(latest.tag_name, CURRENT_YAAGL_VERSION) && neu !== undefined) {
     return {
       latest: false,

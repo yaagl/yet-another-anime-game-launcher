@@ -13,11 +13,11 @@ export async function createGithubEndpoint () {
     timeout(5000)
   ])
 
-  fastest == '' || (await log(`Using github proxy ${fastest}`))
+  fastest === '' || (await log(`Using github proxy ${fastest}`))
 
   async function api (path: `/${string}`): Promise<any> {
     return await fetch(`${fastest}https://api.github.com${path}`).then(async (x) => {
-      if (x.status == 200 || x.status == 301 || x.status == 302) {
+      if (x.status === 200 || x.status === 301 || x.status === 302) {
         return await x.json()
       }
       return await Promise.reject(

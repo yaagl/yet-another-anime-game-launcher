@@ -18,7 +18,7 @@ export async function createRetinaConfig ({
   locale: Locale
 }) {
   try {
-    config.retina = (await getKey('config_retina')) == 'true'
+    config.retina = (await getKey('config_retina')) === 'true'
   } catch {
     config.retina = false // default value
   }
@@ -30,7 +30,7 @@ export async function createRetinaConfig ({
       setValue(config.retina!)
       return NOOP
     }
-    if (config.retina! == value()) return NOOP
+    if (config.retina! === value()) return NOOP
     config.retina = value()
     await setKey('config_retina', config.retina ? 'true' : 'false')
     return NOOP

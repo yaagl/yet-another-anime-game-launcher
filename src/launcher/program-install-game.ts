@@ -36,7 +36,7 @@ export async function * downloadAndInstallGameProgram ({
     uri: gameFileZip,
     absDst: gameFileTmp
   })) {
-    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+    if (!gameFileStart && progress.downloadSpeed === BigInt(0)) {
       continue
     }
     gameFileStart = true
@@ -67,7 +67,7 @@ export async function * downloadAndInstallGameProgram ({
   //   uri: gameAudioZip,
   //   absDst: audioFileTmp,
   // })) {
-  //   if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+  //   if (!gameFileStart && progress.downloadSpeed === BigInt(0)) {
   //     continue;
   //   }
   //   gameFileStart = true;

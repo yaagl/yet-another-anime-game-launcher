@@ -1,11 +1,11 @@
 import { join } from 'path-browserify'
 import { build, CommandSegments, rawString } from '../command-builder'
 
-export async function resolve (path: string) {
+export async function resolve (path: string): Promise<string> {
   if (path.startsWith('./')) {
     path = join(import.meta.env.PROD ? window.NL_PATH : window.NL_CWD, path)
     // await Neutralino.os.showMessageBox("1", command, "OK");
-    if (!path.startsWith('/') || path == '/') { throw new Error('Assertation failed ' + path) }
+    if (!path.startsWith('/') || path === '/') { throw new Error('Assertation failed ' + path) }
   }
   return path
 }
@@ -22,7 +22,7 @@ export async function exec (
   )
   await log(sudo ? runInSudo(cmd) : cmd)
   const ret = await Neutralino.os.execCommand(sudo ? runInSudo(cmd) : cmd, {})
-  if (ret.exitCode != 0) {
+  if (ret.exitCode !== 0) {
     throw new Error(
       `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
     )
@@ -34,10 +34,10 @@ export async function exec2 (
   segments: CommandSegments,
   env?: { [key: string]: string },
   sudo: boolean = false,
-  log_redirect: string | undefined = undefined
+  logRedirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = build(
-    [...segments, ...(log_redirect ? [rawString('&>'), log_redirect] : [])],
+    [...segments, ...(logRedirect ? [rawString('&>'), logRedirect] : [])],
     env
   )
   await log(cmd)
@@ -48,10 +48,10 @@ export async function exec2 (
     > = (event) => {
       let stdErr = ''
       let stdOut = ''
-      if (event!.detail.id == id) {
-        if ((event!.detail as any).action == 'exit') {
+      if (event!.detail.id === id) {
+        if ((event!.detail as any).action === 'exit') {
           const exit = Number((event!.detail as any).data)
-          if (exit == 0) {
+          if (exit === 0) {
             res({
               pid,
               exitCode: exit,
@@ -67,9 +67,9 @@ export async function exec2 (
           }
 
           Neutralino.events.off('spawnedProcess', handler)
-        } else if ((event!.detail as any).action == 'stdOut') {
+        } else if ((event!.detail as any).action === 'stdOut') {
           stdOut += (event!.detail as any).data
-        } else if ((event!.detail as any).action == 'stdErr') {
+        } else if ((event!.detail as any).action === 'stdErr') {
           stdErr += (event!.detail as any).data
         }
       }
@@ -78,7 +78,7 @@ export async function exec2 (
   })
 }
 
-export function runInSudo (cmd: string) {
+export function runInSudo (cmd: string): string {
   return build([
     'osascript',
     '-e',
@@ -94,7 +94,7 @@ export function runInSudo (cmd: string) {
   ])
 }
 
-export async function tar_extract (src: string, dst: string) {
+export async function tar_extract (src: string, dst: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec(['tar', '-zxvf', src, '-C', dst])
 }
 
@@ -115,27 +115,27 @@ export async function getKey (key: string): Promise<string> {
   return await Neutralino.storage.getData(key)
 }
 
-export async function setKey (key: string, value: string | null) {
+export async function setKey (key: string, value: string | null): Promise<void> {
   return await Neutralino.storage.setData(key, value!)
 }
 
-export async function log (message: string) {
+export async function log (message: string): Promise<void> {
   return await Neutralino.debug.log(message, 'INFO')
 }
 
-export async function warn (message: string) {
+export async function warn (message: string): Promise<void> {
   return await Neutralino.debug.log(message, 'WARNING')
 }
 
-export async function logerror (message: string) {
+export async function logerror (message: string): Promise<void> {
   return await Neutralino.debug.log(message, 'ERROR')
 }
 
-export async function restart () {
+export async function restart (): Promise<void> {
   return await Neutralino.app.restartProcess()
 }
 
-export async function fatal (error: any) {
+export async function fatal (error: any): Promise<void> {
   await Neutralino.os.showMessageBox(
     'Fatal error',
     `${error instanceof Error ? String(error) : JSON.stringify(error)}`,
@@ -145,7 +145,7 @@ export async function fatal (error: any) {
   Neutralino.app.exit(-1)
 }
 
-export async function appendFile (path: string, content: string) {
+export async function appendFile (path: string, content: string): Promise<void> {
   await Neutralino.filesystem.appendFile(await resolve(path), content)
 }
 
@@ -171,25 +171,25 @@ export async function rmrf_dangerously (target: string) {
   return await exec(['rm', '-rf', target])
 }
 
-export async function prompt (title: string, message: string) {
+export async function prompt (title: string, message: string): Promise<boolean> {
   const out = await Neutralino.os.showMessageBox(title, message, 'YES_NO')
-  return out == 'YES'
+  return out === 'YES'
 }
 
-export async function alert (title: string, message: string) {
+export async function alert (title: string, message: string): Promise<string> {
   return await Neutralino.os.showMessageBox(title, message, 'OK')
 }
 
-export async function openDir (title: string) {
+export async function openDir (title: string): Promise<string> {
   const out = await Neutralino.os.showFolderDialog(title, {})
   return out
 }
 
-export async function readBinary (path: string) {
+export async function readBinary (path: string): Promise<ArrayBuffer> {
   return await Neutralino.filesystem.readBinaryFile(path)
 }
 
-export async function readAllLines (path: string) {
+export async function readAllLines (path: string): Promise<string[]> {
   const content = await Neutralino.filesystem.readFile(path)
   if (content.includes('\r\n')) {
     return content.split('\r\n')
@@ -197,25 +197,25 @@ export async function readAllLines (path: string) {
   return content.split('\n')
 }
 
-export async function writeBinary (path: string, data: ArrayBuffer) {
+export async function writeBinary (path: string, data: ArrayBuffer): Promise<void> {
   return await Neutralino.filesystem.writeBinaryFile(path, data)
 }
 
-export async function writeFile (path: string, data: string) {
+export async function writeFile (path: string, data: string): Promise<void> {
   return await Neutralino.filesystem.writeFile(path, data)
 }
 
-export async function removeFile (path: string) {
+export async function removeFile (path: string): Promise<void> {
   return await Neutralino.filesystem.removeFile(path)
 }
 
-export async function stats (path: string) {
+export async function stats (path: string): Promise<Neutralino.filesystem.Stats> {
   return await Neutralino.filesystem.getStats(path)
 }
 
 const hooks: Array<(forced: boolean) => Promise<boolean>> = []
 
-export function addTerminationHook (fn: (forced: boolean) => Promise<boolean>) {
+export function addTerminationHook (fn: (forced: boolean) => Promise<boolean>): () => void {
   hooks.push(fn)
   const len = hooks.length
   return () => {
@@ -227,7 +227,7 @@ export function addTerminationHook (fn: (forced: boolean) => Promise<boolean>) {
 }
 
 // ??
-export async function GLOBAL_onClose (forced: boolean) {
+export async function GLOBAL_onClose (forced: boolean): Promise<boolean> {
   for (const hook of hooks.reverse()) {
     if (!(await hook(forced)) && !forced) {
       return false // aborted
@@ -236,13 +236,13 @@ export async function GLOBAL_onClose (forced: boolean) {
   return true
 }
 
-export async function shutdown () {
+export async function shutdown (): Promise<void> {
   for (const hook of hooks.reverse()) {
     await hook(true)
   }
 }
 
-export async function _safeRelaunch () {
+export async function _safeRelaunch (): Promise<void> {
   await shutdown()
   // await wait(1000);
   // HACK

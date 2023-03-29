@@ -22,10 +22,10 @@ export async function createAria2 ({
   async function * doStreaming (gid: string) {
     while (true) {
       const status = await rpc.tellStatus(gid)
-      if (status.status == 'complete') {
+      if (status.status === 'complete') {
         break
       }
-      if (status.totalLength == BigInt(0)) {
+      if (status.totalLength === BigInt(0)) {
         continue
       }
       yield status
@@ -40,15 +40,15 @@ export async function createAria2 ({
     const gid = await sha256_16(`${options.uri}:${options.absDst}`)
     try {
       const status = await rpc.tellStatus(gid)
-      if (status.status == 'paused') {
+      if (status.status === 'paused') {
         await rpc.unpause(gid)
-      } else if (status.status == 'complete') {
+      } else if (status.status === 'complete') {
         return
       } else {
         throw new Error('FIXME: implmenet me (aria2.ts) ' + status.status)
       }
     } catch (e: any) {
-      if (e && e.code == 1) {
+      if (e && e.code === 1) {
         await rpc.addUri(options.uri, {
           gid,
           'max-connection-per-server': 16,

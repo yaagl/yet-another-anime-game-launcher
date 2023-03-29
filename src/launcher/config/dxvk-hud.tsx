@@ -43,7 +43,7 @@ export async function createDxvkHUDConfig ({
       setValue(config.dxvkHud!)
       return NOOP
     }
-    if (config.dxvkHud! == value()) return NOOP
+    if (config.dxvkHud! === value()) return NOOP
     config.dxvkHud = value()
     await setKey('config_dxvkHud', config.dxvkHud!)
     return NOOP

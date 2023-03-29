@@ -18,7 +18,7 @@ async function * checkIntegrityProgram ({
     md5: string
     fileSize: number
   }> = (await readAllLines(join(gameDir, 'pkg_version')))
-    .filter((x) => x.trim() != '')
+    .filter((x) => x.trim() !== '')
     .map((x) => JSON.parse(x))
   const toFix: Array<{
     remoteName: string
@@ -56,7 +56,7 @@ async function * checkIntegrityProgram ({
     yield ['setProgress', (count / entries.length) * 100]
   }
   setKey('patched', null)
-  if (toFix.length == 0) {
+  if (toFix.length === 0) {
     return
   }
   yield ['setUndeterminedProgress']

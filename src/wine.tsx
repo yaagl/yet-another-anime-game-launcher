@@ -29,7 +29,7 @@ export async function createWine (options: {
   loaderBin: string
   prefix: string
 }) {
-  async function cmd (command: string, args: string[]) {
+  async function cmd (command: string, args: string[]): Promise<Neutralino.os.ExecCommandResult> {
     return await exec('cmd', [command, ...args])
   }
 
@@ -37,10 +37,10 @@ export async function createWine (options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
-  ) {
+    logFile: string | undefined = undefined
+  ): Promise<Neutralino.os.ExecCommandResult> {
     return await unixExec(
-      program == 'copy'
+      program === 'copy'
         ? [options.loaderBin, 'cmd', '/c', program, ...args]
         : [options.loaderBin, program, ...args],
       {
@@ -48,7 +48,7 @@ export async function createWine (options: {
         ...(env ?? {})
       },
       false,
-      log_file
+      logFile
     )
   }
 
@@ -57,9 +57,9 @@ export async function createWine (options: {
     args: string[],
     env?: { [key: string]: string },
     log_file: string | undefined = undefined
-  ) {
+  ): Promise<Neutralino.os.ExecCommandResult> {
     return await unixExec2(
-      program == 'copy'
+      program === 'copy'
         ? [options.loaderBin, 'cmd', '/c', program, ...args]
         : [options.loaderBin, program, ...args],
       {
@@ -71,7 +71,7 @@ export async function createWine (options: {
     )
   }
 
-  function toWinePath (absPath: string) {
+  function toWinePath (absPath: string): string {
     return 'Z:' + absPath.replaceAll('/', '\\')
   }
 
@@ -88,7 +88,7 @@ export async function createWine (options: {
     }
   }
 
-  async function openCmdWindow ({ gameDir }: { gameDir: string }) {
+  async function openCmdWindow ({ gameDir }: { gameDir: string }): Promise<Neutralino.os.ExecCommandResult> {
     return await unixExec2(
       [
         'osascript',
@@ -154,7 +154,7 @@ export type Wine = ReturnType<typeof createWine> extends Promise<infer T>
 export async function checkWine (github: Github) {
   try {
     const wineState = await getKey('wine_state')
-    if (wineState == 'update') {
+    if (wineState === 'update') {
       return {
         wineReady: false,
         wineUpdate: await getKey('wine_update_url'),
@@ -372,7 +372,7 @@ export async function createWineInstallProgram ({
 }
 
 // by New Bing
-function generateRandomString (n: number) {
+function generateRandomString (n: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let result = ''
   for (let i = 0; i < n; i++) {
