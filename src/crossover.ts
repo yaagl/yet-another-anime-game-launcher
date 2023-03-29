@@ -9,7 +9,6 @@ export const CROSSOVER_DATA =
   "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/share/crossover/bottle_data";
 
 export async function checkCrossover() {
-  return false; // FIXME
   try {
     await stats(CROSSOVER_LOADER);
     const { stdOut } = await exec([
@@ -18,7 +17,7 @@ export async function checkCrossover() {
       rawString("|"),
       "grep",
       "-A1",
-      "CFBundleShortVersionString",
+      "CFBundleVersion",
       rawString("|"),
       "grep",
       "string",

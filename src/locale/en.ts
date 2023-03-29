@@ -72,4 +72,7 @@ export const en: typeof zh_CN = {
   SETTING_OPEN_CMD: "Open Wine Command Line Tool",
   SETTING_OPEN_GAME_INSTALL_DIR: "Open Game Install Directory",
   SETTING_OPEN_YAAGL_DIR: "Open Yaagl Data Directory",
+
+
+  SETTING_WINE_CROSSOVER_ALERT: "To use crossover, there is an additional step that must be done manually. Click this box to learn about the detail.",
 };

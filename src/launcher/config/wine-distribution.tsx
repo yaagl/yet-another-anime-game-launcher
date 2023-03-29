@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Button,
   FormControl,
   FormLabel,
@@ -110,6 +112,12 @@ export async function createWineDistroConfig({
           <Button size="sm" colorScheme="danger" onClick={applyChanges}>
             {locale.get("SETTING_WINE_VERSION_CONFIRM")}
           </Button>
+        </Show>,
+        <Show when={value() != config.wineDistro && value()=="crossover"}>
+          <Alert status="info" variant="left-accent" onClick={() => Neutralino.os.open("https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver:-use-latest-MoltenVK")}>
+            <AlertIcon mr="$2_5" />
+            {locale.get("SETTING_WINE_CROSSOVER_ALERT")}
+          </Alert>
         </Show>,
       ];
     },

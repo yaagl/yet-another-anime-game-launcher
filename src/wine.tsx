@@ -264,28 +264,28 @@ export async function createWineInstallProgram({
     } catch {}
     await rmrf_dangerously(wineAbsPrefix);
     if (wineTag === "crossover") {
-      yield* checkAndDownloadMoltenVK(aria2);
+      // yield* checkAndDownloadMoltenVK(aria2);
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
       const CROSSOVER_LIBDIR =
         "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib64";
       
-      await unixExec([
-        "mv",
-        "-n",
-        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
-        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib.bak"),
-      ]);
-      await forceMove(
-        await resolve("./moltenvk/libMoltenVK.dylib"),
-        join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
-      )
-      await unixExec([
-        "printf",
-        "libMoltenVK.dylib is modified by Yaagl. You can restore it from libMoltenVK.dylib.bak\n",
-        rawString(">"),
-        join(CROSSOVER_LIBDIR, "libMoltenVK-Modified-By-Yaagl"),
-      ]);
+      // await unixExec([
+      //   "mv",
+      //   "-n",
+      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
+      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib.bak"),
+      // ]);
+      // await forceMove(
+      //   await resolve("./moltenvk/libMoltenVK.dylib"),
+      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
+      // )
+      // await unixExec([
+      //   "printf",
+      //   "libMoltenVK.dylib is modified by Yaagl. You can restore it from libMoltenVK.dylib.bak\n",
+      //   rawString(">"),
+      //   join(CROSSOVER_LIBDIR, "libMoltenVK-Modified-By-Yaagl"),
+      // ]);
       await ensureHosts(ENSURE_HOSTS);
       yield ["setUndeterminedProgress"];
     } else {
