@@ -14,7 +14,7 @@ import {
   log,
   removeFile,
   resolve,
-  rmrf_dangerously,
+  rmrfDangerously,
   setKey,
   tar_extract
 } from './utils'
@@ -262,7 +262,7 @@ export async function createWineInstallProgram ({
       //   //failed to backup
       // }
     } catch {}
-    await rmrf_dangerously(wineAbsPrefix)
+    await rmrfDangerously(wineAbsPrefix)
     if (wineTag === 'crossover') {
       yield * checkAndDownloadMoltenVK(aria2)
       yield ['setStateText', 'CONFIGURING_ENVIRONMENT']
@@ -309,7 +309,7 @@ export async function createWineInstallProgram ({
       }
       yield ['setStateText', 'EXTRACT_ENVIRONMENT']
       yield ['setUndeterminedProgress']
-      await rmrf_dangerously(wineBinaryDir)
+      await rmrfDangerously(wineBinaryDir)
       await unixExec(['mkdir', '-p', wineBinaryDir])
       await tar_extract(await resolve('./wine.tar.gz'), wineBinaryDir)
       await removeFile(wineTarPath)

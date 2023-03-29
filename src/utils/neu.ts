@@ -68,9 +68,9 @@ export async function exec2 (
 
           Neutralino.events.off('spawnedProcess', handler)
         } else if ((event!.detail as any).action === 'stdOut') {
-          stdOut += (event!.detail as any).data
+          stdOut += `${(event!.detail as any).data}`
         } else if ((event!.detail as any).action === 'stdErr') {
-          stdErr += (event!.detail as any).data
+          stdErr += `${(event!.detail as any).data}`
         }
       }
     }
@@ -106,7 +106,7 @@ export async function spawn (
   await log(cmd)
   const { pid, id } = await Neutralino.os.spawnProcess(cmd)
   // await Neutralino.os.
-  await log(pid + '')
+  await log(`${pid}`)
   await log(cmd)
   return { pid, id }
 }
@@ -167,7 +167,7 @@ export async function cp (source: string, destination: string) {
   ])
 }
 
-export async function rmrf_dangerously (target: string) {
+export async function rmrfDangerously (target: string) {
   return await exec(['rm', '-rf', target])
 }
 

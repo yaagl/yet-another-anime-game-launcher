@@ -58,9 +58,9 @@ export async function createApp () {
   ])
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
-    await log('killing process ' + apid)
+    await log(`killing process ${apid}`)
     try {
-      await exec(['kill', apid + ''])
+      await exec(['kill', `${apid}`])
     } catch {
       await log('killing process failed?')
     }

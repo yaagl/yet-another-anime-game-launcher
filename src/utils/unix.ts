@@ -34,7 +34,7 @@ export async function hpatchz (
   originalFile: string,
   patchFile: string,
   targetFile: string
-) {
+): Promise<Neutralino.os.ExecCommandResult> {
   return await exec([
     await resolve('./sidecar/hpatchz/hpatchz'),
     '-f',
@@ -44,7 +44,7 @@ export async function hpatchz (
   ])
 }
 
-export async function mkdirp (dir: string) {
+export async function mkdirp (dir: string): Promise<Neutralino.os.ExecCommandResult> {
   return await exec(['mkdir', '-p', dir])
 }
 
@@ -109,5 +109,5 @@ export async function * doStreamUnzip (
   if (processExitCode === 0) {
     return
   }
-  throw new Error('unzip exited with code ' + processExitCode)
+  throw new Error(`unzip exited with code ${processExitCode}`)
 }
