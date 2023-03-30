@@ -41,7 +41,7 @@ export const vi_VN: typeof zh_CN = {
   ALLOCATING_FILE: "Sắp xếp files trên ổ",
   DOWNLOADING_FILE_PROGRESS:"Đang tải file: {0} ({2}/{3}) {1}/s",
 
-  BACKUP_USER_DATA: "Đang sau lưu dữ liệu người dùng",
+  BACKUP_USER_DATA: "Đang sao lưu dữ liệu người dùng",
   RECOVER_BACKUP_USER_DATA: "Đang khôi phục sao lưu",
 
   INSTALL_DONE: "Hoàn tất",
@@ -64,15 +64,15 @@ export const vi_VN: typeof zh_CN = {
   SETTING_CHECK_INTEGRITY: "Kiểm tra tính toàn vẹn file",
   SETTING_GAME_INSTALL_DIR: "Thư Mục Cài Đặt Game",
   // 0.0.27
-  SETTING_WINE_VERSION_CONFIRM: en.SETTING_WINE_VERSION_CONFIRM,
-  SETTING_QUICK_ACTIONS: en.SETTING_QUICK_ACTIONS,
-  SETTING_GENERAL: en.SETTING_GENERAL,
+  SETTING_WINE_VERSION_CONFIRM: "Nhấp vào để xác nhận thay đổi",
+  SETTING_QUICK_ACTIONS: "Hành động nhanh",
+  SETTING_GENERAL: "Tổng quát",
   LANGUAGE_LOCALE_NAME: "Tiếng Việt",
-  SETTING_UI_LOCALE: en.SETTING_UI_LOCALE,
-  SETTING_RESTART_TO_TAKE_EFFECT: en.SETTING_RESTART_TO_TAKE_EFFECT,
-  SETTING_OPEN_CMD: en.SETTING_OPEN_CMD,
-  SETTING_OPEN_GAME_INSTALL_DIR: en.SETTING_OPEN_GAME_INSTALL_DIR,
-  SETTING_OPEN_YAAGL_DIR: en.SETTING_OPEN_YAAGL_DIR,
+  SETTING_UI_LOCALE: "Ngôn ngữ Launcher",
+  SETTING_RESTART_TO_TAKE_EFFECT: "Cài đặt sẽ có hiệu lực sau khi khởi động lại",
+  SETTING_OPEN_CMD: "Mở cộng cụ Command Line (cmd) của wine",
+  SETTING_OPEN_GAME_INSTALL_DIR: "Mở thư mục cài đặt game",
+  SETTING_OPEN_YAAGL_DIR: "Mở thư mục data của Yaagl",
 
-  SETTING_WINE_CROSSOVER_ALERT: en.SETTING_WINE_CROSSOVER_ALERT,
+  SETTING_WINE_CROSSOVER_ALERT: "Để sử dụng CrossOver, có một số bước mà các bạn cần phải làm thủ công. Nhấn vào cái ô này để biết thêm chi tiết",
 };
