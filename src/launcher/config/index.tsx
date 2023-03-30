@@ -29,6 +29,7 @@ import { createWineDistroConfig } from "./wine-distribution";
 import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
 import createPatchOff from "./patch-off";
+import createFPSUnlock from "./fps-unlock";
 import { exec2, resolve } from "../../utils";
 
 export async function createConfiguration({
@@ -60,6 +61,7 @@ export async function createConfiguration({
   const [W3] = await createWorkaround3Config({ locale, config });
   const [UL] = await createLocaleConfig({ locale, config });
   const [PO] = await createPatchOff({ locale, config });
+  const [FO] = await createFPSUnlock({ locale, config });
 
   return {
     UI: function (props: {
@@ -89,6 +91,7 @@ export async function createConfiguration({
                       <DA />
                       <DH />
                       <R />
+                      <FO />
                       <Divider />
                       <PO />
                       <W3 />

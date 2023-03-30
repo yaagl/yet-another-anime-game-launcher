@@ -75,4 +75,7 @@ export const en: typeof zh_CN = {
 
 
   SETTING_WINE_CROSSOVER_ALERT: "To use crossover, there is an additional step that must be done manually. Click this box to learn about the detail.",
+
+  SETTING_FPS_UNLOCK: "Unlock FPS Limit",
+  SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
 };

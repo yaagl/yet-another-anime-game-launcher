@@ -50,7 +50,17 @@ copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 regedit retina.reg
-"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+${await (async () => {
+  if (config.fpsUnlock !== "default") {
+    return `"${wine.toWinePath(
+      await resolve("./fpsunlock/genshin-force-fps.exe")
+    )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
+      join(gameDir, gameExecutable)
+    )}"`;
+  } else {
+    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+  }
+})()}`;
   await writeFile(await resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(await resolve("./logs"));

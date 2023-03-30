@@ -73,4 +73,7 @@ export const zh_CN = {
     SETTING_OPEN_YAAGL_DIR: "打开Yaagl数据目录",
 
     SETTING_WINE_CROSSOVER_ALERT: "如果使用CrossOver，则有一个步骤必须由你手动完成。点击这个提示以获取详情。",
+
+    SETTING_FPS_UNLOCK: "帧率限制解锁",
+    SETTING_FPS_UNLOCK_DEFAULT: "不解锁",
 }
