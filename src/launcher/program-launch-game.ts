@@ -77,6 +77,8 @@ ${await (async () => {
         "cmd",
         ["/c", `${wine.toWinePath(await resolve("./config.bat"))}`],
         {
+          METAL_CAPTURE_ENABLED: config.frameTrace ? "1" : "",
+          MVK_CONFIG_AUTO_GPU_CAPTURE_SCOPE: config.frameTrace ? "2" : "",
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
           DXVK_ASYNC: config.dxvkAsync ? "1" : "",

@@ -78,4 +78,5 @@ export const en: typeof zh_CN = {
 
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
+  SETTING_FRAME_TRACE: "Enable Metal Capture",
 };

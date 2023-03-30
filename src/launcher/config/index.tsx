@@ -30,6 +30,7 @@ import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
 import createPatchOff from "./patch-off";
 import createFPSUnlock from "./fps-unlock";
+import createFrameTrace from "./frame-trace";
 import { exec2, resolve } from "../../utils";
 
 export async function createConfiguration({
@@ -62,6 +63,7 @@ export async function createConfiguration({
   const [UL] = await createLocaleConfig({ locale, config });
   const [PO] = await createPatchOff({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
+  const [FT] = await createFrameTrace({ locale, config });
 
   return {
     UI: function (props: {
@@ -92,6 +94,7 @@ export async function createConfiguration({
                       <DH />
                       <R />
                       <FO />
+                      <FT />
                       <Divider />
                       <PO />
                       <W3 />

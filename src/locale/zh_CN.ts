@@ -76,4 +76,5 @@ export const zh_CN = {
 
     SETTING_FPS_UNLOCK: "帧率限制解锁",
     SETTING_FPS_UNLOCK_DEFAULT: "不解锁",
+    SETTING_FRAME_TRACE: "Enable Metal Capture",
 }
