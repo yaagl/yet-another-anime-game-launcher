@@ -76,4 +76,8 @@ export const zh_CN = {
 
     SETTING_FPS_UNLOCK: "帧率限制解锁",
     SETTING_FPS_UNLOCK_DEFAULT: "不解锁",
+
+    SETTING_ADVANCED: "高级设置",
+    SETTING_ADVANCED_ALERT: "在不清楚作用的情况下，请不要改动任何设置。",
+    SETTING_ADVANCED_VISIBLE: "高级设置已解锁。",
 }

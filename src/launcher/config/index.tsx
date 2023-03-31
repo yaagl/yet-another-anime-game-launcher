@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Divider,
@@ -16,6 +18,7 @@ import {
   Tabs,
   Text,
   VStack,
+  notificationService
 } from "@hope-ui/solid";
 import { CURRENT_YAAGL_VERSION } from "../../constants";
 import { Locale } from "../../locale";
@@ -30,7 +33,8 @@ import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
 import createPatchOff from "./patch-off";
 import createFPSUnlock from "./fps-unlock";
-import { exec2, resolve } from "../../utils";
+import { exec2, getKey, resolve, setKey } from "../../utils";
+import { createSignal, Show } from "solid-js";
 
 export async function createConfiguration({
   wine,
@@ -63,6 +67,31 @@ export async function createConfiguration({
   const [PO] = await createPatchOff({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
 
+  let _advancedSetting = false;
+  try {
+    _advancedSetting = (await getKey("config_advanced")) == "true";
+  } catch {}
+  const [advanceSetting, setAdvancedSetting] = createSignal(_advancedSetting);
+
+  const clickTimestamp: number[] = [];
+  async function onClickVersion() {
+    clickTimestamp.push(Date.now());
+    if(clickTimestamp.length > 5) {
+      if(clickTimestamp[clickTimestamp.length - 1] - clickTimestamp[clickTimestamp.length - 5] < 1000) {
+        if(!advanceSetting()) {
+          notificationService.show({
+            status: "info",
+            title: locale.get("SETTING_ADVANCED_VISIBLE"),
+            description: "",
+          });
+        }
+        setAdvancedSetting(x=>!x);
+        clickTimestamp.length = 0;
+        await setKey("config_advanced", String(advanceSetting()));
+      }
+    }
+  }
+
   return {
     UI: function (props: {
       onClose: (action: "check-integrity" | "close") => void;
@@ -73,9 +102,12 @@ export async function createConfiguration({
           <ModalHeader>{locale.get("SETTING")}</ModalHeader>
           <ModalBody pb={20}>
             <Tabs orientation="vertical" h="100%">
-              <TabList>
+              <TabList minW={120}>
                 <Tab>{locale.get("SETTING_GENERAL")}</Tab>
                 <Tab>Wine</Tab>
+                <Show when={advanceSetting()}>
+                  <Tab>{locale.get("SETTING_ADVANCED")}</Tab>
+                </Show>
               </TabList>
               <TabPanel flex={1} pt={0} pb={0}>
                 <HStack spacing={"$4"} h="100%">
@@ -91,7 +123,6 @@ export async function createConfiguration({
                       <DA />
                       <DH />
                       <R />
-                      <FO />
                       <Divider />
                       <PO />
                       <W3 />
@@ -99,7 +130,7 @@ export async function createConfiguration({
                       <UL />
                       <FormControl>
                         <FormLabel>Yaagl version</FormLabel>
-                        <Text>{CURRENT_YAAGL_VERSION}</Text>
+                        <Text userSelect={"none"} onClick={onClickVersion}>{CURRENT_YAAGL_VERSION}</Text>
                       </FormControl>
                     </VStack>
                   </Box>
@@ -168,6 +199,17 @@ export async function createConfiguration({
                   <WD />
                 </VStack>
               </TabPanel>
+              <Show when={advanceSetting()}>
+                <TabPanel flex={1} pt={0} pb={0} h="100%">
+                  <VStack spacing={"$4"} w="40%" alignItems="start">
+                    <Alert status="warning" variant="left-accent">
+                      <AlertIcon mr="$2_5" />
+                      {locale.get("SETTING_ADVANCED_ALERT")}
+                    </Alert>
+                    <FO />
+                  </VStack>
+                </TabPanel>
+              </Show>
             </Tabs>
           </ModalBody>
         </ModalContent>

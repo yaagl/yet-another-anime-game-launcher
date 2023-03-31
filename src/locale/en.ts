@@ -78,4 +78,8 @@ export const en: typeof zh_CN = {
 
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
+
+  SETTING_ADVANCED: "Advanced",
+  SETTING_ADVANCED_ALERT: "DO NOT CHANGE ANYTHING, unless you know what you are doing.",
+  SETTING_ADVANCED_VISIBLE: "Advanced settings are visible now.",
 };

@@ -1,6 +1,6 @@
 import { render } from "solid-js/web";
 import { createApp } from "./app";
-import { HopeProvider } from "@hope-ui/solid";
+import { HopeProvider, NotificationsProvider } from "@hope-ui/solid";
 import { amber } from "@radix-ui/colors";
 
 import { fatal } from "./utils";
@@ -20,14 +20,18 @@ if (typeof Neutralino == "undefined") {
     .then((UI) => {
       render(
         () => (
-          <HopeProvider config={{
-            lightTheme: {
-              colors: {
-                ...createPlates("primary",amber,"amber") // 兔兔伯爵，出击
-              }
-            }
-          }}>
-            <UI />
+          <HopeProvider
+            config={{
+              lightTheme: {
+                colors: {
+                  ...createPlates("primary", amber, "amber"), // 兔兔伯爵，出击
+                },
+              },
+            }}
+          >
+            <NotificationsProvider>
+              <UI />
+            </NotificationsProvider>
           </HopeProvider>
         ),
         document.getElementById("root") as HTMLElement
