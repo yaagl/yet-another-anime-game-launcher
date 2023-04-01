@@ -82,4 +82,8 @@ export const en: typeof zh_CN = {
   SETTING_ADVANCED: "Advanced",
   SETTING_ADVANCED_ALERT: "DO NOT CHANGE ANYTHING, unless you know what you are doing.",
   SETTING_ADVANCED_VISIBLE: "Advanced settings are visible now.",
+
+
+  NO_ENOUGH_DISKSPACE: "No enough freespace on disk",
+  NO_ENOUGH_DISKSPACE_DESC: "At least {0}G of freespace is required.",
 };

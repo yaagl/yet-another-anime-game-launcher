@@ -111,3 +111,20 @@ export async function* doStreamUnzip(
   }
   throw new Error("unzip exited with code " + processExitCode);
 }
+
+export function getFreeSpace(path: string, unit: "m" | "k" | "g") {
+  return exec([
+    "/bin/df",
+    "-" + unit,
+    path,
+    rawString("|"),
+    "/usr/bin/awk",
+    "{print $4}",
+    rawString("|"),
+    "/usr/bin/grep",
+    "-v",
+    "^Available",
+  ]).then((output) => {
+    return parseInt(output.stdOut.split("\n")[0]);
+  });
+}

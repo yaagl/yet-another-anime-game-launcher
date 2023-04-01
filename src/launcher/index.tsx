@@ -14,6 +14,7 @@ import {
   stats,
   fatal,
   setKey,
+  getFreeSpace,
 } from "../utils";
 import {
   Box,
@@ -56,6 +57,7 @@ const IconSetting = createIcon({
 });
 
 const CURRENT_SUPPORTED_VERSION = "3.5.0";
+const FREESPACE_LIMIT = 110;
 
 export async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";
@@ -207,6 +209,16 @@ export async function createLauncher({
         try {
           await stats(join(selection, "pkg_version"));
         } catch {
+          const freeSpaceGB = await getFreeSpace(selection, "g");
+
+          if (freeSpaceGB < FREESPACE_LIMIT) {
+            await locale.alert(
+              "NO_ENOUGH_DISKSPACE",
+              "NO_ENOUGH_DISKSPACE_DESC",
+              [FREESPACE_LIMIT + ""]
+            );
+            return;
+          }
           taskQueue.next(async function* () {
             yield* downloadAndInstallGameProgram({
               aria2,

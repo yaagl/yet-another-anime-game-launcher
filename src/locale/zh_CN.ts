@@ -80,4 +80,7 @@ export const zh_CN = {
     SETTING_ADVANCED: "高级设置",
     SETTING_ADVANCED_ALERT: "在不清楚作用的情况下，请不要改动任何设置。",
     SETTING_ADVANCED_VISIBLE: "高级设置已解锁。",
+
+    NO_ENOUGH_DISKSPACE: "磁盘空间不足",
+    NO_ENOUGH_DISKSPACE_DESC: "解压安装需要至少{0}G的剩余空间",
 }
