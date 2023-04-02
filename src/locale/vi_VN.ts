@@ -75,4 +75,15 @@ export const vi_VN: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Mở thư mục dữ liệu của Yaagl",
 
   SETTING_WINE_CROSSOVER_ALERT: "Để sử dụng CrossOver, một vài bước cần phải được tuỳ chỉnh thủ công. Nhấn vào đây để biết thêm chi tiết",
+
+  SETTING_FPS_UNLOCK: "Mở khoá giới hạn FPSUnlock FPS Limit",
+  SETTING_FPS_UNLOCK_DEFAULT: "Tắt",
+
+  SETTING_ADVANCED: "Nâng cao",
+  SETTING_ADVANCED_ALERT: "VUI LÒNG KHÔNG THAY ĐỔI BẤT KỲ ĐIỀU GÌ, trừ khi bạn biết mình nên làm gì.",
+  SETTING_ADVANCED_VISIBLE: "Cài đặt nâng cao hiện có thể nhìn thấy.",
+
+
+  NO_ENOUGH_DISKSPACE: "Không đủ dung lượng trống trên ổ đĩa",
+  NO_ENOUGH_DISKSPACE_DESC: "Cần có tối thiếu {0}G dung lượng trống.",
 };
