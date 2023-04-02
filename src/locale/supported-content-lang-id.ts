@@ -8,6 +8,7 @@ export type SuppportedContentLangId =
   | "fr-fr"
   | "id-id"
   | "ja-jp"
+  | "pt-br"
   | "zh-cn"
   | "zh-tw"
   | "vi-vn";
