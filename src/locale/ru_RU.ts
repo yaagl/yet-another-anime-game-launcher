@@ -1,7 +1,7 @@
 import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
-export const ru_RU: typeof zh_CN = {
+export const ru_RU: typeof ru_RU = {
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Запустить игру",
   INSTALL: "Установить игру",
