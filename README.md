@@ -16,6 +16,12 @@ Do __not__ mention the real name of the game or the game company, in code commit
 
 Just follow these, or share and ruin this project for all other macOS (including Linux as well) players.
 
+### Hall of Shame
+
+This is a list of people/organization violating Yaagl policies
+
+* [bilibili: 别叫我萝卜仔](https://space.bilibili.com/1451107821)
+
 ## Is it safe?
 
 Use it at your own risk. Or enjoying it with a new f2p account.
