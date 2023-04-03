@@ -3,7 +3,12 @@ import { build, CommandSegments, rawString } from "../command-builder";
 
 export async function resolve(path: string) {
   if (path.startsWith("./")) {
-    path = join(import.meta.env.PROD ? window.NL_PATH : window.NL_CWD, path);
+    path = join(
+      import.meta.env.PROD
+        ? window.NL_PATH
+        : join(window.NL_CWD, window.NL_PATH),
+      path
+    );
     // await Neutralino.os.showMessageBox("1", command, "OK");
     if (!path.startsWith("/") || path == "/")
       throw new Error("Assertation failed " + path);
