@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "vite build --mode=\"development\" && neu update && cp './bin/neutralino.js.map' './dist/neutralino.js.map' && mkdir -p yaaglwd && cp neutralino.config.json yaaglwd/neutralino.config.json && rsync -rlptu dist yaaglwd && rsync -rlptu src/icons yaaglwd/src && neu run -- --path=./yaaglwd",
+    "start": "vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p yaaglwd && cp neutralino.config.json yaaglwd/neutralino.config.json && rsync -rlptu dist yaaglwd && rsync -rlptu src/icons yaaglwd/src && neu run -- --path=./yaaglwd",
     "dev": "vite",
     "build": "vite build",
     "build-dev": "vite build --mode=\"development\""
