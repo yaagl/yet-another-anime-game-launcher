@@ -174,9 +174,9 @@ export async function checkWine(github: Github) {
     return {
       wineReady: false,
       wineUpdate: github.acceleratedPath(
-        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/wine.tar.gz"
+        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz"
       ),
-      wineUpdateTag: "gi-wine-1.0",
+      wineUpdateTag: "gi-wine-1.2",
     } as const;
   }
 }
