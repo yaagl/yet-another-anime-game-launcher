@@ -2,7 +2,7 @@ import { join } from "path-browserify";
 import { build, CommandSegments, rawString } from "../command-builder";
 
 export async function resolve(path: string) {
-  if (path.startsWith("./")) {
+  if (!path.startsWith("/")) {
     path = join(
       import.meta.env.PROD
         ? window.NL_PATH
@@ -192,11 +192,11 @@ export async function openDir(title: string) {
 }
 
 export async function readBinary(path: string) {
-  return await Neutralino.filesystem.readBinaryFile(path);
+  return await Neutralino.filesystem.readBinaryFile(await resolve(path));
 }
 
 export async function readAllLines(path: string) {
-  const content = await Neutralino.filesystem.readFile(path);
+  const content = await Neutralino.filesystem.readFile(await resolve(path));
   if (content.indexOf("\r\n") >= 0) {
     return content.split("\r\n");
   }
@@ -204,19 +204,19 @@ export async function readAllLines(path: string) {
 }
 
 export async function writeBinary(path: string, data: ArrayBuffer) {
-  return await Neutralino.filesystem.writeBinaryFile(path, data);
+  return await Neutralino.filesystem.writeBinaryFile(await resolve(path), data);
 }
 
 export async function writeFile(path: string, data: string) {
-  return await Neutralino.filesystem.writeFile(path, data);
+  return await Neutralino.filesystem.writeFile(await resolve(path), data);
 }
 
 export async function removeFile(path: string) {
-  return await Neutralino.filesystem.removeFile(path);
+  return await Neutralino.filesystem.removeFile(await resolve(path));
 }
 
 export async function stats(path: string) {
-  return await Neutralino.filesystem.getStats(path);
+  return await Neutralino.filesystem.getStats(await resolve(path));
 }
 
 const hooks: Array<(forced: boolean) => Promise<boolean>> = [];

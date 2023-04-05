@@ -53,7 +53,7 @@ export async function* doStreamUnzip(
   source: string,
   destination: string
 ): AsyncGenerator<readonly [number, number], void, unknown> {
-  const logFile = "decompress.log";
+  const logFile = await resolve("decompress.log");
   let processExit = false,
     processExitCode = 0;
 

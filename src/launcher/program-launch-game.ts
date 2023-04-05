@@ -67,7 +67,7 @@ ${await (async () => {
   let processRunning = true;
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = `logs/game_${Date.now()}.log`;
+    const logfile = await resolve(`./logs/game_${Date.now()}.log`);
     // await forceMove(
     //   join(gameDir, atob("bWh5cGJhc2UuZGxs")),
     //   join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak")
