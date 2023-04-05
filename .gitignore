@@ -8,10 +8,6 @@
 # Neutralinojs client (minified)
 neutralino.js
 
-# Neutralinojs related files
-.storage
-*.log
-
 node_modules
 
 .tmp/
@@ -20,15 +16,9 @@ node_modules
 
 .DS_Store
 
-*.session
 *.neu
 
-/wine*
-
 /external
-
-*.log
-*.dxvk-cache
 
 .vscode
 
