@@ -9,6 +9,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const raw = true;
 
   await execa("pnpm", ["exec", "tsc"]); // do typecheck first
+  await execa("rm", ["-rf", "./.tmp"]);
   await execa("pnpm", ["exec", "vite", "build"]);
   await execa("cp", ["./neutralino.js", "./dist/neutralino.js"]);
   // run neu build command
