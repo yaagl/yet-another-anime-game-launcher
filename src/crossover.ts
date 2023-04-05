@@ -10,6 +10,13 @@ export const CROSSOVER_DATA =
 
 export async function checkCrossover() {
   try {
+    const {
+      physical: { total },
+    } = (await Neutralino.computer.getMemoryInfo()) as any as {
+      physical: Neutralino.computer.MemoryInfo;
+    };
+    // disable crossover if RAM < 16GB
+    if (total < 16 * Math.pow(1024, 3)) return false;
     await stats(CROSSOVER_LOADER);
     const { stdOut } = await exec([
       "cat",
@@ -25,7 +32,9 @@ export async function checkCrossover() {
       "sed",
       "s/<[^>]*>//g",
     ]);
-    return gte(coerce(stdOut.split("\n")[0].trim())!, "22.1.0", { loose: true });
+    return gte(coerce(stdOut.split("\n")[0].trim())!, "22.1.0", {
+      loose: true,
+    });
   } catch {
     return false;
   }
