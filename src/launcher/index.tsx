@@ -216,7 +216,7 @@ export async function createLauncher({
             await locale.alert(
               "NO_ENOUGH_DISKSPACE",
               "NO_ENOUGH_DISKSPACE_DESC",
-              [requiredSpaceGB + ""]
+              [requiredSpaceGB + "", (requiredSpaceGB*1.074).toFixed(1)]
             );
             return;
           }
