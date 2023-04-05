@@ -8,9 +8,9 @@ You can now play _An Anime Game_ on macOS!
 
 ## Policy
 
-Please don't link to this repository. If you really want to share it with people, just tell the project name __Yaagl__ and where to find (Github!) but __don't share an one-click link__ unless it's a private message.
+Please don't link to this repository. If you really want to share it with people, just tell the project name __Yaagl__ and where to find (Github!) but __don't share/disclose the link__ unless it's a private message.
 
-Do __not__ provide any forms of tutorial for _how to use Yaagl_ on public channels.
+Do __not__ provide any forms of tutorial for _how to use Yaagl_ on public channels. (If you really want to do that, ask the project owner for permission first.)
 
 Do __not__ mention the real name of the game or the game company, in code commits, issues, pr or dicussions. Use _The Anime Game_ or _The Anime Company_ instead.
 
