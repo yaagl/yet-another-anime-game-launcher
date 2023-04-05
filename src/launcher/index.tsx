@@ -114,6 +114,7 @@ export async function createLauncher({
           path,
           decompressed_path,
           voice_packs,
+          size,
         },
       },
     },
@@ -210,12 +211,12 @@ export async function createLauncher({
           await stats(join(selection, "pkg_version"));
         } catch {
           const freeSpaceGB = await getFreeSpace(selection, "g");
-
-          if (freeSpaceGB < FREESPACE_LIMIT) {
+          const requiredSpaceGB = Math.ceil(parseInt(size) / Math.pow(1024, 3)) * 1.2;
+          if (freeSpaceGB < requiredSpaceGB) {
             await locale.alert(
               "NO_ENOUGH_DISKSPACE",
               "NO_ENOUGH_DISKSPACE_DESC",
-              [FREESPACE_LIMIT + ""]
+              [requiredSpaceGB + ""]
             );
             return;
           }
