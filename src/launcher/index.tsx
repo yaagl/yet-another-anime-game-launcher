@@ -32,7 +32,7 @@ import { createIcon } from "@hope-ui/solid";
 import { batch, createSignal, Show } from "solid-js";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
-import { patternSearch } from "./patch";
+import { patchRevertProgram, patternSearch } from "./patch";
 import { CommonUpdateProgram } from "../common-update-ui";
 import { Locale } from "../locale";
 import { createConfiguration } from "./config";
@@ -185,6 +185,12 @@ export async function createLauncher({
         }
       })();
     taskQueue.next(); // ignored anyway
+    taskQueue.next(async function*() {
+      try {
+        await getKey("patched");
+        yield* patchRevertProgram(_gameInstallDir(), wine.prefix, server, config)
+      } catch {}
+    })
 
     async function onButtonClick() {
       if (programBusy()) return; // ignore
