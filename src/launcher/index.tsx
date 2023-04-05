@@ -142,7 +142,7 @@ export async function createLauncher({
     locale,
   });
 
-  return function Laucnher() {
+  return function Launcher() {
     // const bh = 40 / window.devicePixelRatio;
     // const bw = 136 / window.devicePixelRatio;
     const bh = 40;
