@@ -76,7 +76,7 @@ export async function createApp() {
     github,
     aria2,
   });
-  if (!latest) {
+  if (latest == false) {
     if (
       await locale.prompt(
         "NEW_VERSION_AVALIABLE",
