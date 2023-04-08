@@ -57,13 +57,12 @@ node ./build-app.js
 1. Drag app to the bin
 2. Delete folder `~/Library/Application Support/Yaagl` or `~/Library/Application Support/Yaagl OS` if you are using oversea version
 
-## Roadmap
+## Related projects
 
-* Localization
-* Robust launching process
-* More config flexibility
-
-TBD
+* Yaagl is using custom `wine (crossover)` builds from [3Shain/winecx](https://github.com/3Shain/winecx)
+* Custom `neutralinojs` binary from [3Shain/neutralinojs](https://github.com/3Shain/neutralinojs)
+* [DXVK-macOS](https://github.com/Gcenx/DXVK-macOS)
+* [MoltenVK](https://github.com/KhronosGroup/MoltenVK) and [its binary releases](https://github.com/The-Wineskin-Project/MoltenVK/releases)
 
 ## Special thanks
 * An anime game launcher (you can find it on GitHub as I can't link to it) where the idea of this project comes from and provide so many details on launching process. (By the way, Yaagl is __not__ a fork of this project)
