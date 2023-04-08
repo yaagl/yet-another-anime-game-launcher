@@ -86,4 +86,7 @@ export const vi_VN: typeof zh_CN = {
 
   NO_ENOUGH_DISKSPACE: "Không đủ dung lượng trống trên ổ đĩa",
   NO_ENOUGH_DISKSPACE_DESC: "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống.",
+
+  UPDATE: en.UPDATE,
+  GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
 };

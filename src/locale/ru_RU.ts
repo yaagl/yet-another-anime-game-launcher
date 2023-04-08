@@ -87,4 +87,7 @@ export const ru_RU: typeof zh_CN = {
 
   NO_ENOUGH_DISKSPACE: "Недостаточно свободного места на диске",
   NO_ENOUGH_DISKSPACE_DESC: "Требуется не менее {0}ГиБ ({1}Гб) свободного пространства.",
+  
+  UPDATE: en.UPDATE,
+  GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
 };

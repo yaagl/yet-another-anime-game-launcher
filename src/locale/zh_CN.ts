@@ -83,4 +83,7 @@ export const zh_CN = {
 
     NO_ENOUGH_DISKSPACE: "磁盘空间不足",
     NO_ENOUGH_DISKSPACE_DESC: "解压安装需要至少{0}GiB ({1}GB)的剩余空间",
+
+    UPDATE: "更新游戏",
+    GAME_VERSION_TOO_OLD_DESC: "当前游戏版本({0})太过久远，无法增量更新。请重新安装游戏。",
 }

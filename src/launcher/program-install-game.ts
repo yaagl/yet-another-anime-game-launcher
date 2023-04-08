@@ -94,9 +94,9 @@ export async function* downloadAndInstallGameProgram({
   await writeFile(
     join(gameDir, "config.ini"),
     `[General]
-  game_version=${gameVersion}
-  channel=${server.channel_id}
-  sub_channel=${server.subchannel_id}
-  cps=${server.cps}`
+game_version=${gameVersion}
+channel=${server.channel_id}
+sub_channel=${server.subchannel_id}
+cps=${server.cps}`
   );
 }

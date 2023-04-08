@@ -38,6 +38,7 @@ import { Locale } from "../locale";
 import { createConfiguration } from "./config";
 import { Github } from "../github";
 import { downloadAndInstallGameProgram } from "./program-install-game";
+import { updateGameProgram } from "./program-update-game";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
@@ -57,7 +58,6 @@ const IconSetting = createIcon({
 });
 
 const CURRENT_SUPPORTED_VERSION = "3.5.0";
-const FREESPACE_LIMIT = 110;
 
 export async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";
@@ -109,6 +109,7 @@ export async function createLauncher({
   const {
     data: {
       game: {
+        diffs,
         latest: {
           version: GAME_LATEST_VERSION,
           path,
@@ -195,21 +196,55 @@ export async function createLauncher({
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (_gameInstalled()) {
-        // assert:
-        taskQueue.next(async function* () {
-
-          yield* checkAndDownloadDXVK(aria2);
-          if(config.fpsUnlock!="default") {
-            yield* checkAndDownloadFpsUnlocker(aria2);
+        if(GAME_LATEST_VERSION == gameCurrentVersion()) {
+          if (gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) && !config.patchOff) {
+            await locale.alert(
+              "UNSUPPORTED_VERSION",
+              "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+              [gameCurrentVersion()]
+            );
+            return;
           }
-          yield* launchGameProgram({
-            gameDir: _gameInstallDir(),
-            wine,
-            gameExecutable: server.executable,
-            config,
-            server,
+          taskQueue.next(async function* () {
+
+            yield* checkAndDownloadDXVK(aria2);
+            if(config.fpsUnlock!="default") {
+              yield* checkAndDownloadFpsUnlocker(aria2);
+            }
+            yield* launchGameProgram({
+              gameDir: _gameInstallDir(),
+              wine,
+              gameExecutable: server.executable,
+              config,
+              server,
+            });
           });
-        });
+        } else {
+          const updateTarget = diffs.find(x=>x.version == gameCurrentVersion());
+          if(!updateTarget) {
+            await locale.prompt("UNSUPPORTED_VERSION", "GAME_VERSION_TOO_OLD_DESC", [gameCurrentVersion()]);
+            batch(() => {
+              setGameInstalled(false);
+              setGameInstallDir("");
+              setGameCurrentVersion("0.0.0");
+            });
+            await setKey("game_install_dir", null);
+            return;
+          }
+          taskQueue.next(async function* () {
+            yield* updateGameProgram({
+              aria2,
+              server,
+              currentGameVersion: gameCurrentVersion(),
+              updatedGameVersion: GAME_LATEST_VERSION,
+              updateFileZip: updateTarget.path,
+              gameDir: _gameInstallDir()
+            });
+            batch(() => {
+              setGameCurrentVersion(GAME_LATEST_VERSION);
+            });
+          });
+        }
       } else {
         const selection = await selectPath();
         if (!selection) return;
@@ -257,23 +292,34 @@ export async function createLauncher({
           );
           return;
         } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
-          await locale.alert("NOT_SUPPORTED_YET", "UPGRADE_FUNCTION_TBD");
-          return;
-        }
-        taskQueue.next(async function* () {
-          yield* checkIntegrityProgram({
-            aria2,
-            gameDir: selection,
-            remoteDir: decompressed_path,
-          });
-          // setGameInstalled
+          const updateTarget = diffs.find(x=>x.version == gameVersion);
+          if(!updateTarget) {
+            await locale.prompt("UNSUPPORTED_VERSION", "GAME_VERSION_TOO_OLD_DESC", [gameVersion]);
+            return;
+          }
           batch(() => {
             setGameInstalled(true);
             setGameInstallDir(selection);
             setGameCurrentVersion(gameVersion);
           });
           await setKey("game_install_dir", selection);
-        });
+          // FIXME: perform a integrity check?
+        } else {
+          taskQueue.next(async function* () {
+            yield* checkIntegrityProgram({
+              aria2,
+              gameDir: selection,
+              remoteDir: decompressed_path,
+            });
+            // setGameInstalled
+            batch(() => {
+              setGameInstalled(true);
+              setGameInstallDir(selection);
+              setGameCurrentVersion(gameVersion);
+            });
+            await setKey("game_install_dir", selection);
+          });
+        }
       }
     }
 
@@ -332,7 +378,9 @@ export async function createLauncher({
                   onClick={() => onButtonClick().catch(fatal)}
                 >
                   {_gameInstalled()
-                    ? locale.get("LAUNCH")
+                    ? GAME_LATEST_VERSION == gameCurrentVersion() 
+                      ? locale.get("LAUNCH")
+                      : locale.get("UPDATE")
                     : locale.get("INSTALL")}
                 </Button>
                 <Show when={_gameInstalled()}>

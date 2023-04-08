@@ -86,4 +86,7 @@ export const en: typeof zh_CN = {
 
   NO_ENOUGH_DISKSPACE: "No enough freespace on disk",
   NO_ENOUGH_DISKSPACE_DESC: "At least {0}GiB ({1}GB) of freespace is required.",
+
+  UPDATE: "Update Game",
+  GAME_VERSION_TOO_OLD_DESC: "Current game version ({0}) is too old to update incrementally. Please re-install the game."
 };
