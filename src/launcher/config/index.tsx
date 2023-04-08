@@ -71,7 +71,7 @@ export async function createConfiguration({
 
   let _advancedSetting = false;
   try {
-    _advancedSetting = (await getKey("config_advanced")) == "true";
+    _advancedSetting = YAAGL_ADVANCED_ENABLE && (await getKey("config_advanced")) == "true";
   } catch {}
   const [advanceSetting, setAdvancedSetting] = createSignal(_advancedSetting);
 
