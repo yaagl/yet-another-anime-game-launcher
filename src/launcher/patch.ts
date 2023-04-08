@@ -10,6 +10,8 @@ import {
   getKey,
   setKey,
   cp,
+  resolve,
+  removeFileIfExists,
 } from "../utils";
 import { xdelta3 } from "../utils/unix";
 
@@ -87,6 +89,16 @@ export async function* patchProgram(
     );
     await cp(`./dxvk/${f.name}.dll`, join(system32Dir, f.name + ".dll"));
   }
+  if(config.reshade) {
+    await forceMove(
+      await resolve("./reshade/dxgi.dll"),
+      join(gameDir, "dxgi.dll")
+    );
+    await forceMove(
+      await resolve("./reshade/d3dcompiler_47.dll"),
+      join(gameDir, "d3dcompiler_47.dll")
+    );
+  }
   setKey("patched", "1");
 }
 
@@ -127,6 +139,14 @@ export async function* patchRevertProgram(
     await forceMove(
       join(system32Dir, f.name + ".dll.bak"),
       join(system32Dir, f.name + ".dll")
+    );
+  }
+  if(config.reshade) {
+    await removeFileIfExists(
+      join(gameDir, "dxgi.dll")
+    );
+    await removeFileIfExists(
+      join(gameDir, "d3dcompiler_47.dll")
     );
   }
   setKey("patched", null);

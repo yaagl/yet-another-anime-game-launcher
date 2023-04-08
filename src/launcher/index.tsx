@@ -44,6 +44,7 @@ import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
 import { checkAndDownloadDXVK, checkAndDownloadFpsUnlocker } from "../downloadable-resource";
 import { VoicePackNames } from "../constants";
+import { checkAndDownloadReshade } from "../reshade";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -209,7 +210,9 @@ export async function createLauncher({
             return;
           }
           taskQueue.next(async function* () {
-
+            if(config.reshade) {
+              yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
+            }
             yield* checkAndDownloadDXVK(aria2);
             if(config.fpsUnlock!="default") {
               yield* checkAndDownloadFpsUnlocker(aria2);

@@ -20,7 +20,7 @@ import {
   VStack,
   notificationService
 } from "@hope-ui/solid";
-import { CURRENT_YAAGL_VERSION } from "../../constants";
+import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../../constants";
 import { Locale } from "../../locale";
 import { Wine, WineVersionChecker } from "../../wine";
 import { Config } from "./config-def";
@@ -35,6 +35,7 @@ import createPatchOff from "./patch-off";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKey, resolve, setKey } from "../../utils";
 import { createSignal, Show } from "solid-js";
+import createReShade from "./reshade";
 
 export async function createConfiguration({
   wine,
@@ -66,6 +67,7 @@ export async function createConfiguration({
   const [UL] = await createLocaleConfig({ locale, config });
   const [PO] = await createPatchOff({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
+  const [RS] = await createReShade({ locale, config });
 
   let _advancedSetting = false;
   try {
@@ -75,6 +77,9 @@ export async function createConfiguration({
 
   const clickTimestamp: number[] = [];
   async function onClickVersion() {
+    if(!YAAGL_ADVANCED_ENABLE) {
+      return;
+    }
     clickTimestamp.push(Date.now());
     if(clickTimestamp.length > 5) {
       if(clickTimestamp[clickTimestamp.length - 1] - clickTimestamp[clickTimestamp.length - 5] < 1000) {
@@ -207,6 +212,7 @@ export async function createConfiguration({
                       {locale.get("SETTING_ADVANCED_ALERT")}
                     </Alert>
                     <FO />
+                    <RS />
                   </VStack>
                 </TabPanel>
               </Show>
