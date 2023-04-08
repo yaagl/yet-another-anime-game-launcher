@@ -43,6 +43,7 @@ import { checkIntegrityProgram } from "./program-check-integrity";
 import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
 import { checkAndDownloadDXVK, checkAndDownloadFpsUnlocker } from "../downloadable-resource";
+import { VoicePackNames } from "../constants";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -233,6 +234,14 @@ export async function createLauncher({
             await setKey("game_install_dir", null);
             return;
           }
+          const voicePacks = (await Promise.all(updateTarget.voice_packs.map(async x=>{
+            try {
+              await stats(join(_gameInstallDir(), `Audio_${VoicePackNames[x.language]}_pkg_version`));
+              return x;
+            } catch {
+              return null!;
+            }
+          }))).filter(x=>x!=null);
           taskQueue.next(async function* () {
             yield* updateGameProgram({
               aria2,
@@ -240,7 +249,8 @@ export async function createLauncher({
               currentGameVersion: gameCurrentVersion(),
               updatedGameVersion: GAME_LATEST_VERSION,
               updateFileZip: updateTarget.path,
-              gameDir: _gameInstallDir()
+              gameDir: _gameInstallDir(),
+              updateVoicePackZips: voicePacks.map(x=>x.path)
             });
             batch(() => {
               setGameCurrentVersion(GAME_LATEST_VERSION);

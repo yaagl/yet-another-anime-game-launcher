@@ -203,6 +203,20 @@ export async function readAllLines(path: string) {
   return content.split("\n");
 }
 
+export async function readAllLinesIfExists(path: string) {
+  try {
+    await stats(await resolve(path));
+  } catch {
+    return [];
+  }
+  const content = await Neutralino.filesystem.readFile(await resolve(path));
+  if (content.indexOf("\r\n") >= 0) {
+    return content.split("\r\n");
+  }
+  return content.split("\n");
+}
+
+
 export async function writeBinary(path: string, data: ArrayBuffer) {
   return await Neutralino.filesystem.writeBinaryFile(await resolve(path), data);
 }
@@ -212,6 +226,15 @@ export async function writeFile(path: string, data: string) {
 }
 
 export async function removeFile(path: string) {
+  return await Neutralino.filesystem.removeFile(await resolve(path));
+}
+
+export async function removeFileIfExists(path: string) {
+  try {
+    await stats(await resolve(path));
+  } catch {
+    return;
+  }
   return await Neutralino.filesystem.removeFile(await resolve(path));
 }
 

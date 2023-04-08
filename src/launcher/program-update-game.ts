@@ -8,30 +8,17 @@ import {
   doStreamUnzip,
   removeFile,
   writeFile,
-  readAllLines,
   hpatchz,
   forceMove,
+  readAllLinesIfExists,
+  removeFileIfExists,
 } from "../utils";
 
-export async function* updateGameProgram({
-  aria2,
-  updateFileZip,
-  gameDir,
-  currentGameVersion,
-  updatedGameVersion,
-  server,
-}: {
-  updateFileZip: string;
-  gameDir: string;
-  currentGameVersion: string;
-  updatedGameVersion: string;
-  aria2: Aria2;
-  server: Server;
-}): CommonUpdateProgram {
+async function* downloadAndPatch(updateFileZip: string, gameDir: string, aria2: Aria2): CommonUpdateProgram {
   const downloadTmp = join(gameDir, ".ariatmp");
-  const updateFileTmp = join(downloadTmp, "update.zip");
-  // const audioFileTmp = join(downloadTmp, "audio.zip");
   await mkdirp(downloadTmp);
+  const updateFileTmp = join(downloadTmp, basename(updateFileZip));
+
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "ALLOCATING_FILE"];
   let gameFileStart = false;
@@ -67,12 +54,12 @@ export async function* updateGameProgram({
   yield ['setStateText','PATCHING'];
   // delete files
   const deleteList = (
-    await readAllLines(join(gameDir, "deletefiles.txt"))
+    await readAllLinesIfExists(join(gameDir, "deletefiles.txt"))
   ).filter((x) => x.trim() != "");
 
   const diffList: {
     remoteName: string;
-  }[] = (await readAllLines(join(gameDir, "hdifffiles.txt")))
+  }[] = (await readAllLinesIfExists(join(gameDir, "hdifffiles.txt")))
     .filter((x) => x.trim() != "")
     .map((x) => JSON.parse(x));
 
@@ -84,7 +71,7 @@ export async function* updateGameProgram({
     doneCount++;
     yield ['setProgress', doneCount / patchCount * 100];
   }
-  await removeFile(join(gameDir, "deletefiles.txt"));
+  await removeFileIfExists(join(gameDir, "deletefiles.txt"));
   // diff files
 
   for (const { remoteName: file } of diffList) {
@@ -98,8 +85,33 @@ export async function* updateGameProgram({
     doneCount++;
     yield ['setProgress', doneCount / patchCount * 100];
   }
-  await removeFile(join(gameDir, "hdifffiles.txt"));
+  await removeFileIfExists(join(gameDir, "hdifffiles.txt"));
   yield ['setUndeterminedProgress'];
+}
+
+export async function* updateGameProgram({
+  aria2,
+  updateFileZip,
+  gameDir,
+  currentGameVersion,
+  updatedGameVersion,
+  server,
+  updateVoicePackZips
+}: {
+  updateFileZip: string;
+  gameDir: string;
+  currentGameVersion: string;
+  updatedGameVersion: string;
+  aria2: Aria2;
+  server: Server;
+  updateVoicePackZips: string[];
+}): CommonUpdateProgram {
+
+  yield* downloadAndPatch(updateFileZip, gameDir, aria2);
+
+  for(const updateVoicePackZip of updateVoicePackZips) {
+    yield* downloadAndPatch(updateVoicePackZip, gameDir, aria2);
+  }
 
   await writeFile(
     join(gameDir, "config.ini"),
