@@ -189,8 +189,10 @@ export async function createLauncher({
     taskQueue.next(async function*() {
       try {
         await getKey("patched");
-        yield* patchRevertProgram(_gameInstallDir(), wine.prefix, server, config)
-      } catch {}
+      } catch {
+        return;
+      }
+      yield* patchRevertProgram(_gameInstallDir(), wine.prefix, server, config)
     })
 
     async function onButtonClick() {
