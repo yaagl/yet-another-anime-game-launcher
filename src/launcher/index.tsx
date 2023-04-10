@@ -158,7 +158,7 @@ export async function createLauncher({
     predownload_available = false; // already downloaded
   } catch {}
   const [showPredownload, setShowPredownload] = createSignal(
-    predownload_available
+    predownload_available && gameInstalled
   );
 
   return function Launcher() {
@@ -405,7 +405,7 @@ export async function createLauncher({
     async function predownload() {
       setShowPredownload(false);
       if(pre_download_game == null) return;
-      const updateTarget = pre_download_game.diffs.find((x) => x.version == gameVersion);
+      const updateTarget = pre_download_game.diffs.find((x) => x.version == gameCurrentVersion());
       if(updateTarget == null) return;
       const voicePacks = (
         await Promise.all(
