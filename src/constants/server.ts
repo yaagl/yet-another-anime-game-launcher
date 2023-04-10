@@ -73,7 +73,19 @@ export interface ServerVersionData {
       plugins: {}[]; // not necessary
       version: string;
     };
-    pre_download_game: null; // fixme:
+    pre_download_game: null | {
+      latest: GameDef;
+      diffs: {
+        is_recommended_update: boolean;
+        md5: string;
+        name: string;
+        package_size: string;
+        path: string;
+        size: string;
+        version: string;
+        voice_packs: VoicePackDef[];
+      }[];
+    };
     sdk: null;
     web_url: string;
   };

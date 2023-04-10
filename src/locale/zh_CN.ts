@@ -86,4 +86,6 @@ export const zh_CN = {
 
     UPDATE: "更新游戏",
     GAME_VERSION_TOO_OLD_DESC: "当前游戏版本({0})太过久远，无法增量更新。请重新安装游戏。",
+
+    PREDOWNLOAD_READY: "预载{0}版本"
 }

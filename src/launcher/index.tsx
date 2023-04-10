@@ -25,20 +25,26 @@ import {
   IconButton,
   Modal,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
   Progress,
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
 import { batch, createSignal, Show } from "solid-js";
 import { join } from "path-browserify";
-import { gt, lt } from "semver";
+import { gt, gte, lt } from "semver";
 import { patchRevertProgram, patternSearch } from "./patch";
 import { CommonUpdateProgram } from "../common-update-ui";
 import { Locale } from "../locale";
 import { createConfiguration } from "./config";
 import { Github } from "../github";
 import { downloadAndInstallGameProgram } from "./program-install-game";
-import { updateGameProgram } from "./program-update-game";
+import { predownloadGameProgram, updateGameProgram } from "./program-update-game";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
@@ -120,6 +126,7 @@ export async function createLauncher({
           size,
         },
       },
+      pre_download_game,
     },
   }: ServerVersionData = await (await fetch(server.update_url)).json();
   await waitImageReady(background);
@@ -144,6 +151,15 @@ export async function createLauncher({
       await openDir(locale.get("SELECT_INSTALLATION_DIR")),
     locale,
   });
+
+  let predownload_available = pre_download_game != null;
+  try {
+    await getKey("predownloaded_all");
+    predownload_available = false; // already downloaded
+  } catch {}
+  const [showPredownload, setShowPredownload] = createSignal(
+    predownload_available
+  );
 
   return function Launcher() {
     // const bh = 40 / window.devicePixelRatio;
@@ -188,19 +204,31 @@ export async function createLauncher({
         }
       })();
     taskQueue.next(); // ignored anyway
-    taskQueue.next(async function*() {
+    taskQueue.next(async function* () {
       try {
         await getKey("patched");
       } catch {
         return;
       }
-      yield* patchRevertProgram(_gameInstallDir(), wine.prefix, server, config)
-    })
-
+      try {
+        yield* patchRevertProgram(
+          _gameInstallDir(),
+          wine.prefix,
+          server,
+          config
+        );
+      } catch {
+        yield* checkIntegrityProgram({
+          aria2,
+          gameDir: _gameInstallDir(),
+          remoteDir: decompressed_path,
+        });
+      }
+    });
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (_gameInstalled()) {
-        if(GAME_LATEST_VERSION == gameCurrentVersion()) {
+        if(gte(gameCurrentVersion(), GAME_LATEST_VERSION)) {
           if (gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) && !config.patchOff) {
             await locale.alert(
               "UNSUPPORTED_VERSION",
@@ -338,6 +366,74 @@ export async function createLauncher({
       }
     }
 
+
+    const [nonUrgentStatusText, setNonUrgentStatusText] = createSignal("");
+    const [nonUrgentProgress, setNonUrgentProgress] = createSignal(0);
+    const [nonUrgentProgramBusy, setNonUrgentBusy] = createSignal(false);
+    const nonUrgentTaskQueue: AsyncGenerator<
+      any,
+      void,
+      () => CommonUpdateProgram
+    > = (async function* () {
+      while (true) {
+        const task = yield 0;
+        setNonUrgentBusy(true);
+        try {
+          for await (const text of task()) {
+            switch (text[0]) {
+              case "setProgress":
+                setNonUrgentProgress(text[1]);
+                break;
+              case "setUndeterminedProgress":
+                setNonUrgentProgress(0);
+                break;
+              case "setStateText":
+                setNonUrgentStatusText(locale.format(text[1], text.slice(2)));
+                break;
+            }
+          }
+        } catch (e) {
+          // fatal
+          await fatal(e);
+          return;
+        }
+        setNonUrgentBusy(false);
+      }
+    })();
+    nonUrgentTaskQueue.next(); // ignored anyway
+
+    async function predownload() {
+      setShowPredownload(false);
+      if(pre_download_game == null) return;
+      const updateTarget = pre_download_game.diffs.find((x) => x.version == gameVersion);
+      if(updateTarget == null) return;
+      const voicePacks = (
+        await Promise.all(
+          updateTarget.voice_packs.map(async (x) => {
+            try {
+              await stats(
+                join(
+                  _gameInstallDir(),
+                  `Audio_${VoicePackNames[x.language]}_pkg_version`
+                )
+              );
+              return x;
+            } catch {
+              return null!;
+            }
+          })
+        )
+      ).filter((x) => x != null);
+      nonUrgentTaskQueue.next(async function* () {
+        yield* predownloadGameProgram({
+          aria2,
+          updateFileZip: updateTarget.path,
+          gameDir: _gameInstallDir(),
+          updateVoicePackZips: voicePacks.map((x) => x.path),
+        });
+      });
+    }
+
     return (
       <div
         class="background"
@@ -364,10 +460,30 @@ export async function createLauncher({
             alignItems={"flex-end"}
           >
             <Box flex={1}>
+              <Show when={nonUrgentProgramBusy()}>
+                <h3
+                  style={
+                    "text-shadow: 1px 1px 2px #333;color:white;margin-bottom:5px;margin-top:8px"
+                  }
+                >
+                  {nonUrgentStatusText()}
+                </h3>
+                <Progress
+                  value={nonUrgentProgress()}
+                  indeterminate={nonUrgentProgress() == 0}
+                  size="sm"
+                  borderRadius={8}
+                >
+                  <ProgressIndicator
+                    style={"transition: none;"}
+                    borderRadius={8}
+                  ></ProgressIndicator>
+                </Progress>
+              </Show>
               <Show when={programBusy()}>
                 <h3
                   style={
-                    "text-shadow: 1px 1px 2px #333;color:white;margin-bottom:5px;"
+                    "text-shadow: 1px 1px 2px #333;color:white;margin-bottom:5px;margin-top:8px;"
                   }
                 >
                   {statusText()}
@@ -385,30 +501,51 @@ export async function createLauncher({
                 </Progress>
               </Show>
             </Box>
-            <Box>
-              <ButtonGroup class="launch-button" size="xl" attached minWidth={150}>
-                <Button
-                  mr="-1px"
-                  disabled={programBusy()}
-                  onClick={() => onButtonClick().catch(fatal)}
+            <Popover placement="top" opened={showPredownload() && !isOpen()} onClose={()=>setShowPredownload(false)} closeOnBlur={true}>
+              <PopoverTrigger as={Box}>
+                <ButtonGroup
+                  class="launch-button"
+                  size="xl"
+                  attached
+                  minWidth={150}
                 >
-                  {_gameInstalled()
-                    ? GAME_LATEST_VERSION == gameCurrentVersion() 
-                      ? locale.get("LAUNCH")
-                      : locale.get("UPDATE")
-                    : locale.get("INSTALL")}
-                </Button>
-                <Show when={_gameInstalled()}>
-                  <IconButton
-                    onClick={onOpen}
+                  <Button
+                    mr="-1px"
                     disabled={programBusy()}
-                    fontSize={30}
-                    aria-label="Settings"
-                    icon={<IconSetting />}
-                  />
-                </Show>
-              </ButtonGroup>
-            </Box>
+                    onClick={() => onButtonClick().catch(fatal)}
+                  >
+                    {_gameInstalled()
+                      ? gte(gameCurrentVersion() , GAME_LATEST_VERSION)
+                        ? locale.get("LAUNCH")
+                        : locale.get("UPDATE")
+                      : locale.get("INSTALL")}
+                  </Button>
+                  <Show when={_gameInstalled()}>
+                    <IconButton
+                      onClick={onOpen}
+                      disabled={programBusy()}
+                      fontSize={30}
+                      aria-label="Settings"
+                      icon={<IconSetting />}
+                    />
+                  </Show>
+                </ButtonGroup>
+              </PopoverTrigger>
+              <PopoverContent
+                borderColor="$success3"
+                bg="$success3"
+                color="$success11"
+                width={200}
+              >
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverBody width={200}>
+                  <Button id="predownload" colorScheme="success" size="sm" variant="ghost" onClick={predownload}>
+                    {locale.format("PREDOWNLOAD_READY", [pre_download_game?.latest.version??""])}
+                  </Button>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
             <Modal opened={isOpen()} onClose={onClose} scrollBehavior="inside">
               <ModalOverlay />
               <ConfigurationUI

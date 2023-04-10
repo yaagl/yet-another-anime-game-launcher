@@ -12,39 +12,62 @@ import {
   forceMove,
   readAllLinesIfExists,
   removeFileIfExists,
+  getKey,
+  stats,
+  setKey,
+  exec,
 } from "../utils";
+import { gte } from "semver";
+
+//https://stackoverflow.com/a/69399958
+const sha1sum = async (message: string) => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-1', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+  return hashHex;
+}
 
 async function* downloadAndPatch(updateFileZip: string, gameDir: string, aria2: Aria2): CommonUpdateProgram {
   const downloadTmp = join(gameDir, ".ariatmp");
   await mkdirp(downloadTmp);
   const updateFileTmp = join(downloadTmp, basename(updateFileZip));
 
-  yield ["setUndeterminedProgress"];
-  yield ["setStateText", "ALLOCATING_FILE"];
-  let gameFileStart = false;
-  for await (const progress of aria2.doStreamingDownload({
-    uri: updateFileZip,
-    absDst: updateFileTmp,
-  })) {
-    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-      continue;
+  try {
+    await getKey(`predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0,32)}`);
+    await stats(updateFileTmp);
+    await setKey(`predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0,32)}`, null);
+  } catch {
+    yield ["setUndeterminedProgress"];
+    yield ["setStateText", "ALLOCATING_FILE"];
+    let gameFileStart = false;
+    for await (const progress of aria2.doStreamingDownload({
+      uri: updateFileZip,
+      absDst: updateFileTmp,
+    })) {
+      if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+        continue;
+      }
+      gameFileStart = true;
+      yield [
+        "setStateText",
+        "DOWNLOADING_FILE_PROGRESS",
+        basename(updateFileZip),
+        humanFileSize(Number(progress.downloadSpeed)),
+        humanFileSize(Number(progress.completedLength)),
+        humanFileSize(Number(progress.totalLength)),
+      ];
+      yield [
+        "setProgress",
+        Number(
+          (progress.completedLength * BigInt(10000)) / progress.totalLength
+        ) / 100,
+      ];
     }
-    gameFileStart = true;
-    yield [
-      "setStateText",
-      "DOWNLOADING_FILE_PROGRESS",
-      basename(updateFileZip),
-      humanFileSize(Number(progress.downloadSpeed)),
-      humanFileSize(Number(progress.completedLength)),
-      humanFileSize(Number(progress.totalLength)),
-    ];
-    yield [
-      "setProgress",
-      Number(
-        (progress.completedLength * BigInt(10000)) / progress.totalLength
-      ) / 100,
-    ];
   }
+
+
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
   for await (const [dec, total] of doStreamUnzip(updateFileTmp, gameDir)) {
     yield ["setProgress", (dec / total) * 100];
@@ -107,12 +130,27 @@ export async function* updateGameProgram({
   updateVoicePackZips: string[];
 }): CommonUpdateProgram {
 
+  // 3.6.0 
+  if(gte(updatedGameVersion, "3.6.0")) {
+    try {
+      await stats(join(gameDir,server.dataDir,"StreamingAssets","Audio","GeneratedSoundBanks","Windows"));
+      // if do exists
+      await mkdirp(join(gameDir,server.dataDir,"StreamingAssets","AudioAssets"));
+      await exec(["/bin/cp","-R", "-f", 
+        join(gameDir,server.dataDir,"StreamingAssets","Audio","GeneratedSoundBanks","Windows")+"/.",
+        join(gameDir,server.dataDir,"StreamingAssets","AudioAssets")]);
+      await exec(["rm","-rf", join(gameDir,server.dataDir,"StreamingAssets","Audio","GeneratedSoundBanks","Windows")]);
+    } catch {
+    }
+  }
+
   yield* downloadAndPatch(updateFileZip, gameDir, aria2);
 
   for(const updateVoicePackZip of updateVoicePackZips) {
     yield* downloadAndPatch(updateVoicePackZip, gameDir, aria2);
   }
 
+  await setKey(`predownloaded_all`, null);
   await writeFile(
     join(gameDir, "config.ini"),
     `[General]
@@ -121,4 +159,66 @@ channel=${server.channel_id}
 sub_channel=${server.subchannel_id}
 cps=${server.cps}`
   );
+}
+
+async function* predownload(
+  updateFileZip: string,
+  gameDir: string,
+  aria2: Aria2
+): CommonUpdateProgram {
+  const downloadTmp = join(gameDir, ".ariatmp");
+  await mkdirp(downloadTmp);
+  const updateFileTmp = join(downloadTmp, basename(updateFileZip));
+
+  try {
+    await getKey(`predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0,32)}`);
+    return;
+  } catch { }
+
+  yield ["setUndeterminedProgress"];
+  yield ["setStateText", "ALLOCATING_FILE"];
+  let gameFileStart = false;
+  for await (const progress of aria2.doStreamingDownload({
+    uri: updateFileZip,
+    absDst: updateFileTmp,
+  })) {
+    if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+      continue;
+    }
+    gameFileStart = true;
+    yield [
+      "setStateText",
+      "DOWNLOADING_FILE_PROGRESS",
+      basename(updateFileZip),
+      humanFileSize(Number(progress.downloadSpeed)),
+      humanFileSize(Number(progress.completedLength)),
+      humanFileSize(Number(progress.totalLength)),
+    ];
+    yield [
+      "setProgress",
+      Number(
+        (progress.completedLength * BigInt(10000)) / progress.totalLength
+      ) / 100,
+    ];
+  }
+  await setKey(`predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0,32)}`, 'true');
+}
+
+export async function* predownloadGameProgram({
+  gameDir,
+  updateFileZip,
+  aria2,
+  updateVoicePackZips,
+}: {
+  updateFileZip: string;
+  gameDir: string;
+  aria2: Aria2;
+  updateVoicePackZips: string[];
+}) {
+  yield* predownload(updateFileZip, gameDir, aria2);
+
+  for (const updateVoicePackZip of updateVoicePackZips) {
+    yield* predownload(updateVoicePackZip, gameDir, aria2);
+  }
+  await setKey(`predownloaded_all`, 'true');
 }

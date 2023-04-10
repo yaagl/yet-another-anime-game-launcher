@@ -88,5 +88,7 @@ import { zh_CN } from "./zh_CN";
 
     UPDATE: en.UPDATE,
     GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
+
+    PREDOWNLOAD_READY: en.PREDOWNLOAD_READY,
   };
   
