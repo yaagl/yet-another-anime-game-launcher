@@ -89,6 +89,11 @@ export async function checkGameState(locale: Locale, server: Server) {
   }
 }
 
+async function getLatestVersionInfo(server: Server): Promise<ServerVersionData> {
+  const ret: ServerVersionData = await (await fetch(server.update_url)).json()
+  return ret;
+}
+
 export async function createLauncher({
   aria2,
   wine,
@@ -128,7 +133,7 @@ export async function createLauncher({
       },
       pre_download_game,
     },
-  }: ServerVersionData = await (await fetch(server.update_url)).json();
+  }: ServerVersionData = await getLatestVersionInfo(server);
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -158,7 +163,7 @@ export async function createLauncher({
     predownload_available = false; // already downloaded
   } catch {}
   const [showPredownload, setShowPredownload] = createSignal(
-    predownload_available && gameInstalled
+    predownload_available && gameInstalled && gt(pre_download_game!.latest.version, gameVersion)
   );
 
   return function Launcher() {

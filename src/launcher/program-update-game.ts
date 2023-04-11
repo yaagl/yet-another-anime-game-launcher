@@ -129,7 +129,7 @@ export async function* updateGameProgram({
   server: Server;
   updateVoicePackZips: string[];
 }): CommonUpdateProgram {
-
+  yield ['setStateText', 'UPDATING'];
   // 3.6.0 
   if(gte(updatedGameVersion, "3.6.0")) {
     try {
