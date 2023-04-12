@@ -88,8 +88,8 @@ export const ru_RU: typeof zh_CN = {
   NO_ENOUGH_DISKSPACE: "Недостаточно свободного места на диске",
   NO_ENOUGH_DISKSPACE_DESC: "Требуется не менее {0}ГиБ ({1}Гб) свободного пространства.",
   
-  UPDATE: en.UPDATE,
-  GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
+  UPDATE: "Обновите игру",
+  GAME_VERSION_TOO_OLD_DESC: "Текущая версия игры ({0}) слишком устарела для постепенного обновления. Пожалуйста, переустановите игру.",
 
-  PREDOWNLOAD_READY: en.PREDOWNLOAD_READY,
+  PREDOWNLOAD_READY: "Предзагрузка {0}",
 };
