@@ -37,7 +37,7 @@ export async function* checkAndDownloadMoltenVK(
 }
 
 const dxvkFiles = ["d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll"];
-const CURRENT_DXVK_VERSION = "1.10.3";
+const CURRENT_DXVK_VERSION = "1.10.4-alpha.20230402"; // there is no 1.10.4! I have to make up something greater than 1.10.3
 
 export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   try {
