@@ -65,7 +65,7 @@ const IconSetting = createIcon({
   },
 });
 
-const CURRENT_SUPPORTED_VERSION = "3.5.0";
+const CURRENT_SUPPORTED_VERSION = "3.6.0";
 
 export async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";

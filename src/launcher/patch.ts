@@ -12,6 +12,7 @@ import {
   cp,
   resolve,
   removeFileIfExists,
+  stats,
 } from "../utils";
 import { xdelta3 } from "../utils/unix";
 
@@ -68,7 +69,10 @@ export async function* patchProgram(
       ...server.removed,
       ...(config.workaround3 ? [] : server.removed2),
     ].map(atob)) {
-      await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
+      try {
+        await stats(join(gameDir, file));
+        await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
+      } catch { }
     }
   }
   await forceMove(
@@ -127,7 +131,10 @@ export async function* patchRevertProgram(
       ...server.removed,
       ...(config.workaround3 ? [] : server.removed2),
     ].map(atob)) {
-      await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
+      try {
+        await stats(join(gameDir, file + ".bak"));
+        await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
+      } catch { }
     }
   }
   await forceMove(
