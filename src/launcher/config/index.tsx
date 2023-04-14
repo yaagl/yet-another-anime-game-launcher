@@ -18,7 +18,7 @@ import {
   Tabs,
   Text,
   VStack,
-  notificationService
+  notificationService,
 } from "@hope-ui/solid";
 import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../../constants";
 import { Locale } from "../../locale";
@@ -71,26 +71,32 @@ export async function createConfiguration({
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
 
-  const _advancedSetting =  YAAGL_ADVANCED_ENABLE && (await getKeyOrDefault("config_advanced", "false")) == "true";
+  const _advancedSetting =
+    YAAGL_ADVANCED_ENABLE &&
+    (await getKeyOrDefault("config_advanced", "false")) == "true";
 
   const [advanceSetting, setAdvancedSetting] = createSignal(_advancedSetting);
 
   const clickTimestamp: number[] = [];
   async function onClickVersion() {
-    if(!YAAGL_ADVANCED_ENABLE) {
+    if (!YAAGL_ADVANCED_ENABLE) {
       return;
     }
     clickTimestamp.push(Date.now());
-    if(clickTimestamp.length > 5) {
-      if(clickTimestamp[clickTimestamp.length - 1] - clickTimestamp[clickTimestamp.length - 5] < 1000) {
-        if(!advanceSetting()) {
+    if (clickTimestamp.length > 5) {
+      if (
+        clickTimestamp[clickTimestamp.length - 1] -
+          clickTimestamp[clickTimestamp.length - 5] <
+        1000
+      ) {
+        if (!advanceSetting()) {
           notificationService.show({
             status: "info",
             title: locale.get("SETTING_ADVANCED_VISIBLE"),
             description: "",
           });
         }
-        setAdvancedSetting(x=>!x);
+        setAdvancedSetting(x => !x);
         clickTimestamp.length = 0;
         await setKey("config_advanced", String(advanceSetting()));
       }
@@ -136,7 +142,9 @@ export async function createConfiguration({
                       <UL />
                       <FormControl>
                         <FormLabel>Yaagl version</FormLabel>
-                        <Text userSelect={"none"} onClick={onClickVersion}>{CURRENT_YAAGL_VERSION}</Text>
+                        <Text userSelect={"none"} onClick={onClickVersion}>
+                          {CURRENT_YAAGL_VERSION}
+                        </Text>
                       </FormControl>
                     </VStack>
                   </Box>

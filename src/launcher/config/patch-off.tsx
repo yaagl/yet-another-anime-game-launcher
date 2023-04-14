@@ -51,7 +51,7 @@ export default async function ({
           <Box>
             <Checkbox
               checked={value()}
-              onChange={() => setValue((x) => !x)}
+              onChange={() => setValue(x => !x)}
               size="md"
             >
               {locale.get("SETTING_ENABLED")}

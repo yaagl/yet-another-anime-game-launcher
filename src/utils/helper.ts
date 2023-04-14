@@ -29,7 +29,7 @@ export async function sha256_16(str: string) {
     new TextEncoder().encode(str)
   );
   return Array.prototype.map
-    .call(new Uint8Array(buf), (x) => ("00" + x.toString(16)).slice(-2))
+    .call(new Uint8Array(buf), x => ("00" + x.toString(16)).slice(-2))
     .slice(0, 8)
     .join("");
 }
@@ -50,11 +50,7 @@ export function formatString(str: string, intrp: string[]) {
  *
  * @return Formatted string.
  */
-export function humanFileSize(
-  bytes: number,
-  si = false,
-  dp = 1
-) {
+export function humanFileSize(bytes: number, si = false, dp = 1) {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {

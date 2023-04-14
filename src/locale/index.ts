@@ -77,7 +77,7 @@ export async function createLocale() {
         };
       }
     ),
-    currentLanguage
+    currentLanguage,
   };
 }
 

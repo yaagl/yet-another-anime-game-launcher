@@ -5,8 +5,19 @@ import { amber } from "@radix-ui/colors";
 
 import { fatal } from "./utils";
 
-function createPlates(tag: string, color: Record<string,string>, colortag:string) {
-  return Object.fromEntries((new Array(12)).fill(1).map((_,i)=>[`${tag}${i+1}`,color[`${colortag}${i+1}`] as string] as const));
+function createPlates(
+  tag: string,
+  color: Record<string, string>,
+  colortag: string
+) {
+  return Object.fromEntries(
+    new Array(12)
+      .fill(1)
+      .map(
+        (_, i) =>
+          [`${tag}${i + 1}`, color[`${colortag}${i + 1}`] as string] as const
+      )
+  );
 }
 
 if (typeof Neutralino == "undefined") {
@@ -14,10 +25,10 @@ if (typeof Neutralino == "undefined") {
 } else {
   Neutralino.init();
   if (import.meta.env.PROD) {
-    document.addEventListener("contextmenu", (event) => event.preventDefault());
+    document.addEventListener("contextmenu", event => event.preventDefault());
   }
   createApp()
-    .then((UI) => {
+    .then(UI => {
       render(
         () => (
           <HopeProvider

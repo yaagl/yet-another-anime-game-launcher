@@ -26,17 +26,17 @@ export async function createDxvkAsyncConfig({
   const [value, setValue] = createSignal(config.dxvkAsync);
 
   async function onSave(apply: boolean) {
-    if(!apply) {
+    if (!apply) {
       setValue(config.dxvkAsync!);
       return NOOP;
     }
-    if(config.dxvkAsync! == value()) return NOOP;
+    if (config.dxvkAsync! == value()) return NOOP;
     config.dxvkAsync = value();
     await setKey("config_dxvkAsync", config.dxvkAsync! ? "true" : "false");
-    return NOOP
+    return NOOP;
   }
 
-  createEffect(()=>{
+  createEffect(() => {
     value();
     onSave(true);
   });
@@ -49,7 +49,7 @@ export async function createDxvkAsyncConfig({
           <Box>
             <Checkbox
               checked={value()}
-              onChange={() => setValue((x) => !x)}
+              onChange={() => setValue(x => !x)}
               size="md"
             >
               {locale.get("SETTING_ENABLED")}

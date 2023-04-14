@@ -72,7 +72,7 @@ export async function* patchProgram(
       try {
         await stats(join(gameDir, file));
         await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
-      } catch { }
+      } catch {}
     }
   }
   await forceMove(
@@ -93,11 +93,8 @@ export async function* patchProgram(
     );
     await cp(`./dxvk/${f.name}.dll`, join(system32Dir, f.name + ".dll"));
   }
-  if(config.reshade) {
-    await cp(
-      await resolve("./reshade/dxgi.dll"),
-      join(gameDir, "dxgi.dll")
-    );
+  if (config.reshade) {
+    await cp(await resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
       await resolve("./reshade/d3dcompiler_47.dll"),
       join(gameDir, "d3dcompiler_47.dll")
@@ -134,7 +131,7 @@ export async function* patchRevertProgram(
       try {
         await stats(join(gameDir, file + ".bak"));
         await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
-      } catch { }
+      } catch {}
     }
   }
   await forceMove(
@@ -148,13 +145,9 @@ export async function* patchRevertProgram(
       join(system32Dir, f.name + ".dll")
     );
   }
-  if(config.reshade) {
-    await removeFileIfExists(
-      join(gameDir, "dxgi.dll")
-    );
-    await removeFileIfExists(
-      join(gameDir, "d3dcompiler_47.dll")
-    );
+  if (config.reshade) {
+    await removeFileIfExists(join(gameDir, "dxgi.dll"));
+    await removeFileIfExists(join(gameDir, "d3dcompiler_47.dll"));
   }
   setKey("patched", null);
 }

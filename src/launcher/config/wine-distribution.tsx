@@ -49,14 +49,14 @@ export async function createWineDistroConfig({
         tag: config.wineDistro!,
         url: "not_applicable",
       },
-    ].filter((x) => x.tag != "crossover")
+    ].filter(x => x.tag != "crossover")
   );
   (async () => {
     const versions = await wineVersionChecker.getAllReleases();
-    if (versions.find((x) => x.tag === config.wineDistro!)) {
+    if (versions.find(x => x.tag === config.wineDistro!)) {
       setwineVersions(versions);
     } else {
-      setwineVersions((x) => [...x, ...versions]);
+      setwineVersions(x => [...x, ...versions]);
     }
   })();
 
@@ -70,7 +70,7 @@ export async function createWineDistroConfig({
         "wine_update_url",
         tag == "crossover"
           ? "not_appliable"
-          : wineVersions().find((x) => x.tag == tag)!.url
+          : wineVersions().find(x => x.tag == tag)!.url
       );
       await _safeRelaunch();
     }
@@ -97,7 +97,7 @@ export async function createWineDistroConfig({
                       : []),
                   ]}
                 >
-                  {(item) => (
+                  {item => (
                     <SelectOption value={item.tag}>
                       <SelectOptionText>{item.tag}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -113,8 +113,16 @@ export async function createWineDistroConfig({
             {locale.get("SETTING_WINE_VERSION_CONFIRM")}
           </Button>
         </Show>,
-        <Show when={value() != config.wineDistro && value()=="crossover"}>
-          <Alert status="info" variant="left-accent" onClick={() => Neutralino.os.open("https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver:-use-latest-MoltenVK")}>
+        <Show when={value() != config.wineDistro && value() == "crossover"}>
+          <Alert
+            status="info"
+            variant="left-accent"
+            onClick={() =>
+              Neutralino.os.open(
+                "https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver:-use-latest-MoltenVK"
+              )
+            }
+          >
             <AlertIcon mr="$2_5" />
             {locale.get("SETTING_WINE_CROSSOVER_ALERT")}
           </Alert>

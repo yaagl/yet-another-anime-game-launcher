@@ -39,17 +39,17 @@ export async function createDxvkHUDConfig({
   const [value, setValue] = createSignal(config.dxvkHud);
 
   async function onSave(apply: boolean) {
-    if(!apply) {
+    if (!apply) {
       setValue(config.dxvkHud!);
       return NOOP;
     }
-    if(config.dxvkHud! == value()) return NOOP;
+    if (config.dxvkHud! == value()) return NOOP;
     config.dxvkHud = value();
     await setKey("config_dxvkHud", config.dxvkHud!);
     return NOOP;
   }
 
-  createEffect(()=>{
+  createEffect(() => {
     value();
     onSave(true);
   });
@@ -83,7 +83,7 @@ export async function createDxvkHUDConfig({
                     },
                   ]}
                 >
-                  {(item) => (
+                  {item => (
                     <SelectOption value={item.value}>
                       <SelectOptionText>{item.name}</SelectOptionText>
                       <SelectOptionIndicator />

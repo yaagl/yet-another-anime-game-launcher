@@ -19,8 +19,8 @@ function exec_eval(cmd: string): Promise<string[]> {
 }
 
 function exec_sh(cmd: string): Promise<string[]> {
-    return exec(build(["sh", "-c", cmd]));
-  }
+  return exec(build(["sh", "-c", cmd]));
+}
 
 function exec_osa(cmd: string): Promise<string[]> {
   //     const embeded = build(["echo", "Hello ' World"]);
@@ -108,34 +108,36 @@ function buildTest(name: string, exec: (cmd: string) => Promise<string[]>) {
     });
 
     it("pipe should work", async () => {
-        const literal = "Hello '&_#`~[]<>| World";
-        const cmd = build(["echo",literal,rawString("|"),"base64"]);
-        console.log(cmd);
-        expect((await exec(cmd))[0]).toBe(Buffer.from(literal+'\n').toString('base64'));
-        //                                                      ^ waste my time
-      });
+      const literal = "Hello '&_#`~[]<>| World";
+      const cmd = build(["echo", literal, rawString("|"), "base64"]);
+      console.log(cmd);
+      expect((await exec(cmd))[0]).toBe(
+        Buffer.from(literal + "\n").toString("base64")
+      );
+      //                                                      ^ waste my time
+    });
 
-      // we can keep nesting...
+    // we can keep nesting...
 
-      it("eval a command string", async () => {
-        const cmd = build(["eval", build(["echo", "Hello World"])]);
-        // expect(cmd).toBe("echo Hello\\ \\$\\(echo\\ World\\)"); // fuck no idea what is the mess
-        expect((await exec(cmd))[0]).toBe("Hello World");
-      });
+    it("eval a command string", async () => {
+      const cmd = build(["eval", build(["echo", "Hello World"])]);
+      // expect(cmd).toBe("echo Hello\\ \\$\\(echo\\ World\\)"); // fuck no idea what is the mess
+      expect((await exec(cmd))[0]).toBe("Hello World");
+    });
 
-      it("eval a command string, but osascript -e", async () => {
-        const cmd = build([
-          "osascript",
-          "-e",
-          [
-            "do",
-            "shell",
-            "script",
-            `"${build(["echo", "Hello World"]).replace("\\", "\\\\")}"`,
-          ].join(" "),
-        ]);
-        expect((await exec(cmd))[0]).toBe("Hello World");
-      });
+    it("eval a command string, but osascript -e", async () => {
+      const cmd = build([
+        "osascript",
+        "-e",
+        [
+          "do",
+          "shell",
+          "script",
+          `"${build(["echo", "Hello World"]).replace("\\", "\\\\")}"`,
+        ].join(" "),
+      ]);
+      expect((await exec(cmd))[0]).toBe("Hello World");
+    });
   });
 }
 

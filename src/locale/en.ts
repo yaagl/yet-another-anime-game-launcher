@@ -18,27 +18,34 @@ export const en: typeof zh_CN = {
   RESTART_TO_INSTALL: "Restart the program",
   PATH_INVALID: "Path is invalid",
   PLEASE_SELECT_A_DIR: "Please select a path",
-  PATH_INVALID_ASCII_ONLY: "Please ensure that the path contains only ASCII characters",
-  PATH_INVALID_FORBIDDEN_DIR: 'Please choose a path that is not inside "Desktop", "Downloads" or "Documents"',
+  PATH_INVALID_ASCII_ONLY:
+    "Please ensure that the path contains only ASCII characters",
+  PATH_INVALID_FORBIDDEN_DIR:
+    'Please choose a path that is not inside "Desktop", "Downloads" or "Documents"',
   NOT_SUPPORTED_YET: "Feature not supported yet",
-  PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "The launcher currently doesn't support version {0} currently, please wait for further updates",
+  PLEASE_WAIT_FOR_LAUNCHER_UPDATE:
+    "The launcher currently doesn't support version {0} currently, please wait for further updates",
   UNSUPPORTED_VERSION: "Not a supported version",
-  SELECT_INSTALLATION_DIR: "Please select the game installation directory.\nIf you have already installed the game, select where the game executable file is located",
+  SELECT_INSTALLATION_DIR:
+    "Please select the game installation directory.\nIf you have already installed the game, select where the game executable file is located",
   CANT_OPEN_GAME_FILE: "Failed to access game file",
-  CANT_OPEN_GAME_FILE_DESC: "Launcher failed to access game file.\nBut no worries, you can select the game installation directory again when this dialog closes\n\nIf this dialog appears repeatedly, please check whether the launcher has the right permissions to access the game installation directory",
+  CANT_OPEN_GAME_FILE_DESC:
+    "Launcher failed to access game file.\nBut no worries, you can select the game installation directory again when this dialog closes\n\nIf this dialog appears repeatedly, please check whether the launcher has the right permissions to access the game installation directory",
   GAME_DIR_CHANGED: "The path to directory has changed",
-  GAME_DIR_CHANGED_DESC: "Seems like you have selected another path that is different from the one previously selected. This operation is invalid, but you can reselect later",
+  GAME_DIR_CHANGED_DESC:
+    "Seems like you have selected another path that is different from the one previously selected. This operation is invalid, but you can reselect later",
 
   NEW_VERSION_AVALIABLE: "New update avaliable",
-  NEW_VERSION_AVALIABLE_DESC: "Would you like to update launcher to version {0}?\n What's updated:\n{1}",
+  NEW_VERSION_AVALIABLE_DESC:
+    "Would you like to update launcher to version {0}?\n What's updated:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Downloding update files",
 
   UPGRADE_FUNCTION_TBD: "Currently updating is not implemented",
 
-  DECOMPRESS_FILE_PROGRESS:"Decompressing files",
+  DECOMPRESS_FILE_PROGRESS: "Decompressing files",
   ALLOCATING_FILE: "Allocating files on disk",
-  DOWNLOADING_FILE_PROGRESS:"Downloading file: {0} ({2}/{3}) {1}/s",
+  DOWNLOADING_FILE_PROGRESS: "Downloading file: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Backing up user data",
   RECOVER_BACKUP_USER_DATA: "Recovering backup",
@@ -46,7 +53,8 @@ export const en: typeof zh_CN = {
   INSTALL_DONE: "Done",
 
   RELAUNCH_REQUIRED: "Relaunch required",
-  RELAUNCH_REQUIRED_DESC: "The launcher will restart to process the wine installation.",
+  RELAUNCH_REQUIRED_DESC:
+    "The launcher will restart to process the wine installation.",
 
   SETTING: "Settings",
   SETTING_WINE_VERSION: "Wine Distribution",
@@ -74,22 +82,24 @@ export const en: typeof zh_CN = {
   SETTING_OPEN_GAME_INSTALL_DIR: "Open Game Install Directory",
   SETTING_OPEN_YAAGL_DIR: "Open Yaagl Data Directory",
 
-
-  SETTING_WINE_CROSSOVER_ALERT: "To use crossover, there is an additional step that must be done manually. Click this box to learn about the detail.",
+  SETTING_WINE_CROSSOVER_ALERT:
+    "To use crossover, there is an additional step that must be done manually. Click this box to learn about the detail.",
 
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
 
   SETTING_ADVANCED: "Advanced",
-  SETTING_ADVANCED_ALERT: "DO NOT CHANGE ANYTHING, unless you know what you are doing.",
+  SETTING_ADVANCED_ALERT:
+    "DO NOT CHANGE ANYTHING, unless you know what you are doing.",
   SETTING_ADVANCED_VISIBLE: "Advanced settings are visible now.",
 
-
   NO_ENOUGH_DISKSPACE: "No enough freespace on disk",
-  NO_ENOUGH_DISKSPACE_DESC: "At least {0}GiB ({1}GB) of freespace is required on your disk.",
+  NO_ENOUGH_DISKSPACE_DESC:
+    "At least {0}GiB ({1}GB) of freespace is required on your disk.",
 
   UPDATE: "Update Game",
-  GAME_VERSION_TOO_OLD_DESC: "Current game version ({0}) is too old to update incrementally. Please re-install the game.",
+  GAME_VERSION_TOO_OLD_DESC:
+    "Current game version ({0}) is too old to update incrementally. Please re-install the game.",
 
   PREDOWNLOAD_READY: "Pre-download {0}",
 };

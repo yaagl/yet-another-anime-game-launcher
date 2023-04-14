@@ -26,7 +26,7 @@ export async function createLeftCmdConfig({
   const [value, setValue] = createSignal(config.leftCmd);
 
   async function onSave(apply: boolean) {
-    if(!apply) {
+    if (!apply) {
       setValue(config.leftCmd!);
       return NOOP;
     }
@@ -35,8 +35,8 @@ export async function createLeftCmdConfig({
     await setKey("left_cmd", config.leftCmd! ? "true" : "false");
     return NOOP;
   }
-  
-  createEffect(()=>{
+
+  createEffect(() => {
     value();
     onSave(true);
   });
@@ -50,7 +50,7 @@ export async function createLeftCmdConfig({
             <Checkbox
               checked={value()}
               size="md"
-              onChange={() => setValue((x) => !x)}
+              onChange={() => setValue(x => !x)}
             >
               {locale.get("SETTING_ENABLED")}
             </Checkbox>

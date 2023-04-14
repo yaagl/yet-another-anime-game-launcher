@@ -86,9 +86,9 @@ export async function* doStreamUnzip(
     rawString("&>"),
     "/dev/null",
   ]);
-  const handler: Neutralino.events.Handler<Neutralino.os.SpawnProcessResult> = (
-    event
-  ) => {
+  const handler: Neutralino.events.Handler<
+    Neutralino.os.SpawnProcessResult
+  > = event => {
     if (!event) return;
     log(JSON.stringify(event.detail));
     if (event.detail.id == id) {
@@ -127,7 +127,7 @@ export function getFreeSpace(path: string, unit: "m" | "k" | "g") {
     "/usr/bin/grep",
     "-v",
     "^Available",
-  ]).then((output) => {
+  ]).then(output => {
     return parseInt(output.stdOut.split("\n")[0]);
   });
 }

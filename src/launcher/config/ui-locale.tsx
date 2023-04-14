@@ -18,20 +18,19 @@ import { Locale } from "../../locale";
 import { setKey } from "../../utils";
 import { Config } from "./config-def";
 
-export default async function({
+export default async function ({
   locale,
 }: {
   config: Partial<Config>;
   locale: Locale;
 }) {
-
   const [value, setValue] = createSignal(locale.currentLanguage);
 
   async function onSave(apply: boolean) {
     await setKey("config_uiLocale", value());
   }
 
-  createEffect(()=>{
+  createEffect(() => {
     value();
     onSave(true);
   });
@@ -49,10 +48,8 @@ export default async function({
             </SelectTrigger>
             <SelectContent>
               <SelectListbox>
-                <For
-                  each={locale.supportedLanguages}
-                >
-                  {(item) => (
+                <For each={locale.supportedLanguages}>
+                  {item => (
                     <SelectOption value={item.id}>
                       <SelectOptionText>{item.name}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -63,9 +60,11 @@ export default async function({
             </SelectContent>
           </Select>
         </FormControl>,
-        <Show when={locale.currentLanguage!=value()}>
-          <Text fontSize={11} color={"$blackAlpha8"}>{locale.get("SETTING_RESTART_TO_TAKE_EFFECT")}</Text>
-        </Show>
+        <Show when={locale.currentLanguage != value()}>
+          <Text fontSize={11} color={"$blackAlpha8"}>
+            {locale.get("SETTING_RESTART_TO_TAKE_EFFECT")}
+          </Text>
+        </Show>,
       ];
     },
   ] as const;

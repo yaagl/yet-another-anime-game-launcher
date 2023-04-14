@@ -5,10 +5,10 @@ const END_POINTS = ["", "https://ghp.3shain.uk/"];
 export async function createGithubEndpoint() {
   await log(`Checking github endpoints`);
   const fastest = await Promise.race([
-    ...END_POINTS.map((prefix) =>
+    ...END_POINTS.map(prefix =>
       fetch(`${prefix}https://api.github.com/octocat`)
-        .then((x) => x.text())
-        .then((x) => prefix)
+        .then(x => x.text())
+        .then(x => prefix)
         .catch(() => timeout(5000))
     ),
     timeout(5000),
@@ -17,7 +17,7 @@ export async function createGithubEndpoint() {
   fastest == "" || (await log(`Using github proxy ${fastest}`));
 
   function api(path: `/${string}`): Promise<unknown> {
-    return fetch(`${fastest}https://api.github.com${path}`).then((x) => {
+    return fetch(`${fastest}https://api.github.com${path}`).then(x => {
       if (x.status == 200 || x.status == 301 || x.status == 302) {
         return x.json();
       }

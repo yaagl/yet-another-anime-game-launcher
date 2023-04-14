@@ -71,19 +71,21 @@ export default async function ({
               <SelectListbox>
                 <For
                   each={[
-                   {
-                    name: locale.get("SETTING_FPS_UNLOCK_DEFAULT"),
-                    value: "default"
-                   },{
-                    name: "120Hz",
-                    value: "120",
-                   },{
-                    name: "144Hz",
-                    value: "144",
-                   }
+                    {
+                      name: locale.get("SETTING_FPS_UNLOCK_DEFAULT"),
+                      value: "default",
+                    },
+                    {
+                      name: "120Hz",
+                      value: "120",
+                    },
+                    {
+                      name: "144Hz",
+                      value: "144",
+                    },
                   ]}
                 >
-                  {(item) => (
+                  {item => (
                     <SelectOption value={item.value}>
                       <SelectOptionText>{item.name}</SelectOptionText>
                       <SelectOptionIndicator />

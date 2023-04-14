@@ -145,7 +145,7 @@ export const CN_SERVER = {
     "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
   ],
   removed2: ["bWh5cGJhc2UuZGxs"],
-  hosts: CN_CUSTOM_HOSTS
+  hosts: CN_CUSTOM_HOSTS,
 };
 
 export type Server = typeof CN_SERVER;
@@ -179,5 +179,5 @@ export const OS_SERVER: Server = {
     "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
   ],
   removed2: ["bWh5cGJhc2UuZGxs"],
-  hosts: OS_CUSTOM_HOSTS
+  hosts: OS_CUSTOM_HOSTS,
 };

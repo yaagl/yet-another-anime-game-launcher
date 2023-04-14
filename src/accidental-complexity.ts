@@ -9,7 +9,7 @@ export async function createGameInstallationDirectorySanitizer({
   locale: Locale;
 }) {
   const HOME = await Neutralino.os.getEnv("HOME");
-  await log(`HOME:`+HOME);
+  await log(`HOME:` + HOME);
 
   async function selectPath(): Promise<string> {
     retry: for (;;) {
@@ -18,13 +18,13 @@ export async function createGameInstallationDirectorySanitizer({
         return "";
       }
       if (!path.startsWith("/")) {
-        await locale.alert("PATH_INVALID", "PLEASE_SELECT_A_DIR")
+        await locale.alert("PATH_INVALID", "PLEASE_SELECT_A_DIR");
         continue;
       }
       const segments = path.split("/").slice(1);
       if (path.startsWith(HOME)) {
         if (["Desktop", "Downloads", "Documents"].indexOf(segments[2]) >= 0) {
-          await locale.alert("PATH_INVALID", "PATH_INVALID_FORBIDDEN_DIR")
+          await locale.alert("PATH_INVALID", "PATH_INVALID_FORBIDDEN_DIR");
           continue;
         }
       }
@@ -32,7 +32,7 @@ export async function createGameInstallationDirectorySanitizer({
         // FIXME
         // eslint-disable-next-line no-control-regex
         if (!/^[\x00-\x7F]*$/.test(seg)) {
-          await locale.alert("PATH_INVALID", "PATH_INVALID_ASCII_ONLY")
+          await locale.alert("PATH_INVALID", "PATH_INVALID_ASCII_ONLY");
           continue retry;
         }
       }

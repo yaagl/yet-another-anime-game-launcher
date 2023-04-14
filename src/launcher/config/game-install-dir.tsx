@@ -11,14 +11,13 @@ import { Config, NOOP } from "./config-def";
 
 export async function createGameInstallDirConfig({
   locale,
-  gameInstallDir
+  gameInstallDir,
 }: {
   config: Partial<Config>;
   locale: Locale;
-  gameInstallDir: ()=>string
+  gameInstallDir: () => string;
 }) {
   // try get s
-
 
   async function onSave(apply: boolean) {
     return NOOP;

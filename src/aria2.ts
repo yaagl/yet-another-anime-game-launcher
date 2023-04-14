@@ -40,15 +40,15 @@ export async function createAria2({
     const gid = await sha256_16(`${options.uri}:${options.absDst}`);
     try {
       const status = await rpc.tellStatus(gid);
-      if(status.status=='paused') {
+      if (status.status == "paused") {
         await rpc.unpause(gid);
-      } else if(status.status=='complete') {
+      } else if (status.status == "complete") {
         return;
       } else {
-        throw new Error('FIXME: implmenet me (aria2.ts) '+status.status)
+        throw new Error("FIXME: implmenet me (aria2.ts) " + status.status);
       }
     } catch (e: unknown) {
-      if (typeof e == 'object' && e != null && "code" in e && e["code"] == 1) {
+      if (typeof e == "object" && e != null && "code" in e && e["code"] == 1) {
         await rpc.addUri(options.uri, {
           gid,
           "max-connection-per-server": 16,

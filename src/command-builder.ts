@@ -28,8 +28,8 @@ const sanitize = (str: string) =>
     .replaceAll("(", "\\(")
     .replaceAll(")", "\\)")
     .replaceAll(";", "\\;")
-    .replaceAll("\n","\\\\n")
-    .replaceAll("\t","\\\\t");
+    .replaceAll("\n", "\\\\n")
+    .replaceAll("\t", "\\\\t");
 
 export function build(
   command: CommandSegments,
@@ -42,7 +42,7 @@ export function build(
       })
       .join("") +
     command
-      .map((segment) => {
+      .map(segment => {
         if (segment instanceof Array) {
           return `$(${build(segment)})`; // TODO: special handling
         } else if (typeof segment == "string") {
@@ -57,6 +57,6 @@ export function build(
 
 export function rawString(str: string) {
   return {
-    _rawString_: str
-  }
+    _rawString_: str,
+  };
 }

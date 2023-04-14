@@ -15,16 +15,16 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
     } as const;
   }
   try {
-    const latest: GithubReleaseInfo = await deps.github.api(
+    const latest: GithubReleaseInfo = (await deps.github.api(
       `/repos/${owner}/${repo}/releases/latest`
-    ) as GithubReleaseInfo;
-    const neu = latest.assets.find((x) => x.name == "resources.neu");
+    )) as GithubReleaseInfo;
+    const neu = latest.assets.find(x => x.name == "resources.neu");
     if (gt(latest.tag_name, CURRENT_YAAGL_VERSION) && neu !== undefined) {
       return {
         latest: false,
         downloadUrl: neu.browser_download_url,
         version: latest.tag_name,
-        description: latest.body
+        description: latest.body,
       } as const;
     }
     return {
@@ -32,8 +32,8 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
     } as const;
   } catch {
     return {
-      latest: undefined
-    }
+      latest: undefined,
+    };
   }
 }
 

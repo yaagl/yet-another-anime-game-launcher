@@ -51,7 +51,7 @@ export async function exec2(
   return await new Promise((res, rej) => {
     const handler: Neutralino.events.Handler<
       Neutralino.os.SpawnProcessResult
-    > = (event) => {
+    > = event => {
       if (!event) return;
       let stdErr = "",
         stdOut = "";

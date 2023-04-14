@@ -3,8 +3,7 @@ import { Aria2 } from "../aria2";
 import { CommonUpdateProgram } from "../common-update-ui";
 import { log, md5, stats, readAllLines, setKey } from "../utils";
 
-export 
-async function* checkIntegrityProgram({
+export async function* checkIntegrityProgram({
   gameDir,
   remoteDir,
   aria2,
@@ -18,8 +17,8 @@ async function* checkIntegrityProgram({
     md5: string;
     fileSize: number;
   }[] = (await readAllLines(join(gameDir, "pkg_version")))
-    .filter((x) => x.trim() != "")
-    .map((x) => JSON.parse(x));
+    .filter(x => x.trim() != "")
+    .map(x => JSON.parse(x));
   const toFix: {
     remoteName: string;
     md5: string;

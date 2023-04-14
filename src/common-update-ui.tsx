@@ -10,7 +10,7 @@ export function createCommonUpdateUI(
   program: () => CommonUpdateProgram
 ) {
   let confirmRestart: (v: unknown) => void;
-  const confirmRestartPromise = new Promise((res) => {
+  const confirmRestartPromise = new Promise(res => {
     confirmRestart = res;
   });
   return function CommonUpdateUI() {
@@ -53,7 +53,9 @@ export function createCommonUpdateUI(
               when={!done()}
               fallback={
                 <Center>
-                  <Button onClick={confirmRestart}>{locale.get("RESTART_TO_INSTALL")}</Button>
+                  <Button onClick={confirmRestart}>
+                    {locale.get("RESTART_TO_INSTALL")}
+                  </Button>
                 </Center>
               }
             >

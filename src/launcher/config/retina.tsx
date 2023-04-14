@@ -26,7 +26,7 @@ export async function createRetinaConfig({
   const [value, setValue] = createSignal(config.retina);
 
   async function onSave(apply: boolean) {
-    if(!apply) {
+    if (!apply) {
       setValue(config.retina!);
       return NOOP;
     }
@@ -35,8 +35,8 @@ export async function createRetinaConfig({
     await setKey("config_retina", config.retina! ? "true" : "false");
     return NOOP;
   }
-  
-  createEffect(()=>{
+
+  createEffect(() => {
     value();
     onSave(true);
   });
@@ -50,7 +50,7 @@ export async function createRetinaConfig({
             <Checkbox
               checked={value()}
               size="md"
-              onChange={() => setValue((x) => !x)}
+              onChange={() => setValue(x => !x)}
             >
               {locale.get("SETTING_ENABLED")}
             </Checkbox>
