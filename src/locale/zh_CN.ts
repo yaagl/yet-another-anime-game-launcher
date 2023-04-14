@@ -56,6 +56,7 @@ export const zh_CN = {
     SETTING_DXVK_HUD_FPS: "显示FPS",
     SETTING_DXVK_HUD_ALL: "显示所有信息",
     SETTING_RETINA: "Retina 模式",
+    SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
     SETTING_SAVE: "保存",
     SETTING_CANCEL: "取消",
 

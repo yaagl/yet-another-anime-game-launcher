@@ -28,6 +28,7 @@ import { createDxvkAsyncConfig } from "./dxvk-async";
 import { createDxvkHUDConfig } from "./dxvk-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
+import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
@@ -57,6 +58,7 @@ export async function createConfiguration({
   const [DA] = await createDxvkAsyncConfig({ locale, config });
   const [DH] = await createDxvkHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
+  const [LC] = await createLeftCmdConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
     locale,
     config,
@@ -128,6 +130,7 @@ export async function createConfiguration({
                       <DA />
                       <DH />
                       <R />
+                      <LC />
                       <Divider />
                       <PO />
                       <W3 />

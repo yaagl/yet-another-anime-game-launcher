@@ -58,6 +58,7 @@ import { zh_CN } from "./zh_CN";
     SETTING_DXVK_HUD_FPS: "Solo FPS",
     SETTING_DXVK_HUD_ALL: "Todo",
     SETTING_RETINA: "Modo Retina",
+    SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
     SETTING_SAVE: "Guardar",
     SETTING_CANCEL: "Cancelar",
   

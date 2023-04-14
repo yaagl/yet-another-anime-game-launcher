@@ -57,6 +57,7 @@ export const en: typeof zh_CN = {
   SETTING_DXVK_HUD_FPS: "FPS only",
   SETTING_DXVK_HUD_ALL: "Everything",
   SETTING_RETINA: "Retina Mode",
+  SETTING_LEFT_CMD: "Map left CMD to CTRL",
   SETTING_SAVE: "Save",
   SETTING_CANCEL: "Cancel",
 
