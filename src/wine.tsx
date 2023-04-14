@@ -1,4 +1,3 @@
-import { join } from "path-browserify";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "./common-update-ui";
 import { Server } from "./constants";
@@ -8,7 +7,6 @@ import { Locale } from "./locale";
 import {
   exec as unixExec,
   exec2 as unixExec2,
-  forceMove,
   getKey,
   humanFileSize,
   log,
@@ -17,10 +15,10 @@ import {
   rmrf_dangerously,
   setKey,
   tar_extract,
+  arrayFind,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
-import { build, rawString } from "./command-builder";
-import { checkAndDownloadMoltenVK } from "./downloadable-resource";
+import { build } from "./command-builder";
 import { ensureHosts } from "./hosts";
 import { ENSURE_HOSTS } from "./constants/server_secret";
 import cpu_db from "./constants/cpu_db";
@@ -126,7 +124,7 @@ export async function createWine(options: {
 
   const cpuInfo = await Neutralino.computer.getCPUInfo();
   await log(JSON.stringify(cpuInfo));
-  const fakeCpu: {} =
+  const fakeCpu: Record<string, string> =
     cpuInfo.model.indexOf("Apple") >= 0
       ? cpuInfo.logicalThreads in cpu_db
         ? {
@@ -188,7 +186,8 @@ export async function createWineVersionChecker(github: Github) {
         return {
           tag: x.tag_name,
           url: github.acceleratedPath(
-            x.assets.find(x => x.name === "wine.tar.gz")!.browser_download_url
+            arrayFind(x.assets, x => x.name === "wine.tar.gz")
+              .browser_download_url
           ),
         };
       });
@@ -224,65 +223,12 @@ export async function createWineInstallProgram({
 }) {
   async function* program(): CommonUpdateProgram {
     const wineBinaryDir = await resolve("./wine");
-    const existBackup = false;
-    try {
-      yield ["setStateText", "BACKUP_USER_DATA"];
-      const currentTag = await getKey("wine_tag");
-      // there is an existing wine
-      const wine = await createWine({
-        loaderBin:
-          currentTag === "crossover"
-            ? CROSSOVER_LOADER
-            : join(wineBinaryDir, "bin", "wine64"),
-        prefix: await resolve("./wineprefix"),
-      });
-      // backup
-      // try {
-      //   await wine.exec("reg", [
-      //     "export",
-      //     `HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}\\${server.product_name}`,
-      //     "backup1.reg",
-      //     "/y",
-      //     "&>",
-      //     "/dev/null", // lifesaver
-      //   ]);
-      //   await wine.exec("reg", [
-      //     "export",
-      //     `HKEY_CURRENT_USER\\Software\\${server.THE_REAL_COMPANY_NAME}SDK`,
-      //     "backup2.reg",
-      //     "/y",
-      //     "&>",
-      //     "/dev/null",
-      //   ]);
-      //   existBackup = true;
-      // } catch {
-      //   //failed to backup
-      // }
-    } catch {}
+
     await rmrf_dangerously(wineAbsPrefix);
     if (wineTag === "crossover") {
       // yield* checkAndDownloadMoltenVK(aria2);
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
-      const CROSSOVER_LIBDIR =
-        "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib64";
-
-      // await unixExec([
-      //   "mv",
-      //   "-n",
-      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
-      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib.bak"),
-      // ]);
-      // await forceMove(
-      //   await resolve("./moltenvk/libMoltenVK.dylib"),
-      //   join(CROSSOVER_LIBDIR, "libMoltenVK.dylib"),
-      // )
-      // await unixExec([
-      //   "printf",
-      //   "libMoltenVK.dylib is modified by Yaagl. You can restore it from libMoltenVK.dylib.bak\n",
-      //   rawString(">"),
-      //   join(CROSSOVER_LIBDIR, "libMoltenVK-Modified-By-Yaagl"),
-      // ]);
       await ensureHosts(ENSURE_HOSTS);
       yield ["setUndeterminedProgress"];
     } else {

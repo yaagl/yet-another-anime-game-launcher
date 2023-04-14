@@ -17,6 +17,7 @@ import {
   setKey,
   exec,
   getKeyOrDefault,
+  fileOrDirExists,
 } from "../utils";
 import { gte } from "semver";
 
@@ -141,8 +142,8 @@ export async function* updateGameProgram({
   yield ["setStateText", "UPDATING"];
   // 3.6.0
   if (gte(updatedGameVersion, "3.6.0")) {
-    try {
-      await stats(
+    if (
+      await fileOrDirExists(
         join(
           gameDir,
           server.dataDir,
@@ -151,8 +152,8 @@ export async function* updateGameProgram({
           "GeneratedSoundBanks",
           "Windows"
         )
-      );
-      // if do exists
+      )
+    ) {
       await mkdirp(
         join(gameDir, server.dataDir, "StreamingAssets", "AudioAssets")
       );
@@ -182,7 +183,7 @@ export async function* updateGameProgram({
           "Windows"
         ),
       ]);
-    } catch {}
+    }
   }
 
   yield* downloadAndPatch(updateFileZip, gameDir, aria2);

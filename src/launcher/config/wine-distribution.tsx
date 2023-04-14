@@ -18,7 +18,13 @@ import {
 import { createSignal, For, Show } from "solid-js";
 import { checkCrossover } from "../../crossover";
 import { Locale } from "../../locale";
-import { getKey, setKey, _safeRelaunch } from "../../utils";
+import {
+  getKey,
+  setKey,
+  _safeRelaunch,
+  assertValueDefined,
+  arrayFind,
+} from "../../utils";
 import { WineVersionChecker } from "../../wine";
 import { Config } from "./config-def";
 
@@ -41,19 +47,20 @@ export async function createWineDistroConfig({
 
   const crossoverPresent = await checkCrossover();
 
-  const [value, setValue] = createSignal(config.wineDistro!);
+  assertValueDefined(config.wineDistro);
+  const [value, setValue] = createSignal(config.wineDistro);
 
   const [wineVersions, setwineVersions] = createSignal(
     [
       {
-        tag: config.wineDistro!,
+        tag: config.wineDistro,
         url: "not_applicable",
       },
     ].filter(x => x.tag != "crossover")
   );
   (async () => {
     const versions = await wineVersionChecker.getAllReleases();
-    if (versions.find(x => x.tag === config.wineDistro!)) {
+    if (versions.find(x => x.tag === config.wineDistro)) {
       setwineVersions(versions);
     } else {
       setwineVersions(x => [...x, ...versions]);
@@ -61,7 +68,7 @@ export async function createWineDistroConfig({
   })();
 
   async function applyChanges() {
-    const tag = (config.wineDistro! = value());
+    const tag = (config.wineDistro = value());
     await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
     {
       await setKey("wine_state", "update");
@@ -70,7 +77,7 @@ export async function createWineDistroConfig({
         "wine_update_url",
         tag == "crossover"
           ? "not_appliable"
-          : wineVersions().find(x => x.tag == tag)!.url
+          : arrayFind(wineVersions(), x => x.tag == tag).url
       );
       await _safeRelaunch();
     }

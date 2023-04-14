@@ -40,7 +40,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: tsc
+      - name: Type/Lint/Format check
         run: |
           ./configure.sh
           pnpm exec tsc
+          pnpm run format-check
+          pnpm run lint

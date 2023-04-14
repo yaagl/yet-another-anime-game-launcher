@@ -36,6 +36,7 @@ export async function createLocale() {
       lang = "en";
     }
   }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore THIS IS A BUG
   const currentLanguage: keyof typeof locales = lang in locales ? lang : "en";
   const locale = locales[currentLanguage];

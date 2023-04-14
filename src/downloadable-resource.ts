@@ -1,21 +1,29 @@
-import { gt } from "semver";
+import { eq } from "semver";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram } from "./common-update-ui";
-import { getKey, mkdirp, stats, resolve, humanFileSize, setKey } from "./utils";
+import {
+  mkdirp,
+  resolve,
+  humanFileSize,
+  setKey,
+  getKeyOrDefault,
+  fileOrDirExists,
+} from "./utils";
 
 const CURRENT_MVK_VERSION = "1.2.2";
 
 export async function* checkAndDownloadMoltenVK(
   aria2: Aria2
 ): CommonUpdateProgram {
-  try {
-    await stats("./moltenvk/libMoltenVK.dylib");
-    const version = await getKey("installed_moltenvk_version");
-    if (gt(CURRENT_MVK_VERSION, version)) {
-      throw "update";
-    }
+  if (
+    (await fileOrDirExists("./moltenvk/libMoltenVK.dylib")) &&
+    eq(
+      CURRENT_MVK_VERSION,
+      await getKeyOrDefault("installed_moltenvk_version", "0.0.0")
+    )
+  ) {
     return;
-  } catch {}
+  }
 
   await mkdirp("./moltenvk");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
@@ -40,16 +48,14 @@ const dxvkFiles = ["d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll"];
 const CURRENT_DXVK_VERSION = "1.10.4-alpha.20230402"; // there is no 1.10.4! I have to make up something greater than 1.10.3
 
 export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
-  try {
-    for (const file of dxvkFiles) {
-      await stats(`./dxvk/${file}`);
-    }
-    const version = await getKey("installed_dxvk_version");
-    if (gt(CURRENT_DXVK_VERSION, version)) {
-      throw "update";
-    }
+  if (
+    eq(
+      CURRENT_DXVK_VERSION,
+      await getKeyOrDefault("installed_dxvk_version", "0.0.0")
+    )
+  ) {
     return;
-  } catch {}
+  }
 
   await mkdirp("./dxvk");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
@@ -78,14 +84,15 @@ const CURRENT_FPSUNLOCK_VERSION = "0.1.2";
 export async function* checkAndDownloadFpsUnlocker(
   aria2: Aria2
 ): CommonUpdateProgram {
-  try {
-    await stats("./fpsunlock/genshin-force-fps.exe");
-    const version = await getKey("installed_fps_unlock");
-    if (gt(CURRENT_FPSUNLOCK_VERSION, version)) {
-      throw "update";
-    }
+  if (
+    (await fileOrDirExists("./fpsunlock/genshin-force-fps.exe")) &&
+    eq(
+      CURRENT_FPSUNLOCK_VERSION,
+      await getKeyOrDefault("installed_fps_unlock", "0.0.0")
+    )
+  ) {
     return;
-  } catch {}
+  }
 
   await mkdirp("./fpsunlock");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
