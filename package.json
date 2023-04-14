@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build-dev": "vite build --mode=\"development\"",
-    "lint": "eslint ./src --ext .ts --ext .tsx"
+    "lint": "eslint ./src --ext .ts --ext .tsx",
+    "format": "prettier -w ./src"
   },
   "license": "MIT",
   "dependencies": {
@@ -31,6 +32,7 @@
     "eslint": "^8.38.0",
     "execa": "5.1.1",
     "fs-extra": "^11.1.0",
+    "prettier": "^2.8.7",
     "rimraf": "^4.3.0",
     "rollup-plugin-copy": "^3.4.0",
     "typescript": "^4.7.4",
