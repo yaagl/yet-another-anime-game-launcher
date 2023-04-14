@@ -89,11 +89,12 @@ export async function* doStreamUnzip(
   const handler: Neutralino.events.Handler<Neutralino.os.SpawnProcessResult> = (
     event
   ) => {
-    log(JSON.stringify(event!.detail));
-    if (event!.detail.id == id) {
-      if ((event!.detail as any)["action"] == "exit") {
+    if (!event) return;
+    log(JSON.stringify(event.detail));
+    if (event.detail.id == id) {
+      if (event.detail["action"] == "exit") {
         processExit = true;
-        processExitCode = Number((event!.detail as any)["data"]);
+        processExitCode = Number(event.detail["data"]);
       }
     }
   };
@@ -101,7 +102,9 @@ export async function* doStreamUnzip(
   while (processExit == false) {
     await wait(200);
     const dNumber = Number(
-      (await exec(["wc", "-l", rawString("<"), logFile])).stdOut.trim().split(" ")[0]
+      (await exec(["wc", "-l", rawString("<"), logFile])).stdOut
+        .trim()
+        .split(" ")[0]
     );
     yield [dNumber, totalLines] as const;
   }

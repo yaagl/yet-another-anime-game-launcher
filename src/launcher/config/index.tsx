@@ -34,7 +34,7 @@ import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
 import createPatchOff from "./patch-off";
 import createFPSUnlock from "./fps-unlock";
-import { exec2, getKey, resolve, setKey } from "../../utils";
+import { exec2, getKeyOrDefault, resolve, setKey } from "../../utils";
 import { createSignal, Show } from "solid-js";
 import createReShade from "./reshade";
 
@@ -71,10 +71,8 @@ export async function createConfiguration({
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
 
-  let _advancedSetting = false;
-  try {
-    _advancedSetting = YAAGL_ADVANCED_ENABLE && (await getKey("config_advanced")) == "true";
-  } catch {}
+  const _advancedSetting =  YAAGL_ADVANCED_ENABLE && (await getKeyOrDefault("config_advanced", "false")) == "true";
+
   const [advanceSetting, setAdvancedSetting] = createSignal(_advancedSetting);
 
   const clickTimestamp: number[] = [];

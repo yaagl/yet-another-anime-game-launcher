@@ -16,7 +16,7 @@ export async function createGithubEndpoint() {
 
   fastest == "" || (await log(`Using github proxy ${fastest}`));
 
-  function api(path: `/${string}`): Promise<any> {
+  function api(path: `/${string}`): Promise<unknown> {
     return fetch(`${fastest}https://api.github.com${path}`).then((x) => {
       if (x.status == 200 || x.status == 301 || x.status == 302) {
         return x.json();
@@ -55,7 +55,7 @@ export interface GithubReleaseInfo {
   prerelease: boolean;
   created_at: string;
   published_at: string;
-  author: {};
+  author: unknown;
   assets: GithubReleaseAssetsInfo[];
 }
 

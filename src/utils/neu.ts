@@ -19,7 +19,7 @@ export async function resolve(path: string) {
 export async function exec(
   segments: CommandSegments,
   env?: { [key: string]: string },
-  sudo: boolean = false,
+  sudo = false,
   log_redirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = build(
@@ -39,7 +39,7 @@ export async function exec(
 export async function exec2(
   segments: CommandSegments,
   env?: { [key: string]: string },
-  sudo: boolean = false,
+  sudo = false,
   log_redirect: string | undefined = undefined
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = build(
@@ -52,11 +52,12 @@ export async function exec2(
     const handler: Neutralino.events.Handler<
       Neutralino.os.SpawnProcessResult
     > = (event) => {
+      if (!event) return;
       let stdErr = "",
         stdOut = "";
-      if (event!.detail.id == id) {
-        if ((event!.detail as any)["action"] == "exit") {
-          const exit = Number((event!.detail as any)["data"]);
+      if (event.detail.id == id) {
+        if (event.detail["action"] == "exit") {
+          const exit = Number(event.detail["data"]);
           if (exit == 0) {
             res({
               pid,
@@ -73,10 +74,10 @@ export async function exec2(
           }
 
           Neutralino.events.off("spawnedProcess", handler);
-        } else if ((event!.detail as any)["action"] == "stdOut") {
-          stdOut += (event!.detail as any)["data"];
-        } else if ((event!.detail as any)["action"] == "stdErr") {
-          stdErr += (event!.detail as any)["data"];
+        } else if (event.detail["action"] == "stdOut") {
+          stdOut += event.detail["data"];
+        } else if (event.detail["action"] == "stdErr") {
+          stdErr += event.detail["data"];
         }
       }
     };
@@ -121,8 +122,19 @@ export async function getKey(key: string): Promise<string> {
   return await Neutralino.storage.getData(key);
 }
 
+export async function getKeyOrDefault(
+  key: string,
+  defaultValue: string
+): Promise<string> {
+  try {
+    return await getKey(key);
+  } catch {
+    return defaultValue;
+  }
+}
+
 export async function setKey(key: string, value: string | null) {
-  return await Neutralino.storage.setData(key, value!);
+  return await Neutralino.storage.setData(key, value);
 }
 
 export function log(message: string) {
@@ -141,7 +153,7 @@ export function restart() {
   return Neutralino.app.restartProcess();
 }
 
-export async function fatal(error: any) {
+export async function fatal(error: unknown) {
   await Neutralino.os.showMessageBox(
     "Fatal error",
     `${error instanceof Error ? String(error) : JSON.stringify(error)}`,
@@ -215,7 +227,6 @@ export async function readAllLinesIfExists(path: string) {
   }
   return content.split("\n");
 }
-
 
 export async function writeBinary(path: string, data: ArrayBuffer) {
   return await Neutralino.filesystem.writeBinaryFile(await resolve(path), data);

@@ -113,7 +113,7 @@ ${await (async () => {
         // }
       })(),
     ]);
-  } catch (e: any) {
+  } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
   }

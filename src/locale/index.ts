@@ -10,13 +10,6 @@ import {
   getKey,
 } from "../utils";
 
-// https://stackoverflow.com/questions/67027081/how-to-assert-two-interfaces-contain-the-same-keys-in-typescript
-type AssertKeysEqual<
-  T1 extends Record<keyof T2, any>,
-  T2 extends Record<keyof T1, any>
-> = never;
-type Assertion = AssertKeysEqual<typeof zh_CN, typeof en>;
-
 export type LocaleTextKey = keyof typeof zh_CN;
 
 export const locales = {
@@ -45,7 +38,7 @@ export async function createLocale() {
   }
   // @ts-ignore THIS IS A BUG
   const currentLanguage: keyof typeof locales = lang in locales ? lang : "en";
-  let locale = locales[currentLanguage];
+  const locale = locales[currentLanguage];
 
   function alert(
     title: LocaleTextKey,

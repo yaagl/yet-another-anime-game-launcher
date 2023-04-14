@@ -9,10 +9,6 @@ import { createSignal } from "solid-js";
 import { Locale } from "../../locale";
 import { Config, NOOP } from "./config-def";
 
-declare module "./config-def" {
-  interface Config {}
-}
-
 export async function createGameInstallDirConfig({
   locale,
   gameInstallDir

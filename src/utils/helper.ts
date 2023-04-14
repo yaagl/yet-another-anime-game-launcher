@@ -52,8 +52,8 @@ export function formatString(str: string, intrp: string[]) {
  */
 export function humanFileSize(
   bytes: number,
-  si: boolean = false,
-  dp: number = 1
+  si = false,
+  dp = 1
 ) {
   const thresh = si ? 1000 : 1024;
 

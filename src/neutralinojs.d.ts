@@ -127,14 +127,16 @@ declare namespace Neutralino {
      */
     namespace computer {
         interface MemoryInfo {
-            /**
-             * Total physical memory.
-             */
-            total: number;
-            /**
-             * Available physical memory.
-             */
-            available: number;
+            physical: {
+                /**
+                 * Total physical memory.
+                 */
+                total: number;
+                /**
+                * Available physical memory.
+                 */
+                available: number;
+            };
         }
 
         interface KernelInfo {
@@ -681,6 +683,8 @@ declare namespace Neutralino {
              * Process identifier from the operating system.
              */
             pid: number;
+            action: "exit" | "stdOut" | "stdErr";
+            data: string;
         }
 
         interface Filter {

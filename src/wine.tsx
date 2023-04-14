@@ -185,8 +185,8 @@ export async function createWineVersionChecker(github: Github) {
   function getAllReleases() {
     return github
       .api("/repos/3shain/winecx/releases")
-      .then((x: GithubReleases) => {
-        return x.map((x) => {
+      .then((x) => {
+        return (x as GithubReleases).map((x) => {
           return {
             tag: x.tag_name,
             url: github.acceleratedPath(
@@ -227,7 +227,7 @@ export async function createWineInstallProgram({
 }) {
   async function* program(): CommonUpdateProgram {
     const wineBinaryDir = await resolve("./wine");
-    let existBackup = false;
+    const existBackup = false;
     try {
       yield ["setStateText", "BACKUP_USER_DATA"];
       const currentTag = await getKey("wine_tag");
@@ -375,7 +375,7 @@ export async function createWineInstallProgram({
 function generateRandomString(n: number) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let result = "";
-  for (var i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++) {
     const index = Math.floor(Math.random() * chars.length);
     const char = chars.charAt(index);
     result += char;

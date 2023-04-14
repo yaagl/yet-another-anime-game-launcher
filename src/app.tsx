@@ -24,9 +24,8 @@ import { rawString } from "./command-builder";
 export async function createApp() {
   await setKey("singleton", null);
 
-  let aria2_port = 6868;
+  const aria2_port = 6868;
 
-  await Neutralino.events.on("ready", async () => {});
   await Neutralino.events.on("windowClose", async () => {
     if (await GLOBAL_onClose(false)) {
       Neutralino.app.exit(0);

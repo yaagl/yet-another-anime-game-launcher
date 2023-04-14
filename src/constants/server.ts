@@ -70,7 +70,7 @@ export interface ServerVersionData {
       }[];
     };
     plugin: {
-      plugins: {}[]; // not necessary
+      plugins: unknown[]; // not necessary
       version: string;
     };
     pre_download_game: null | {

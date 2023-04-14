@@ -47,8 +47,8 @@ export async function createAria2({
       } else {
         throw new Error('FIXME: implmenet me (aria2.ts) '+status.status)
       }
-    } catch (e: any) {
-      if (e && e["code"] == 1) {
+    } catch (e: unknown) {
+      if (typeof e == 'object' && e != null && "code" in e && e["code"] == 1) {
         await rpc.addUri(options.uri, {
           gid,
           "max-connection-per-server": 16,

@@ -163,7 +163,7 @@ export async function createLauncher({
     predownload_available = false; // already downloaded
   } catch {}
   const [showPredownload, setShowPredownload] = createSignal(
-    predownload_available && gameInstalled && gt(pre_download_game!.latest.version, gameVersion)
+    pre_download_game != null && gameInstalled && gt(pre_download_game.latest.version, gameVersion)
   );
 
   return function Launcher() {
@@ -181,7 +181,7 @@ export async function createLauncher({
     );
     const { isOpen, onOpen, onClose } = createDisclosure();
 
-    const taskQueue: AsyncGenerator<any, void, () => CommonUpdateProgram> =
+    const taskQueue: AsyncGenerator<unknown, void, () => CommonUpdateProgram> =
       (async function* () {
         while (true) {
           const task = yield 0;
@@ -376,7 +376,7 @@ export async function createLauncher({
     const [nonUrgentProgress, setNonUrgentProgress] = createSignal(0);
     const [nonUrgentProgramBusy, setNonUrgentBusy] = createSignal(false);
     const nonUrgentTaskQueue: AsyncGenerator<
-      any,
+      unknown,
       void,
       () => CommonUpdateProgram
     > = (async function* () {

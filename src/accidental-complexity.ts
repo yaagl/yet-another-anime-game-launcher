@@ -12,7 +12,7 @@ export async function createGameInstallationDirectorySanitizer({
   await log(`HOME:`+HOME);
 
   async function selectPath(): Promise<string> {
-    retry: while (true) {
+    retry: for (;;) {
       const path = await openFolderDialog();
       if (!path) {
         return "";
@@ -29,6 +29,8 @@ export async function createGameInstallationDirectorySanitizer({
         }
       }
       for (const seg of segments) {
+        // FIXME
+        // eslint-disable-next-line no-control-regex
         if (!/^[\x00-\x7F]*$/.test(seg)) {
           await locale.alert("PATH_INVALID", "PATH_INVALID_ASCII_ONLY")
           continue retry;
