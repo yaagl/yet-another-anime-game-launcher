@@ -1,6 +1,8 @@
 import a from "../../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
 import retina_on from "../constants/retina_on.reg?url";
 import retina_off from "../constants/retina_off.reg?url";
+import left_cmd_on from "../constants/left_cmd_on.reg?url";
+import left_cmd_off from "../constants/left_cmd_off.reg?url";
 
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "../common-update-ui";
@@ -42,6 +44,13 @@ export async function* launchGameProgram({
   } else {
     await putLocal(retina_off, await resolve("retina.reg"));
   }
+
+  if (config.leftCmd) {
+    await putLocal(left_cmd_on, await resolve("left_cmd.reg"));
+  } else {
+    await putLocal(left_cmd_off, await resolve("left_cmd.reg"));
+  }
+
   const cmd = `@echo off
 cd "%~dp0"
 regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
@@ -50,6 +59,7 @@ copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 regedit retina.reg
+regedit left_cmd.reg
 ${await (async () => {
   if (config.fpsUnlock !== "default") {
     return `"${wine.toWinePath(
@@ -118,6 +128,7 @@ ${await (async () => {
 
   await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   await removeFile(await resolve("retina.reg"));
+  await removeFile(await resolve("left_cmd.reg"));
   await removeFile(await resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine.prefix, server, config);
