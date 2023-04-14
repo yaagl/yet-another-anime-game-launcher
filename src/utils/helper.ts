@@ -73,3 +73,11 @@ export function humanFileSize(bytes: number, si = false, dp = 1) {
 
   return bytes.toFixed(dp) + " " + units[u];
 }
+
+export function assertValueDefined<V>(
+  value: V
+): asserts value is NonNullable<V> {
+  if (value === null || value === undefined) {
+    throw new Error("Assertation failed: value is either null or undefined.");
+  }
+}

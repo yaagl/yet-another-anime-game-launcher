@@ -15,6 +15,8 @@ import {
   fatal,
   setKey,
   getFreeSpace,
+  getKeyOrDefault,
+  assertValueDefined,
 } from "../utils";
 import {
   Box,
@@ -165,15 +167,11 @@ export async function createLauncher({
     locale,
   });
 
-  let predownload_available = pre_download_game != null;
-  try {
-    await getKey("predownloaded_all");
-    predownload_available = false; // already downloaded
-  } catch {}
   const [showPredownload, setShowPredownload] = createSignal(
-    pre_download_game != null &&
-      gameInstalled &&
-      gt(pre_download_game.latest.version, gameVersion)
+    pre_download_game != null && //exist pre_download_game data in server response
+      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) == "NOTFOUND" && // not downloaded yet
+      gameInstalled && // game installed
+      gt(pre_download_game.latest.version, gameVersion) // predownload version is greater
   );
 
   return function Launcher() {
@@ -301,11 +299,16 @@ export async function createLauncher({
                   );
                   return x;
                 } catch {
-                  return null!;
+                  return null;
                 }
               })
             )
-          ).filter(x => x != null);
+          )
+            .filter(x => x != null)
+            .map(x => {
+              assertValueDefined(x);
+              return x;
+            });
           taskQueue.next(async function* () {
             yield* updateGameProgram({
               aria2,
@@ -458,11 +461,16 @@ export async function createLauncher({
               );
               return x;
             } catch {
-              return null!;
+              return null;
             }
           })
         )
-      ).filter(x => x != null);
+      )
+        .filter(x => x != null)
+        .map(x => {
+          assertValueDefined(x);
+          return x;
+        });
       nonUrgentTaskQueue.next(async function* () {
         yield* predownloadGameProgram({
           aria2,

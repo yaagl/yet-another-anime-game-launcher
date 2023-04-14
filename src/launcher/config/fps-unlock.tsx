@@ -14,7 +14,7 @@ import {
 } from "@hope-ui/solid";
 import { createEffect, createSignal, For } from "solid-js";
 import { Locale } from "../../locale";
-import { getKey, setKey, _safeRelaunch } from "../../utils";
+import { getKey, setKey, _safeRelaunch, assertValueDefined } from "../../utils";
 import { Config } from "./config-def";
 
 declare module "./config-def" {
@@ -33,7 +33,7 @@ export default async function ({
   config: Partial<Config>;
 }) {
   try {
-    config.fpsUnlock = (await getKey(CONFIG_KEY)) as any; // FIXME
+    config.fpsUnlock = (await getKey(CONFIG_KEY)) as "default" | "120" | "144";
   } catch {
     config.fpsUnlock = "default"; // default value
   }
@@ -41,13 +41,14 @@ export default async function ({
   const [value, setValue] = createSignal(config.fpsUnlock);
 
   async function onSave(apply: boolean) {
+    assertValueDefined(config.fpsUnlock);
     if (!apply) {
-      setValue(config.fpsUnlock!);
+      setValue(config.fpsUnlock);
       return;
     }
-    if (config.fpsUnlock! == value()) return;
+    if (config.fpsUnlock == value()) return;
     config.fpsUnlock = value();
-    await setKey(CONFIG_KEY, config.fpsUnlock!);
+    await setKey(CONFIG_KEY, config.fpsUnlock);
     return;
   }
 

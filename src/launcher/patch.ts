@@ -12,7 +12,8 @@ import {
   cp,
   resolve,
   removeFileIfExists,
-  stats,
+  fileOrDirExists,
+  getKeyOrDefault,
 } from "../utils";
 import { xdelta3 } from "../utils/unix";
 
@@ -43,10 +44,9 @@ export async function* patchProgram(
   server: Server,
   config: Config
 ): CommonUpdateProgram {
-  try {
-    await getKey("patched");
+  if ((await getKeyOrDefault("patched", "NOTFOUND")) != "NOTFOUND") {
     return;
-  } catch {}
+  }
   if (!config.patchOff) {
     for (const file of [
       ...server.patched,
@@ -69,10 +69,9 @@ export async function* patchProgram(
       ...server.removed,
       ...(config.workaround3 ? [] : server.removed2),
     ].map(atob)) {
-      try {
-        await stats(join(gameDir, file));
+      if (await fileOrDirExists(join(gameDir, file))) {
         await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
-      } catch {}
+      }
     }
   }
   await forceMove(
@@ -128,10 +127,9 @@ export async function* patchRevertProgram(
       ...server.removed,
       ...(config.workaround3 ? [] : server.removed2),
     ].map(atob)) {
-      try {
-        await stats(join(gameDir, file + ".bak"));
+      if (await fileOrDirExists(join(gameDir, file + ".bak"))) {
         await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
-      } catch {}
+      }
     }
   }
   await forceMove(

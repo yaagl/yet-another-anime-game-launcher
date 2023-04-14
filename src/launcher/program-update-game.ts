@@ -16,6 +16,7 @@ import {
   stats,
   setKey,
   exec,
+  getKeyOrDefault,
 } from "../utils";
 import { gte } from "semver";
 
@@ -210,12 +211,14 @@ async function* predownload(
   await mkdirp(downloadTmp);
   const updateFileTmp = join(downloadTmp, basename(updateFileZip));
 
-  try {
-    await getKey(
-      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`
-    );
+  if (
+    (await getKeyOrDefault(
+      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`,
+      `NOTFOUND`
+    )) !== "NOTFOUND"
+  ) {
     return;
-  } catch {}
+  }
 
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "ALLOCATING_FILE"];

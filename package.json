@@ -8,7 +8,8 @@
     "build": "vite build",
     "build-dev": "vite build --mode=\"development\"",
     "lint": "eslint ./src --ext .ts --ext .tsx",
-    "format": "prettier -w ./src"
+    "format": "prettier -w ./src",
+    "format-check": "prettier -c ./src"
   },
   "license": "MIT",
   "dependencies": {

@@ -1,8 +1,7 @@
-import { gt } from "semver";
+import { eq } from "semver";
 import { Aria2 } from "./aria2";
 import { CommonUpdateProgram } from "./common-update-ui";
 import {
-  getKey,
   mkdirp,
   humanFileSize,
   setKey,
@@ -12,6 +11,7 @@ import {
   doStreamUnzip,
   forceMove,
   writeFile,
+  getKeyOrDefault,
 } from "./utils";
 import { join } from "path-browserify";
 import { Wine } from "./wine";
@@ -24,13 +24,15 @@ export async function* checkAndDownloadReshade(
   gameDir: string
 ): CommonUpdateProgram {
   const reshaderDir = await resolve("./reshade");
-  try {
-    const version = await getKey("installed_reshade");
-    if (gt(CURRENT_RESHADE_VERSION, version)) {
-      throw "update";
-    }
+
+  if (
+    eq(
+      CURRENT_RESHADE_VERSION,
+      await getKeyOrDefault("installed_reshade", "0.0.0")
+    )
+  ) {
     return;
-  } catch {}
+  }
 
   await mkdirp(reshaderDir);
   await mkdirp(join(reshaderDir, "Shaders"));

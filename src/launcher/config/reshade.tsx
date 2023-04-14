@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../../locale";
-import { getKey, setKey } from "../../utils";
+import { assertValueDefined, getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
 
 declare module "./config-def" {
@@ -28,13 +28,14 @@ export default async function ({
   const [value, setValue] = createSignal(config.reshade);
 
   async function onSave(apply: boolean) {
+    assertValueDefined(config.reshade);
     if (!apply) {
-      setValue(config.reshade!);
+      setValue(config.reshade);
       return NOOP;
     }
-    if (config.reshade! == value()) return NOOP;
+    if (config.reshade == value()) return NOOP;
     config.reshade = value();
-    await setKey(CONFIG_KEY, config.reshade! ? "true" : "false");
+    await setKey(CONFIG_KEY, config.reshade ? "true" : "false");
     return NOOP;
   }
 

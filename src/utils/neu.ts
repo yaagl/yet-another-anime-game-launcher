@@ -253,6 +253,15 @@ export async function stats(path: string) {
   return await Neutralino.filesystem.getStats(await resolve(path));
 }
 
+export async function fileOrDirExists(path: string) {
+  try {
+    await stats(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const hooks: Array<(forced: boolean) => Promise<boolean>> = [];
 
 export function addTerminationHook(fn: (forced: boolean) => Promise<boolean>) {

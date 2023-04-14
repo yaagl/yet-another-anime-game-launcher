@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../../locale";
-import { getKey, setKey } from "../../utils";
+import { assertValueDefined, getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
 
 declare module "./config-def" {
@@ -26,13 +26,14 @@ export async function createRetinaConfig({
   const [value, setValue] = createSignal(config.retina);
 
   async function onSave(apply: boolean) {
+    assertValueDefined(config.retina);
     if (!apply) {
-      setValue(config.retina!);
+      setValue(config.retina);
       return NOOP;
     }
-    if (config.retina! == value()) return NOOP;
+    if (config.retina == value()) return NOOP;
     config.retina = value();
-    await setKey("config_retina", config.retina! ? "true" : "false");
+    await setKey("config_retina", config.retina ? "true" : "false");
     return NOOP;
   }
 

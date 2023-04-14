@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../../locale";
-import { getKey, setKey } from "../../utils";
+import { assertValueDefined, getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
 
 declare module "./config-def" {
@@ -26,13 +26,14 @@ export async function createDxvkAsyncConfig({
   const [value, setValue] = createSignal(config.dxvkAsync);
 
   async function onSave(apply: boolean) {
+    assertValueDefined(config.dxvkAsync);
     if (!apply) {
-      setValue(config.dxvkAsync!);
+      setValue(config.dxvkAsync);
       return NOOP;
     }
-    if (config.dxvkAsync! == value()) return NOOP;
+    if (config.dxvkAsync == value()) return NOOP;
     config.dxvkAsync = value();
-    await setKey("config_dxvkAsync", config.dxvkAsync! ? "true" : "false");
+    await setKey("config_dxvkAsync", config.dxvkAsync ? "true" : "false");
     return NOOP;
   }
 

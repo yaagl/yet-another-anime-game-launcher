@@ -14,7 +14,7 @@ import {
 } from "@hope-ui/solid";
 import { createEffect, createSignal, For } from "solid-js";
 import { Locale } from "../../locale";
-import { getKey, setKey } from "../../utils";
+import { assertValueDefined, getKey, setKey } from "../../utils";
 import { Config, NOOP } from "./config-def";
 
 declare module "./config-def" {
@@ -31,7 +31,7 @@ export async function createDxvkHUDConfig({
   locale: Locale;
 }) {
   try {
-    config.dxvkHud = (await getKey("config_dxvkHud")) as any;
+    config.dxvkHud = (await getKey("config_dxvkHud")) as Config["dxvkHud"];
   } catch {
     config.dxvkHud = "fps"; // default value
   }
@@ -39,13 +39,14 @@ export async function createDxvkHUDConfig({
   const [value, setValue] = createSignal(config.dxvkHud);
 
   async function onSave(apply: boolean) {
+    assertValueDefined(config.dxvkHud);
     if (!apply) {
-      setValue(config.dxvkHud!);
+      setValue(config.dxvkHud);
       return NOOP;
     }
-    if (config.dxvkHud! == value()) return NOOP;
+    if (config.dxvkHud == value()) return NOOP;
     config.dxvkHud = value();
-    await setKey("config_dxvkHud", config.dxvkHud!);
+    await setKey("config_dxvkHud", config.dxvkHud);
     return NOOP;
   }
 
