@@ -24,7 +24,7 @@ export async function createWorkaround3Config({
   } catch {
     const { model } = await Neutralino.computer.getCPUInfo();
     config.workaround3 =
-      (await Neutralino.os.getEnv("YAAGL_OVERSEA")) == "1"
+      (import.meta.env["YAAGL_CHANNEL_CLIENT"]) == "hk4eos"
         ? false
         : model.includes("Apple") // HACK: the app runs on rosetta
         ? true

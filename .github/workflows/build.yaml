@@ -44,7 +44,7 @@ jobs:
           ./configure.sh
           pnpm run format-check
           pnpm run lint
-          node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=hk4ecn node ./build-app.js
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
 
       - name: Tar app

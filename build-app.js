@@ -19,7 +19,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const config = await fs.readJSON(
     path.resolve(process.cwd(), "neutralino.config.json")
   );
-  const isOverseaVersion = process.env["YAAGL_OVERSEA"] == "1";
+  const isOverseaVersion = process.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos";
   const bundleId = isOverseaVersion
     ? config.applicationId + ".os"
     : config.applicationId;
@@ -158,9 +158,7 @@ mkdir -p "$APST_DIR"
 CONTENTS_DIR="$(dirname "$SCRIPT_DIR")"
 rsync -rlptu "$CONTENTS_DIR/Resources/." "$APST_DIR"
 cd "$APST_DIR"
-PATH_LAUNCH="$(dirname "$CONTENTS_DIR")"${
-      isOverseaVersion ? " YAAGL_OVERSEA=1" : ""
-    } exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
+PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
   );
 
   await fs.chmod(

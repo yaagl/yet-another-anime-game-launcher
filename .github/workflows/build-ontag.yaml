@@ -48,8 +48,8 @@ jobs:
       - name: Build app
         run: |
           ./configure.sh
-          node ./build-app.js
-          cp dist/Yaagl/resources.neu resources.neu
+          YAAGL_CHANNEL_CLIENT=hk4ecn node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hk4ecn.neu
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
           cp dist/Yaagl/resources.neu resources_hk4eos.neu
 
@@ -66,5 +66,5 @@ jobs:
           files: |
             Yaagl.app.tar.gz
             Yaagl OS.app.tar.gz
-            resources.neu
+            resources_hk4ecn.neu
             resources_hk4eos.neu
