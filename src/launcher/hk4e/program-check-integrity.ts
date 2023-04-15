@@ -1,7 +1,7 @@
 import { join } from "path-browserify";
-import { Aria2 } from "../aria2";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { log, md5, stats, readAllLines, setKey } from "../utils";
+import { Aria2 } from "../../aria2";
+import { CommonUpdateProgram } from "../../common-update-ui";
+import { log, md5, stats, readAllLines, setKey } from "../../utils";
 
 export async function* checkIntegrityProgram({
   gameDir,

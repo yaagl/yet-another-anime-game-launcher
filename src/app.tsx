@@ -20,6 +20,8 @@ import { createLocale } from "./locale";
 import { CROSSOVER_LOADER } from "./crossover";
 import { CN_SERVER, OS_SERVER } from "./constants";
 import { rawString } from "./command-builder";
+import { createHK4EChannelClient } from "./launcher/hk4e";
+import { ChannelClient } from "./launcher/channel-client";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -93,8 +95,7 @@ export async function createApp() {
     github
   );
   const prefixPath = await resolve("./wineprefix"); // CHECK: hardcoded path?
-  const isOverseaVersion = (await Neutralino.os.getEnv("YAAGL_OVERSEA")) == "1";
-  const server = isOverseaVersion ? OS_SERVER : CN_SERVER;
+
   if (wineReady) {
     const wine = await createWine({
       loaderBin:
@@ -103,12 +104,27 @@ export async function createApp() {
           : await resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
+    let channelClient: ChannelClient;
+    if (import.meta.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos") {
+      channelClient = await createHK4EChannelClient({
+        server: OS_SERVER,
+        locale,
+        aria2,
+        wine,
+      });
+    } else {
+      channelClient = await createHK4EChannelClient({
+        server: CN_SERVER,
+        locale,
+        aria2,
+        wine,
+      });
+    }
     return await createLauncher({
-      aria2,
       wine,
       locale,
       github,
-      server,
+      channelClient,
     });
   } else {
     return await createWineInstallProgram({
@@ -117,7 +133,6 @@ export async function createApp() {
       wineAbsPrefix: prefixPath,
       wineTag: wineUpdateTag,
       locale,
-      server,
     });
   }
 }

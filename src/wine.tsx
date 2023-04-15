@@ -212,14 +212,12 @@ export async function createWineInstallProgram({
   wineAbsPrefix,
   wineTag,
   locale,
-  server,
 }: {
   aria2: Aria2;
   locale: Locale;
   wineUpdateTarGzFile: string;
   wineAbsPrefix: string;
   wineTag: string;
-  server: Server;
 }) {
   async function* program(): CommonUpdateProgram {
     const wineBinaryDir = await resolve("./wine");

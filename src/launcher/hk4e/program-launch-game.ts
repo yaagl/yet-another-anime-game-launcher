@@ -1,12 +1,12 @@
-import a from "../../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
-import retina_on from "../constants/retina_on.reg?url";
-import retina_off from "../constants/retina_off.reg?url";
-import left_cmd_on from "../constants/left_cmd_on.reg?url";
-import left_cmd_off from "../constants/left_cmd_off.reg?url";
+import a from "../../../external/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
+import retina_on from "../../constants/retina_on.reg?url";
+import retina_off from "../../constants/retina_off.reg?url";
+import left_cmd_on from "../../constants/left_cmd_on.reg?url";
+import left_cmd_off from "../../constants/left_cmd_off.reg?url";
 
 import { join } from "path-browserify";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { Server } from "../constants";
+import { CommonUpdateProgram } from "../../common-update-ui";
+import { Server } from "../../constants";
 import {
   mkdirp,
   removeFile,
@@ -17,9 +17,9 @@ import {
   forceMove,
   stats,
   exec,
-} from "../utils";
-import { Wine } from "../wine";
-import { Config } from "./config";
+} from "../../utils";
+import { Wine } from "../../wine";
+import { Config } from "../config";
 import { putLocal, patchProgram, patchRevertProgram } from "./patch";
 
 export async function* launchGameProgram({

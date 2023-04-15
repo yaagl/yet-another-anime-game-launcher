@@ -1,7 +1,7 @@
 import { join, basename } from "path-browserify";
-import { Aria2 } from "../aria2";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { Server } from "../constants";
+import { Aria2 } from "../../aria2";
+import { CommonUpdateProgram } from "../../common-update-ui";
+import { Server } from "../../constants";
 import {
   mkdirp,
   humanFileSize,
@@ -18,7 +18,7 @@ import {
   exec,
   getKeyOrDefault,
   fileOrDirExists,
-} from "../utils";
+} from "../../utils";
 import { gte } from "semver";
 
 //https://stackoverflow.com/a/69399958
@@ -45,10 +45,6 @@ async function* downloadAndPatch(
       `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`
     );
     await stats(updateFileTmp);
-    await setKey(
-      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`,
-      null
-    );
   } catch {
     yield ["setUndeterminedProgress"];
     yield ["setStateText", "ALLOCATING_FILE"];
@@ -76,6 +72,11 @@ async function* downloadAndPatch(
         ) / 100,
       ];
     }
+  } finally {
+    await setKey(
+      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`,
+      null
+    );
   }
 
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];

@@ -1,6 +1,6 @@
 import { join } from "path-browserify";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { Server } from "../constants";
+import { CommonUpdateProgram } from "../../common-update-ui";
+import { Server } from "../../constants";
 import {
   writeBinary,
   forceMove,
@@ -14,10 +14,10 @@ import {
   removeFileIfExists,
   fileOrDirExists,
   getKeyOrDefault,
-} from "../utils";
-import { xdelta3 } from "../utils/unix";
+} from "../../utils";
+import { xdelta3 } from "../../utils/unix";
 
-import { Config } from "./config";
+import { Config } from "../config";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());

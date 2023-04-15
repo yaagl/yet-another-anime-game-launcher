@@ -1,23 +1,5 @@
-import { Aria2 } from "../aria2";
 import { createWineVersionChecker, Wine } from "../wine";
-import {
-  Server,
-  ServerContentData,
-  ServerVersionData,
-} from "../constants/server";
-import {
-  getKey,
-  log,
-  openDir,
-  waitImageReady,
-  readBinary,
-  stats,
-  fatal,
-  setKey,
-  getFreeSpace,
-  getKeyOrDefault,
-  assertValueDefined,
-} from "../utils";
+import { openDir, fatal } from "../utils";
 import {
   Box,
   Button,
@@ -37,28 +19,13 @@ import {
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { batch, createSignal, Show } from "solid-js";
-import { join } from "path-browserify";
-import { gt, gte, lt } from "semver";
-import { patchRevertProgram, patternSearch } from "./patch";
-import { CommonUpdateProgram } from "../common-update-ui";
+import { createSignal, Show } from "solid-js";
 import { Locale } from "../locale";
 import { createConfiguration } from "./config";
 import { Github } from "../github";
-import { downloadAndInstallGameProgram } from "./program-install-game";
-import {
-  predownloadGameProgram,
-  updateGameProgram,
-} from "./program-update-game";
-import { checkIntegrityProgram } from "./program-check-integrity";
-import { launchGameProgram } from "./program-launch-game";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
-import {
-  checkAndDownloadDXVK,
-  checkAndDownloadFpsUnlocker,
-} from "../downloadable-resource";
-import { VoicePackNames } from "../constants";
-import { checkAndDownloadReshade } from "../reshade";
+import { CommonUpdateProgram } from "../common-update-ui";
+import { ChannelClient } from "./channel-client";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -73,92 +40,36 @@ const IconSetting = createIcon({
   },
 });
 
-const CURRENT_SUPPORTED_VERSION = "3.6.0";
-
-export async function checkGameState(locale: Locale, server: Server) {
-  let gameDir = "";
-  try {
-    gameDir = await getKey("game_install_dir");
-  } catch {
-    return {
-      gameInstalled: false,
-    } as const;
-  }
-  try {
-    return {
-      gameInstalled: true,
-      gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
-    } as const;
-  } catch {
-    return {
-      gameInstalled: false,
-    } as const;
-  }
-}
-
-async function getLatestVersionInfo(
-  server: Server
-): Promise<ServerVersionData> {
-  const ret: ServerVersionData = await (await fetch(server.update_url)).json();
-  return ret;
-}
-
 export async function createLauncher({
-  aria2,
   wine,
   locale,
   github,
-  server,
+  channelClient: {
+    installDir,
+    installState,
+    showPredownloadPrompt,
+    updateRequired,
+    install,
+    predownload,
+    launch,
+    update,
+    checkIntegrity,
+    init,
+    uiContent: { background, url, iconImage },
+    dismissPredownload,
+    predownloadVersion,
+  },
 }: {
-  aria2: Aria2;
   wine: Wine;
   locale: Locale;
   github: Github;
-  server: Server;
+  channelClient: ChannelClient;
 }) {
-  const {
-    data: {
-      adv: { background, url, icon },
-    },
-  }: ServerContentData = await (
-    await fetch(
-      server.adv_url +
-        (server.id == "CN"
-          ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
-    )
-  ).json();
-  const {
-    data: {
-      game: {
-        diffs,
-        latest: {
-          version: GAME_LATEST_VERSION,
-          path,
-          decompressed_path,
-          voice_packs,
-          size,
-        },
-      },
-      pre_download_game,
-    },
-  }: ServerVersionData = await getLatestVersionInfo(server);
-  await waitImageReady(background);
-
-  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
-    locale,
-    server
-  );
-
-  const [_gameInstallDir, setGameInstallDir] = createSignal(
-    gameInstallDir ?? ""
-  );
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wine,
     wineVersionChecker: await createWineVersionChecker(github),
     locale,
-    gameInstallDir: _gameInstallDir,
+    gameInstallDir: installDir,
   });
 
   const { selectPath } = await createGameInstallationDirectorySanitizer({
@@ -166,13 +77,6 @@ export async function createLauncher({
       await openDir(locale.get("SELECT_INSTALLATION_DIR")),
     locale,
   });
-
-  const [showPredownload, setShowPredownload] = createSignal(
-    pre_download_game != null && //exist pre_download_game data in server response
-      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) == "NOTFOUND" && // not downloaded yet
-      gameInstalled && // game installed
-      gt(pre_download_game.latest.version, gameVersion) // predownload version is greater
-  );
 
   return function Launcher() {
     // const bh = 40 / window.devicePixelRatio;
@@ -182,11 +86,8 @@ export async function createLauncher({
 
     const [statusText, setStatusText] = createSignal("");
     const [progress, setProgress] = createSignal(0);
-    const [_gameInstalled, setGameInstalled] = createSignal(gameInstalled);
     const [programBusy, setBusy] = createSignal(false);
-    const [gameCurrentVersion, setGameCurrentVersion] = createSignal(
-      gameVersion ?? "0.0.0"
-    );
+
     const { isOpen, onOpen, onClose } = createDisclosure();
 
     const taskQueue: AsyncGenerator<unknown, void, () => CommonUpdateProgram> =
@@ -217,193 +118,19 @@ export async function createLauncher({
         }
       })();
     taskQueue.next(); // ignored anyway
-    taskQueue.next(async function* () {
-      try {
-        await getKey("patched");
-      } catch {
-        return;
-      }
-      try {
-        yield* patchRevertProgram(
-          _gameInstallDir(),
-          wine.prefix,
-          server,
-          config
-        );
-      } catch {
-        yield* checkIntegrityProgram({
-          aria2,
-          gameDir: _gameInstallDir(),
-          remoteDir: decompressed_path,
-        });
-      }
-    });
+    taskQueue.next(() => init(config));
     async function onButtonClick() {
       if (programBusy()) return; // ignore
-      if (_gameInstalled()) {
-        if (gte(gameCurrentVersion(), GAME_LATEST_VERSION)) {
-          if (
-            gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
-            !config.patchOff
-          ) {
-            await locale.alert(
-              "UNSUPPORTED_VERSION",
-              "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-              [gameCurrentVersion()]
-            );
-            return;
-          }
-          taskQueue.next(async function* () {
-            if (config.reshade) {
-              yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
-            }
-            yield* checkAndDownloadDXVK(aria2);
-            if (config.fpsUnlock != "default") {
-              yield* checkAndDownloadFpsUnlocker(aria2);
-            }
-            yield* launchGameProgram({
-              gameDir: _gameInstallDir(),
-              wine,
-              gameExecutable: server.executable,
-              config,
-              server,
-            });
-          });
+      if (installState() == "INSTALLED") {
+        if (updateRequired() == true) {
+          taskQueue.next(update);
         } else {
-          const updateTarget = diffs.find(
-            x => x.version == gameCurrentVersion()
-          );
-          if (!updateTarget) {
-            await locale.prompt(
-              "UNSUPPORTED_VERSION",
-              "GAME_VERSION_TOO_OLD_DESC",
-              [gameCurrentVersion()]
-            );
-            batch(() => {
-              setGameInstalled(false);
-              setGameInstallDir("");
-              setGameCurrentVersion("0.0.0");
-            });
-            await setKey("game_install_dir", null);
-            return;
-          }
-          const voicePacks = (
-            await Promise.all(
-              updateTarget.voice_packs.map(async x => {
-                try {
-                  await stats(
-                    join(
-                      _gameInstallDir(),
-                      `Audio_${VoicePackNames[x.language]}_pkg_version`
-                    )
-                  );
-                  return x;
-                } catch {
-                  return null;
-                }
-              })
-            )
-          )
-            .filter(x => x != null)
-            .map(x => {
-              assertValueDefined(x);
-              return x;
-            });
-          taskQueue.next(async function* () {
-            yield* updateGameProgram({
-              aria2,
-              server,
-              currentGameVersion: gameCurrentVersion(),
-              updatedGameVersion: GAME_LATEST_VERSION,
-              updateFileZip: updateTarget.path,
-              gameDir: _gameInstallDir(),
-              updateVoicePackZips: voicePacks.map(x => x.path),
-            });
-            batch(() => {
-              setGameCurrentVersion(GAME_LATEST_VERSION);
-            });
-          });
+          taskQueue.next(() => launch(config));
         }
       } else {
         const selection = await selectPath();
         if (!selection) return;
-        try {
-          await stats(join(selection, "pkg_version"));
-        } catch {
-          const freeSpaceGB = await getFreeSpace(selection, "g");
-          const requiredSpaceGB =
-            Math.ceil(parseInt(size) / Math.pow(1024, 3)) * 1.2;
-          if (freeSpaceGB < requiredSpaceGB) {
-            await locale.alert(
-              "NO_ENOUGH_DISKSPACE",
-              "NO_ENOUGH_DISKSPACE_DESC",
-              [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
-            );
-            return;
-          }
-          taskQueue.next(async function* () {
-            yield* downloadAndInstallGameProgram({
-              aria2,
-              gameDir: selection,
-              gameFileZip: path,
-              // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
-              //   .path,
-              gameVersion: GAME_LATEST_VERSION,
-              server,
-            });
-            // setGameInstalled
-            batch(() => {
-              setGameInstalled(true);
-              setGameInstallDir(selection);
-              setGameCurrentVersion(GAME_LATEST_VERSION);
-            });
-            await setKey("game_install_dir", selection);
-          });
-          return;
-        }
-        const gameVersion = await getGameVersion(
-          join(selection, server.dataDir)
-        );
-        if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
-          await locale.alert(
-            "UNSUPPORTED_VERSION",
-            "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-            [gameVersion]
-          );
-          return;
-        } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
-          const updateTarget = diffs.find(x => x.version == gameVersion);
-          if (!updateTarget) {
-            await locale.prompt(
-              "UNSUPPORTED_VERSION",
-              "GAME_VERSION_TOO_OLD_DESC",
-              [gameVersion]
-            );
-            return;
-          }
-          batch(() => {
-            setGameInstalled(true);
-            setGameInstallDir(selection);
-            setGameCurrentVersion(gameVersion);
-          });
-          await setKey("game_install_dir", selection);
-          // FIXME: perform a integrity check?
-        } else {
-          taskQueue.next(async function* () {
-            yield* checkIntegrityProgram({
-              aria2,
-              gameDir: selection,
-              remoteDir: decompressed_path,
-            });
-            // setGameInstalled
-            batch(() => {
-              setGameInstalled(true);
-              setGameInstallDir(selection);
-              setGameCurrentVersion(gameVersion);
-            });
-            await setKey("game_install_dir", selection);
-          });
-        }
+        taskQueue.next(() => install(selection));
       }
     }
 
@@ -442,45 +169,6 @@ export async function createLauncher({
     })();
     nonUrgentTaskQueue.next(); // ignored anyway
 
-    async function predownload() {
-      setShowPredownload(false);
-      if (pre_download_game == null) return;
-      const updateTarget = pre_download_game.diffs.find(
-        x => x.version == gameCurrentVersion()
-      );
-      if (updateTarget == null) return;
-      const voicePacks = (
-        await Promise.all(
-          updateTarget.voice_packs.map(async x => {
-            try {
-              await stats(
-                join(
-                  _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
-              );
-              return x;
-            } catch {
-              return null;
-            }
-          })
-        )
-      )
-        .filter(x => x != null)
-        .map(x => {
-          assertValueDefined(x);
-          return x;
-        });
-      nonUrgentTaskQueue.next(async function* () {
-        yield* predownloadGameProgram({
-          aria2,
-          updateFileZip: updateTarget.path,
-          gameDir: _gameInstallDir(),
-          updateVoicePackZips: voicePacks.map(x => x.path),
-        });
-      });
-    }
-
     return (
       <div
         class="background"
@@ -493,7 +181,7 @@ export async function createLauncher({
           role="button"
           class="version-icon"
           style={{
-            "background-image": `url(${icon})`,
+            "background-image": `url(${iconImage})`,
             height: `${bh}px`,
             width: `${bw}px`, //fixme: responsive size
           }}
@@ -550,8 +238,8 @@ export async function createLauncher({
             </Box>
             <Popover
               placement="top"
-              opened={showPredownload() && !isOpen()}
-              onClose={() => setShowPredownload(false)}
+              opened={showPredownloadPrompt() && !isOpen()}
+              onClose={dismissPredownload}
               closeOnBlur={true}
             >
               <PopoverTrigger as={Box}>
@@ -566,13 +254,13 @@ export async function createLauncher({
                     disabled={programBusy()}
                     onClick={() => onButtonClick().catch(fatal)}
                   >
-                    {_gameInstalled()
-                      ? gte(gameCurrentVersion(), GAME_LATEST_VERSION)
-                        ? locale.get("LAUNCH")
-                        : locale.get("UPDATE")
+                    {installState() == "INSTALLED"
+                      ? updateRequired()
+                        ? locale.get("UPDATE")
+                        : locale.get("LAUNCH")
                       : locale.get("INSTALL")}
                   </Button>
-                  <Show when={_gameInstalled()}>
+                  <Show when={installState() == "INSTALLED"}>
                     <IconButton
                       onClick={onOpen}
                       disabled={programBusy()}
@@ -597,11 +285,9 @@ export async function createLauncher({
                     colorScheme="success"
                     size="sm"
                     variant="ghost"
-                    onClick={predownload}
+                    onClick={() => nonUrgentTaskQueue.next(predownload)}
                   >
-                    {locale.format("PREDOWNLOAD_READY", [
-                      pre_download_game?.latest.version ?? "",
-                    ])}
+                    {locale.format("PREDOWNLOAD_READY", [predownloadVersion()])}
                   </Button>
                 </PopoverBody>
               </PopoverContent>
@@ -612,13 +298,7 @@ export async function createLauncher({
                 onClose={action => {
                   onClose();
                   if (action == "check-integrity") {
-                    taskQueue.next(async function* () {
-                      yield* checkIntegrityProgram({
-                        aria2,
-                        gameDir: _gameInstallDir(),
-                        remoteDir: decompressed_path,
-                      });
-                    });
+                    taskQueue.next(checkIntegrity);
                   }
                 }}
               ></ConfigurationUI>
@@ -628,27 +308,4 @@ export async function createLauncher({
       </div>
     );
   };
-}
-
-async function getGameVersion(gameDataDir: string) {
-  const ggmPath = join(gameDataDir, "globalgamemanagers");
-  await log(ggmPath);
-  const view = new Uint8Array(await readBinary(ggmPath));
-  await log(`read ${view.byteLength} bytes`);
-  const index = patternSearch(
-    view,
-    [
-      0x69, 0x63, 0x2e, 0x61, 0x70, 0x70, 0x2d, 0x63, 0x61, 0x74, 0x65, 0x67,
-      0x6f, 0x72, 0x79, 0x2e,
-    ]
-  );
-  if (index == -1) {
-    throw new Error("pattern not found"); //FIXME
-  } else {
-    const len = index + 120;
-    const v = new DataView(view.buffer);
-    const strlen = v.getUint32(len, true);
-    const str = String.fromCharCode(...view.slice(len + 4, len + strlen + 4));
-    return str.split("_")[0];
-  }
 }

@@ -4,8 +4,10 @@
   "description": "",
   "scripts": {
     "start": "vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p yaaglwd && cp neutralino.config.json yaaglwd/neutralino.config.json && rsync -rlptu dist yaaglwd && rsync -rlptu sidecar yaaglwd && rsync -rlptu src/icons yaaglwd/src && neu run -- --path=./yaaglwd",
+    "start-hk4eos": "YAAGL_CHANNEL_CLIENT=hk4eos vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p yaaglwdos && cp neutralino.config.json yaaglwdos/neutralino.config.json && rsync -rlptu dist yaaglwdos && rsync -rlptu sidecar yaaglwdos && rsync -rlptu src/icons yaaglwdos/src && neu run -- --path=./yaaglwdos",
     "dev": "vite",
     "build": "vite build",
+    "build-hk4eos": "YAAGL_CHANNEL_CLIENT=hk4eos vite build",
     "build-dev": "vite build --mode=\"development\"",
     "lint": "eslint ./src --ext .ts --ext .tsx",
     "format": "prettier -w ./src",

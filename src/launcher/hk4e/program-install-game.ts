@@ -1,14 +1,14 @@
 import { join, basename } from "path-browserify";
-import { Aria2 } from "../aria2";
-import { CommonUpdateProgram } from "../common-update-ui";
-import { Server } from "../constants";
+import { Aria2 } from "../../aria2";
+import { CommonUpdateProgram } from "../../common-update-ui";
+import { Server } from "../../constants";
 import {
   mkdirp,
   humanFileSize,
   doStreamUnzip,
   removeFile,
   writeFile,
-} from "../utils";
+} from "../../utils";
 
 export async function* downloadAndInstallGameProgram({
   aria2,
