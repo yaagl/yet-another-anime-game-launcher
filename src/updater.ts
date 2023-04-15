@@ -18,7 +18,9 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
     const latest: GithubReleaseInfo = (await deps.github.api(
       `/repos/${owner}/${repo}/releases/latest`
     )) as GithubReleaseInfo;
-    const update_neu = `resources_${import.meta.env["YAAGL_CHANNEL_CLIENT"]}.neu`
+    const update_neu = `resources_${
+      import.meta.env["YAAGL_CHANNEL_CLIENT"]
+    }.neu`;
     const neu = latest.assets.find(x => x.name == update_neu);
     if (gt(latest.tag_name, CURRENT_YAAGL_VERSION) && neu !== undefined) {
       return {
