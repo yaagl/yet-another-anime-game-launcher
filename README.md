@@ -2,9 +2,9 @@
 
 You can now play _An Anime Game_ on macOS!
 
- <img src="docs/screenshot35.png">
+ <img src="docs/screenshot36.png">
 
-## Current Supported Game Version: 3.5.0
+## Current Supported Game Version: 3.6.0
 
 ## Policy
 
@@ -16,11 +16,9 @@ Do __not__ mention the real name of the game or the game company, in code commit
 
 Just follow these, or share and ruin this project for all other macOS (including Linux as well) players.
 
-### Hall of Shame
+<!-- ### Hall of Shame
 
-This is a list of people/organization violating Yaagl policies
-
-* [bilibili: 别叫我萝卜仔](https://space.bilibili.com/1451107821)
+This is a list of people/organization violating Yaagl policies -->
 
 ## Is it safe?
 
@@ -44,9 +42,11 @@ pnpm exec neu update
 
 ### Run
 ```sh
+# CN
 pnpm start
+# Oversea
+pnpm run start-hk4eos
 ```
-> Note by default it launches CN server. If you want to debug on OS server, set the enviroment variable YAAGL_OVERSEA=1. The same to build.
 
 ### Build
 ```sh
