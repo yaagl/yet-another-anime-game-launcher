@@ -45,7 +45,7 @@ jobs:
           pnpm run format-check
           pnpm run lint
           node ./build-app.js
-          YAAGL_OVERSEA=1 node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
 
       - name: Tar app
         run: |
@@ -61,8 +61,3 @@ jobs:
         with:
           name: app-os
           path: "Yaagl OS.tar.gz"
-      - name: Upload artifact - neu
-        uses: actions/upload-artifact@v3
-        with:
-          name: neu
-          path: dist/Yaagl/resources.neu

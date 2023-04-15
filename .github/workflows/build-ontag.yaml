@@ -49,7 +49,9 @@ jobs:
         run: |
           ./configure.sh
           node ./build-app.js
-          YAAGL_OVERSEA=1 node ./build-app.js
+          cp dist/Yaagl/resources.neu resources.neu
+          YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hk4eos.neu
 
       - name: Tar app
         run: |
@@ -64,4 +66,5 @@ jobs:
           files: |
             Yaagl.app.tar.gz
             Yaagl OS.app.tar.gz
-            dist/Yaagl/resources.neu
+            resources.neu
+            resources_hk4eos.neu
