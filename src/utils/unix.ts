@@ -115,6 +115,19 @@ export async function* doStreamUnzip(
   throw new Error("unzip exited with code " + processExitCode);
 }
 
+export async function extract7z(
+  source: string,
+  destination: string
+) {
+  return await exec([
+    await resolve("./sidecar/7z/7zz"),
+    "x",
+    source,
+    `-o${destination}`,
+    "-y"
+  ]);
+}
+
 export function getFreeSpace(path: string, unit: "m" | "k" | "g") {
   return exec([
     "/bin/df",
