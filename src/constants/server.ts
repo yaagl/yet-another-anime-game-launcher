@@ -1,9 +1,13 @@
-import b from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
-import c from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
-import d from "../../external/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
-import e from "../../external/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url";
-import f from "../../external/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url";
+import b from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
+import c from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
+import d from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
+import e from "../../external/hk4e/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url";
+import f from "../../external/hk4e/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url";
 import {
+  BH3_GLB_ADV_URL,
+  BH3_GLB_DATA_DIR,
+  BH3_GLB_EXECUTABLE,
+  BH3_GLB_UPDATE_URL,
   CN_ADV_URL,
   CN_COMPANY_NAME,
   CN_CPS,
@@ -14,6 +18,7 @@ import {
   CN_UPDATE_URL,
   DLL1,
   DLL2,
+  DLL4,
   OS_ADV_URL,
   OS_CPS,
   OS_CUSTOM_HOSTS,
@@ -180,4 +185,34 @@ export const OS_SERVER: Server = {
   ],
   removed2: ["bWh5cGJhc2UuZGxs"],
   hosts: OS_CUSTOM_HOSTS,
+};
+
+import x from "../../external/bh3/diffs/QkgzQmFzZS5kbGwudmNkaWZmCg==.vcdiff?url";
+import y from "../../external/bh3/diffs/VW5pdHlQbGF5ZXIuZGxsLnZjZGlmZgo=.vcdiff?url";
+
+export const BH3_GLB: Server = {
+  id: "BH3_GLB",
+  hosts: "",
+  removed: [],
+  removed2: [],
+  channel_id: 0, //?
+  subchannel_id: 0, //?
+  cps: "", //?
+  patched: [
+    {
+      file: DLL4,
+      diffUrl: x,
+    },
+    {
+      file: DLL1,
+      diffUrl: y,
+    },
+  ],
+  patched2: [],
+  product_name: "?",
+  THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,
+  executable: BH3_GLB_EXECUTABLE,
+  update_url: BH3_GLB_UPDATE_URL,
+  adv_url: BH3_GLB_ADV_URL,
+  dataDir: BH3_GLB_DATA_DIR,
 };

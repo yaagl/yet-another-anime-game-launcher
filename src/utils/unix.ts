@@ -115,16 +115,13 @@ export async function* doStreamUnzip(
   throw new Error("unzip exited with code " + processExitCode);
 }
 
-export async function extract7z(
-  source: string,
-  destination: string
-) {
+export async function extract7z(source: string, destination: string) {
   return await exec([
     await resolve("./sidecar/7z/7zz"),
     "x",
     source,
     `-o${destination}`,
-    "-y"
+    "-y",
   ]);
 }
 

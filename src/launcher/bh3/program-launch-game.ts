@@ -1,4 +1,3 @@
-import a from "../../../external/hk4e/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
 import retina_on from "../../constants/retina_on.reg?url";
 import retina_off from "../../constants/retina_off.reg?url";
 import left_cmd_on from "../../constants/left_cmd_on.reg?url";
@@ -38,7 +37,6 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await putLocal(a, await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   if (config.retina) {
     await putLocal(retina_on, await resolve("retina.reg"));
   } else {
@@ -53,24 +51,13 @@ export async function* launchGameProgram({
 
   const cmd = `@echo off
 cd "%~dp0"
-regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
 copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
 copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 regedit retina.reg
 regedit left_cmd.reg
-${await (async () => {
-  if (config.fpsUnlock !== "default") {
-    return `"${wine.toWinePath(
-      await resolve("./fpsunlock/genshin-force-fps.exe")
-    )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
-      join(gameDir, gameExecutable)
-    )}"`;
-  } else {
-    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
-  }
-})()}`;
+${wine.toWinePath(join(gameDir, gameExecutable))}`;
   await writeFile(await resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(await resolve("./logs"));
@@ -126,7 +113,6 @@ ${await (async () => {
   //   );
   // } catch {}
 
-  await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   await removeFile(await resolve("retina.reg"));
   await removeFile(await resolve("left_cmd.reg"));
   await removeFile(await resolve("config.bat"));

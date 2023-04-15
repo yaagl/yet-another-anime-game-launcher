@@ -37,9 +37,9 @@ import {
 } from "../../downloadable-resource";
 import { checkAndDownloadReshade } from "../../reshade";
 
-const CURRENT_SUPPORTED_VERSION = "3.6.0";
+const CURRENT_SUPPORTED_VERSION = "6.5.0";
 
-export async function createHK4EChannelClient({
+export async function createBH3ChannelClient({
   server,
   locale,
   aria2,
@@ -66,13 +66,7 @@ export async function createHK4EChannelClient({
     data: {
       game: {
         diffs,
-        latest: {
-          version: GAME_LATEST_VERSION,
-          path,
-          decompressed_path,
-          voice_packs,
-          size,
-        },
+        latest: { version: GAME_LATEST_VERSION, path, decompressed_path, size },
       },
       pre_download_game,
     },
