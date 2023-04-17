@@ -16,12 +16,15 @@ import {
   setKey,
   tar_extract,
   arrayFind,
+  writeFile,
+  forceMove,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
 import { build } from "./command-builder";
 import { ensureHosts } from "./hosts";
 import { ENSURE_HOSTS } from "./constants/server_secret";
 import cpu_db from "./constants/cpu_db";
+import { join } from "path-browserify";
 
 export async function createWine(options: {
   loaderBin: string;
@@ -161,11 +164,21 @@ export async function checkWine(github: Github) {
     }
     return { wineReady: true, wineTag: await getKey("wine_tag") } as const;
   } catch (e) {
-    if (await checkCrossover()) {
+    // if (await checkCrossover()) {
+    //   return {
+    //     wineReady: false,
+    //     wineUpdate: "not_applicable",
+    //     wineUpdateTag: "crossover",
+    //   } as const;
+    // }
+    // FIXME: don't abuse import.meta.env
+    if (String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("bh3")) {
       return {
         wineReady: false,
-        wineUpdate: "not_applicable",
-        wineUpdateTag: "crossover",
+        wineUpdate: github.acceleratedPath(
+          "https://github.com/3Shain/winecx/releases/download/unstable-bh-wine-1.0/wine.tar.gz"
+        ),
+        wineUpdateTag: "unstable-bh-wine-1.0",
       } as const;
     }
     // FIXME:
@@ -264,42 +277,37 @@ export async function createWineInstallProgram({
       wineTag === "crossover"
         ? CROSSOVER_LOADER
         : await resolve("./wine/bin/wine64");
-    await unixExec([wine64Bin, "wineboot", "-u"], {
-      WINEPREFIX: wineAbsPrefix,
+    const wine = await createWine({
+      loaderBin: wine64Bin,
+      prefix: wineAbsPrefix,
     });
-    await unixExec([wine64Bin, "winecfg", "-v", "win10"], {
-      WINEPREFIX: wineAbsPrefix,
-    });
+    await wine.exec("wineboot", ["-u"], {}, "/dev/null");
+    await wine.exec("winecfg", ["-v", "win10"], {}, "/dev/null");
     if (wineTag === "crossover") {
-      await unixExec(
+      await wine.exec(
+        "rundll32",
         [
-          wine64Bin,
-          "rundll32",
           "setupapi.dll,InstallHinfSection",
           "Win10Install",
           "128",
           "Z:" + `${CROSSOVER_DATA}/crossover.inf`.replaceAll("/", "\\"),
         ],
-        {
-          WINEPREFIX: wineAbsPrefix,
-        }
+        {},
+        "/dev/null"
       );
-      await unixExec([wine64Bin, "rundll32", "mscoree.dll,wine_install_mono"], {
-        WINEPREFIX: wineAbsPrefix,
-      });
+      await wine.exec(
+        "rundll32",
+        ["mscoree.dll,wine_install_mono"],
+        {},
+        "/dev/null"
+      );
     }
 
-    // if (existBackup) {
-    //   yield ["setStateText", "RECOVER_BACKUP_USER_DATA"];
-    //   await unixExec(wine64Bin, ["regedit", "backup1.reg"], {
-    //     WINEPREFIX: `${wineAbsPrefix}`,
-    //   });
-    //   await removeFile(await resolve("./backup1.reg"));
-    //   await unixExec(wine64Bin, ["regedit", "backup2.reg"], {
-    //     WINEPREFIX: `${wineAbsPrefix}`,
-    //   });
-    //   await removeFile(await resolve("./backup2.reg"));
-    // }
+    // FIXME: don't abuse import.meta.env
+    if (String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("bh3")) {
+      yield* installMediaFoundation(aria2, wine);
+    }
+
     await setKey("wine_state", "ready");
     await setKey("wine_tag", wineTag);
     await setKey("wine_update_url", null);
@@ -322,4 +330,94 @@ function generateRandomString(n: number) {
     result += char;
   }
   return result;
+}
+
+const MF_DLLS = [
+  "colorcnv",
+  "mf",
+  "mferror",
+  "mfplat",
+  "mfplay",
+  "mfreadwrite",
+  "msmpeg2adec",
+  "msmpeg2vdec",
+  "sqmapi",
+];
+
+const MF_SRVS = ["colorcnv", "msmpeg2adec", "msmpeg2vdec"];
+
+import mf from "./constants/mf.reg?raw";
+import wmf from "./constants/wmf.reg?raw";
+
+async function* installMediaFoundation(
+  aria2: Aria2,
+  wine: Wine
+): CommonUpdateProgram {
+  for (const dll of MF_DLLS) {
+    yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
+    for await (const progress of aria2.doStreamingDownload({
+      uri: `https://github.com/z0z0z/mf-install/raw/master/system32/${dll}.dll`,
+      absDst: join(
+        wine.prefix,
+        "drive_c",
+        "windows",
+        "system32",
+        `${dll}.dll.downloading`
+      ),
+    })) {
+      yield [
+        "setProgress",
+        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      ];
+      yield [
+        "setStateText",
+        "DOWNLOADING_ENVIRONMENT_SPEED",
+        `${humanFileSize(Number(progress.downloadSpeed))}`,
+      ];
+    }
+    await forceMove(
+      join(
+        wine.prefix,
+        "drive_c",
+        "windows",
+        "system32",
+        `${dll}.dll.downloading`
+      ),
+      join(wine.prefix, "drive_c", "windows", "system32", `${dll}.dll`)
+    );
+    await wine.exec(
+      "reg",
+      [
+        "add",
+        `HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides`,
+        "/v",
+        dll,
+        "/d",
+        "native",
+        "/f",
+      ],
+      {},
+      "/dev/null"
+    );
+  }
+  yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+  await writeFile("mf.reg", mf);
+  await wine.exec(
+    "regedit",
+    [wine.toWinePath(await resolve("mf.reg"))],
+    {},
+    "/dev/null"
+  );
+  await removeFile("mf.reg");
+  await writeFile("wmf.reg", wmf);
+  await wine.exec(
+    "regedit",
+    [wine.toWinePath(await resolve("wmf.reg"))],
+    {},
+    "/dev/null"
+  );
+  await removeFile("wmf.reg");
+  for (const srv of MF_SRVS) {
+    await wine.exec("regsvr32", [`${srv}.dll`], {}, "/dev/null");
+  }
 }

@@ -1,0 +1,212 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.3g2]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.3gp]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.3gp2]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.3gpp]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.aac]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.adt]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.adts]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.asf]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.avi]
+"{7AFA253E-F823-42f6-A5D9-714BDE467412}"="AVI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.dvr-ms]
+"{a8721937-e2fb-4d7a-a9ee-4eb08c890b6e}"="MF SBE Source ByteStreamHandler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.m4a]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.m4v]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.mov]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.mp3]
+"{A82E50BA-8E92-41eb-9DF2-433F50EC2993}"="MP3 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.mp4]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.mp4v]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.nsc]
+"{B084785C-DDE0-4d30-8CA8-05A373E185BE}"="NSC Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.sami]
+"{7A56C4CB-D678-4188-85A8-BA2EF68FA10D}"="SAMI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.smi]
+"{7A56C4CB-D678-4188-85A8-BA2EF68FA10D}"="SAMI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.wav]
+"{42C9B9F5-16FC-47ef-AF22-DA05F7C842E3}"="WAV Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.wm]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.wma]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\.wmv]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/3gpp]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/3gpp2]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/aac]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/aacp]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/L16]
+"{3FFB3B8C-EB99-472b-8902-E1C1B05F07CF}"="LPCM Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/mp4]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/mpeg]
+"{A82E50BA-8E92-41eb-9DF2-433F50EC2993}"="MP3 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/vnd.dlna.adts]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/wav]
+"{42C9B9F5-16FC-47ef-AF22-DA05F7C842E3}"="WAV Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/x-aac]
+"{926f41f7-003e-4382-9e84-9e953be10562}"="ADTS Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/x-mp3]
+"{A82E50BA-8E92-41eb-9DF2-433F50EC2993}"="MP3 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/x-mpeg]
+"{A82E50BA-8E92-41eb-9DF2-433F50EC2993}"="MP3 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/x-ms-wma]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\audio/x-wav]
+"{42C9B9F5-16FC-47ef-AF22-DA05F7C842E3}"="WAV Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/3gpp]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/3gpp2]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/avi]
+"{7AFA253E-F823-42f6-A5D9-714BDE467412}"="AVI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/mp4]
+"{271C3902-6095-4c45-A22F-20091816EE9E}"="MPEG4 Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/msvideo]
+"{7AFA253E-F823-42f6-A5D9-714BDE467412}"="AVI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/x-ms-asf]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/x-ms-wm]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/x-ms-wmv]
+"{41457294-644C-4298-A28A-BD69F2C0CF3B}"="ASF Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\ByteStreamHandlers\video/x-msvideo]
+"{7AFA253E-F823-42f6-A5D9-714BDE467412}"="AVI Byte Stream Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\HardwareMFT]
+"EnableDecoders"=dword:00000000
+"EnableEncoders"=dword:00000001
+"EnableVideoProcessors"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform\EVR]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform\EVR\{16260968-C914-4aa1-8736-B7A6F3C5AE9B}]
+"SWVideoDecodePowerLevel"=dword:00000000
+"OptimizationFlags"=dword:00000590
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform\EVR\{5C67A112-A4C9-483f-B4A7-1D473BECAFDC}]
+"SWVideoDecodePowerLevel"=dword:00000064
+"OptimizationFlags"=dword:00000a10
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform\EVR\{651288E5-A7ED-4076-A96B-6CC62D848FE1}]
+"SWVideoDecodePowerLevel"=dword:00000032
+"OptimizationFlags"=dword:00000590
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\RemoteDesktop]
+"PluginCLSID"="{636c15cf-df63-4790-866a-117163d10a46}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\file:]
+"{477EC299-1421-4bdd-971F-7CCB933F21AD}"="File Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\http:]
+"{9EC4B4F9-3029-45ad-947B-344DE2A249E2}"="Urlmon Scheme Handler"
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\httpd:]
+"{44CB442B-9DA9-49df-B3FD-023777B16E50}"="Http Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\httpnd:]
+"{2EEEED04-0908-4cdb-AF8F-AC5B768A34C9}"="Drm Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\https:]
+"{37A61C8B-7F8E-4d08-B12B-248D73E9AB4F}"="Secure Http Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\httpsd:]
+"{37A61C8B-7F8E-4d08-B12B-248D73E9AB4F}"="Secure Http Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\httpt:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\httpu:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\mcast:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\mms:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\rtsp:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\rtspt:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\rtspu:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\SchemeHandlers\sdp:]
+"{E9F4EBAB-D97B-463e-A2B1-C54EE3F9414D}"="Net Scheme Handler"

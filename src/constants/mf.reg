@@ -1,0 +1,32 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\Software\Wine\LicenseInformation]
+"msmpeg2adec-AACDecoderV2AddInEnable"=dword:00000001
+"msmpeg2adec-AACDecoderV2InSKU"=dword:00000001
+"msmpeg2adec-DolbyDigitalDecoderV2AddInEnable"=dword:00000001
+"msmpeg2adec-DolbyDigitalDecoderV2InSKU"=dword:00000001
+"msmpeg2vdec-H264VideoDecoderV2AddInEnable"=dword:00000001
+"msmpeg2vdec-H264VideoDecoderV2InSKU"=dword:00000001
+"msmpeg2vdec-MPEG2VideoDecoderV2AddInEnable"=dword:00000001
+"msmpeg2vdec-MPEG2VideoDecoderV2InSKU"=dword:00000001
+
+[HKEY_CLASSES_ROOT\CLSID\{271C3902-6095-4c45-A22F-20091816EE9E}]
+@="MPEG4 Byte Stream Handler"
+
+[HKEY_CLASSES_ROOT\CLSID\{271C3902-6095-4c45-A22F-20091816EE9E}\InprocServer32]
+@="mf.dll"
+"ThreadingModel"="Both"
+
+[HKEY_CLASSES_ROOT\CLSID\{477EC299-1421-4bdd-971F-7CCB933F21AD}]
+@="File Scheme Handler"
+
+[HKEY_CLASSES_ROOT\CLSID\{477EC299-1421-4bdd-971F-7CCB933F21AD}\InprocServer32]
+@="mf.dll"
+"ThreadingModel"="Both"
+
+[HKEY_CLASSES_ROOT\CLSID\{48e2ed0f-98c2-4a37-bed5-166312ddd83f}]
+@="MFReadWrite Class Factory"
+
+[HKEY_CLASSES_ROOT\CLSID\{48e2ed0f-98c2-4a37-bed5-166312ddd83f}\InprocServer32]
+@="mfreadwrite.dll"
+"ThreadingModel"="Both"
