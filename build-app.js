@@ -8,25 +8,50 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const icns = new IconIcns();
   const raw = true;
 
-  await execa("pnpm", ["exec", "tsc"]); // do typecheck first
-  await execa("rm", ["-rf", "./.tmp"]);
-  await execa("pnpm", ["exec", "vite", "build"]);
-  await execa("cp", ["./neutralino.js", "./dist/neutralino.js"]);
-  // run neu build command
-  await execa("pnpm", ["exec", "neu", "build"]);
-
+  await execa("cp", ["neutralino.config.json", "neutralino.config.json.bak"]);
   // build done read neutralino.config.js file
   const config = await fs.readJSON(
     path.resolve(process.cwd(), "neutralino.config.json")
   );
-  const isOverseaVersion = process.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos";
-  const bundleId = isOverseaVersion
-    ? config.applicationId + ".os"
-    : config.applicationId;
+  let bundleId;
+  let appDistributionName;
+  switch (process.env["YAAGL_CHANNEL_CLIENT"]) {
+    case "hk4ecn":
+      bundleId = config.applicationId;
+      appDistributionName = config.cli.binaryName;
+      break;
+    case "hk4eos":
+      bundleId = config.applicationId + ".os";
+      appDistributionName = config.cli.binaryName + " OS";
+      break;
+    case "bh3glb":
+      bundleId = config.applicationId + ".bh3.glb";
+      appDistributionName = config.cli.binaryName + " Honkai Global";
+      config.modes.window.icon = "/src/icons/Elysia.cr.png";
+      break;
+    default:
+      throw new Error("YAAGL_CHANNEL_CLIENT env required");
+  }
+  await fs.writeJSON(
+    path.resolve(process.cwd(), "neutralino.config.json"),
+    config
+  );
+  try {
+    await execa("pnpm", ["exec", "tsc"]); // do typecheck first
+    await execa("rm", ["-rf", "./.tmp"]);
+    await execa("pnpm", ["exec", "vite", "build"]);
+    await execa("cp", ["./neutralino.js", "./dist/neutralino.js"]);
+    // run neu build command
+    await execa("pnpm", ["exec", "neu", "build"]);
+  } finally {
+    await execa("mv", [
+      "-f",
+      "neutralino.config.json.bak",
+      "neutralino.config.json",
+    ]);
+  }
+
   const appname = config.cli.binaryName;
-  const appDistributionName = isOverseaVersion
-    ? config.cli.binaryName + " OS"
-    : config.cli.binaryName;
   const binaryName = `${config.cli.binaryName}-mac_x64`;
 
   // read package.json
@@ -95,7 +120,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const resources = fs.readdirSync(
     path.resolve(process.cwd(), "dist", appname)
   );
-  const resourcesFile = resources.find((file) => /res(ources)?/.test(file));
+  const resourcesFile = resources.find(file => /res(ources)?/.test(file));
   await fs.copy(
     path.resolve(process.cwd(), "dist", appname, resourcesFile),
     path.resolve(
@@ -196,7 +221,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });
     await Promise.all(
-      dirents.map((dirent) => {
+      dirents.map(dirent => {
         const res = path.resolve(dir, dirent.name);
         return dirent.isDirectory()
           ? getFiles(res)
