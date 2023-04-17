@@ -1,10 +1,10 @@
 # Yet another anime game launcher (Yaagl)
 
-<div style="position: relative;">
-  <img style="position: absolute;top:0;left:0;" src="docs/sc65.png" width="60%" /> 
-  <img style="position: absolute; top: 30%;left:30%" src="docs/screenshot36.png" width="60%" />
-  <img style="visibility: hidden" src="docs/screenshot36.png" />
-</div>
+
+|  |  |
+| --- | --- |
+| ![](/docs/screenshot36.png) | ![](/docs/sc65.png) |
+
 
 ## Current Supported Game Version: 
 ### GI: 3.6.0 OS/CN
