@@ -52,11 +52,14 @@ jobs:
           cp dist/Yaagl/resources.neu resources_hk4ecn.neu
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
           cp dist/Yaagl/resources.neu resources_hk4eos.neu
+          YAAGL_CHANNEL_CLIENT=bh3glb node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_bh3glb.neu
 
       - name: Tar app
         run: |
           tar -zcf Yaagl.app.tar.gz Yaagl.app
           tar -zcf "Yaagl OS.app.tar.gz" "Yaagl OS.app"
+          tar -zcf "Yaagl Honkai Global.tar.gz" "Yaagl Honkai Global.app"
       - name: Generate prerelease
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -66,5 +69,7 @@ jobs:
           files: |
             Yaagl.app.tar.gz
             Yaagl OS.app.tar.gz
+            Yaagl Honkai Global.app.tar.gz
             resources_hk4ecn.neu
             resources_hk4eos.neu
+            resources_bh3glb.neu

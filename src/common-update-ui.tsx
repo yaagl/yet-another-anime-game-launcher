@@ -6,7 +6,7 @@ import s from "./assets/Nahida.cr.png";
 import s2 from "./assets/Aponia.cr.webp";
 import { Locale, LocaleTextKey } from "./locale";
 
-const img = import.meta.env["YAAGL_CHANNEL_CLIENT"]=="bh3glb" ? s2 : s; 
+const img = import.meta.env["YAAGL_CHANNEL_CLIENT"] == "bh3glb" ? s2 : s;
 
 export function createCommonUpdateUI(
   locale: Locale,
