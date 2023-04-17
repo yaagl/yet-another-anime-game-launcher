@@ -72,3 +72,5 @@ node ./build-app.js
 * An anime game launcher (you can find it on GitHub as I can't link to it) where the idea of this project comes from and provide so many details on launching process. (By the way, Yaagl is __not__ a fork of this project)
 
 * Krock, the game running on macOS can not come true without his patch (you can find the link to his work in this repository, while you have to make a little effort ;) )
+
+* mkrsym1, tackled IMO the most challenging AC component. It's a really remarkable and mind-blowing achievement.
