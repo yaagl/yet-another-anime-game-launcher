@@ -1,6 +1,5 @@
 name: "Build Latest (when new tag created)"
 on:
-  workflow_dispatch:
   push:
     tags:
       - '*'
