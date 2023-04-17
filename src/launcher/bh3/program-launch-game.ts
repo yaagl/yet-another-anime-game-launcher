@@ -19,7 +19,7 @@ import {
 } from "../../utils";
 import { Wine } from "../../wine";
 import { Config } from "../config";
-import { putLocal, patchProgram, patchRevertProgram } from "./patch";
+import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 
 export async function* launchGameProgram({
   gameDir,
@@ -51,24 +51,17 @@ export async function* launchGameProgram({
 
   const cmd = `@echo off
 cd "%~dp0"
-copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
-copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
-  )}" "%WINDIR%\\system32\\"
 regedit retina.reg
 regedit left_cmd.reg
+cd /d "${wine.toWinePath(gameDir)}"
 ${wine.toWinePath(join(gameDir, gameExecutable))}`;
   await writeFile(await resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(await resolve("./logs"));
-  let processRunning = true;
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = await resolve(`./logs/game_${Date.now()}.log`);
-    // await forceMove(
-    //   join(gameDir, atob("bWh5cGJhc2UuZGxs")),
-    //   join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak")
-    // );
+    const yaaglDir = await resolve("./");
     await Promise.all([
       wine.exec2(
         "cmd",
@@ -83,6 +76,9 @@ ${wine.toWinePath(join(gameDir, gameExecutable))}`;
                 DXVK_HUD: config.dxvkHud,
               }),
           GIWINEHOSTS: `${server.hosts}`,
+          DXVK_STATE_CACHE_PATH: yaaglDir,
+          DXVK_LOG_PATH: yaaglDir,
+          DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
         },
         logfile
       ),
@@ -104,14 +100,6 @@ ${wine.toWinePath(join(gameDir, gameExecutable))}`;
     // it seems game crashed?
     await log(String(e));
   }
-  processRunning = false;
-  // try {
-  //   await stats(join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"));
-  //   await forceMove(
-  //     join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
-  //     join(gameDir, atob("bWh5cGJhc2UuZGxs"))
-  //   );
-  // } catch {}
 
   await removeFile(await resolve("retina.reg"));
   await removeFile(await resolve("left_cmd.reg"));

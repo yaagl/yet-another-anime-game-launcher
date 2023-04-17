@@ -28,7 +28,7 @@ import {
 } from "./program-update-game";
 import { downloadAndInstallGameProgram } from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
-import { patchRevertProgram } from "./patch";
+import { patchRevertProgram } from "../patch";
 import { Aria2 } from "../../aria2";
 import { Wine } from "../../wine";
 import {

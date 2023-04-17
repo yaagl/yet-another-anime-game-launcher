@@ -19,6 +19,9 @@ import {
   DLL1,
   DLL2,
   DLL4,
+  FILE1,
+  FILE2,
+  FILE3,
   OS_ADV_URL,
   OS_CPS,
   OS_CUSTOM_HOSTS,
@@ -121,7 +124,34 @@ export interface ServerContentData {
   retcode: number;
 }
 
-export const CN_SERVER = {
+export type Server = {
+  id: string;
+  update_url: string;
+  adv_url: string;
+  cps: string;
+  channel_id: number;
+  subchannel_id: number;
+  removed: {
+    file: string;
+    tag?: string;
+  }[];
+  product_name: string;
+  executable: string;
+  dataDir: string;
+  THE_REAL_COMPANY_NAME: string;
+  added: {
+    file: string;
+    url: string;
+  }[];
+  patched: {
+    file: string;
+    diffUrl: string;
+    tag?: string;
+  }[];
+  hosts: string; // ?
+};
+
+export const CN_SERVER: Server = {
   id: "CN",
   update_url: CN_UPDATE_URL,
   channel_id: 1,
@@ -137,23 +167,30 @@ export const CN_SERVER = {
       file: DLL1,
       diffUrl: c,
     },
-  ],
-  patched2: [
     {
       file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
       diffUrl: e,
+      tag: "workaround3",
     },
   ],
   removed: [
-    "WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ==",
-    "WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA==",
+    {
+      file: atob("WXVhblNoZW5fRGF0YS91cGxvYWRfY3Jhc2guZXhl"),
+    },
+    {
+      file: atob("WXVhblNoZW5fRGF0YS9QbHVnaW5zL2NyYXNocmVwb3J0LmV4ZQ=="),
+    },
+    {
+      file: atob("WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA=="),
+    },
+    {
+      file: atob("bWh5cGJhc2UuZGxs"),
+      tag: "workaround3",
+    },
   ],
-  removed2: ["bWh5cGJhc2UuZGxs"],
   hosts: CN_CUSTOM_HOSTS,
+  added: [],
 };
-
-export type Server = typeof CN_SERVER;
 
 export const OS_SERVER: Server = {
   id: "OS",
@@ -171,30 +208,48 @@ export const OS_SERVER: Server = {
       file: DLL1,
       diffUrl: d,
     },
-  ],
-  patched2: [
     {
       file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
       diffUrl: f,
+      tag: "workaround3",
     },
   ],
   removed: [
-    "R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU=",
-    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl",
-    "R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs",
+    {
+      file: atob("R2Vuc2hpbkltcGFjdF9EYXRhL3VwbG9hZF9jcmFzaC5leGU="),
+    },
+    {
+      file: atob("R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvY3Jhc2hyZXBvcnQuZXhl"),
+    },
+    {
+      file: atob("R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs"),
+    },
+    {
+      file: atob("bWh5cGJhc2UuZGxs"),
+      tag: "workaround3",
+    },
   ],
-  removed2: ["bWh5cGJhc2UuZGxs"],
   hosts: OS_CUSTOM_HOSTS,
+  added: [],
 };
 
 import x from "../../external/bh3/diffs/QkgzQmFzZS5kbGwudmNkaWZmCg==.vcdiff?url";
 import y from "../../external/bh3/diffs/VW5pdHlQbGF5ZXIuZGxsLnZjZGlmZgo=.vcdiff?url";
+import a0 from "../../external/bh3/files/VFZNQm9vdHN0cmFwLmRsbAo=.dll?url";
+import a1 from "../../external/bh3/files/R2VuZXJhdGVkCg==.Generated/dHZtX2FsbG9jYXRpb25fdGFibGUuZGF0Cg==.dat?url";
+import a2 from "../../external/bh3/files/R2VuZXJhdGVkCg==.Generated/dHZtX2VudHJ5X3RhYmxlLmRhdAo=.dat?url";
 
 export const BH3_GLB: Server = {
   id: "BH3_GLB",
   hosts: "",
-  removed: [],
-  removed2: [],
+  removed: [
+    {
+      file: atob("QkgzX0RhdGEvUGx1Z2lucy9jcmFzaHJlcG9ydC5leGU="),
+    },
+    {
+      file: atob("QkgzX0RhdGEvUGx1Z2lucy92dWxrYW4tMS5kbGw="),
+    },
+  ],
   channel_id: 0, //?
   subchannel_id: 0, //?
   cps: "", //?
@@ -208,11 +263,24 @@ export const BH3_GLB: Server = {
       diffUrl: y,
     },
   ],
-  patched2: [],
   product_name: "?",
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,
   executable: BH3_GLB_EXECUTABLE,
   update_url: BH3_GLB_UPDATE_URL,
   adv_url: BH3_GLB_ADV_URL,
   dataDir: BH3_GLB_DATA_DIR,
+  added: [
+    {
+      file: FILE1,
+      url: a0,
+    },
+    {
+      file: FILE3,
+      url: a1,
+    },
+    {
+      file: FILE2,
+      url: a2,
+    },
+  ],
 };

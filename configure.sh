@@ -23,6 +23,9 @@ popd
 pushd "$EXTERNAL/bh3/diffs"
 for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
 popd
+pushd "$EXTERNAL/bh3/files/Generated"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
 pushd "$EXTERNAL/bh3/files"
 for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
 popd

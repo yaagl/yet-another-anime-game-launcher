@@ -1,6 +1,6 @@
-import { join } from "path-browserify";
-import { CommonUpdateProgram } from "../../common-update-ui";
-import { Server } from "../../constants";
+import { dirname, join } from "path-browserify";
+import { CommonUpdateProgram } from "../common-update-ui";
+import { Server } from "../constants";
 import {
   writeBinary,
   forceMove,
@@ -14,10 +14,9 @@ import {
   removeFileIfExists,
   fileOrDirExists,
   getKeyOrDefault,
-} from "../../utils";
-import { xdelta3 } from "../../utils/unix";
-
-import { Config } from "../config";
+} from "../utils";
+import { mkdirp, xdelta3 } from "../utils/unix";
+import { Config } from "./config";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -48,10 +47,8 @@ export async function* patchProgram(
     return;
   }
   if (!config.patchOff) {
-    for (const file of [
-      ...server.patched,
-      ...(config.workaround3 ? [] : server.patched2),
-    ]) {
+    for (const file of server.patched) {
+      if (file.tag === "workaround3" && config.workaround3) continue;
       await forceMove(
         join(gameDir, file.file),
         join(gameDir, file.file + ".bak")
@@ -65,13 +62,15 @@ export async function* patchProgram(
       await log("patched " + file.file);
       await removeFile(join(gameDir, file.file + ".diff"));
     }
-    for (const file of [
-      ...server.removed,
-      ...(config.workaround3 ? [] : server.removed2),
-    ].map(atob)) {
+    for (const { file, tag } of server.removed) {
+      if (tag === "workaround3" && config.workaround3) continue;
       if (await fileOrDirExists(join(gameDir, file))) {
         await forceMove(join(gameDir, file), join(gameDir, file + ".bak"));
       }
+    }
+    for (const file of server.added) {
+      await mkdirp(join(gameDir, dirname(file.file)));
+      await putLocal(file.url, join(gameDir, file.file));
     }
   }
   await forceMove(
@@ -114,21 +113,22 @@ export async function* patchRevertProgram(
     return;
   }
   if (!config.patchOff) {
-    for (const file of [
-      ...server.patched,
-      ...(config.workaround3 ? [] : server.patched2),
-    ]) {
-      await forceMove(
-        join(gameDir, file.file + ".bak"),
-        join(gameDir, file.file)
-      );
+    for (const file of server.patched) {
+      if (await fileOrDirExists(join(gameDir, file.file + ".bak"))) {
+        await forceMove(
+          join(gameDir, file.file + ".bak"),
+          join(gameDir, file.file)
+        );
+      }
     }
-    for (const file of [
-      ...server.removed,
-      ...(config.workaround3 ? [] : server.removed2),
-    ].map(atob)) {
+    for (const { file } of server.removed) {
       if (await fileOrDirExists(join(gameDir, file + ".bak"))) {
         await forceMove(join(gameDir, file + ".bak"), join(gameDir, file));
+      }
+    }
+    for (const file of server.added) {
+      if (await fileOrDirExists(join(gameDir, file.file))) {
+        await removeFile(join(gameDir, file.file));
       }
     }
   }
