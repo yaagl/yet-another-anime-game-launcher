@@ -26,7 +26,7 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 ## Download
 
-Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases)
+Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest)
 
 ## Development
 
