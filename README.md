@@ -1,10 +1,14 @@
 # Yet another anime game launcher (Yaagl)
 
-You can now play _An Anime Game_ on macOS!
+<div style="position: relative;">
+  <img style="position: absolute;top:0;left:0;" src="docs/sc65.png" width="60%" /> 
+  <img style="position: absolute; top: 30%;left:30%" src="docs/screenshot36.png" width="60%" />
+  <img style="visibility: hidden" src="docs/screenshot36.png" />
+</div>
 
- <img src="docs/screenshot36.png">
-
-## Current Supported Game Version: 3.6.0
+## Current Supported Game Version: 
+### GI: 3.6.0 OS/CN
+### HI: 6.5.0 Global
 
 ## Policy
 
