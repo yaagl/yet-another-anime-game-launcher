@@ -1,5 +1,7 @@
+import { JSXElement } from "solid-js";
 import { CommonUpdateProgram } from "../common-update-ui";
 import { Config } from "./config";
+import { Locale } from "../locale";
 
 export type ChannelClientInstallState = "INSTALLED" | "NOT_INSTALLED";
 
@@ -25,4 +27,8 @@ export interface ChannelClient {
   launch(config: Config): CommonUpdateProgram;
   checkIntegrity(): CommonUpdateProgram;
   init(config: Config): CommonUpdateProgram;
+  createConfig(
+    locale: Locale,
+    config: Partial<Config>
+  ): Promise<() => JSXElement>;
 }

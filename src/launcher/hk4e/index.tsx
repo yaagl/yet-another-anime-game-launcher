@@ -36,6 +36,8 @@ import {
   checkAndDownloadFpsUnlocker,
 } from "../../downloadable-resource";
 import { checkAndDownloadReshade } from "../../reshade";
+import { createWorkaround3Config } from "./config/workaround-3";
+import createPatchOff from "./config/patch-off";
 
 const CURRENT_SUPPORTED_VERSION = "3.6.0";
 
@@ -331,6 +333,14 @@ export async function createHK4EChannelClient({
           remoteDir: decompressed_path,
         });
       }
+    },
+    async createConfig(locale: Locale, config: Partial<Config>) {
+      const [W3] = await createWorkaround3Config({ locale, config });
+      const [PO] = await createPatchOff({ locale, config });
+
+      return function () {
+        return [<W3 />, <PO />];
+      };
     },
   };
 }

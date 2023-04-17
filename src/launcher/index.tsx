@@ -58,6 +58,7 @@ export async function createLauncher({
     uiContent: { background, url, iconImage },
     dismissPredownload,
     predownloadVersion,
+    createConfig,
   },
 }: {
   wine: Wine;
@@ -70,6 +71,7 @@ export async function createLauncher({
     wineVersionChecker: await createWineVersionChecker(github),
     locale,
     gameInstallDir: installDir,
+    configForChannelClient: createConfig,
   });
 
   const { selectPath } = await createGameInstallationDirectorySanitizer({

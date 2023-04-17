@@ -326,6 +326,11 @@ export async function createBH3ChannelClient({
         });
       }
     },
+    async createConfig() {
+      return function () {
+        return [];
+      };
+    },
   };
 }
 

@@ -1,10 +1,10 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
-import { Locale } from "../../locale";
-import { assertValueDefined, getKey, setKey } from "../../utils";
-import { Config, NOOP } from "./config-def";
+import { Locale } from "../../../locale";
+import { assertValueDefined, getKey, setKey } from "../../../utils";
+import { Config, NOOP } from "../../config/config-def";
 
-declare module "./config-def" {
+declare module "../../config/config-def" {
   interface Config {
     workaround3: boolean;
   }

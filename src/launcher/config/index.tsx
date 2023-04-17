@@ -30,12 +30,10 @@ import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
-import { createWorkaround3Config } from "./workaround-3";
 import createLocaleConfig from "./ui-locale";
-import createPatchOff from "./patch-off";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../../utils";
-import { createSignal, Show } from "solid-js";
+import { createSignal, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
 
 export async function createConfiguration({
@@ -43,11 +41,16 @@ export async function createConfiguration({
   wineVersionChecker,
   locale,
   gameInstallDir,
+  configForChannelClient,
 }: {
   wine: Wine;
   wineVersionChecker: WineVersionChecker;
   locale: Locale;
   gameInstallDir: () => string;
+  configForChannelClient: (
+    locale: Locale,
+    config: Partial<Config>
+  ) => Promise<() => JSXElement>;
 }) {
   const config: Partial<Config> = {};
   const [WD] = await createWineDistroConfig({
@@ -65,11 +68,11 @@ export async function createConfiguration({
     gameInstallDir,
   });
 
-  const [W3] = await createWorkaround3Config({ locale, config });
   const [UL] = await createLocaleConfig({ locale, config });
-  const [PO] = await createPatchOff({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
+
+  const ChannelClientConfig = await configForChannelClient(locale, config);
 
   const _advancedSetting =
     YAAGL_ADVANCED_ENABLE &&
@@ -115,6 +118,7 @@ export async function createConfiguration({
             <Tabs orientation="vertical" h="100%">
               <TabList minW={120}>
                 <Tab>{locale.get("SETTING_GENERAL")}</Tab>
+                <Tab>Game</Tab>
                 <Tab>Wine</Tab>
                 <Show when={advanceSetting()}>
                   <Tab>{locale.get("SETTING_ADVANCED")}</Tab>
@@ -135,9 +139,6 @@ export async function createConfiguration({
                       <DH />
                       <R />
                       <LC />
-                      <Divider />
-                      <PO />
-                      <W3 />
                       <Divider />
                       <UL />
                       <FormControl>
@@ -207,6 +208,11 @@ export async function createConfiguration({
                     </Button>
                   </VStack>
                 </HStack>
+              </TabPanel>
+              <TabPanel flex={1} pt={0} pb={0} h="100%">
+                <VStack spacing={"$4"} w="40%" alignItems="start">
+                  <ChannelClientConfig />
+                </VStack>
               </TabPanel>
               <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
