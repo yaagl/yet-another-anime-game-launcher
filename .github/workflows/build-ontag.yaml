@@ -1,5 +1,6 @@
 name: "Build Latest (when new tag created)"
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
@@ -59,7 +60,7 @@ jobs:
         run: |
           tar -zcf Yaagl.app.tar.gz Yaagl.app
           tar -zcf "Yaagl OS.app.tar.gz" "Yaagl OS.app"
-          tar -zcf "Yaagl Honkai Global.tar.gz" "Yaagl Honkai Global.app"
+          tar -zcf "Yaagl Honkai Global.app.tar.gz" "Yaagl Honkai Global.app"
       - name: Generate prerelease
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
