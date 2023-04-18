@@ -176,9 +176,9 @@ export async function checkWine(github: Github) {
       return {
         wineReady: false,
         wineUpdate: github.acceleratedPath(
-          "https://github.com/3Shain/winecx/releases/download/unstable-bh-wine-1.0.1/wine.tar.gz"
+          "https://github.com/3Shain/winecx/releases/download/unstable-bh-wine-1.0.2/wine.tar.gz"
         ),
-        wineUpdateTag: "unstable-bh-wine-1.0.1",
+        wineUpdateTag: "unstable-bh-wine-1.0.2",
       } as const;
     }
     // FIXME:
