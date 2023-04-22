@@ -19,9 +19,9 @@ import {
   writeFile,
   forceMove,
   getCPUInfo,
+  build,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
-import { build } from "./command-builder";
 import { ensureHosts } from "./hosts";
 import { ENSURE_HOSTS } from "./clients/secret";
 import cpu_db from "./constants/cpu_db";

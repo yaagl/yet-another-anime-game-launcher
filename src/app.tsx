@@ -9,6 +9,7 @@ import {
   GLOBAL_onClose,
   setKey,
   exit,
+  rawString,
 } from "./utils";
 import { createAria2 } from "./aria2";
 import { checkWine, createWine, createWineInstallProgram } from "./wine";
@@ -19,7 +20,6 @@ import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { CROSSOVER_LOADER } from "./crossover";
-import { rawString } from "./command-builder";
 import { createClient } from "./clients";
 
 export async function createApp() {

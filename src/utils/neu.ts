@@ -1,5 +1,5 @@
 import { join } from "path-browserify";
-import { build, CommandSegments, rawString } from "../command-builder";
+import { build, CommandSegments, rawString } from "./command-builder";
 
 export function resolve(path: string): string {
   if (!path.startsWith("/")) {

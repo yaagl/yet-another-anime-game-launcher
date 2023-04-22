@@ -1,5 +1,4 @@
-import { rawString } from "./command-builder";
-import { exec, readAllLines } from "./utils";
+import { exec, readAllLines, rawString } from "./utils";
 
 export async function ensureHosts(hosts: [string, string][]) {
   const content = await readAllLines("/etc/hosts");

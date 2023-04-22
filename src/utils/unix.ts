@@ -1,4 +1,4 @@
-import { rawString } from "../command-builder";
+import { rawString } from "./command-builder";
 import { wait } from "./helper";
 import { exec, spawn, resolve, log } from "./neu";
 
