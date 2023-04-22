@@ -4,12 +4,7 @@ import {
   ChannelClient,
   ChannelClientInstallState,
 } from "../../../channel-client";
-import {
-  Server,
-  ServerContentData,
-  ServerVersionData,
-  VoicePackNames,
-} from "@constants";
+import { Server } from "@constants";
 import { Locale } from "@locale";
 import {
   assertValueDefined,
@@ -30,7 +25,7 @@ import {
 } from "./program-update-game";
 import { downloadAndInstallGameProgram } from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
-import { patchRevertProgram } from "../../../patch";
+import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
@@ -39,6 +34,11 @@ import {
 } from "../../../downloadable-resource";
 import { checkAndDownloadReshade } from "../../../reshade";
 import { getGameVersion } from "../unity";
+import {
+  LauncherContentData,
+  LauncherResourceData,
+  VoicePackNames,
+} from "../launcher-info";
 
 const CURRENT_SUPPORTED_VERSION = "6.5.0";
 
@@ -57,7 +57,7 @@ export async function createBH3ChannelClient({
     data: {
       adv: { background, url, icon },
     },
-  }: ServerContentData = await (
+  }: LauncherContentData = await (
     await fetch(
       server.adv_url +
         (server.id == "CN"
@@ -73,7 +73,7 @@ export async function createBH3ChannelClient({
       },
       pre_download_game,
     },
-  }: ServerVersionData = await getLatestVersionInfo(server);
+  }: LauncherResourceData = await getLatestVersionInfo(server);
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -361,7 +361,9 @@ async function checkGameState(locale: Locale, server: Server) {
 
 async function getLatestVersionInfo(
   server: Server
-): Promise<ServerVersionData> {
-  const ret: ServerVersionData = await (await fetch(server.update_url)).json();
+): Promise<LauncherResourceData> {
+  const ret: LauncherResourceData = await (
+    await fetch(server.update_url)
+  ).json();
   return ret;
 }

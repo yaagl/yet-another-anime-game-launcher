@@ -1,12 +1,11 @@
 import { dirname, join } from "path-browserify";
-import { CommonUpdateProgram } from "./common-update-ui";
-import { Server } from "./constants";
+import { CommonUpdateProgram } from "@common-update-ui";
+import { Server } from "@constants";
 import {
   writeBinary,
   forceMove,
   removeFile,
   log,
-  readBinary,
   getKey,
   setKey,
   cp,
@@ -14,9 +13,11 @@ import {
   removeFileIfExists,
   fileOrDirExists,
   getKeyOrDefault,
-} from "./utils";
-import { mkdirp, xdelta3 } from "./utils/unix";
-import { Config } from "./config";
+  mkdirp,
+  xdelta3,
+} from "@utils";
+import { Config } from "@config";
+import { disableUnityFeature } from "./unity";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -148,33 +149,4 @@ export async function* patchRevertProgram(
     await removeFileIfExists(join(gameDir, "d3dcompiler_47.dll"));
   }
   setKey("patched", null);
-}
-
-async function disableUnityFeature(ggmPath: string) {
-  const view = new Uint8Array(await readBinary(ggmPath));
-  const index = patternSearch(
-    view,
-    [
-      0x69, 0x63, 0x2e, 0x61, 0x70, 0x70, 0x2d, 0x63, 0x61, 0x74, 0x65, 0x67,
-      0x6f, 0x72, 0x79, 0x2e,
-    ]
-  );
-  if (index == -1) {
-    throw new Error("pattern not found"); //FIXME
-  } else {
-    const len = index + 8;
-    const v = new DataView(view.buffer);
-    v.setInt32(len, 0, true);
-    return view.buffer;
-  }
-}
-
-export function patternSearch(view: Uint8Array, pattern: number[]) {
-  retry: for (let i = 0; i < view.byteLength - pattern.length; i++) {
-    for (let j = 0; j < pattern.length; j++) {
-      if (view[i + j] != pattern[j]) continue retry;
-    }
-    return i + pattern.length;
-  }
-  return -1;
 }

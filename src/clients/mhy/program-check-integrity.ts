@@ -62,12 +62,7 @@ export async function* checkIntegrityProgram({
     const localPath = join(gameDir, remoteName);
     const remotePath = join(remoteDir, remoteName).replace(":/", "://"); //....join: wtf?
     yield ["setUndeterminedProgress"];
-    yield [
-      "setStateText",
-      "FIXING_FILES",
-      String(count),
-      String(toFix.length),
-    ];
+    yield ["setStateText", "FIXING_FILES", String(count), String(toFix.length)];
     for await (const progress of aria2.doStreamingDownload({
       uri: remotePath,
       absDst: localPath,

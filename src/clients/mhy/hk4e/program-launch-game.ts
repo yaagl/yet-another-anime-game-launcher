@@ -20,7 +20,7 @@ import {
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
-import { putLocal, patchProgram, patchRevertProgram } from "../../../patch";
+import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 
 export async function* launchGameProgram({
   gameDir,
