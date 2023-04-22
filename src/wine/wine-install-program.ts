@@ -13,7 +13,7 @@ import {
 } from "@utils";
 import { resolve } from "path-browserify";
 import { ENSURE_HOSTS } from "../clients/secret";
-import { CROSSOVER_LOADER, CROSSOVER_DATA } from "../crossover";
+import { CROSSOVER_LOADER, CROSSOVER_DATA } from "./crossover";
 import { ensureHosts } from "../hosts";
 import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";

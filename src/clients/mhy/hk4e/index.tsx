@@ -31,8 +31,8 @@ import { Wine } from "@wine";
 import {
   checkAndDownloadDXVK,
   checkAndDownloadFpsUnlocker,
+  checkAndDownloadReshade,
 } from "../../../downloadable-resource";
-import { checkAndDownloadReshade } from "../../../reshade";
 import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
 import { getGameVersion } from "../unity";

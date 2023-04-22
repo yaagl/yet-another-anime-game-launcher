@@ -19,7 +19,7 @@ import "./app.css";
 import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
-import { CROSSOVER_LOADER } from "./crossover";
+import { CROSSOVER_LOADER } from "./wine/crossover";
 import { createClient } from "./clients";
 
 export async function createApp() {

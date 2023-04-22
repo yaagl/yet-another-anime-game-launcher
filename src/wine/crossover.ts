@@ -1,5 +1,5 @@
 import { gte, coerce } from "semver";
-import { exec, stats, getMemoryInfo, rawString } from "./utils";
+import { exec, stats, getMemoryInfo, rawString } from "../utils";
 
 export const CROSSOVER_LOADER =
   "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader64";

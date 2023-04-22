@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@hope-ui/solid";
 import { createSignal, For, Show } from "solid-js";
-import { checkCrossover } from "../crossover";
+import { checkCrossover } from "../wine/crossover";
 import { Locale } from "../locale";
 import {
   getKey,

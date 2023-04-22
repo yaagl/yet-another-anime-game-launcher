@@ -21,7 +21,7 @@
       "@utils": ["src/utils/index.ts"],
       "@constants": ["src/constants/index.ts"],
       "@aria2": ["src/aria2.ts"],
-      "@wine": ["src/wine.tsx"],
+      "@wine": ["src/wine/index.ts"],
       "@common-update-ui": ["src/common-update-ui.tsx"],
     }
   },
