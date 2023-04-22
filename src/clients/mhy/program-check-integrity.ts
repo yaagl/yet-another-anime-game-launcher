@@ -21,7 +21,6 @@ export async function* checkIntegrityProgram({
     .map(x => JSON.parse(x));
   const toFix: {
     remoteName: string;
-    md5: string;
   }[] = [];
   let count = 0;
   yield [
@@ -38,7 +37,7 @@ export async function* checkIntegrityProgram({
         throw new Error("Size not match");
       }
       const md5sum = await md5(localPath);
-      if (md5sum !== entry.md5) {
+      if (md5sum.toLowerCase() !== entry.md5.toLowerCase()) {
         await log(`${md5sum} ${entry.md5} not match`);
         throw new Error("Md5 not match");
       }
@@ -58,31 +57,26 @@ export async function* checkIntegrityProgram({
   if (toFix.length == 0) {
     return;
   }
-  yield ["setUndeterminedProgress"];
-
-  yield ["setStateText", "FIXING_FILES", String(count), String(toFix.length)];
   count = 0;
-  for (const entry of toFix) {
-    const localPath = join(gameDir, entry.remoteName);
-    const remotePath = join(remoteDir, entry.remoteName).replace(":/", "://"); //....join: wtf?
-    await log(remotePath);
-    await log(localPath);
+  for (const { remoteName } of toFix) {
+    const localPath = join(gameDir, remoteName);
+    const remotePath = join(remoteDir, remoteName).replace(":/", "://"); //....join: wtf?
+    yield ["setUndeterminedProgress"];
+    yield [
+      "setStateText",
+      "FIXING_FILES",
+      String(count),
+      String(toFix.length),
+    ];
     for await (const progress of aria2.doStreamingDownload({
       uri: remotePath,
       absDst: localPath,
     })) {
-      yield [
-        "setStateText",
-        "FIXING_FILES",
-        String(count),
-        String(toFix.length),
-      ];
       yield [
         "setProgress",
         Number((progress.completedLength * BigInt(100)) / progress.totalLength),
       ];
     }
     count++;
-    // yield ['setStateText', 'COMPLETE_FILE', count, toFix.length]
   }
 }
