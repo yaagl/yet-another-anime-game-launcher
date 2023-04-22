@@ -8,6 +8,7 @@ import {
   addTerminationHook,
   GLOBAL_onClose,
   setKey,
+  exit,
 } from "./utils";
 import { createAria2 } from "./aria2";
 import { checkWine, createWine, createWineInstallProgram } from "./wine";
@@ -28,7 +29,7 @@ export async function createApp() {
 
   await Neutralino.events.on("windowClose", async () => {
     if (await GLOBAL_onClose(false)) {
-      Neutralino.app.exit(0);
+      exit(0);
     }
   });
 

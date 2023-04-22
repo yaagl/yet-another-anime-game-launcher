@@ -18,6 +18,7 @@ import {
   arrayFind,
   writeFile,
   forceMove,
+  getCPUInfo,
 } from "./utils";
 import { xattrRemove } from "./utils/unix";
 import { build } from "./command-builder";
@@ -125,7 +126,7 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  const cpuInfo = await Neutralino.computer.getCPUInfo();
+  const cpuInfo = await getCPUInfo();
   await log(JSON.stringify(cpuInfo));
   const fakeCpu: Record<string, string> =
     cpuInfo.model.indexOf("Apple") >= 0
@@ -262,9 +263,7 @@ export async function createWineInstallProgram({
     }
 
     const wine64Bin =
-      wineTag === "crossover"
-        ? CROSSOVER_LOADER
-        : resolve("./wine/bin/wine64");
+      wineTag === "crossover" ? CROSSOVER_LOADER : resolve("./wine/bin/wine64");
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,

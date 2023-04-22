@@ -262,6 +262,26 @@ export async function fileOrDirExists(path: string) {
   }
 }
 
+export async function env(key: string) {
+  return Neutralino.os.getEnv(key);
+}
+
+export function exit(exitCode: number) {
+  return Neutralino.app.exit(exitCode);
+}
+
+export function getMemoryInfo() {
+  return Neutralino.computer.getMemoryInfo();
+}
+
+export function getCPUInfo() {
+  return Neutralino.computer.getCPUInfo();
+}
+
+export function open(url: string) {
+  return Neutralino.os.open(url);
+}
+
 const hooks: Array<(forced: boolean) => Promise<boolean>> = [];
 
 export function addTerminationHook(fn: (forced: boolean) => Promise<boolean>) {

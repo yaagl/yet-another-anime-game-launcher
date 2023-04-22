@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
-import { assertValueDefined, getKey, setKey } from "@utils";
+import { assertValueDefined, getCPUInfo, getKey, setKey } from "@utils";
 import { Config, NOOP } from "@config/config-def";
 
 declare module "@config/config-def" {
@@ -22,7 +22,7 @@ export async function createWorkaround3Config({
   try {
     config.workaround3 = (await getKey(CONFIG_KEY)) == "true";
   } catch {
-    const { model } = await Neutralino.computer.getCPUInfo();
+    const { model } = await getCPUInfo();
     config.workaround3 =
       import.meta.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos"
         ? false

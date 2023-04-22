@@ -1,6 +1,6 @@
 import { gte, coerce } from "semver";
 import { rawString } from "./command-builder";
-import { exec, log, stats } from "./utils";
+import { exec, stats, getMemoryInfo } from "./utils";
 
 export const CROSSOVER_LOADER =
   "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader64";
@@ -12,7 +12,7 @@ export async function checkCrossover() {
   try {
     const {
       physical: { total },
-    } = await Neutralino.computer.getMemoryInfo();
+    } = await getMemoryInfo();
     // disable crossover if RAM < 16GB
     if (total < 16 * Math.pow(1024, 3)) return false;
     await stats(CROSSOVER_LOADER);

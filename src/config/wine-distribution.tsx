@@ -24,6 +24,7 @@ import {
   _safeRelaunch,
   assertValueDefined,
   arrayFind,
+  open,
 } from "../utils";
 import { WineVersionChecker } from "../wine";
 import { Config } from "./config-def";
@@ -125,7 +126,7 @@ export async function createWineDistroConfig({
             status="info"
             variant="left-accent"
             onClick={() =>
-              Neutralino.os.open(
+              open(
                 "https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver:-use-latest-MoltenVK"
               )
             }

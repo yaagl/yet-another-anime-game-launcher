@@ -1,5 +1,5 @@
 import { createWineVersionChecker, Wine } from "./wine";
-import { openDir, fatal } from "./utils";
+import { openDir, fatal, open } from "./utils";
 import {
   Box,
   Button,
@@ -179,7 +179,7 @@ export async function createLauncher({
         }}
       >
         <div
-          onClick={() => Neutralino.os.open(url)}
+          onClick={() => open(url)}
           role="button"
           class="version-icon"
           style={{
