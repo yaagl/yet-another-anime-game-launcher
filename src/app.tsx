@@ -18,11 +18,8 @@ import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { CROSSOVER_LOADER } from "./crossover";
-import { BH3_GLB, CN_SERVER, OS_SERVER } from "./constants";
 import { rawString } from "./command-builder";
-import { createHK4EChannelClient } from "./launcher/hk4e";
-import { ChannelClient } from "./launcher/channel-client";
-import { createBH3ChannelClient } from "./launcher/bh3";
+import { createClient } from "./clients";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -105,34 +102,15 @@ export async function createApp() {
           : await resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
-    let channelClient: ChannelClient;
-    if (import.meta.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos") {
-      channelClient = await createHK4EChannelClient({
-        server: OS_SERVER,
-        locale,
-        aria2,
-        wine,
-      });
-    } else if (import.meta.env["YAAGL_CHANNEL_CLIENT"] == "bh3glb") {
-      channelClient = await createBH3ChannelClient({
-        server: BH3_GLB,
-        locale,
-        aria2,
-        wine,
-      });
-    } else {
-      channelClient = await createHK4EChannelClient({
-        server: CN_SERVER,
-        locale,
-        aria2,
-        wine,
-      });
-    }
     return await createLauncher({
       wine,
       locale,
       github,
-      channelClient,
+      channelClient: await createClient({
+        wine,
+        aria2,
+        locale,
+      }),
     });
   } else {
     return await createWineInstallProgram({

@@ -2,11 +2,8 @@ import { Button, Progress, ProgressIndicator, Center } from "@hope-ui/solid";
 import { Box, VStack, Image } from "@hope-ui/solid";
 import { createSignal, onMount, Show } from "solid-js";
 import { fatal, _safeRelaunch } from "./utils";
-import s from "./assets/Nahida.cr.png";
-import s2 from "./assets/Aponia.cr.webp";
 import { Locale, LocaleTextKey } from "./locale";
-
-const img = import.meta.env["YAAGL_CHANNEL_CLIENT"] == "bh3glb" ? s2 : s;
+import { UPDATE_UI_IMAGE } from "./clients";
 
 export function createCommonUpdateUI(
   locale: Locale,
@@ -48,7 +45,7 @@ export function createCommonUpdateUI(
       <Center h="100vh" w="100vw">
         <VStack alignItems="stretch" spacing="$8" w="80vw">
           <Center>
-            <Image boxSize={280} src={img}></Image>
+            <Image boxSize={280} src={UPDATE_UI_IMAGE}></Image>
           </Center>
           <h1 style="text-align: center">{statusText()}</h1>
           <Box height={100}>

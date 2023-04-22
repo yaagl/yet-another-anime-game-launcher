@@ -1,4 +1,4 @@
-base64 -d -i ./src/constants/server_secret.b64 -o ./src/constants/server_secret.ts
+base64 -d -i ./src/clients/secret.b64 -o ./src/clients/secret.ts
 
 EXTERNAL="./external"
 

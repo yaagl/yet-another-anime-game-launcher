@@ -25,6 +25,7 @@ specifiers:
   typescript: ^4.7.4
   vite: ^3.0.0
   vite-plugin-solid: ^2.3.0
+  vite-tsconfig-paths: ^4.2.0
   vitest: ^0.29.7
 
 dependencies:
@@ -54,6 +55,7 @@ devDependencies:
   typescript: 4.9.5
   vite: 3.2.5_@types+node@18.14.6
   vite-plugin-solid: 2.6.1_solid-js@1.6.11+vite@3.2.5
+  vite-tsconfig-paths: 4.2.0_mmfldfnusamjexuwtlvii3fpxu
   vitest: 0.29.7
 
 packages:
@@ -1967,6 +1969,10 @@ packages:
       slash: 3.0.0
     dev: true
 
+  /globrex/0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+    dev: true
+
   /graceful-fs/4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
     dev: true
@@ -2886,6 +2892,19 @@ packages:
     resolution: {integrity: sha512-iawgk0hLP3SxGKDfnDJf8wTz4p2qImnyihM5Hh/sGvQ3K37dPi/w8sRhdNIxYA1TwFwc5mDhIJq+O0RsvXBKdQ==}
     dev: true
 
+  /tsconfck/2.1.1_typescript@4.9.5:
+    resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
+    engines: {node: ^14.13.1 || ^16 || >=18}
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.3.5 || ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 4.9.5
+    dev: true
+
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
@@ -3055,6 +3074,23 @@ packages:
       vitefu: 0.2.4_vite@3.2.5
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /vite-tsconfig-paths/4.2.0_mmfldfnusamjexuwtlvii3fpxu:
+    resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 2.1.1_typescript@4.9.5
+      vite: 3.2.5_@types+node@18.14.6
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
     dev: true
 
   /vite/3.2.5_@types+node@18.14.6:

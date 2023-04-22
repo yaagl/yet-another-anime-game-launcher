@@ -22,7 +22,7 @@ import {
 import { xattrRemove } from "./utils/unix";
 import { build } from "./command-builder";
 import { ensureHosts } from "./hosts";
-import { ENSURE_HOSTS } from "./constants/server_secret";
+import { ENSURE_HOSTS } from "./clients/secret";
 import cpu_db from "./constants/cpu_db";
 import { join } from "path-browserify";
 
@@ -171,23 +171,11 @@ export async function checkWine(github: Github) {
     //     wineUpdateTag: "crossover",
     //   } as const;
     // }
-    // FIXME: don't abuse import.meta.env
-    if (String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("bh3")) {
-      return {
-        wineReady: false,
-        wineUpdate: github.acceleratedPath(
-          "https://github.com/3Shain/winecx/releases/download/unstable-bh-wine-1.0.2/wine.tar.gz"
-        ),
-        wineUpdateTag: "unstable-bh-wine-1.0.2",
-      } as const;
-    }
     // FIXME:
     return {
       wineReady: false,
-      wineUpdate: github.acceleratedPath(
-        "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz"
-      ),
-      wineUpdateTag: "gi-wine-1.2",
+      wineUpdate: github.acceleratedPath(DEFAULT_WINE_DISTRO_URL),
+      wineUpdateTag: DEFAULT_WINE_DISTRO_TAG,
     } as const;
   }
 }
@@ -348,6 +336,7 @@ const MF_SRVS = ["colorcnv", "msmpeg2adec", "msmpeg2vdec"];
 
 import mf from "./constants/mf.reg?raw";
 import wmf from "./constants/wmf.reg?raw";
+import { DEFAULT_WINE_DISTRO_TAG, DEFAULT_WINE_DISTRO_URL } from "./clients";
 
 async function* installMediaFoundation(
   aria2: Aria2,

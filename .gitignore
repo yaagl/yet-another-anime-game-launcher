@@ -23,6 +23,8 @@ node_modules
 .vscode
 
 server_secret.ts
+**/*.secret.ts
+**/secret.ts
 
 yaaglwd
 yaaglwdos

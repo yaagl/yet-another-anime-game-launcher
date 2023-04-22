@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "strict": true,
     "target": "ESNext",
     "module": "ESNext",
@@ -11,7 +12,18 @@
     "types": ["vite/client"],
     "noEmit": true,
     "isolatedModules": true,
-    "skipLibCheck":true
+    "skipLibCheck":true,
+    "paths": {
+      "@config": ["src/config/index.tsx"],
+      "@config/*": ["src/config/*"],
+      "@locale": ["src/locale/index.ts"],
+      "@locale/*": ["src/locale/*"],
+      "@utils": ["src/utils/index.ts"],
+      "@constants": ["src/constants/index.ts"],
+      "@aria2": ["src/aria2.ts"],
+      "@wine": ["src/wine.tsx"],
+      "@common-update-ui": ["src/common-update-ui.tsx"],
+    }
   },
   "include": ["src/**/*.ts","src/**/*.tsx"]
 }

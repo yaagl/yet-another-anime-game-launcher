@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "YAAGL_CHANNEL_CLIENT=hk4ecn vite build",
     "build-hk4eos": "YAAGL_CHANNEL_CLIENT=hk4eos vite build",
+    "build-bh3glb": "YAAGL_CHANNEL_CLIENT=bh3glb vite build",
     "build-dev": "vite build --mode=\"development\"",
     "lint": "eslint ./src --ext .ts --ext .tsx",
     "format": "prettier -w ./src",
@@ -42,6 +43,7 @@
     "typescript": "^4.7.4",
     "vite": "^3.0.0",
     "vite-plugin-solid": "^2.3.0",
+    "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.29.7"
   }
 }
