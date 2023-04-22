@@ -13,7 +13,8 @@
     "build-dev": "vite build --mode=\"development\"",
     "lint": "eslint ./src --ext .ts --ext .tsx",
     "format": "prettier -w ./src",
-    "format-check": "prettier -c ./src"
+    "format-check": "prettier -c ./src",
+    "precommit": "tsc && pnpm run lint && pnpm run format-check"
   },
   "license": "MIT",
   "dependencies": {

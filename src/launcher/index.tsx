@@ -1,5 +1,5 @@
-import { createWineVersionChecker, Wine } from "./wine";
-import { openDir, fatal, open } from "./utils";
+import { createWineVersionChecker, Wine } from "@wine";
+import { openDir, fatal, open } from "@utils";
 import {
   Box,
   Button,
@@ -19,13 +19,13 @@ import {
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { createSignal, Show } from "solid-js";
-import { Locale } from "./locale";
-import { createConfiguration } from "./config";
-import { Github } from "./github";
-import { createGameInstallationDirectorySanitizer } from "./accidental-complexity";
-import { CommonUpdateProgram } from "./common-update-ui";
-import { ChannelClient } from "./channel-client";
+import { Show } from "solid-js";
+import { Locale } from "@locale";
+import { createConfiguration } from "@config";
+import { Github } from "../github";
+import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
+import { ChannelClient } from "../channel-client";
+import { createTaskQueueState } from "./task-queue";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -86,41 +86,20 @@ export async function createLauncher({
     const bh = 40;
     const bw = 136;
 
-    const [statusText, setStatusText] = createSignal("");
-    const [progress, setProgress] = createSignal(0);
-    const [programBusy, setBusy] = createSignal(false);
+    const [statusText, progress, programBusy, taskQueue] = createTaskQueueState(
+      { locale }
+    );
+    taskQueue.next(() => init(config));
+
+    const [
+      nonUrgentStatusText,
+      nonUrgentProgress,
+      nonUrgentProgramBusy,
+      nonUrgentTaskQueue,
+    ] = createTaskQueueState({ locale });
 
     const { isOpen, onOpen, onClose } = createDisclosure();
 
-    const taskQueue: AsyncGenerator<unknown, void, () => CommonUpdateProgram> =
-      (async function* () {
-        while (true) {
-          const task = yield 0;
-          setBusy(true);
-          try {
-            for await (const text of task()) {
-              switch (text[0]) {
-                case "setProgress":
-                  setProgress(text[1]);
-                  break;
-                case "setUndeterminedProgress":
-                  setProgress(0);
-                  break;
-                case "setStateText":
-                  setStatusText(locale.format(text[1], text.slice(2)));
-                  break;
-              }
-            }
-          } catch (e) {
-            // fatal
-            await fatal(e);
-            return;
-          }
-          setBusy(false);
-        }
-      })();
-    taskQueue.next(); // ignored anyway
-    taskQueue.next(() => init(config));
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (installState() == "INSTALLED") {
@@ -135,41 +114,6 @@ export async function createLauncher({
         taskQueue.next(() => install(selection));
       }
     }
-
-    const [nonUrgentStatusText, setNonUrgentStatusText] = createSignal("");
-    const [nonUrgentProgress, setNonUrgentProgress] = createSignal(0);
-    const [nonUrgentProgramBusy, setNonUrgentBusy] = createSignal(false);
-    const nonUrgentTaskQueue: AsyncGenerator<
-      unknown,
-      void,
-      () => CommonUpdateProgram
-    > = (async function* () {
-      while (true) {
-        const task = yield 0;
-        setNonUrgentBusy(true);
-        try {
-          for await (const text of task()) {
-            switch (text[0]) {
-              case "setProgress":
-                setNonUrgentProgress(text[1]);
-                break;
-              case "setUndeterminedProgress":
-                setNonUrgentProgress(0);
-                break;
-              case "setStateText":
-                setNonUrgentStatusText(locale.format(text[1], text.slice(2)));
-                break;
-            }
-          }
-        } catch (e) {
-          // fatal
-          await fatal(e);
-          return;
-        }
-        setNonUrgentBusy(false);
-      }
-    })();
-    nonUrgentTaskQueue.next(); // ignored anyway
 
     return (
       <div
