@@ -93,9 +93,9 @@ export async function* patchProgram(
     await cp(`./dxvk/${f.name}.dll`, join(system32Dir, f.name + ".dll"));
   }
   if (config.reshade) {
-    await cp(await resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
+    await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
-      await resolve("./reshade/d3dcompiler_47.dll"),
+      resolve("./reshade/d3dcompiler_47.dll"),
       join(gameDir, "d3dcompiler_47.dll")
     );
   }

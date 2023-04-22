@@ -221,7 +221,7 @@ export async function createWineInstallProgram({
   wineTag: string;
 }) {
   async function* program(): CommonUpdateProgram {
-    const wineBinaryDir = await resolve("./wine");
+    const wineBinaryDir = resolve("./wine");
 
     await rmrf_dangerously(wineAbsPrefix);
     if (wineTag === "crossover") {
@@ -232,7 +232,7 @@ export async function createWineInstallProgram({
       yield ["setUndeterminedProgress"];
     } else {
       yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-      const wineTarPath = await resolve("./wine.tar.gz");
+      const wineTarPath = resolve("./wine.tar.gz");
       for await (const progress of aria2.doStreamingDownload({
         uri: wineUpdateTarGzFile,
         absDst: wineTarPath,
@@ -253,7 +253,7 @@ export async function createWineInstallProgram({
       yield ["setUndeterminedProgress"];
       await rmrf_dangerously(wineBinaryDir);
       await unixExec(["mkdir", "-p", wineBinaryDir]);
-      await tar_extract(await resolve("./wine.tar.gz"), wineBinaryDir);
+      await tar_extract(resolve("./wine.tar.gz"), wineBinaryDir);
       await removeFile(wineTarPath);
 
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
@@ -264,7 +264,7 @@ export async function createWineInstallProgram({
     const wine64Bin =
       wineTag === "crossover"
         ? CROSSOVER_LOADER
-        : await resolve("./wine/bin/wine64");
+        : resolve("./wine/bin/wine64");
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,
@@ -393,7 +393,7 @@ async function* installMediaFoundation(
   await writeFile("mf.reg", mf);
   await wine.exec(
     "regedit",
-    [wine.toWinePath(await resolve("mf.reg"))],
+    [wine.toWinePath(resolve("mf.reg"))],
     {},
     "/dev/null"
   );
@@ -401,7 +401,7 @@ async function* installMediaFoundation(
   await writeFile("wmf.reg", wmf);
   await wine.exec(
     "regedit",
-    [wine.toWinePath(await resolve("wmf.reg"))],
+    [wine.toWinePath(resolve("wmf.reg"))],
     {},
     "/dev/null"
   );

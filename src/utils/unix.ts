@@ -4,14 +4,14 @@ import { exec, spawn, resolve, log } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
   return await exec(
-    [`xattr`, "-r", "-d", attr, `${await resolve(path)}`],
+    [`xattr`, "-r", "-d", attr, `${resolve(path)}`],
     {},
     true
   );
 }
 
 export async function md5(path: string): Promise<string> {
-  const p = await exec(["md5", "-q", await resolve(path)]);
+  const p = await exec(["md5", "-q", resolve(path)]);
   return p.stdOut.split("\n")[0];
 }
 
@@ -21,7 +21,7 @@ export async function xdelta3(
   targetFile: string
 ): Promise<Neutralino.os.ExecCommandResult> {
   return await exec([
-    await resolve("./sidecar/xdelta/xdelta3"),
+    resolve("./sidecar/xdelta/xdelta3"),
     "-d",
     "-s",
     originalFile,
@@ -36,7 +36,7 @@ export async function hpatchz(
   targetFile: string
 ) {
   return await exec([
-    await resolve("./sidecar/hpatchz/hpatchz"),
+    resolve("./sidecar/hpatchz/hpatchz"),
     "-f",
     originalFile,
     patchFile,
@@ -53,7 +53,7 @@ export async function* doStreamUnzip(
   source: string,
   destination: string
 ): AsyncGenerator<readonly [number, number], void, unknown> {
-  const logFile = await resolve("decompress.log");
+  const logFile = resolve("decompress.log");
   let processExit = false,
     processExitCode = 0;
 
@@ -117,7 +117,7 @@ export async function* doStreamUnzip(
 
 export async function extract7z(source: string, destination: string) {
   return await exec([
-    await resolve("./sidecar/7z/7zz"),
+    resolve("./sidecar/7z/7zz"),
     "x",
     source,
     `-o${destination}`,

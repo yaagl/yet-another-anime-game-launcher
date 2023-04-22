@@ -197,7 +197,7 @@ export async function createConfiguration({
                       size="sm"
                       onClick={async () =>
                         await exec2(
-                          ["open", await resolve("./")],
+                          ["open", resolve("./")],
                           {},
                           false,
                           "/dev/null"

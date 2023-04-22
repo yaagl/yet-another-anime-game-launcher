@@ -29,7 +29,7 @@ export async function* checkAndDownloadMoltenVK(
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
     uri: "https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/libMoltenVK.dylib",
-    absDst: await resolve("./moltenvk/libMoltenVK.dylib"),
+    absDst: resolve("./moltenvk/libMoltenVK.dylib"),
   })) {
     yield [
       "setProgress",
@@ -62,7 +62,7 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   for (const file of dxvkFiles) {
     for await (const progress of aria2.doStreamingDownload({
       uri: `https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/${file}`,
-      absDst: await resolve(`./dxvk/${file}`),
+      absDst: resolve(`./dxvk/${file}`),
     })) {
       yield [
         "setProgress",
@@ -98,7 +98,7 @@ export async function* checkAndDownloadFpsUnlocker(
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
     uri: "https://github.com/y0soro/genshin-force-fps-rs/releases/download/v0.1.2/genshin-force-fps.exe",
-    absDst: await resolve("./fpsunlock/genshin-force-fps.exe"),
+    absDst: resolve("./fpsunlock/genshin-force-fps.exe"),
   })) {
     yield [
       "setProgress",

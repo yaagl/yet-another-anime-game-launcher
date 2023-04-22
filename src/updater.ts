@@ -51,7 +51,7 @@ export async function* downloadProgram(
   yield ["setStateText", "DOWNLOADING_UPDATE_FILE"];
   for await (const progress of aria2.doStreamingDownload({
     uri: url,
-    absDst: await resolve("./resources.neu.update"),
+    absDst: resolve("./resources.neu.update"),
   })) {
     yield [
       "setProgress",

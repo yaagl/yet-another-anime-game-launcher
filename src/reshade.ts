@@ -23,7 +23,7 @@ export async function* checkAndDownloadReshade(
   wine: Wine,
   gameDir: string
 ): CommonUpdateProgram {
-  const reshaderDir = await resolve("./reshade");
+  const reshaderDir = resolve("./reshade");
 
   if (
     eq(
@@ -95,8 +95,8 @@ export async function* checkAndDownloadReshade(
   writeFile(
     join(gameDir, "ReShade.ini"),
     `[GENERAL]
-EffectSearchPaths=${wine.toWinePath(await resolve("./reshade/Shaders"))}
-TextureSearchPaths=${wine.toWinePath(await resolve("./reshade/Textures"))}`
+EffectSearchPaths=${wine.toWinePath(resolve("./reshade/Shaders"))}
+TextureSearchPaths=${wine.toWinePath(resolve("./reshade/Textures"))}`
   );
 
   setKey("installed_reshade", CURRENT_RESHADE_VERSION);

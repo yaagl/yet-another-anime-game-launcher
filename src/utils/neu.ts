@@ -1,7 +1,7 @@
 import { join } from "path-browserify";
 import { build, CommandSegments, rawString } from "../command-builder";
 
-export async function resolve(path: string) {
+export function resolve(path: string): string {
   if (!path.startsWith("/")) {
     path = join(
       import.meta.env.PROD
@@ -164,15 +164,15 @@ export async function fatal(error: unknown) {
 }
 
 export async function appendFile(path: string, content: string) {
-  await Neutralino.filesystem.appendFile(await resolve(path), content);
+  await Neutralino.filesystem.appendFile(resolve(path), content);
 }
 
 export async function forceMove(source: string, destination: string) {
   return await exec([
     "mv",
     "-f",
-    `${await resolve(source)}`,
-    `${await resolve(destination)}`,
+    `${resolve(source)}`,
+    `${resolve(destination)}`,
   ]);
 }
 
@@ -180,8 +180,8 @@ export async function cp(source: string, destination: string) {
   return await exec([
     "cp",
     "-p",
-    `${await resolve(source)}`,
-    `${await resolve(destination)}`,
+    `${resolve(source)}`,
+    `${resolve(destination)}`,
   ]);
 }
 
@@ -204,11 +204,11 @@ export async function openDir(title: string) {
 }
 
 export async function readBinary(path: string) {
-  return await Neutralino.filesystem.readBinaryFile(await resolve(path));
+  return await Neutralino.filesystem.readBinaryFile(resolve(path));
 }
 
 export async function readAllLines(path: string) {
-  const content = await Neutralino.filesystem.readFile(await resolve(path));
+  const content = await Neutralino.filesystem.readFile(resolve(path));
   if (content.indexOf("\r\n") >= 0) {
     return content.split("\r\n");
   }
@@ -217,11 +217,11 @@ export async function readAllLines(path: string) {
 
 export async function readAllLinesIfExists(path: string) {
   try {
-    await stats(await resolve(path));
+    await stats(resolve(path));
   } catch {
     return [];
   }
-  const content = await Neutralino.filesystem.readFile(await resolve(path));
+  const content = await Neutralino.filesystem.readFile(resolve(path));
   if (content.indexOf("\r\n") >= 0) {
     return content.split("\r\n");
   }
@@ -229,28 +229,28 @@ export async function readAllLinesIfExists(path: string) {
 }
 
 export async function writeBinary(path: string, data: ArrayBuffer) {
-  return await Neutralino.filesystem.writeBinaryFile(await resolve(path), data);
+  return await Neutralino.filesystem.writeBinaryFile(resolve(path), data);
 }
 
 export async function writeFile(path: string, data: string) {
-  return await Neutralino.filesystem.writeFile(await resolve(path), data);
+  return await Neutralino.filesystem.writeFile(resolve(path), data);
 }
 
 export async function removeFile(path: string) {
-  return await Neutralino.filesystem.removeFile(await resolve(path));
+  return await Neutralino.filesystem.removeFile(resolve(path));
 }
 
 export async function removeFileIfExists(path: string) {
   try {
-    await stats(await resolve(path));
+    await stats(resolve(path));
   } catch {
     return;
   }
-  return await Neutralino.filesystem.removeFile(await resolve(path));
+  return await Neutralino.filesystem.removeFile(resolve(path));
 }
 
 export async function stats(path: string) {
-  return await Neutralino.filesystem.getStats(await resolve(path));
+  return await Neutralino.filesystem.getStats(resolve(path));
 }
 
 export async function fileOrDirExists(path: string) {

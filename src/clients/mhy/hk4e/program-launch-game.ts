@@ -38,17 +38,17 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await putLocal(a, await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  await putLocal(a, resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   if (config.retina) {
-    await putLocal(retina_on, await resolve("retina.reg"));
+    await putLocal(retina_on, resolve("retina.reg"));
   } else {
-    await putLocal(retina_off, await resolve("retina.reg"));
+    await putLocal(retina_off, resolve("retina.reg"));
   }
 
   if (config.leftCmd) {
-    await putLocal(left_cmd_on, await resolve("left_cmd.reg"));
+    await putLocal(left_cmd_on, resolve("left_cmd.reg"));
   } else {
-    await putLocal(left_cmd_off, await resolve("left_cmd.reg"));
+    await putLocal(left_cmd_off, resolve("left_cmd.reg"));
   }
 
   const cmd = `@echo off
@@ -64,7 +64,7 @@ cd /d "${wine.toWinePath(gameDir)}"
 ${await (async () => {
   if (config.fpsUnlock !== "default") {
     return `"${wine.toWinePath(
-      await resolve("./fpsunlock/genshin-force-fps.exe")
+      resolve("./fpsunlock/genshin-force-fps.exe")
     )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
       join(gameDir, gameExecutable)
     )}"`;
@@ -72,17 +72,17 @@ ${await (async () => {
     return `"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
   }
 })()}`;
-  await writeFile(await resolve("config.bat"), cmd);
+  await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
-  await mkdirp(await resolve("./logs"));
-  const yaaglDir = await resolve("./");
+  await mkdirp(resolve("./logs"));
+  const yaaglDir = resolve("./");
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = await resolve(`./logs/game_${Date.now()}.log`);
+    const logfile = resolve(`./logs/game_${Date.now()}.log`);
     await Promise.all([
       wine.exec2(
         "cmd",
-        ["/c", `${wine.toWinePath(await resolve("./config.bat"))}`],
+        ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
         {
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
@@ -118,10 +118,10 @@ ${await (async () => {
     await log(String(e));
   }
 
-  await removeFile(await resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(await resolve("retina.reg"));
-  await removeFile(await resolve("left_cmd.reg"));
-  await removeFile(await resolve("config.bat"));
+  await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  await removeFile(resolve("retina.reg"));
+  await removeFile(resolve("left_cmd.reg"));
+  await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine.prefix, server, config);
 }

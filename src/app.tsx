@@ -34,7 +34,7 @@ export async function createApp() {
 
   const locale = await createLocale();
   const github = await createGithubEndpoint();
-  const aria2_session = await resolve("./aria2.session");
+  const aria2_session = resolve("./aria2.session");
   await appendFile(aria2_session, "");
   const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
   const { pid: apid } = await spawn([
@@ -92,14 +92,14 @@ export async function createApp() {
   const { wineReady, wineUpdate, wineUpdateTag, wineTag } = await checkWine(
     github
   );
-  const prefixPath = await resolve("./wineprefix"); // CHECK: hardcoded path?
+  const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
 
   if (wineReady) {
     const wine = await createWine({
       loaderBin:
         wineTag == "crossover"
           ? CROSSOVER_LOADER
-          : await resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
+          : resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
     });
     return await createLauncher({

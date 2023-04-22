@@ -38,15 +38,15 @@ export async function* launchGameProgram({
   yield ["setStateText", "PATCHING"];
 
   if (config.retina) {
-    await putLocal(retina_on, await resolve("retina.reg"));
+    await putLocal(retina_on, resolve("retina.reg"));
   } else {
-    await putLocal(retina_off, await resolve("retina.reg"));
+    await putLocal(retina_off, resolve("retina.reg"));
   }
 
   if (config.leftCmd) {
-    await putLocal(left_cmd_on, await resolve("left_cmd.reg"));
+    await putLocal(left_cmd_on, resolve("left_cmd.reg"));
   } else {
-    await putLocal(left_cmd_off, await resolve("left_cmd.reg"));
+    await putLocal(left_cmd_off, resolve("left_cmd.reg"));
   }
 
   const cmd = `@echo off
@@ -55,17 +55,17 @@ regedit retina.reg
 regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
 ${wine.toWinePath(join(gameDir, gameExecutable))}`;
-  await writeFile(await resolve("config.bat"), cmd);
+  await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine.prefix, server, config);
-  await mkdirp(await resolve("./logs"));
+  await mkdirp(resolve("./logs"));
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = await resolve(`./logs/game_${Date.now()}.log`);
-    const yaaglDir = await resolve("./");
+    const logfile = resolve(`./logs/game_${Date.now()}.log`);
+    const yaaglDir = resolve("./");
     await Promise.all([
       wine.exec2(
         "cmd",
-        ["/c", `${wine.toWinePath(await resolve("./config.bat"))}`],
+        ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
         {
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
@@ -101,9 +101,9 @@ ${wine.toWinePath(join(gameDir, gameExecutable))}`;
     await log(String(e));
   }
 
-  await removeFile(await resolve("retina.reg"));
-  await removeFile(await resolve("left_cmd.reg"));
-  await removeFile(await resolve("config.bat"));
+  await removeFile(resolve("retina.reg"));
+  await removeFile(resolve("left_cmd.reg"));
+  await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine.prefix, server, config);
 }
