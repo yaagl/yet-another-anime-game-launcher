@@ -24,6 +24,16 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       bundleId = config.applicationId + ".os";
       appDistributionName = config.cli.binaryName + " OS";
       break;
+    case "hkrpgcn":
+      bundleId = config.applicationId + ".hkrpg.cn";
+      appDistributionName = config.cli.binaryName + " HSR";
+      config.modes.window.icon = "/src/icons/March7th.cr.png";
+      break;
+    case "hkrpgos":
+      bundleId = config.applicationId + ".hkrpg.os";
+      appDistributionName = config.cli.binaryName + " HSR OS";
+      config.modes.window.icon = "/src/icons/March7th.cr.png";
+      break;
     case "bh3glb":
       bundleId = config.applicationId + ".bh3.glb";
       appDistributionName = config.cli.binaryName + " Honkai Global";

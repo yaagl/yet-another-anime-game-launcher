@@ -22,6 +22,42 @@ export async function getGameVersion(gameDataDir: string) {
   }
 }
 
+export async function getGameVersion2019(gameDataDir: string) {
+  const ggmPath = join(gameDataDir, "data.unity3d");
+  const view = new Uint8Array(await readBinary(ggmPath));
+  const index = binaryPatternSearch(
+    view,
+    [0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x2e, 0x67]
+  );
+  if (index == -1) {
+    throw new Error("pattern not found"); //FIXME
+  } else {
+    let str = "";
+    let offset = 0;
+    for (let i = 0; i < 3; i++) {
+      for (;;) {
+        const w = view[index + 0x40 + offset];
+        if (w - 48 == -2) {
+          // dot
+          str += ".";
+          offset++;
+          break;
+        } else if (w - 48 >= 0 && w - 48 < 10) {
+          // decimal
+          str += String.fromCharCode(w);
+          offset++;
+          continue;
+        } else if (i == 2) {
+          return str;
+        } else {
+          throw new Error("Falied to parse version");
+        }
+      }
+    }
+    throw new Error("Assertation: unreachable");
+  }
+}
+
 export async function disableUnityFeature(ggmPath: string) {
   const view = new Uint8Array(await readBinary(ggmPath));
   const index = binaryPatternSearch(
