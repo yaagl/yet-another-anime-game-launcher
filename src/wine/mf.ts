@@ -2,8 +2,14 @@ import mf from "../constants/mf.reg?raw";
 import wmf from "../constants/wmf.reg?raw";
 import { Aria2 } from "@aria2";
 import { CommonUpdateProgram } from "@common-update-ui";
-import { humanFileSize, forceMove, removeFile, writeFile } from "@utils";
-import { join, resolve } from "path-browserify";
+import {
+  humanFileSize,
+  forceMove,
+  removeFile,
+  writeFile,
+  resolve,
+} from "@utils";
+import { join } from "path-browserify";
 import { Wine } from "./wine";
 
 const MF_DLLS = [

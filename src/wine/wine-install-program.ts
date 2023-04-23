@@ -10,8 +10,8 @@ import {
   setKey,
   exec,
   generateRandomString,
+  resolve,
 } from "@utils";
-import { resolve } from "path-browserify";
 import { ENSURE_HOSTS } from "../clients/secret";
 import { CROSSOVER_LOADER, CROSSOVER_DATA } from "./crossover";
 import { ensureHosts } from "../hosts";
