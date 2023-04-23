@@ -14,7 +14,7 @@ export async function getGameVersion(gameDataDir: string) {
   if (index == -1) {
     throw new Error("pattern not found"); //FIXME
   } else {
-    const len = index + 120;
+    const len = index + 0x88;
     const v = new DataView(view.buffer);
     const strlen = v.getUint32(len, true);
     const str = String.fromCharCode(...view.slice(len + 4, len + strlen + 4));
@@ -34,7 +34,7 @@ export async function disableUnityFeature(ggmPath: string) {
   if (index == -1) {
     throw new Error("pattern not found"); //FIXME
   } else {
-    const len = index + 8;
+    const len = index + 24;
     const v = new DataView(view.buffer);
     v.setInt32(len, 0, true);
     return view.buffer;

@@ -98,7 +98,7 @@ export function binaryPatternSearch(view: Uint8Array, pattern: number[]) {
     for (let j = 0; j < pattern.length; j++) {
       if (view[i + j] != pattern[j]) continue retry;
     }
-    return i + pattern.length;
+    return i;
   }
   return -1;
 }
