@@ -64,7 +64,7 @@ jobs:
           tar -zcf Yaagl.app.tar.gz Yaagl.app
           tar -zcf "Yaagl OS.app.tar.gz" "Yaagl OS.app"
           tar -zcf "Yaagl Honkai Global.app.tar.gz" "Yaagl Honkai Global.app"
-          tar -zcf "Yaagl HSR.tar.gz" "Yaagl HSR.app"
+          tar -zcf "Yaagl HSR.app.tar.gz" "Yaagl HSR.app"
           tar -zcf "Yaagl HSR OS.app.tar.gz" "Yaagl HSR OS.app"
       - name: Generate prerelease
         uses: "marvinpinto/action-automatic-releases@latest"
