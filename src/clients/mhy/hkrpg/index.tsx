@@ -42,7 +42,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "0.0.0";
+const CURRENT_SUPPORTED_VERSION = "1.0.5";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -186,11 +186,11 @@ export async function createHKRPGChannelClient({
         await setKey("game_install_dir", selection);
         // FIXME: perform a integrity check?
       } else {
-        yield* checkIntegrityProgram({
-          aria2,
-          gameDir: selection,
-          remoteDir: decompressed_path,
-        });
+        // yield* checkIntegrityProgram({
+        //   aria2,
+        //   gameDir: selection,
+        //   remoteDir: decompressed_path,
+        // });
         // setGameInstalled
         batch(() => {
           setInstalled("INSTALLED");

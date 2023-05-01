@@ -46,7 +46,7 @@ regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
 ${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
   await writeFile(resolve("config.bat"), cmd);
-  // yield* patchProgram(gameDir, wine.prefix, server, config);
+  yield* patchProgram(gameDir, wine.prefix, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
   try {
@@ -80,5 +80,5 @@ ${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
-  // yield* patchRevertProgram(gameDir, wine.prefix, server, config);
+  yield* patchRevertProgram(gameDir, wine.prefix, server, config);
 }

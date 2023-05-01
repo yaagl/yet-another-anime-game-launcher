@@ -6,6 +6,10 @@ rm -rf "$EXTERNAL"
 mkdir -p "$EXTERNAL/hk4e"
 mkdir -p "$EXTERNAL/bh3/diffs"
 mkdir -p "$EXTERNAL/bh3/files"
+mkdir -p "$EXTERNAL/hkrpg/cn/diffs"
+mkdir -p "$EXTERNAL/hkrpg/cn/files"
+mkdir -p "$EXTERNAL/hkrpg/os/diffs"
+mkdir -p "$EXTERNAL/hkrpg/os/files"
 
 mkdir -p "$EXTERNAL/hk4e"
 mkdir -p ./tmp
@@ -15,6 +19,12 @@ rm -rf ./tmp
 git clone $(echo "aHR0cHM6Ly9ub3RhYnVnLm9yZy9ta3JzeW0xL2R1c2s=" | base64 --decode) ./tmp
 cp -R ./tmp/diffs/. "$EXTERNAL/bh3/diffs"
 cp -R ./tmp/files/. "$EXTERNAL/bh3/files"
+rm -rf ./tmp
+git clone $(echo "aHR0cHM6Ly9ub3RhYnVnLm9yZy9ta3JzeW0xL2FzdHJh" | base64 --decode) ./tmp
+cp -R ./tmp/cn/diffs/. "$EXTERNAL/hkrpg/cn/diffs"
+cp -R ./tmp/cn/files/. "$EXTERNAL/hkrpg/cn/files"
+cp -R ./tmp/os/diffs/. "$EXTERNAL/hkrpg/os/diffs"
+cp -R ./tmp/os/files/. "$EXTERNAL/hkrpg/os/files"
 rm -rf ./tmp
 pushd "$EXTERNAL/hk4e"
 # for file in * ; do echo "$file" "$(basename $file | base64 )"."${file##*.}" ; done
@@ -27,6 +37,24 @@ pushd "$EXTERNAL/bh3/files/Generated"
 for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
 popd
 pushd "$EXTERNAL/bh3/files"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/cn/diffs"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/cn/files/Generated"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/cn/files"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/os/diffs"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/os/files/Generated"
+for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
+popd
+pushd "$EXTERNAL/hkrpg/os/files"
 for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
 popd
 

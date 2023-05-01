@@ -74,16 +74,19 @@ export async function* patchProgram(
       await putLocal(file.url, join(gameDir, file.file));
     }
   }
-  await forceMove(
-    join(gameDir, server.dataDir, "globalgamemanagers"),
-    join(gameDir, server.dataDir, "globalgamemanagers.bak")
-  );
-  writeBinary(
-    join(gameDir, server.dataDir, "globalgamemanagers"),
-    await disableUnityFeature(
+  // FIXME: dirty hack
+  if (["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1) {
+    await forceMove(
+      join(gameDir, server.dataDir, "globalgamemanagers"),
       join(gameDir, server.dataDir, "globalgamemanagers.bak")
-    )
-  );
+    );
+    writeBinary(
+      join(gameDir, server.dataDir, "globalgamemanagers"),
+      await disableUnityFeature(
+        join(gameDir, server.dataDir, "globalgamemanagers.bak")
+      )
+    );
+  }
   const system32Dir = join(winprefixDir, "drive_c", "windows", "system32");
   for (const f of dxvkFiles) {
     await forceMove(
@@ -133,10 +136,13 @@ export async function* patchRevertProgram(
       }
     }
   }
-  await forceMove(
-    join(gameDir, server.dataDir, "globalgamemanagers.bak"),
-    join(gameDir, server.dataDir, "globalgamemanagers")
-  );
+  // FIXME: dirty hack
+  if (["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1) {
+    await forceMove(
+      join(gameDir, server.dataDir, "globalgamemanagers.bak"),
+      join(gameDir, server.dataDir, "globalgamemanagers")
+    );
+  }
   const system32Dir = join(winprefixDir, "drive_c", "windows", "system32");
   for (const f of dxvkFiles) {
     await forceMove(
