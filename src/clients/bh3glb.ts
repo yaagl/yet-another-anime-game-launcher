@@ -8,11 +8,11 @@ export const DEFAULT_WINE_DISTRO_TAG = "unstable-bh-wine-1.0.2";
 
 export const UPDATE_UI_IMAGE = s2;
 
-import x from "../../external/bh3/diffs/QkgzQmFzZS5kbGwudmNkaWZmCg==.vcdiff?url";
-import y from "../../external/bh3/diffs/VW5pdHlQbGF5ZXIuZGxsLnZjZGlmZgo=.vcdiff?url";
-import a0 from "../../external/bh3/files/VFZNQm9vdHN0cmFwLmRsbAo=.dll?url";
-import a1 from "../../external/bh3/files/R2VuZXJhdGVkCg==.Generated/dHZtX2FsbG9jYXRpb25fdGFibGUuZGF0Cg==.dat?url";
-import a2 from "../../external/bh3/files/R2VuZXJhdGVkCg==.Generated/dHZtX2VudHJ5X3RhYmxlLmRhdAo=.dat?url";
+import x from "../../external/bh3/glb/diffs/QkgzQmFzZS5kbGwudmNkaWZmCg==.vcdiff?url";
+import y from "../../external/bh3/glb/diffs/VW5pdHlQbGF5ZXIuZGxsLnZjZGlmZgo=.vcdiff?url";
+import a0 from "../../external/bh3/glb/files/VFZNQm9vdHN0cmFwLmRsbAo=.dll?url";
+import a1 from "../../external/bh3/glb/files/R2VuZXJhdGVkCg==.Generated/dHZtX2FsbG9jYXRpb25fdGFibGUuZGF0Cg==.dat?url";
+import a2 from "../../external/bh3/glb/files/R2VuZXJhdGVkCg==.Generated/dHZtX2VudHJ5X3RhYmxlLmRhdAo=.dat?url";
 import { Server } from "@constants";
 import {
   DLL4,
