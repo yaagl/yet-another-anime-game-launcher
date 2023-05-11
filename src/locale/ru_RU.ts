@@ -54,13 +54,13 @@ export const ru_RU: typeof zh_CN = {
 
   RELAUNCH_REQUIRED: "Требуется повторный запуск",
   RELAUNCH_REQUIRED_DESC:
-    "Программа запуска перезагрузится, чтобы выполнить установку wine.",
+    "Программа запуска перезагрузится, чтобы выполнить установку Wine.",
 
   SETTING: "Настройки",
   SETTING_WINE_VERSION: "Дистрибутив Wine",
   SETTING_ASYNC_DXVK: "Асинхронная компиляция шейдера DXVK",
   SETTING_ENABLED: "Включено",
-  SETTING_DXVK_HUD: "Овелэй DXVK",
+  SETTING_DXVK_HUD: "Оверлэй DXVK",
   SETTING_DXVK_HUD_NONE: "Ничего",
   SETTING_DXVK_HUD_FPS: "Только FPS",
   SETTING_DXVK_HUD_ALL: "Всё",
@@ -83,7 +83,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Откройте каталог данных Yaagl",
 
   SETTING_WINE_CROSSOVER_ALERT:
-    "Чтобы использовать crossover, существует дополнительный шаг, который необходимо выполнить вручную. Нажмите на это поле, чтобы ознакомиться с подробностями.",
+    "Чтобы использовать CrossOver, существует дополнительный шаг, который необходимо выполнить вручную. Нажмите на это поле, чтобы ознакомиться с подробностями.",
 
   SETTING_FPS_UNLOCK: "Разблокируйте FPS лимит",
   SETTING_FPS_UNLOCK_DEFAULT: "Выключено",
