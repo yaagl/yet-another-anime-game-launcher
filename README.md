@@ -3,12 +3,14 @@
 
 |  |  |
 | --- | --- |
-| ![](/docs/screenshot36.png) | ![](/docs/sc65.png) |
+| ![](/docs/hk4e37.png) | ![](/docs/bh66.png) |
+| ![](/docs/hsr105.png) |  |
 
 
 ## Current Supported Game Version: 
-### GI: 3.6.0 OS/CN
-### HI: 6.5.0 Global
+### GI: 3.7.0 OS/CN
+### HI: 6.6.0 Global
+### HSR: 1.0.5 OS/CN (For Intel Mac Only)
 
 ## Policy
 
