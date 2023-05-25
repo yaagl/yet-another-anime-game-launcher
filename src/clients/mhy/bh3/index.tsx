@@ -40,7 +40,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "6.5.0";
+const CURRENT_SUPPORTED_VERSION = "6.6.0";
 
 export async function createBH3ChannelClient({
   server,
