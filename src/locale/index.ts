@@ -25,7 +25,7 @@ export async function createLocale() {
   try {
     lang = (await getKey("config_uiLocale")).toLowerCase();
   } catch {
-    lang = navigator.language.replaceAll("-", "_").toLowerCase();
+    lang = `${navigator.language}`.replaceAll("-", "_").toLowerCase();
     if (lang == "") {
       lang = "en";
     } else {

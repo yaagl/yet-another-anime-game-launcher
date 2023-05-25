@@ -93,7 +93,7 @@ export function runInSudo(cmd: string) {
       "do",
       "shell",
       "script",
-      `"${cmd.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`,
+      `"${`${cmd}`.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`,
       "with",
       "administrator",
       "privileges",
@@ -281,6 +281,15 @@ export function getCPUInfo() {
 export function open(url: string) {
   return Neutralino.os.open(url);
 }
+
+export const sha1sum = async (message: string) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-1", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join(""); // convert bytes to hex string
+  return hashHex;
+};
 
 const hooks: Array<(forced: boolean) => Promise<boolean>> = [];
 

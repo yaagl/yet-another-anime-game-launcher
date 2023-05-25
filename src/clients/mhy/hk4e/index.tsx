@@ -42,7 +42,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "3.6.0";
+const CURRENT_SUPPORTED_VERSION = "3.7.0";
 
 export async function createHK4EChannelClient({
   server,
@@ -73,7 +73,7 @@ export async function createHK4EChannelClient({
         diffs,
         latest: {
           version: GAME_LATEST_VERSION,
-          path,
+          segments,
           decompressed_path,
           voice_packs,
           size,
@@ -140,7 +140,7 @@ export async function createHK4EChannelClient({
         yield* downloadAndInstallGameProgram({
           aria2,
           gameDir: selection,
-          gameFileZip: path,
+          gameSegmentZips: segments.map(x => x.path),
           // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
           //   .path,
           gameVersion: GAME_LATEST_VERSION,

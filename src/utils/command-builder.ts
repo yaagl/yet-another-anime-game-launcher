@@ -7,7 +7,7 @@ export type CommandSegments = (
 )[];
 
 const sanitize = (str: string) =>
-  str
+  `${str}`
     .replaceAll("\\", "\\\\")
     .replaceAll(" ", "\\ ")
     .replaceAll('"', '\\"')

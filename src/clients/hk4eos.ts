@@ -1,7 +1,6 @@
 import { Server } from "@constants";
 
 import d from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
-import f from "../../external/hk4e/eGx1YV9wYXRjaF9vcy52Y2RpZmYK.vcdiff?url";
 
 import s from "../assets/Nahida.cr.png";
 
@@ -40,11 +39,11 @@ export const SERVER_DEFINITION: Server = {
       file: DLL1,
       diffUrl: d,
     },
-    {
-      file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
-      diffUrl: f,
-      tag: "workaround3",
-    },
+    // {
+    //   file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
+    //   diffUrl: f,
+    //   tag: "workaround3",
+    // },
   ],
   removed: [
     {

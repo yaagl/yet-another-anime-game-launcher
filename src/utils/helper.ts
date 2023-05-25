@@ -35,7 +35,7 @@ export async function sha256_16(str: string) {
 }
 
 export function formatString(str: string, intrp: string[]) {
-  return str.replace(/{(\d+)}/g, function (match, number) {
+  return `${str}`.replace(/{(\d+)}/g, function (match, number) {
     return typeof intrp[number] != "undefined" ? intrp[number] : match;
   });
 }

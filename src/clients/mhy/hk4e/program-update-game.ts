@@ -18,18 +18,11 @@ import {
   exec,
   getKeyOrDefault,
   fileOrDirExists,
-} from "../../../utils";
+  sha1sum,
+} from "@utils";
 import { gte } from "semver";
 
 //https://stackoverflow.com/a/69399958
-const sha1sum = async (message: string) => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hashBuffer = await crypto.subtle.digest("SHA-1", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join(""); // convert bytes to hex string
-  return hashHex;
-};
 
 async function* downloadAndPatch(
   updateFileZip: string,

@@ -59,13 +59,13 @@ export async function createWine(options: {
   }
 
   function toWinePath(absPath: string) {
-    return "Z:" + absPath.replaceAll("/", "\\");
+    return "Z:" + `${absPath}`.replaceAll("/", "\\");
   }
 
   function getEnvironmentVariables() {
     return {
       WINEESYNC: "1",
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
+      WINEDEBUG: "fixme-all,err-unwind,+timestamp,trace+seh",
       WINEPREFIX: options.prefix,
       GIWINEPCNAME: `${netbiosname}`,
       ...fakeCpu,

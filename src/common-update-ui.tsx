@@ -70,7 +70,10 @@ export function createCommonUpdateUI(
   };
 }
 
-export type CommonUpdateProgram = AsyncGenerator<CommonProgressUICommand, void>;
+export type CommonUpdateProgram<Ret = void> = AsyncGenerator<
+  CommonProgressUICommand,
+  Ret
+>;
 
 export type CommonProgressUICommand =
   | ["setProgress", number]
