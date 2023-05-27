@@ -1,7 +1,7 @@
 import { Server } from "@constants";
+
 import b from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
 import c from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
-import e from "../../external/hk4e/eGx1YV9wYXRjaF9jbi52Y2RpZmYK.vcdiff?url";
 
 import s from "../assets/Nahida.cr.png";
 
@@ -24,7 +24,7 @@ export const DEFAULT_WINE_DISTRO_URL =
   "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz";
 export const DEFAULT_WINE_DISTRO_TAG = "gi-wine-1.2";
 
-export const SERVER_DEFINITION: Server = {
+const SERVER_DEFINITION: Server = {
   id: "CN",
   update_url: CN_UPDATE_URL,
   channel_id: 1,
@@ -40,11 +40,11 @@ export const SERVER_DEFINITION: Server = {
       file: DLL1,
       diffUrl: c,
     },
-    {
-      file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
-      diffUrl: e,
-      tag: "workaround3",
-    },
+    // {
+    //   file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
+    //   diffUrl: e,
+    //   tag: "workaround3",
+    // },
   ],
   removed: [
     {

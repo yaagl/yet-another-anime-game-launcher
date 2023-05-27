@@ -2,7 +2,7 @@ import { Aria2 } from "./aria2";
 import { Github, GithubReleaseInfo } from "./github";
 import { gt } from "semver";
 import { CURRENT_YAAGL_VERSION } from "./constants";
-import { forceMove, log, resolve } from "./utils";
+import { env, forceMove, log, resolve } from "./utils";
 import { CommonUpdateProgram } from "./common-update-ui";
 
 const owner = "3shain";
@@ -15,12 +15,21 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
     } as const;
   }
   try {
+    let updateVersion = "";
+    if (
+      import.meta.env["YAAGL_CHANNEL_CLIENT"] &&
+      import.meta.env["YAAGL_CHANNEL_CLIENT"] != "hk4euniversal"
+    ) {
+      updateVersion = import.meta.env["YAAGL_CHANNEL_CLIENT"];
+    } else if ((await env("YAAGL_OS")) == "1") {
+      updateVersion = "hk4eos";
+    } else {
+      updateVersion = "hk4ecn";
+    }
     const latest: GithubReleaseInfo = (await deps.github.api(
       `/repos/${owner}/${repo}/releases/latest`
     )) as GithubReleaseInfo;
-    const update_neu = `resources_${
-      import.meta.env["YAAGL_CHANNEL_CLIENT"]
-    }.neu`;
+    const update_neu = `resources_${updateVersion}.neu`;
     const neu = latest.assets.find(x => x.name == update_neu);
     if (gt(latest.tag_name, CURRENT_YAAGL_VERSION) && neu !== undefined) {
       return {

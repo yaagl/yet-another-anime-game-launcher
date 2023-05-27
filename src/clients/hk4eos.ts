@@ -23,7 +23,7 @@ export const DEFAULT_WINE_DISTRO_URL =
   "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz";
 export const DEFAULT_WINE_DISTRO_TAG = "gi-wine-1.2";
 
-export const SERVER_DEFINITION: Server = {
+const SERVER_DEFINITION: Server = {
   id: "OS",
   update_url: OS_UPDATE_URL,
   channel_id: 1,
