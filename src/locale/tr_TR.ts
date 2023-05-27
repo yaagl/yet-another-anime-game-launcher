@@ -12,7 +12,7 @@ export const tr_TR: typeof zh_CN = {
   REVERT_PATCHING: "Yamalar geri alınıyor",
   SCANNING_FILES: "Oyun dosyalarının bütünlüğü kontrol ediliyor. Tamamlanan dosyalar {0}/{1}",
   DOWNLOADING_ENVIRONMENT: "Ortam dosyaları indiriliyor",
-  DOWNLOADING_ENVIRONMENT_SPEED: "Downloading environment files ({0}/s)",
+  DOWNLOADING_ENVIRONMENT_SPEED: "Ortam dosyaları indiriliyor ({0}/s)",
   EXTRACT_ENVIRONMENT: "Ortam çıkartılıyor",
   CONFIGURING_ENVIRONMENT: "Ortam ayarlanıyor",
   RESTART_TO_INSTALL: "Programı yeniden başlat",
