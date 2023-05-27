@@ -24,6 +24,10 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       bundleId = config.applicationId + ".os";
       appDistributionName = config.cli.binaryName + " OS";
       break;
+    case "hk4euniversal":
+        bundleId = config.applicationId + ".uni";
+        appDistributionName = config.cli.binaryName + " Uni";
+        break;
     case "hkrpgcn":
       bundleId = config.applicationId + ".hkrpg.cn";
       appDistributionName = config.cli.binaryName + " HSR";
