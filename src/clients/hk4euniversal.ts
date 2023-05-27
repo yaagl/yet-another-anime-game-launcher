@@ -8,8 +8,10 @@ export const DEFAULT_WINE_DISTRO_URL =
   "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz";
 export const DEFAULT_WINE_DISTRO_TAG = "gi-wine-1.2";
 
-export async function createClient(options: CreateClientOptions): Promise<ChannelClient> {
-  if(await Neutralino.os.getEnv("YAAGL_OVERSEA")=="1") {
+export async function createClient(
+  options: CreateClientOptions
+): Promise<ChannelClient> {
+  if ((await Neutralino.os.getEnv("YAAGL_OVERSEA")) == "1") {
     return await createOSClient(options);
   } else {
     return await createCNClient(options);
