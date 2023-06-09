@@ -1,7 +1,7 @@
 import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
-export const en: typeof zh_CN = {
+export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",
   INSTALL: "게임 다운로드",
@@ -66,7 +66,7 @@ export const en: typeof zh_CN = {
   SETTING_DXVK_HUD_FPS: "FPS만",
   SETTING_DXVK_HUD_ALL: "모든 정보 보기",
   SETTING_RETINA: "Retina 모드",
-  SETTING_LEFT_CMD: "왼쪽 CMD를 CTRL로 매핑",
+  SETTING_LEFT_CMD: "왼쪽 CMD를 CTRL로 할당",
   SETTING_SAVE: "저장",
   SETTING_CANCEL: "취소",
 
