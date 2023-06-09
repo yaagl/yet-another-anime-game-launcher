@@ -3,6 +3,7 @@ import { en } from "./en";
 import { vi_VN } from "./vi_VN";
 import { es_ES } from "./es_ES";
 import { ru_RU } from "./ru_RU";
+import { ko_KR } from "./ko_KR";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -18,6 +19,7 @@ export const locales = {
   vi_vn: vi_VN,
   es_es: es_ES,
   ru_ru: ru_RU,
+  ko_kr: KO_KR,
 };
 
 export async function createLocale() {
