@@ -19,7 +19,7 @@ export const locales = {
   vi_vn: vi_VN,
   es_es: es_ES,
   ru_ru: ru_RU,
-  ko_kr: KO_KR,
+  ko_kr: ko_KR,
 };
 
 export async function createLocale() {
