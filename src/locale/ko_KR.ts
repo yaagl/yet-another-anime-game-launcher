@@ -18,8 +18,7 @@ export const ko_KR: typeof zh_CN = {
   RESTART_TO_INSTALL: "프로그램 제시작",
   PATH_INVALID: "경로가 유효하지 않습니다",
   PLEASE_SELECT_A_DIR: "경로를 선택해 주세요",
-  PATH_INVALID_ASCII_ONLY:
-    "경로에 ASCII 문자열만 포함되어 있는지 확인하세요",
+  PATH_INVALID_ASCII_ONLY: "경로에 ASCII 문자열만 포함되어 있는지 확인하세요",
   PATH_INVALID_FORBIDDEN_DIR:
     '"데스크탑", "다운로드" 또는 "문서" 폴더 내의 경로는 지정할 수 없습니다',
   NOT_SUPPORTED_YET: "지원되지 않는 기능입니다",
@@ -37,7 +36,7 @@ export const ko_KR: typeof zh_CN = {
 
   NEW_VERSION_AVALIABLE: "새로운 업데이트 사용 가능",
   NEW_VERSION_AVALIABLE_DESC:
-    "런처를 {0}버전으로 업데이트하시겠습니까? \N 업데이트 내역:\n{1}",
+    "런처를 {0}버전으로 업데이트하시겠습니까? N 업데이트 내역:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "업데이트 파일 다운로드 중",
 
@@ -77,7 +76,8 @@ export const ko_KR: typeof zh_CN = {
   SETTING_GENERAL: "일반",
   LANGUAGE_LOCALE_NAME: "한국어",
   SETTING_UI_LOCALE: "런처 UI 언어",
-  SETTING_RESTART_TO_TAKE_EFFECT: "이 설정은 런처를 재시작한 이후에 적용됩니다.",
+  SETTING_RESTART_TO_TAKE_EFFECT:
+    "이 설정은 런처를 재시작한 이후에 적용됩니다.",
   SETTING_OPEN_CMD: "Wine 명령줄 도구 실행",
   SETTING_OPEN_GAME_INSTALL_DIR: "게임 설치 경로 열기",
   SETTING_OPEN_YAAGL_DIR: "YAAGL 데이터 경로 열기",
