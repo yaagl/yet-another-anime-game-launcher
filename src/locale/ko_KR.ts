@@ -1,4 +1,3 @@
-import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
 export const ko_KR: typeof zh_CN = {
