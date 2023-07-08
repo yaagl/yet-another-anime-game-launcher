@@ -1,6 +1,6 @@
 import { Server } from "@constants";
 
-import d from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
+// import d from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfb3MudmNkaWZmCg==.vcdiff?url";
 
 import s from "../assets/Nahida.cr.png";
 
@@ -35,10 +35,10 @@ const SERVER_DEFINITION: Server = {
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME, // that's correct 😎
   product_name: OS_PRODUCT_NAME,
   patched: [
-    {
-      file: DLL1,
-      diffUrl: d,
-    },
+    // {
+    //   file: DLL1,
+    //   diffUrl: d,
+    // },
     // {
     //   file: `${OS_DATA_DIR}/Plugins/${DLL2}` as const,
     //   diffUrl: f,
@@ -55,10 +55,10 @@ const SERVER_DEFINITION: Server = {
     {
       file: atob("R2Vuc2hpbkltcGFjdF9EYXRhL1BsdWdpbnMvdnVsa2FuLTEuZGxs"),
     },
-    {
-      file: atob("bWh5cGJhc2UuZGxs"),
-      tag: "workaround3",
-    },
+    // {
+    //   file: atob("bWh5cGJhc2UuZGxs"),
+    //   tag: "workaround3",
+    // },
   ],
   hosts: OS_CUSTOM_HOSTS,
   added: [],

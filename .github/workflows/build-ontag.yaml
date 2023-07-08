@@ -52,10 +52,6 @@ jobs:
           cp dist/Yaagl/resources.neu resources_hk4ecn.neu
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
           cp dist/Yaagl/resources.neu resources_hk4eos.neu
-          YAAGL_CHANNEL_CLIENT=bh3glb node ./build-app.js
-          cp dist/Yaagl/resources.neu resources_bh3glb.neu
-          YAAGL_CHANNEL_CLIENT=hk4euniversal node ./build-app.js
-          cp dist/Yaagl/resources.neu resources.neu
 
       - name: Tar app
         run: |
@@ -71,8 +67,5 @@ jobs:
           files: |
             Yaagl.app.tar.gz
             Yaagl OS.app.tar.gz
-            Yaagl Honkai Global.app.tar.gz
             resources_hk4ecn.neu
             resources_hk4eos.neu
-            resources_bh3glb.neu
-            resources.neu

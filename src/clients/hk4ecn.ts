@@ -1,7 +1,7 @@
 import { Server } from "@constants";
 
-import b from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
-import c from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
+// import b from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfYmIudmNkaWZmCg==.vcdiff?url";
+// import c from "../../external/hk4e/dW5pdHlwbGF5ZXJfcGF0Y2hfY24udmNkaWZmCg==.vcdiff?url";
 
 import s from "../assets/Nahida.cr.png";
 
@@ -36,10 +36,10 @@ const SERVER_DEFINITION: Server = {
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,
   product_name: CN_PRODUCT_NAME,
   patched: [
-    {
-      file: DLL1,
-      diffUrl: c,
-    },
+    // {
+    //   file: DLL1,
+    //   diffUrl: c,
+    // },
     // {
     //   file: `${CN_DATA_DIR}/Plugins/${DLL2}` as const,
     //   diffUrl: e,
@@ -56,10 +56,10 @@ const SERVER_DEFINITION: Server = {
     {
       file: atob("WXVhblNoZW5fRGF0YS9QbHVnaW5zL3Z1bGthbi0xLmRsbA=="),
     },
-    {
-      file: atob("bWh5cGJhc2UuZGxs"),
-      tag: "workaround3",
-    },
+    // {
+    //   file: atob("bWh5cGJhc2UuZGxs"),
+    //   tag: "workaround3",
+    // },
   ],
   hosts: CN_CUSTOM_HOSTS,
   added: [],
