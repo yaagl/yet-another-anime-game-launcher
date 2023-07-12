@@ -66,6 +66,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_DXVK_HUD: "HUD DXVK",
   SETTING_DXVK_HUD_NONE: "Nada",
   SETTING_DXVK_HUD_FPS: "Solo FPS",
+  SETTING_MTL_HUD: "Metal HUD",
   SETTING_DXVK_HUD_ALL: "Todo",
   SETTING_RETINA: "Modo Retina",
   SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
