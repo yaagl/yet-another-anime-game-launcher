@@ -56,6 +56,7 @@ ${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         MVK_ALLOW_METAL_FENCES: "1",
         WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
         DXVK_ASYNC: config.dxvkAsync ? "1" : "",

@@ -26,6 +26,7 @@ import { Wine, WineVersionChecker } from "../wine";
 import { Config } from "./config-def";
 import { createDxvkAsyncConfig } from "./dxvk-async";
 import { createDxvkHUDConfig } from "./dxvk-hud";
+import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createLeftCmdConfig } from "./left-cmd";
@@ -60,6 +61,7 @@ export async function createConfiguration({
   });
   const [DA] = await createDxvkAsyncConfig({ locale, config });
   const [DH] = await createDxvkHUDConfig({ locale, config });
+  const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
@@ -137,6 +139,7 @@ export async function createConfiguration({
                       <Divider />
                       <DA />
                       <DH />
+                      <MH />
                       <R />
                       <LC />
                       <Divider />

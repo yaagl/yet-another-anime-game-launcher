@@ -63,6 +63,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_DXVK_HUD: "Оверлэй DXVK",
   SETTING_DXVK_HUD_NONE: "Ничего",
   SETTING_DXVK_HUD_FPS: "Только FPS",
+  SETTING_MTL_HUD: "Оверлэй Metal",
   SETTING_DXVK_HUD_ALL: "Всё",
   SETTING_RETINA: "Режим Retina",
   SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
