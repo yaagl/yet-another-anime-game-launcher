@@ -86,7 +86,7 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   setKey("installed_dxvk_version", CURRENT_DXVK_VERSION);
 }
 
-const CURRENT_FPSUNLOCK_VERSION = "0.1.2";
+const CURRENT_FPSUNLOCK_VERSION = "0.2.0";
 
 export async function* checkAndDownloadFpsUnlocker(
   aria2: Aria2
@@ -104,7 +104,7 @@ export async function* checkAndDownloadFpsUnlocker(
   await mkdirp("./fpsunlock");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
-    uri: "https://github.com/y0soro/genshin-force-fps-rs/releases/download/v0.1.2/genshin-force-fps.exe",
+    uri: "https://github.com/y0soro/genshin-force-fps-rs/releases/download/v0.2.0/genshin-force-fps.exe",
     absDst: resolve("./fpsunlock/genshin-force-fps.exe"),
   })) {
     yield [
