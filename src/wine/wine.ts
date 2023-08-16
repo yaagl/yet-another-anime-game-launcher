@@ -65,7 +65,7 @@ export async function createWine(options: {
   function getEnvironmentVariables() {
     return {
       WINEESYNC: "1",
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp,trace+seh",
+      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
       GIWINEPCNAME: `${netbiosname}`,
       ...fakeCpu,
