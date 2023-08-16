@@ -14,7 +14,7 @@ mkdir -p "$EXTERNAL/hkrpg/os/files"
 mkdir -p "$EXTERNAL/hk4e"
 mkdir -p ./tmp
 git clone $(echo "aHR0cHM6Ly9ub3RhYnVnLm9yZy9Lcm9jay9kYXduCg==" | base64 --decode) ./tmp
-cp -R ./tmp/380/patch_files/. "$EXTERNAL/hk4e"
+cp -R ./tmp/400/patch_files/. "$EXTERNAL/hk4e"
 rm -rf ./tmp
 # git clone $(echo "aHR0cHM6Ly9ub3RhYnVnLm9yZy9ta3JzeW0xL2R1c2s=" | base64 --decode) ./tmp
 # cp -R ./tmp/glb/diffs/. "$EXTERNAL/bh3/glb/diffs"
