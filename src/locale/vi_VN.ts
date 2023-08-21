@@ -68,6 +68,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Hiện tất cả thông tin",
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Chế độ Retina",
+  SETTING_DISABLE_LOG: "Tắt Log",
   SETTING_LEFT_CMD: "Ánh xạ CMD trái sang CTRL",
   SETTING_SAVE: "Lưu",
   SETTING_CANCEL: "Huỷ",
