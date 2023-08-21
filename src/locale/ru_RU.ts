@@ -66,6 +66,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_MTL_HUD: "Оверлэй Metal",
   SETTING_DXVK_HUD_ALL: "Всё",
   SETTING_RETINA: "Режим Retina",
+  SETTING_DISABLE_LOG: "Отключить журнал",
   SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",

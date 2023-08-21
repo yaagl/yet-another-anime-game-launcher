@@ -69,6 +69,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_DXVK_HUD_ALL: "Todo",
   SETTING_RETINA: "Modo Retina",
+  SETTING_DISABLE_LOG: "Deshabilitar registro",
   SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
   SETTING_SAVE: "Guardar",
   SETTING_CANCEL: "Cancelar",
