@@ -120,7 +120,7 @@ export async function createConfiguration({
             <Tabs orientation="vertical" h="100%">
               <TabList minW={120}>
                 <Tab>{locale.get("SETTING_GENERAL")}</Tab>
-                <Tab>Game</Tab>
+                <Tab>{locale.get("SETTING_GAME")}</Tab>
                 <Tab>Wine</Tab>
                 <Show when={advanceSetting()}>
                   <Tab>{locale.get("SETTING_ADVANCED")}</Tab>
@@ -145,7 +145,7 @@ export async function createConfiguration({
                       <Divider />
                       <UL />
                       <FormControl>
-                        <FormLabel>Yaagl version</FormLabel>
+                        <FormLabel>{locale.get("SETTING_YAAGL_VERSION")}</FormLabel>
                         <Text userSelect={"none"} onClick={onClickVersion}>
                           {CURRENT_YAAGL_VERSION}
                         </Text>

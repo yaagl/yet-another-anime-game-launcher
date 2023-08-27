@@ -64,6 +64,7 @@ export const zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 模式",
   SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
+  SETTING_TURN_OFF_AC_PATCH: "关闭AC补丁",
   SETTING_SAVE: "保存",
   SETTING_CANCEL: "取消",
 
@@ -73,12 +74,14 @@ export const zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "点击确认修改",
   SETTING_QUICK_ACTIONS: "快速操作",
   SETTING_GENERAL: "通用",
+  SETTING_GAME: "游戏",
   LANGUAGE_LOCALE_NAME: "简体中文",
   SETTING_UI_LOCALE: "启动器界面语言",
   SETTING_RESTART_TO_TAKE_EFFECT: "此设置将从下次启动生效",
   SETTING_OPEN_CMD: "打开Wine命令行工具",
   SETTING_OPEN_GAME_INSTALL_DIR: "打开游戏安装目录",
-  SETTING_OPEN_YAAGL_DIR: "打开Yaagl数据目录",
+  SETTING_OPEN_YAAGL_DIR: "打开YAAGL数据目录",
+  SETTING_YAAGL_VERSION: "YAAGL版本",
 
   SETTING_WINE_CROSSOVER_ALERT:
     "如果使用CrossOver，则有一个步骤必须由你手动完成。点击这个提示以获取详情。",

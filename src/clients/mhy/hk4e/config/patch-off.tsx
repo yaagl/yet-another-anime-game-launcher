@@ -48,7 +48,7 @@ export default async function ({
     function UI() {
       return (
         <FormControl>
-          <FormLabel>Turn off the AC patch</FormLabel>
+          <FormLabel>{locale.get("SETTING_TURN_OFF_AC_PATCH")}</FormLabel>
           <Box>
             <Checkbox
               checked={value()}
