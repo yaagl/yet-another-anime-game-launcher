@@ -145,7 +145,9 @@ export async function createConfiguration({
                       <Divider />
                       <UL />
                       <FormControl>
-                        <FormLabel>{locale.get("SETTING_YAAGL_VERSION")}</FormLabel>
+                      <FormLabel>
+                          {locale.get("SETTING_YAAGL_VERSION")}
+                        </FormLabel>
                         <Text userSelect={"none"} onClick={onClickVersion}>
                           {CURRENT_YAAGL_VERSION}
                         </Text>
