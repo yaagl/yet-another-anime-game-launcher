@@ -42,7 +42,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "4.0.1";
+const CURRENT_SUPPORTED_VERSION = "4.1.0";
 
 export async function createHK4EChannelClient({
   server,

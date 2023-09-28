@@ -1,4 +1,4 @@
-import a from "../../../../external/hk4e/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
+// import a from "../../../../external/hk4e/bWh5cHJvdDJfcnVubmluZy5yZWcK.reg?url";
 import retina_on from "../../../constants/retina_on.reg?url";
 import retina_off from "../../../constants/retina_off.reg?url";
 import left_cmd_on from "../../../constants/left_cmd_on.reg?url";
@@ -38,7 +38,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await putLocal(a, resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  // await putLocal(a, resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   if (config.retina) {
     await putLocal(retina_on, resolve("retina.reg"));
   } else {
@@ -53,7 +53,6 @@ export async function* launchGameProgram({
 
   const cmd = `@echo off
 cd "%~dp0"
-regedit bWh5cHJvdDJfcnVubmluZy5yZWcK.reg
 copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
 copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
@@ -126,7 +125,7 @@ ${await (async () => {
     await log(String(e));
   }
 
-  await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
+  // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
   await removeFile(resolve("retina.reg"));
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
