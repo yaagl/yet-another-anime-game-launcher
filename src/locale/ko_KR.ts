@@ -66,6 +66,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 모드",
   SETTING_LEFT_CMD: "왼쪽 CMD를 CTRL로 할당",
+  SETTING_TURN_OFF_AC_PATCH: "AC 패치 비활성화",
   SETTING_SAVE: "저장",
   SETTING_CANCEL: "취소",
 
@@ -75,18 +76,20 @@ export const ko_KR: typeof zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "변경 사항을 확인하려면 이곳을 클릭하세요.",
   SETTING_QUICK_ACTIONS: "빠른 작업",
   SETTING_GENERAL: "일반",
+  SETTING_GAME: "게임",
   LANGUAGE_LOCALE_NAME: "한국어",
   SETTING_UI_LOCALE: "런처 UI 언어",
   SETTING_RESTART_TO_TAKE_EFFECT:
     "이 설정은 런처를 재시작한 이후에 적용됩니다.",
   SETTING_OPEN_CMD: "Wine 명령줄 도구 실행",
   SETTING_OPEN_GAME_INSTALL_DIR: "게임 설치 경로 열기",
-  SETTING_OPEN_YAAGL_DIR: "YAAGL 데이터 경로 열기",
+  SETTING_OPEN_YAAGL_DIR: " YAAGL 데이터 경로 열기",
+  SETTING_YAAGL_VERSION: "YAAGL 버전",
 
   SETTING_WINE_CROSSOVER_ALERT:
     "Crossover를 사용하려면, 수동으로 수행해야 하는 추가 작업이 있습니다. 자세한 내용을 보려면 이 버튼을 클릭하세요.",
 
-  SETTING_FPS_UNLOCK: "FPS제한 해제",
+  SETTING_FPS_UNLOCK: "FPS 제한 해제",
   SETTING_FPS_UNLOCK_DEFAULT: "비활성화",
 
   SETTING_ADVANCED: "고급",
