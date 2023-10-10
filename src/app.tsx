@@ -104,7 +104,7 @@ export async function createApp() {
       prefix: prefixPath,
       attributes: {
         isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
-      }
+      },
     });
     return await createLauncher({
       wine,

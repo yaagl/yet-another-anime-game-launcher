@@ -88,7 +88,9 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   setKey("installed_dxvk_version", CURRENT_DXVK_VERSION);
 }
 
-export async function* checkAndDownloadJadeite(aria2: Aria2): CommonUpdateProgram {
+export async function* checkAndDownloadJadeite(
+  aria2: Aria2
+): CommonUpdateProgram {
   if (
     eq(
       CURRENT_JADEITE_VERSION,
@@ -98,7 +100,7 @@ export async function* checkAndDownloadJadeite(aria2: Aria2): CommonUpdateProgra
     return;
   }
 
-  await rmrf_dangerously(resolve(`./jadeite`))
+  await rmrf_dangerously(resolve(`./jadeite`));
 
   await mkdirp("./jadeite");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
@@ -119,7 +121,7 @@ export async function* checkAndDownloadJadeite(aria2: Aria2): CommonUpdateProgra
 
   for await (const [dec, total] of doStreamUnzip(
     resolve(`./jadeite/archive.zip`),
-    resolve(`./jadeite`),
+    resolve(`./jadeite`)
   )) {
     yield ["setProgress", (dec / total) * 100];
   }

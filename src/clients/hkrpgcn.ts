@@ -2,7 +2,6 @@ import { Server } from "@constants";
 
 import s from "../assets/SilverWolf.cr.png";
 
-
 import { createHKRPGChannelClient } from "./mhy/hkrpg";
 import type { CreateClientOptions } from "./shared";
 import {

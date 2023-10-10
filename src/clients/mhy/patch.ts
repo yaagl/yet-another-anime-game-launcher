@@ -43,7 +43,7 @@ export async function* patchProgram(
   gameDir: string,
   wine: Wine,
   server: Server,
-  config: Config,
+  config: Config
 ): CommonUpdateProgram {
   if ((await getKeyOrDefault("patched", "NOTFOUND")) != "NOTFOUND") {
     return;
@@ -76,7 +76,10 @@ export async function* patchProgram(
     }
   }
   // FIXME: dirty hack
-  if (!wine.attributes.isGamePortingToolkit && ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1) {
+  if (
+    !wine.attributes.isGamePortingToolkit &&
+    ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1
+  ) {
     await forceMove(
       join(gameDir, server.dataDir, "globalgamemanagers"),
       join(gameDir, server.dataDir, "globalgamemanagers.bak")
@@ -89,7 +92,7 @@ export async function* patchProgram(
     );
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if(!wine.attributes.isGamePortingToolkit) {
+  if (!wine.attributes.isGamePortingToolkit) {
     for (const f of dxvkFiles) {
       await forceMove(
         join(system32Dir, f.name + ".dll"),
@@ -140,14 +143,17 @@ export async function* patchRevertProgram(
     }
   }
   // FIXME: dirty hack
-  if (!wine.attributes.isGamePortingToolkit && ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1) {
+  if (
+    !wine.attributes.isGamePortingToolkit &&
+    ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1
+  ) {
     await forceMove(
       join(gameDir, server.dataDir, "globalgamemanagers.bak"),
       join(gameDir, server.dataDir, "globalgamemanagers")
     );
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if(!wine.attributes.isGamePortingToolkit) {
+  if (!wine.attributes.isGamePortingToolkit) {
     for (const f of dxvkFiles) {
       await forceMove(
         join(system32Dir, f.name + ".dll.bak"),
