@@ -54,9 +54,9 @@ cd "%~dp0"
 regedit retina.reg
 regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
-${wine.toWinePath(join(gameDir, gameExecutable))}`;
+${wine.toWinePath(resolve("./jadeite/jadeite.exe"))} ${wine.toWinePath(join(gameDir, gameExecutable))}`;
   await writeFile(resolve("config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, server, config);
+  yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   try {
     yield ["setStateText", "GAME_RUNNING"];
@@ -97,6 +97,7 @@ ${wine.toWinePath(join(gameDir, gameExecutable))}`;
         // }
       })(),
     ]);
+    await wine.waitUntilServerOff();
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
@@ -106,5 +107,5 @@ ${wine.toWinePath(join(gameDir, gameExecutable))}`;
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, server, config);
+  yield* patchRevertProgram(gameDir, wine, server, config);
 }

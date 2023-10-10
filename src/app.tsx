@@ -102,6 +102,9 @@ export async function createApp() {
           ? CROSSOVER_LOADER
           : resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
       prefix: prefixPath,
+      attributes: {
+        isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
+      }
     });
     return await createLauncher({
       wine,

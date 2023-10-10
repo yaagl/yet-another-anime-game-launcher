@@ -31,6 +31,7 @@ import { Wine } from "@wine";
 import {
   checkAndDownloadDXVK,
   checkAndDownloadFpsUnlocker,
+  checkAndDownloadJadeite,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion } from "../unity";
@@ -40,7 +41,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "6.6.0";
+const CURRENT_SUPPORTED_VERSION = "6.9.0";
 
 export async function createBH3ChannelClient({
   server,
@@ -290,6 +291,7 @@ export async function createBH3ChannelClient({
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
       yield* checkAndDownloadDXVK(aria2);
+      yield* checkAndDownloadJadeite(aria2);
       if (config.fpsUnlock != "default") {
         yield* checkAndDownloadFpsUnlocker(aria2);
       }

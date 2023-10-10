@@ -78,6 +78,9 @@ export async function createWineInstallProgram({
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,
+      attributes: {
+        isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
+      },
     });
     await wine.exec("wineboot", ["-u"], {}, "/dev/null");
     await wine.exec("winecfg", ["-v", "win10"], {}, "/dev/null");

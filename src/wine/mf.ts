@@ -33,7 +33,7 @@ export async function* installMediaFoundation(
   for (const dll of MF_DLLS) {
     yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
     for await (const progress of aria2.doStreamingDownload({
-      uri: `https://github.com/z0z0z/mf-install/raw/master/system32/${dll}.dll`,
+      uri: `https://github.com/Ultimator14/mf-install/raw/master/system32/${dll}.dll`,
       absDst: join(
         wine.prefix,
         "drive_c",
