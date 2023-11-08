@@ -328,12 +328,7 @@ export async function createHKRPGChannelClient({
         return;
       }
       try {
-        yield* patchRevertProgram(
-          _gameInstallDir(),
-          wine,
-          server,
-          config
-        );
+        yield* patchRevertProgram(_gameInstallDir(), wine, server, config);
       } catch {
         yield* checkIntegrityProgram({
           aria2,

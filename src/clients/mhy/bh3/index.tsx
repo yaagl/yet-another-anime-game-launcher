@@ -317,12 +317,7 @@ export async function createBH3ChannelClient({
         return;
       }
       try {
-        yield* patchRevertProgram(
-          _gameInstallDir(),
-          wine.prefix,
-          server,
-          config
-        );
+        yield* patchRevertProgram(_gameInstallDir(), wine, server, config);
       } catch {
         yield* checkIntegrityProgram({
           aria2,
