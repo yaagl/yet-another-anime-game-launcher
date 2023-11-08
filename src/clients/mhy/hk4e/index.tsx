@@ -42,7 +42,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "4.1.0";
+const CURRENT_SUPPORTED_VERSION = "4.2.0";
 
 export async function createHK4EChannelClient({
   server,
@@ -325,7 +325,7 @@ export async function createHK4EChannelClient({
       try {
         yield* patchRevertProgram(
           _gameInstallDir(),
-          wine.prefix,
+          wine,
           server,
           config
         );

@@ -43,7 +43,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "1.3.0";
+const CURRENT_SUPPORTED_VERSION = "1.4.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -330,7 +330,7 @@ export async function createHKRPGChannelClient({
       try {
         yield* patchRevertProgram(
           _gameInstallDir(),
-          wine.prefix,
+          wine,
           server,
           config
         );

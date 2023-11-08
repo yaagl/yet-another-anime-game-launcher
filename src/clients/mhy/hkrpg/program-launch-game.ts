@@ -58,8 +58,7 @@ ${wine.toWinePath(resolve("./jadeite/jadeite.exe"))} ${wine.toWinePath(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
-        MTL_HUD_ENABLED: config.metalHud ? "1" : "1",
-        MVK_ALLOW_METAL_FENCES: "1",
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         ...(wine.attributes.isGamePortingToolkit
           ? {}
           : {
