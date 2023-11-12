@@ -68,6 +68,7 @@ export const en: typeof zh_CN = {
   SETTING_RETINA: "Retina Mode",
   
   SETTING_LEFT_CMD: "Map left CMD to CTRL",
+  SETTING_TURN_OFF_AC_PATCH: "Turn off the AC patch",
   SETTING_SAVE: "Save",
   SETTING_CANCEL: "Cancel",
 
@@ -80,12 +81,14 @@ export const en: typeof zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "Click me to confirm the change",
   SETTING_QUICK_ACTIONS: "Quick Actions",
   SETTING_GENERAL: "General",
+  SETTING_GAME: "Game",
   LANGUAGE_LOCALE_NAME: "English",
   SETTING_UI_LOCALE: "Launcher UI Language",
   SETTING_RESTART_TO_TAKE_EFFECT: "This will take effect after restart.",
   SETTING_OPEN_CMD: "Launch Wine Command Line Tool",
   SETTING_OPEN_GAME_INSTALL_DIR: "Open Game Install Directory",
-  SETTING_OPEN_YAAGL_DIR: "Open Yaagl Data Directory",
+  SETTING_OPEN_YAAGL_DIR: "Open YAAGL Data Directory",
+  SETTING_YAAGL_VERSION: "YAAGL Version",
 
   SETTING_WINE_CROSSOVER_ALERT:
     "To use crossover, there is an additional step that must be done manually. Click this box to learn about the detail.",

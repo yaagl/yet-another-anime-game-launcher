@@ -10,11 +10,16 @@ import {
   generateRandomString,
 } from "@utils";
 import cpu_db from "../constants/cpu_db";
-import { join } from "path-browserify";
+import { dirname, join } from "path-browserify";
+
+export interface WineAttribute {
+  isGamePortingToolkit: boolean;
+}
 
 export async function createWine(options: {
   loaderBin: string;
   prefix: string;
+  attributes: WineAttribute;
 }) {
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
@@ -55,6 +60,15 @@ export async function createWine(options: {
       },
       false,
       log_file
+    );
+  }
+
+  async function waitUntilServerOff() {
+    return await unixExec2(
+      [join(dirname(options.loaderBin), "wineserver"), "-w"],
+      {
+        ...getEnvironmentVariables(),
+      }
     );
   }
 
@@ -127,10 +141,12 @@ export async function createWine(options: {
   return {
     exec,
     exec2,
+    waitUntilServerOff,
     cmd,
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
+    attributes: options.attributes,
   };
 }
 

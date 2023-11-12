@@ -33,6 +33,7 @@ import { Wine } from "@wine";
 import {
   checkAndDownloadDXVK,
   checkAndDownloadFpsUnlocker,
+  checkAndDownloadJadeite,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
@@ -42,7 +43,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "1.0.5";
+const CURRENT_SUPPORTED_VERSION = "1.4.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -303,6 +304,7 @@ export async function createHKRPGChannelClient({
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
       yield* checkAndDownloadDXVK(aria2);
+      yield* checkAndDownloadJadeite(aria2);
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),
         wine,
@@ -326,12 +328,7 @@ export async function createHKRPGChannelClient({
         return;
       }
       try {
-        yield* patchRevertProgram(
-          _gameInstallDir(),
-          wine.prefix,
-          server,
-          config
-        );
+        yield* patchRevertProgram(_gameInstallDir(), wine, server, config);
       } catch {
         yield* checkIntegrityProgram({
           aria2,

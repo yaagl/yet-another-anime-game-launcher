@@ -68,6 +68,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_RETINA: "Режим Retina",
   SETTING_DISABLE_LOG: "Отключить журнал",
   SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
+  SETTING_TURN_OFF_AC_PATCH: "выключи патч AC",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",
 
@@ -77,12 +78,14 @@ export const ru_RU: typeof zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "Нажми на меня, чтобы подтвердить изменение",
   SETTING_QUICK_ACTIONS: "Быстрые действия",
   SETTING_GENERAL: "Основные",
+  SETTING_GAME: "Игра",
   LANGUAGE_LOCALE_NAME: "Русский",
   SETTING_UI_LOCALE: "Язык лаунчера",
   SETTING_RESTART_TO_TAKE_EFFECT: "Это вступит в силу после перезагрузки.",
   SETTING_OPEN_CMD: "Открыть командную строку Wine",
   SETTING_OPEN_GAME_INSTALL_DIR: "Открыть каталог установки игры",
-  SETTING_OPEN_YAAGL_DIR: "Откройте каталог данных Yaagl",
+  SETTING_OPEN_YAAGL_DIR: "Откройте каталог данных YAAGL",
+  SETTING_YAAGL_VERSION: "Версия YAAGL",
 
   SETTING_WINE_CROSSOVER_ALERT:
     "Чтобы использовать CrossOver, существует дополнительный шаг, который необходимо выполнить вручную. Нажмите на это поле, чтобы ознакомиться с подробностями.",

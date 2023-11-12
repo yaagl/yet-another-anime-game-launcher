@@ -44,9 +44,11 @@ cd "%~dp0"
 regedit retina.reg
 regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
-${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
+${wine.toWinePath(resolve("./jadeite/jadeite.exe"))} ${wine.toWinePath(
+    join(gameDir, gameExecutable)
+  )} -- -disable-gpu-skinning`;
   await writeFile(resolve("config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, server, config);
+  yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
   try {
@@ -57,21 +59,25 @@ ${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        MVK_ALLOW_METAL_FENCES: "1",
-        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-        DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-        ...(config.dxvkHud == ""
+        ...(wine.attributes.isGamePortingToolkit
           ? {}
           : {
-              DXVK_HUD: config.dxvkHud,
+              WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+              DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+              ...(config.dxvkHud == ""
+                ? {}
+                : {
+                    DXVK_HUD: config.dxvkHud,
+                  }),
+              DXVK_STATE_CACHE_PATH: yaaglDir,
+              DXVK_LOG_PATH: yaaglDir,
+              DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
             }),
         GIWINEHOSTS: `${server.hosts}`,
-        DXVK_STATE_CACHE_PATH: yaaglDir,
-        DXVK_LOG_PATH: yaaglDir,
-        DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
       },
       logfile
     );
+    await wine.waitUntilServerOff();
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
@@ -81,5 +87,5 @@ ${wine.toWinePath(join(gameDir, gameExecutable))} -disable-gpu-skinning`;
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, server, config);
+  yield* patchRevertProgram(gameDir, wine, server, config);
 }

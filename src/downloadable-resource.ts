@@ -13,6 +13,7 @@ import {
   readBinary,
   writeBinary,
   writeFile,
+  rmrf_dangerously,
 } from "@utils";
 import { Wine } from "@wine";
 import { join } from "path-browserify";
@@ -53,6 +54,7 @@ export async function* checkAndDownloadMoltenVK(
 
 const dxvkFiles = ["d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll"];
 const CURRENT_DXVK_VERSION = "1.10.4-alpha.20230402"; // there is no 1.10.4! I have to make up something greater than 1.10.3
+const CURRENT_JADEITE_VERSION = "3.0.9";
 
 export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -84,6 +86,47 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   }
 
   setKey("installed_dxvk_version", CURRENT_DXVK_VERSION);
+}
+
+export async function* checkAndDownloadJadeite(
+  aria2: Aria2
+): CommonUpdateProgram {
+  if (
+    eq(
+      CURRENT_JADEITE_VERSION,
+      await getKeyOrDefault("installed_jadeite_version", "0.0.0")
+    )
+  ) {
+    return;
+  }
+
+  await rmrf_dangerously(resolve(`./jadeite`));
+
+  await mkdirp("./jadeite");
+  yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
+  for await (const progress of aria2.doStreamingDownload({
+    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v3.0.9/v3.0.9.zip`,
+    absDst: resolve(`./jadeite/archive.zip`),
+  })) {
+    yield [
+      "setProgress",
+      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+    ];
+    yield [
+      "setStateText",
+      "DOWNLOADING_ENVIRONMENT_SPEED",
+      `${humanFileSize(Number(progress.downloadSpeed))}`,
+    ];
+  }
+
+  for await (const [dec, total] of doStreamUnzip(
+    resolve(`./jadeite/archive.zip`),
+    resolve(`./jadeite`)
+  )) {
+    yield ["setProgress", (dec / total) * 100];
+  }
+
+  setKey("installed_jadeite_version", CURRENT_JADEITE_VERSION);
 }
 
 const CURRENT_FPSUNLOCK_VERSION = "0.1.2";

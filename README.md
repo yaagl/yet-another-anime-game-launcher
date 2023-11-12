@@ -8,7 +8,7 @@
 
 
 ## Current Supported Game Version: 
-### GI: 4.1.0 OS/CN
+### GI: 4.2.0 OS/CN
 ### ~~HI: 6.6.0 Global~~
 ### ~~HSR: 1.0.5 OS/CN (For Intel Mac Only)~~
 

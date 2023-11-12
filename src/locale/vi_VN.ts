@@ -70,6 +70,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_RETINA: "Chế độ Retina",
   SETTING_DISABLE_LOG: "Tắt Log",
   SETTING_LEFT_CMD: "Ánh xạ CMD trái sang CTRL",
+  SETTING_TURN_OFF_AC_PATCH: "tắt bản vá AC",
   SETTING_SAVE: "Lưu",
   SETTING_CANCEL: "Huỷ",
 
@@ -79,13 +80,15 @@ export const vi_VN: typeof zh_CN = {
   SETTING_WINE_VERSION_CONFIRM: "Ấn vào để xác nhận thay đổi",
   SETTING_QUICK_ACTIONS: "Cài đặt nhanh",
   SETTING_GENERAL: "Cài đặt chung",
+  SETTING_GAME: "Trò chơi",
   LANGUAGE_LOCALE_NAME: "Tiếng Việt",
   SETTING_UI_LOCALE: "Ngôn ngữ trình khởi động",
   SETTING_RESTART_TO_TAKE_EFFECT:
     "Cài đặt sẽ có hiệu lực sau khi khởi động lại",
   SETTING_OPEN_CMD: "Mở command line (cmd) của wine",
   SETTING_OPEN_GAME_INSTALL_DIR: "Mở thư mục cài đặt trò chơi",
-  SETTING_OPEN_YAAGL_DIR: "Mở thư mục dữ liệu của Yaagl",
+  SETTING_OPEN_YAAGL_DIR: "Mở thư mục dữ liệu của YAAGL",
+  SETTING_YAAGL_VERSION: "Phiên bản YAAGL",
 
   SETTING_WINE_CROSSOVER_ALERT:
     "Để sử dụng CrossOver, một vài bước cần phải được tuỳ chỉnh thủ công. Nhấn vào đây để biết thêm chi tiết",

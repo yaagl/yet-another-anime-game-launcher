@@ -72,7 +72,7 @@ ${await (async () => {
   }
 })()}`;
   await writeFile(resolve("config.bat"), cmd);
-  yield* patchProgram(gameDir, wine.prefix, server, config);
+  yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
   try {
@@ -130,5 +130,5 @@ ${await (async () => {
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
-  yield* patchRevertProgram(gameDir, wine.prefix, server, config);
+  yield* patchRevertProgram(gameDir, wine, server, config);
 }
