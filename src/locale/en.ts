@@ -24,7 +24,7 @@ export const en: typeof zh_CN = {
     'Please choose a path that is not inside "Desktop", "Downloads" or "Documents"',
   NOT_SUPPORTED_YET: "Feature not supported yet",
   PLEASE_WAIT_FOR_LAUNCHER_UPDATE:
-    "The launcher currently doesn't support version {0} currently, please wait for further updates",
+    "The launcher does not support version {0} currently. Please wait for further updates",
   UNSUPPORTED_VERSION: "Not a supported version",
   SELECT_INSTALLATION_DIR:
     "Please select the game installation directory.\nIf you have already installed the game, select where the game executable file is located",
@@ -41,7 +41,7 @@ export const en: typeof zh_CN = {
 
   DOWNLOADING_UPDATE_FILE: "Downloding update files",
 
-  UPGRADE_FUNCTION_TBD: "Currently updating is not implemented",
+  UPGRADE_FUNCTION_TBD: "Updating is not currently implemented",
 
   DECOMPRESS_FILE_PROGRESS: "Decompressing files",
   ALLOCATING_FILE: "Allocating files on disk",
