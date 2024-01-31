@@ -8,9 +8,11 @@
 
 
 ## Current Supported Game Version: 
-### GI: 4.3.0 OS/CN __(So Far For Intel Mac Only !!!!!)__
+### GI: 4.4.0 OS/CN **
 ### ~~HI: 6.6.0 Global~~
 ### ~~HSR: 1.0.5 OS/CN (For Intel Mac Only)~~
+
+### **: For Apple Silicon users: Sonoma 14.4 is required (Currently in [Developer Beta](https://developer.apple.com/support/install-beta/))
 
 ## Policy
 
