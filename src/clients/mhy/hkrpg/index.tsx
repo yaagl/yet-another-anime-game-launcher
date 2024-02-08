@@ -43,7 +43,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "1.4.0";
+const CURRENT_SUPPORTED_VERSION = "2.0.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
