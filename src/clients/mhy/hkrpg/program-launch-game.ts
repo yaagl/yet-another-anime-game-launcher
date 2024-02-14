@@ -44,9 +44,9 @@ cd "%~dp0"
 regedit retina.reg
 regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
-${wine.toWinePath(resolve("./jadeite/jadeite.exe"))} ${wine.toWinePath(
+"${wine.toWinePath(resolve("./jadeite/jadeite.exe"))}" "${wine.toWinePath(
     join(gameDir, gameExecutable)
-  )} -- -disable-gpu-skinning`;
+  )}" -- -disable-gpu-skinning`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
