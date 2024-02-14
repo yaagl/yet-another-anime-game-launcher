@@ -46,6 +46,9 @@ jobs:
           pnpm run lint
           YAAGL_CHANNEL_CLIENT=hk4ecn node ./build-app.js
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=bh3glb node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=hkrpgcn node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=hkrpgos node ./build-app.js
 
       # - name: Tar app
       #   run: |
