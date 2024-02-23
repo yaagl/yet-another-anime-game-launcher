@@ -13,10 +13,7 @@ import {
   resolve,
 } from "@utils";
 import { ENSURE_HOSTS } from "../clients/secret";
-import {
-  CROSSOVER_DATA,
-  getCrossoverBinary,
-} from "./crossover";
+import { CROSSOVER_DATA, getCrossoverBinary } from "./crossover";
 import { ensureHosts } from "../hosts";
 import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
