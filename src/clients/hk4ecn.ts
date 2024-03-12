@@ -21,8 +21,8 @@ import {
 } from "./secret";
 
 export const DEFAULT_WINE_DISTRO_URL =
-  "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz";
-export const DEFAULT_WINE_DISTRO_TAG = "gi-wine-1.2";
+  "https://github.com/3Shain/wine/releases/download/v9.2-mingw/wine.tar.gz";
+export const DEFAULT_WINE_DISTRO_TAG = "v9.2-mingw";
 
 const SERVER_DEFINITION: Server = {
   id: "CN",

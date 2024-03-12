@@ -46,6 +46,10 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     default:
       throw new Error("YAAGL_CHANNEL_CLIENT env required");
   }
+  if(process.env["YAAGL_TEST"]) {
+    bundleId += ".test";
+    appDistributionName += " Test"
+  }
   await fs.writeJSON(
     path.resolve(process.cwd(), "neutralino.config.json"),
     config

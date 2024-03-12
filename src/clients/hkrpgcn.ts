@@ -15,8 +15,8 @@ import {
 } from "./secret";
 
 export const DEFAULT_WINE_DISTRO_URL =
-  "https://github.com/3Shain/winecx/releases/download/unstable-bh-wine-1.1/wine.tar.gz";
-export const DEFAULT_WINE_DISTRO_TAG = "unstable-bh-wine-1.1";
+  "https://github.com/3Shain/wine/releases/download/v9.2-mingw/wine.tar.gz";
+export const DEFAULT_WINE_DISTRO_TAG = "v9.2-mingw";
 
 export const SERVER_DEFINITION: Server = {
   id: "hkrpg_cn",

@@ -74,7 +74,7 @@ export async function createWineInstallProgram({
     }
 
     const wine64Bin =
-      wineTag === "crossover" ? CROSSOVER_LOADER : resolve("./wine/bin/wine64");
+      wineTag === "crossover" ? CROSSOVER_LOADER : resolve("./wine/bin/wine");
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,

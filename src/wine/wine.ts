@@ -79,13 +79,8 @@ export async function createWine(options: {
   function getEnvironmentVariables() {
     return {
       WINEESYNC: "1",
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
+      WINEDEBUG: "fixme-all,err-unwind,+timestamp,+seh,+macdrv_gpt",
       WINEPREFIX: options.prefix,
-      GIWINEPCNAME: `${netbiosname}`,
-      ...fakeCpu,
-      GIWINESYSMANU: "OEM",
-      GIWINESYSPRODNAME: "Generic x86-64",
-      GIWINESYSFAML: "B350", // I made it up
     };
   }
 
