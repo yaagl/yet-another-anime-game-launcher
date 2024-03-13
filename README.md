@@ -34,10 +34,11 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 ## Install
 
-Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest)
-Uncompress and copy the resulting application to your `/Applications` folder.
+- Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest) and download the latest version.
 
-Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder, e.g `~Games/GI`.
+- Uncompress and copy the resulting application to your `/Applications` folder. (Do not open the application from Downloads folder).
+
+- Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
 
 ## Development
 
