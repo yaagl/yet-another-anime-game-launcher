@@ -9,8 +9,8 @@
 
 ## Current Supported Game Version: 
 ### GI: 4.5.0 OS/CN **
-### ~~HI: 6.6.0 Global~~
-### ~~HSR: 1.0.5 OS/CN (For Intel Mac Only)~~
+### ~~HI: 7.3 Global~~
+### ~~HSR: 2.0.0 OS/CN (For Intel Mac Only)~~
 
 ### **: For Apple Silicon users: Sonoma 14.4 is required
 
@@ -32,9 +32,11 @@ This is a list of people/organization violating Yaagl policies -->
 
 Use it at your own risk. Or enjoying it with a new f2p account.
 
-## Download
+## Install
 
 Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest)
+Uncompress and copy the resulting application to your `/Applications` folder
+Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder, e.g `~Games/GI`
 
 ## Development
 
