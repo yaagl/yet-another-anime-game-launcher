@@ -66,10 +66,14 @@ export const en: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Everything",
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina Mode",
+  
   SETTING_LEFT_CMD: "Map left CMD to CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Turn off the AC patch",
   SETTING_SAVE: "Save",
   SETTING_CANCEL: "Cancel",
+
+
+  SETTING_DISABLE_LOG: "Disable Log",
 
   SETTING_CHECK_INTEGRITY: "Check Integrity",
   SETTING_GAME_INSTALL_DIR: "Game Installation Directory",

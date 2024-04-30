@@ -65,6 +65,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "모든 정보 보기",
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 모드",
+  SETTING_DISABLE_LOG: "로그 비활성화",
   SETTING_LEFT_CMD: "왼쪽 CMD를 CTRL로 할당",
   SETTING_TURN_OFF_AC_PATCH: "AC 패치 비활성화",
   SETTING_SAVE: "저장",

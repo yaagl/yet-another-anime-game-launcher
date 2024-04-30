@@ -63,6 +63,7 @@ export const zh_CN = {
   SETTING_DXVK_HUD_ALL: "显示所有信息",
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 模式",
+  SETTING_DISABLE_LOG: "禁用日志",
   SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
   SETTING_TURN_OFF_AC_PATCH: "关闭AC补丁",
   SETTING_SAVE: "保存",

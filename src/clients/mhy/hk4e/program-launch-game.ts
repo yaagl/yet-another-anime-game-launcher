@@ -77,7 +77,14 @@ ${await (async () => {
   const yaaglDir = resolve("./");
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = resolve(`./logs/game_${Date.now()}.log`);
+    // const logfile = resolve(`./logs/game_${Date.now()}.log`);
+
+    let logfile = undefined;
+
+    if(!config.disable_log){
+      logfile = resolve(`./logs/game_${Date.now()}.log`);
+    }
+
     await Promise.all([
       wine.exec2(
         "cmd",
