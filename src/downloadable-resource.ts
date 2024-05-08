@@ -54,7 +54,7 @@ export async function* checkAndDownloadMoltenVK(
 
 const dxvkFiles = ["d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll"];
 const CURRENT_DXVK_VERSION = "1.10.4-alpha.20230402"; // there is no 1.10.4! I have to make up something greater than 1.10.3
-const CURRENT_JADEITE_VERSION = "3.1.1";
+const CURRENT_JADEITE_VERSION = "3.1.3";
 
 export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -105,7 +105,7 @@ export async function* checkAndDownloadJadeite(
   await mkdirp("./jadeite");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v3.1.1/v3.1.1.zip`,
+    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v3.1.3/v3.1.3.zip`,
     absDst: resolve(`./jadeite/archive.zip`),
   })) {
     yield [
