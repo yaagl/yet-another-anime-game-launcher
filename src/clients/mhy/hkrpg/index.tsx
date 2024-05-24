@@ -44,7 +44,7 @@ import {
 } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 
-const CURRENT_SUPPORTED_VERSION = "2.1.0";
+const CURRENT_SUPPORTED_VERSION = "2.2.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
