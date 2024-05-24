@@ -12,7 +12,12 @@ import {
   rawString,
 } from "./utils";
 import { createAria2 } from "./aria2";
-import { checkWine, createWine, createWineInstallProgram } from "./wine";
+import {
+  checkWine,
+  createWine,
+  createWineInstallProgram,
+  getCorrectWineBinary,
+} from "./wine";
 import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
 import "./app.css";
@@ -103,7 +108,7 @@ export async function createApp() {
           ? await getCrossoverBinary()
           : wineTag == "whisky-dxvk" || wineTag == "whisky"
           ? await getWhiskyBinary()
-          : resolve("./wine/bin/wine"), // CHECK: hardcoded path?
+          : await getCorrectWineBinary(),
       prefix: prefixPath,
       attributes: {
         isGamePortingToolkit:

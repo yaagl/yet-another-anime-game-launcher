@@ -15,7 +15,7 @@ import {
 import { ENSURE_HOSTS } from "../clients/secret";
 import { CROSSOVER_DATA, getCrossoverBinary } from "./crossover";
 import { ensureHosts } from "../hosts";
-import { createWine } from "./wine";
+import { createWine, getCorrectWineBinary } from "./wine";
 import { installMediaFoundation } from "./mf";
 import { getWhiskyBinary } from "./whisky";
 
@@ -83,7 +83,7 @@ export async function createWineInstallProgram({
         ? await getCrossoverBinary()
         : wineTag === "whisky-dxvk" || wineTag === "whisky"
         ? await getWhiskyBinary()
-        : resolve("./wine/bin/wine");
+        : await getCorrectWineBinary();
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,
