@@ -17,6 +17,7 @@ import { CROSSOVER_DATA, getCrossoverBinary } from "./crossover";
 import { ensureHosts } from "../hosts";
 import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
+import { getWhiskyBinary } from "./whisky";
 
 export async function createWineInstallProgram({
   // github:
@@ -36,7 +37,11 @@ export async function createWineInstallProgram({
     const wineBinaryDir = resolve("./wine");
 
     await rmrf_dangerously(wineAbsPrefix);
-    if (wineTag === "crossover") {
+    if (
+      wineTag === "crossover" ||
+      wineTag == "whisky-dxvk" ||
+      wineTag == "whisky"
+    ) {
       // yield* checkAndDownloadMoltenVK(aria2);
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
@@ -76,12 +81,15 @@ export async function createWineInstallProgram({
     const wine64Bin =
       wineTag === "crossover"
         ? await getCrossoverBinary()
+        : wineTag === "whisky-dxvk" || wineTag === "whisky"
+        ? await getWhiskyBinary()
         : resolve("./wine/bin/wine");
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,
       attributes: {
-        isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
+        isGamePortingToolkit:
+          wineTag == "whisky" || wineTag.indexOf("gptk") >= 0,
       },
     });
     await wine.exec("wineboot", ["-u"], {}, "/dev/null");

@@ -21,6 +21,7 @@ import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
+import { getWhiskyBinary } from "./wine/whisky";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -100,10 +101,13 @@ export async function createApp() {
       loaderBin:
         wineTag == "crossover"
           ? await getCrossoverBinary()
+          : wineTag == "whisky-dxvk" || wineTag == "whisky"
+          ? await getWhiskyBinary()
           : resolve("./wine/bin/wine"), // CHECK: hardcoded path?
       prefix: prefixPath,
       attributes: {
-        isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
+        isGamePortingToolkit:
+          wineTag == "whisky" || wineTag.indexOf("gptk") >= 0,
       },
     });
     return await createLauncher({
