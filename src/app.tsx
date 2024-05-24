@@ -19,7 +19,7 @@ import "./app.css";
 import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
-import { CROSSOVER_LOADER } from "./wine/crossover";
+import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
 
 export async function createApp() {
@@ -99,7 +99,7 @@ export async function createApp() {
     const wine = await createWine({
       loaderBin:
         wineTag == "crossover"
-          ? CROSSOVER_LOADER
+          ? await getCrossoverBinary()
           : resolve("./wine/bin/wine"), // CHECK: hardcoded path?
       prefix: prefixPath,
       attributes: {

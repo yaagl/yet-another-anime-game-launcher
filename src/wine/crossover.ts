@@ -4,8 +4,25 @@ import { exec, stats, getMemoryInfo, rawString } from "../utils";
 export const CROSSOVER_LOADER =
   "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader64";
 
+export const CROSSOVER_LOADER_WINE8 =
+  "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/CrossOver-Hosted Application/wineloader";
+
 export const CROSSOVER_DATA =
   "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/share/crossover/bottle_data";
+
+export const getCrossoverBinary = async () => {
+  try {
+    await stats(CROSSOVER_LOADER);
+    return CROSSOVER_LOADER;
+  } catch {
+    try {
+      await stats(CROSSOVER_LOADER_WINE8);
+      return CROSSOVER_LOADER_WINE8;
+    } catch {
+      throw new Error("Can't find crossover");
+    }
+  }
+};
 
 export async function checkCrossover() {
   try {
@@ -14,7 +31,11 @@ export async function checkCrossover() {
     } = await getMemoryInfo();
     // disable crossover if RAM < 16GB
     if (total < 16 * Math.pow(1024, 3)) return false;
-    await stats(CROSSOVER_LOADER);
+    try {
+      await stats(CROSSOVER_LOADER);
+    } catch {
+      await stats(CROSSOVER_LOADER_WINE8);
+    }
     const { stdOut } = await exec([
       "cat",
       "/Applications/CrossOver.app/Contents/Info.plist",

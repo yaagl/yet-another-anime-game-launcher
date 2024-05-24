@@ -13,7 +13,7 @@ import {
   resolve,
 } from "@utils";
 import { ENSURE_HOSTS } from "../clients/secret";
-import { CROSSOVER_LOADER, CROSSOVER_DATA } from "./crossover";
+import { CROSSOVER_DATA, getCrossoverBinary } from "./crossover";
 import { ensureHosts } from "../hosts";
 import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
@@ -74,7 +74,9 @@ export async function createWineInstallProgram({
     }
 
     const wine64Bin =
-      wineTag === "crossover" ? CROSSOVER_LOADER : resolve("./wine/bin/wine");
+      wineTag === "crossover"
+        ? await getCrossoverBinary()
+        : resolve("./wine/bin/wine");
     const wine = await createWine({
       loaderBin: wine64Bin,
       prefix: wineAbsPrefix,

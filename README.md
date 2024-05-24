@@ -8,13 +8,13 @@
 
 
 ## Current Supported Game Version: 
-### GI: 4.4.0 OS/CN **
-### ~~HI: 6.6.0 Global~~
-### ~~HSR: 1.0.5 OS/CN (For Intel Mac Only)~~
+### GI: 4.6.0 OS/CN **
+### ~~HI: 7.3 Global~~
+### ~~HSR: 2.0.0 OS/CN (For Intel Mac Only)~~
 
-### **: For Apple Silicon users: Sonoma 14.4 is required (Currently in [Developer Beta](https://developer.apple.com/support/install-beta/))
+### **: For Apple Silicon users: Sonoma 14.4 is required
 
-## Policy
+<!-- ## Policy
 
 Please don't link to this repository. If you really want to share it with people, just tell the project name __Yaagl__ and where to find (Github!) but __don't share/disclose the link__ unless it's a private message.
 
@@ -22,7 +22,7 @@ Do __not__ provide any forms of tutorial for _how to use Yaagl_ on public channe
 
 Do __not__ mention the real name of the game or the game company, in code commits, issues, pr or dicussions. Use _The Anime Game_ or _The Anime Company_ instead.
 
-Just follow these, or share and ruin this project for all other macOS (including Linux as well) players.
+Just follow these, or share and ruin this project for all other macOS (including Linux as well) players. -->
 
 <!-- ### Hall of Shame
 
@@ -32,9 +32,13 @@ This is a list of people/organization violating Yaagl policies -->
 
 Use it at your own risk. Or enjoying it with a new f2p account.
 
-## Download
+## Install
 
-Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest)
+- Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest) and download the latest version.
+
+- Uncompress and copy the resulting application to your `/Applications` folder. (Do not open the application from Downloads folder).
+
+- Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
 
 ## Development
 
@@ -70,11 +74,10 @@ node ./build-app.js
 * Yaagl is using custom `wine (crossover)` builds from [3Shain/winecx](https://github.com/3Shain/winecx)
 * Custom `neutralinojs` binary from [3Shain/neutralinojs](https://github.com/3Shain/neutralinojs)
 * [DXVK-macOS](https://github.com/Gcenx/DXVK-macOS)
-* [MoltenVK](https://github.com/KhronosGroup/MoltenVK) and [its binary releases](https://github.com/The-Wineskin-Project/MoltenVK/releases)
+* [MoltenVK](https://github.com/KhronosGroup/MoltenVK)
 
 ## Special thanks
-* An anime game launcher (you can find it on GitHub as I can't link to it) where the idea of this project comes from and provide so many details on launching process. (By the way, Yaagl is __not__ a fork of this project)
-
+* [An anime game launcher](https://github.com/an-anime-team/an-anime-game-launcher) for Linux users
 * Krock, the game running on macOS can not come true without his patch (you can find the link to his work in this repository, while you have to make a little effort ;) )
 
 * mkrsym1, tackled IMO the most challenging AC component. It's a really remarkable and mind-blowing achievement.

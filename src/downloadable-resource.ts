@@ -105,7 +105,7 @@ export async function* checkAndDownloadJadeite(
   await mkdirp("./jadeite");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v3.1.1/v3.1.1.zip`,
+    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v3.1.2/v3.1.2.zip`,
     absDst: resolve(`./jadeite/archive.zip`),
   })) {
     yield [
