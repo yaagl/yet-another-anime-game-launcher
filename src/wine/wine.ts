@@ -79,7 +79,7 @@ export async function createWine(options: {
   function getEnvironmentVariables() {
     return {
       WINEESYNC: "1",
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp,+seh,+macdrv_gpt",
+      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
     };
   }
