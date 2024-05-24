@@ -12,7 +12,12 @@ import {
   rawString,
 } from "./utils";
 import { createAria2 } from "./aria2";
-import { checkWine, createWine, createWineInstallProgram } from "./wine";
+import {
+  checkWine,
+  createWine,
+  createWineInstallProgram,
+  getCorrectWineBinary,
+} from "./wine";
 import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
 import "./app.css";
@@ -21,6 +26,7 @@ import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
+import { getWhiskyBinary } from "./wine/whisky";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -100,10 +106,13 @@ export async function createApp() {
       loaderBin:
         wineTag == "crossover"
           ? await getCrossoverBinary()
-          : resolve("./wine/bin/wine64"), // CHECK: hardcoded path?
+          : wineTag == "whisky-dxvk" || wineTag == "whisky"
+          ? await getWhiskyBinary()
+          : await getCorrectWineBinary(),
       prefix: prefixPath,
       attributes: {
-        isGamePortingToolkit: wineTag.indexOf("gptk") >= 0,
+        isGamePortingToolkit:
+          wineTag == "whisky" || wineTag.indexOf("gptk") >= 0,
       },
     });
     return await createLauncher({

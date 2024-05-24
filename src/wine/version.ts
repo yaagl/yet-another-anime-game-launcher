@@ -32,7 +32,7 @@ export async function checkWine(github: Github) {
 
 export async function createWineVersionChecker(github: Github) {
   function getAllReleases() {
-    return github.api("/repos/3shain/winecx/releases").then(x => {
+    return github.api("/repos/3shain/wine/releases").then(x => {
       return (x as GithubReleases).map(x => {
         return {
           tag: x.tag_name,

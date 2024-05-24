@@ -42,8 +42,9 @@ import {
   LauncherResourceData,
   VoicePackNames,
 } from "../launcher-info";
+import createPatchOff from "./config/patch-off";
 
-const CURRENT_SUPPORTED_VERSION = "2.1.0";
+const CURRENT_SUPPORTED_VERSION = "2.2.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -338,8 +339,10 @@ export async function createHKRPGChannelClient({
       }
     },
     async createConfig(locale: Locale, config: Partial<Config>) {
+      const [PO] = await createPatchOff({ locale, config });
+
       return function () {
-        return ["Game Version: ", gameCurrentVersion()];
+        return ["Game Version: ", gameCurrentVersion(), <PO />];
       };
     },
   };

@@ -8,6 +8,8 @@ import {
   getCPUInfo,
   build,
   generateRandomString,
+  stats,
+  resolve,
 } from "@utils";
 import cpu_db from "../constants/cpu_db";
 import { dirname, join } from "path-browserify";
@@ -81,11 +83,6 @@ export async function createWine(options: {
       WINEESYNC: "1",
       WINEDEBUG: "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
-      GIWINEPCNAME: `${netbiosname}`,
-      ...fakeCpu,
-      GIWINESYSMANU: "OEM",
-      GIWINESYSPRODNAME: "Generic x86-64",
-      GIWINESYSFAML: "B350", // I made it up
     };
   }
 
@@ -148,6 +145,17 @@ export async function createWine(options: {
     openCmdWindow,
     attributes: options.attributes,
   };
+}
+
+export async function getCorrectWineBinary() {
+  try {
+    // use wine64 if it is presented
+    // in newer version of wine (esp. WoW64 mode), only one binary `bin/wine` exists
+    await stats("./wine/bin/wine64");
+    return resolve("./wine/bin/wine64");
+  } catch {
+    return resolve("./wine/bin/wine");
+  }
 }
 
 export type Wine = ReturnType<typeof createWine> extends Promise<infer T>

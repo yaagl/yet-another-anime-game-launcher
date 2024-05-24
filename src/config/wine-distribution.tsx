@@ -28,6 +28,7 @@ import {
 } from "../utils";
 import { WineVersionChecker } from "../wine";
 import { Config } from "./config-def";
+import { checkWhisky } from "../wine/whisky";
 
 declare module "./config-def" {
   interface Config {
@@ -48,6 +49,8 @@ export async function createWineDistroConfig({
 
   const crossoverPresent = await checkCrossover();
 
+  const whiskyPresent = await checkWhisky();
+
   assertValueDefined(config.wineDistro);
   const [value, setValue] = createSignal(config.wineDistro);
 
@@ -57,7 +60,9 @@ export async function createWineDistroConfig({
         tag: config.wineDistro,
         url: "not_applicable",
       },
-    ].filter(x => x.tag != "crossover")
+    ].filter(
+      x => x.tag != "crossover" && x.tag != "whisky-dxvk" && x.tag != "whisky"
+    )
   );
   (async () => {
     const versions = await wineVersionChecker.getAllReleases();
@@ -76,7 +81,7 @@ export async function createWineDistroConfig({
       await setKey("wine_update_tag", tag);
       await setKey(
         "wine_update_url",
-        tag == "crossover"
+        tag == "crossover" || tag == "whisky-dxvk" || tag == "whisky"
           ? "not_appliable"
           : arrayFind(wineVersions(), x => x.tag == tag).url
       );
@@ -102,6 +107,12 @@ export async function createWineDistroConfig({
                     ...wineVersions(),
                     ...(crossoverPresent
                       ? [{ tag: "crossover", url: "not_appliable" }]
+                      : []),
+                    ...(whiskyPresent
+                      ? [
+                          { tag: "whisky-dxvk", url: "not_appliable" },
+                          { tag: "whisky", url: "not_appliable" },
+                        ]
                       : []),
                   ]}
                 >
