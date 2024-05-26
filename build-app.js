@@ -25,9 +25,9 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       appDistributionName = config.cli.binaryName + " OS";
       break;
     case "hk4euniversal":
-        bundleId = config.applicationId + ".uni";
-        appDistributionName = config.cli.binaryName + " Uni";
-        break;
+      bundleId = config.applicationId + ".uni";
+      appDistributionName = config.cli.binaryName + " Uni";
+      break;
     case "hkrpgcn":
       bundleId = config.applicationId + ".hkrpg.cn";
       appDistributionName = config.cli.binaryName + " HSR";
@@ -43,12 +43,20 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       appDistributionName = config.cli.binaryName + " Honkai Global";
       config.modes.window.icon = "/src/icons/Elysia.cr.png";
       break;
+    case "cbjq":
+      bundleId = config.applicationId + ".scz.os";
+      appDistributionName = config.cli.binaryName + " SCZ OS";
+      break;
+    case "cbjqcn":
+      bundleId = config.applicationId + ".scz.cn";
+      appDistributionName = config.cli.binaryName + " SCZ";
+      break;
     default:
       throw new Error("YAAGL_CHANNEL_CLIENT env required");
   }
-  if(process.env["YAAGL_TEST"]) {
+  if (process.env["YAAGL_TEST"]) {
     bundleId += ".test";
-    appDistributionName += " Test"
+    appDistributionName += " Test";
   }
   await fs.writeJSON(
     path.resolve(process.cwd(), "neutralino.config.json"),

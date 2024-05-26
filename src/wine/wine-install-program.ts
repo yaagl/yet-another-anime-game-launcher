@@ -115,7 +115,10 @@ export async function createWineInstallProgram({
     }
 
     // FIXME: don't abuse import.meta.env
-    if (String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("bh3")) {
+    if (
+      String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("bh3") ||
+      String(import.meta.env["YAAGL_CHANNEL_CLIENT"]).startsWith("cbjq")
+    ) {
       yield* installMediaFoundation(aria2, wine);
     }
 

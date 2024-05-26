@@ -30,7 +30,7 @@ export async function exec(
   const ret = await Neutralino.os.execCommand(sudo ? runInSudo(cmd) : cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
-      `Command return non-zero code\n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
+      `Command return non-zero code (${ret.exitCode}) \n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
     );
   }
   return ret;
@@ -68,7 +68,7 @@ export async function exec2(
           } else {
             rej(
               new Error(
-                `Command return non-zero code\n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
+                `Command return non-zero code (${exit}) \n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
               )
             );
           }
