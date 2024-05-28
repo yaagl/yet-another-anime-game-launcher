@@ -10,7 +10,8 @@ export const de_DE: typeof zh_CN = {
   PATCHING: "Spieldateien patchen",
   GAME_RUNNING: "Spiel läuft (SCHLIESSEN SIE DEN LAUNCHER NICHT)",
   REVERT_PATCHING: "Patches rückgängig machen",
-  SCANNING_FILES: "Überprüfe Integrität der Spieldateien. Abgeschlossene Dateien {0}/{1}",
+  SCANNING_FILES:
+    "Überprüfe Integrität der Spieldateien. Abgeschlossene Dateien {0}/{1}",
   DOWNLOADING_ENVIRONMENT: "Umgebungsdateien herunterladen",
   DOWNLOADING_ENVIRONMENT_SPEED: "Umgebungsdateien herunterladen ({0}/s)",
   EXTRACT_ENVIRONMENT: "Umgebung entpacken",
@@ -18,19 +19,26 @@ export const de_DE: typeof zh_CN = {
   RESTART_TO_INSTALL: "Programm neu starten",
   PATH_INVALID: "Pfad ist ungültig",
   PLEASE_SELECT_A_DIR: "Bitte wählen Sie einen Pfad",
-  PATH_INVALID_ASCII_ONLY: "Bitte stellen Sie sicher, dass der Pfad nur ASCII-Zeichen enthält.",
-  PATH_INVALID_FORBIDDEN_DIR: 'Bitte wählen Sie einen Pfad, der nicht in "Desktop", "Downloads" oder "Dokumente" liegt',
+  PATH_INVALID_ASCII_ONLY:
+    "Bitte stellen Sie sicher, dass der Pfad nur ASCII-Zeichen enthält.",
+  PATH_INVALID_FORBIDDEN_DIR:
+    'Bitte wählen Sie einen Pfad, der nicht in "Desktop", "Downloads" oder "Dokumente" liegt',
   NOT_SUPPORTED_YET: "Nicht unterstützte Funktion",
-  PLEASE_WAIT_FOR_LAUNCHER_UPDATE: "Der Launcher unterstützt derzeit Version {0} nicht. Bitte warten Sie auf weitere Updates.",
+  PLEASE_WAIT_FOR_LAUNCHER_UPDATE:
+    "Der Launcher unterstützt derzeit Version {0} nicht. Bitte warten Sie auf weitere Updates.",
   UNSUPPORTED_VERSION: "Nicht unterstützte Version",
-  SELECT_INSTALLATION_DIR: "Bitte wählen Sie das Installationsverzeichnis des Spiels.\nWenn Sie das Spiel bereits installiert haben, wählen Sie das Verzeichnis, in dem sich die ausführbare Spieldatei befindet.",
+  SELECT_INSTALLATION_DIR:
+    "Bitte wählen Sie das Installationsverzeichnis des Spiels.\nWenn Sie das Spiel bereits installiert haben, wählen Sie das Verzeichnis, in dem sich die ausführbare Spieldatei befindet.",
   CANT_OPEN_GAME_FILE: "Zugriff auf Spieldateien fehlgeschlagen.",
-  CANT_OPEN_GAME_FILE_DESC: "Der Launcher konnte nicht auf die Spieldateien zugreifen.\nBitte passen Sie das Installationsverzeichnis des Spiels nach diesem Dialog an.\n\nWenn dieser Dialog wiederholt angezeigt wird, stellen Sie bitte sicher, dass der Launcher die Berechtigung hat, auf das Spielverzeichnis zuzugreifen.",
+  CANT_OPEN_GAME_FILE_DESC:
+    "Der Launcher konnte nicht auf die Spieldateien zugreifen.\nBitte passen Sie das Installationsverzeichnis des Spiels nach diesem Dialog an.\n\nWenn dieser Dialog wiederholt angezeigt wird, stellen Sie bitte sicher, dass der Launcher die Berechtigung hat, auf das Spielverzeichnis zuzugreifen.",
   GAME_DIR_CHANGED: "Der Pfad zum Spielverzeichnis wurde geändert.",
-  GAME_DIR_CHANGED_DESC: "Sie haben Ihren Spielpfad geändert. Diese Operation wird nicht unterstützt, kann jedoch später angepasst werden.",
+  GAME_DIR_CHANGED_DESC:
+    "Sie haben Ihren Spielpfad geändert. Diese Operation wird nicht unterstützt, kann jedoch später angepasst werden.",
 
   NEW_VERSION_AVALIABLE: "Ein neues Update ist verfügbar",
-  NEW_VERSION_AVALIABLE_DESC: "Möchten Sie den Launcher auf Version {0} aktualisieren?\n Änderungen:\n{1}",
+  NEW_VERSION_AVALIABLE_DESC:
+    "Möchten Sie den Launcher auf Version {0} aktualisieren?\n Änderungen:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Update-Dateien herunterladen",
 
@@ -46,7 +54,8 @@ export const de_DE: typeof zh_CN = {
   INSTALL_DONE: "Fertig",
 
   RELAUNCH_REQUIRED: "Neustart des Launchers erforderlich",
-  RELAUNCH_REQUIRED_DESC: "Der Launcher wird neu gestartet, um die Wine-Installation abzuschließen.",
+  RELAUNCH_REQUIRED_DESC:
+    "Der Launcher wird neu gestartet, um die Wine-Installation abzuschließen.",
 
   SETTING: "Einstellungen",
   SETTING_WINE_VERSION: "Wine-Distribution",
@@ -78,20 +87,25 @@ export const de_DE: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "YAAGL-Datenverzeichnis öffnen",
   SETTING_YAAGL_VERSION: "YAAGL-Version",
 
-  SETTING_WINE_CROSSOVER_ALERT: "Um Crossover zu verwenden, ist ein zusätzlicher manueller Schritt erforderlich. Klicken Sie hier, um mehr zu erfahren.",
+  SETTING_WINE_CROSSOVER_ALERT:
+    "Um Crossover zu verwenden, ist ein zusätzlicher manueller Schritt erforderlich. Klicken Sie hier, um mehr zu erfahren.",
 
   SETTING_FPS_UNLOCK: "FPS-Limit aufheben",
   SETTING_FPS_UNLOCK_DEFAULT: "Deaktiviert",
 
   SETTING_ADVANCED: "Erweitert",
-  SETTING_ADVANCED_ALERT: "ÄNDERN SIE NICHTS, es sei denn, Sie wissen, was Sie tun.",
+  SETTING_ADVANCED_ALERT:
+    "ÄNDERN SIE NICHTS, es sei denn, Sie wissen, was Sie tun.",
   SETTING_ADVANCED_VISIBLE: "Erweiterte Einstellungen sind jetzt verfügbar.",
 
-  NO_ENOUGH_DISKSPACE: "Nicht genügend freier Speicherplatz auf der Festplatte.",
-  NO_ENOUGH_DISKSPACE_DESC: "Mindestens {0}GiB ({1}GB) freier Speicherplatz ist auf Ihrer Festplatte erforderlich.",
+  NO_ENOUGH_DISKSPACE:
+    "Nicht genügend freier Speicherplatz auf der Festplatte.",
+  NO_ENOUGH_DISKSPACE_DESC:
+    "Mindestens {0}GiB ({1}GB) freier Speicherplatz ist auf Ihrer Festplatte erforderlich.",
 
   UPDATE: "Spiel aktualisieren",
-  GAME_VERSION_TOO_OLD_DESC: "Ihre aktuelle Spielversion ({0}) ist zu alt, um inkrementell aktualisiert zu werden. Bitte installieren Sie das Spiel neu.",
+  GAME_VERSION_TOO_OLD_DESC:
+    "Ihre aktuelle Spielversion ({0}) ist zu alt, um inkrementell aktualisiert zu werden. Bitte installieren Sie das Spiel neu.",
 
   PREDOWNLOAD_READY: "Pre-Download {0}",
 };
