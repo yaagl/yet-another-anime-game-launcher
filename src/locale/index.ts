@@ -4,6 +4,7 @@ import { vi_VN } from "./vi_VN";
 import { es_ES } from "./es_ES";
 import { ru_RU } from "./ru_RU";
 import { ko_KR } from "./ko_KR";
+import { de_DE } from "./de_DE";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -20,6 +21,7 @@ export const locales = {
   es_es: es_ES,
   ru_ru: ru_RU,
   ko_kr: ko_KR,
+  de_de: de_DE,
 };
 
 export async function createLocale() {
@@ -46,7 +48,7 @@ export async function createLocale() {
   function alert(
     title: LocaleTextKey,
     content: LocaleTextKey,
-    intrp: string[] = []
+    intrp: string[] = [],
   ) {
     return ualert(locale[title], formatString(locale[content], intrp));
   }
@@ -54,7 +56,7 @@ export async function createLocale() {
   function prompt(
     title: LocaleTextKey,
     content: LocaleTextKey,
-    intrp: string[] = []
+    intrp: string[] = [],
   ) {
     return uprompt(locale[title], formatString(locale[content], intrp));
   }
@@ -78,12 +80,11 @@ export async function createLocale() {
           id,
           name: LANGUAGE_LOCALE_NAME,
         };
-      }
+      },
     ),
     currentLanguage,
   };
 }
 
-export type Locale = ReturnType<typeof createLocale> extends Promise<infer C>
-  ? C
-  : never;
+export type Locale =
+  ReturnType<typeof createLocale> extends Promise<infer C> ? C : never;
