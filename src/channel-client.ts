@@ -17,6 +17,7 @@ export interface ChannelClient {
     background: string;
     url: string;
     iconImage: string;
+    launchButtonLocation?: "left" | "right";
   };
 
   dismissPredownload(): void;

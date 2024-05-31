@@ -203,6 +203,10 @@ export async function openDir(title: string) {
   return out;
 }
 
+export async function readFile(path: string) {
+  return await Neutralino.filesystem.readFile(resolve(path));
+}
+
 export async function readBinary(path: string) {
   return await Neutralino.filesystem.readBinaryFile(resolve(path));
 }

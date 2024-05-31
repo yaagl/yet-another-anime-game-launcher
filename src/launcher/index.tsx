@@ -55,7 +55,7 @@ export async function createLauncher({
     update,
     checkIntegrity,
     init,
-    uiContent: { background, url, iconImage },
+    uiContent: { background, url, iconImage, launchButtonLocation },
     dismissPredownload,
     predownloadVersion,
     createConfig,
@@ -134,6 +134,7 @@ export async function createLauncher({
         ></div>
         <Flex h="100vh" direction={"column-reverse"}>
           <Flex
+            direction={launchButtonLocation == "left" ? "row-reverse" : "row"}
             mr={"calc(10vw + 2px)"} // 微操大师
             ml={"10vw"}
             mb={50}

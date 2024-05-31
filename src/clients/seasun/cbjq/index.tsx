@@ -13,6 +13,7 @@ import {
   getKey,
   getKeyOrDefault,
   log,
+  readFile,
   setKey,
   stats,
   waitImageReady,
@@ -39,12 +40,19 @@ import {
 // import { getGameVersion } from "../unity";
 import { LauncherResourceData } from "./launcher-info";
 import { checkIntegrityProgram } from "./program-check-integrity";
+import { updateGameProgram } from "./program-update-game";
 
 const getGameVersion = async (gameDir: string) => {
-  return "1.7.0"; // TODO
+  const local_manifest = join(gameDir, "manifest.json");
+  const localResourceData: LauncherResourceData = await readFile(
+    local_manifest
+  ).then(content => {
+    return JSON.parse(content);
+  });
+  return localResourceData.projectVersion;
 };
 
-const CURRENT_SUPPORTED_VERSION = "1.7.0";
+const CURRENT_SUPPORTED_VERSION = "1.8.0";
 
 export async function createCBJQChannelClient({
   server,
@@ -58,7 +66,7 @@ export async function createCBJQChannelClient({
   wine: Wine;
 }): Promise<ChannelClient> {
   const resourceData = await getLatestVersionInfo(server);
-  const { projectVersion: GAME_LATEST_VERSION, paks }: LauncherResourceData =
+  const { projectVersion: GAME_LATEST_VERSION }: LauncherResourceData =
     resourceData;
   await waitImageReady(server.background_url);
 
@@ -90,6 +98,7 @@ export async function createCBJQChannelClient({
       background: server.background_url,
       iconImage: "",
       url: "",
+      launchButtonLocation: "left",
     },
     predownloadVersion: () => "", // TODO
     dismissPredownload() {
@@ -151,7 +160,15 @@ export async function createCBJQChannelClient({
       // IMPLEMENT ME
     },
     async *update() {
-      // IMPLEMENT ME
+      yield* updateGameProgram({
+        resourceData,
+        aria2,
+        gameDir: _gameInstallDir(),
+        server,
+      });
+      batch(() => {
+        setGameVersion(GAME_LATEST_VERSION);
+      });
     },
     async *launch(config: Config) {
       if (
