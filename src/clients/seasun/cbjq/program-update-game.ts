@@ -1,12 +1,7 @@
 import { join } from "path-browserify";
 import { Aria2 } from "@aria2";
 import { CommonUpdateProgram } from "@common-update-ui";
-import {
-  readFile,
-  setKey,
-  removeFileIfExists,
-  writeFile,
-} from "@utils";
+import { readFile, setKey, removeFileIfExists, writeFile } from "@utils";
 import { LauncherResourceData } from "./launcher-info";
 import { Server } from "../server";
 
