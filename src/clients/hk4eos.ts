@@ -24,7 +24,7 @@ export const DEFAULT_WINE_DISTRO_URL =
 export const DEFAULT_WINE_DISTRO_TAG = "v9.2-mingw";
 
 const SERVER_DEFINITION: Server = {
-  id: "OS",
+  id: "hk4e_global",
   update_url: OS_UPDATE_URL,
   channel_id: 1,
   subchannel_id: 0,

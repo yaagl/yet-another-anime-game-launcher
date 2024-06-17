@@ -12,17 +12,23 @@ import {
 
 export async function* downloadAndInstallGameProgram({
   aria2,
-  gameFileZip,
+  gameSegmentZips,
   gameDir,
   gameVersion,
   server,
 }: {
-  gameFileZip: string;
+  gameSegmentZips: string[];
   gameDir: string;
   gameVersion: string;
   aria2: Aria2;
   server: Server;
 }): CommonUpdateProgram {
+  if (gameSegmentZips.length > 1) {
+    throw new Error(
+      "Assertation failed (gameSegmentZips.length > 1)! please file an issue."
+    );
+  }
+  const gameFileZip = gameSegmentZips[0];
   const downloadTmp = join(gameDir, ".ariatmp");
   const gameFileTmp = join(downloadTmp, "game.zip");
   await mkdirp(downloadTmp);

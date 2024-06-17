@@ -12,7 +12,6 @@ import {
   getFreeSpace,
   getKey,
   getKeyOrDefault,
-  log,
   setKey,
   stats,
   waitImageReady,
@@ -38,17 +37,19 @@ import {
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
 import {
-  LauncherContentData,
-  LauncherResourceData,
+  HoyoConnectGameDisplay,
+  HoyoConnectGameId,
+  HoyoConnectGamePackageMainfest,
+  HoyoConnectGetGamePackagesResponse,
+  HoyoConnectGetGamesResponse,
   VoicePackNames,
 } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 
-const CURRENT_SUPPORTED_VERSION = "2.2.0";
+const CURRENT_SUPPORTED_VERSION = "2.3.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
-  await log(stdOut);
   return {
     async json() {
       return JSON.parse(stdOut);
@@ -68,26 +69,22 @@ export async function createHKRPGChannelClient({
   wine: Wine;
 }): Promise<ChannelClient> {
   const {
-    data: {
-      adv: { background, url, icon },
+    display: {
+      background: { url: background },
+      logo: { url: logo_url },
     },
-  }: LauncherContentData = await (
-    await fetch(
-      server.adv_url +
-        (server.id == "hkrpg_cn"
-          ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
-    )
-  ).json();
+  } = await getLatestAdvInfo(locale, server);
   const {
-    data: {
-      game: {
-        diffs,
-        latest: { version: GAME_LATEST_VERSION, path, decompressed_path, size },
+    main: {
+      major: {
+        version: GAME_LATEST_VERSION,
+        game_pkgs,
+        res_list_url: decompressed_path,
       },
-      pre_download_game,
+      patches,
     },
-  }: LauncherResourceData = await getLatestVersionInfo(server);
+    pre_download,
+  } = await getLatestVersionInfo(server);
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -100,11 +97,11 @@ export async function createHKRPGChannelClient({
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      pre_download_game != null && //exist pre_download_game data in server response
+      pre_download.major != null && //exist pre_download_game data in server response
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
         gameInstalled && // game installed
-        gt(pre_download_game.latest.version, gameVersion) // predownload version is greater
+        gt(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -120,10 +117,10 @@ export async function createHKRPGChannelClient({
     updateRequired,
     uiContent: {
       background,
-      iconImage: icon,
-      url,
+      url: "",
+      logo: logo_url,
     },
-    predownloadVersion: () => pre_download_game?.latest.version ?? "",
+    predownloadVersion: () => pre_download?.major?.version ?? "",
     dismissPredownload() {
       setShowPredownloadPrompt(false);
     },
@@ -133,8 +130,11 @@ export async function createHKRPGChannelClient({
         await stats(join(selection, "GameAssembly.dll")); // FIXME: no pkg_version?
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
-        const requiredSpaceGB =
-          Math.ceil(parseInt(size) / Math.pow(1024, 3)) * 1.2;
+        const totalSize = game_pkgs
+          .map(x => x.size)
+          .map(parseInt)
+          .reduce((a, b) => a + b, 0);
+        const requiredSpaceGB = Math.ceil(totalSize / Math.pow(1024, 3)) * 1.2;
         if (freeSpaceGB < requiredSpaceGB) {
           await locale.alert(
             "NO_ENOUGH_DISKSPACE",
@@ -147,7 +147,7 @@ export async function createHKRPGChannelClient({
         yield* downloadAndInstallGameProgram({
           aria2,
           gameDir: selection,
-          gameFileZip: path,
+          gameSegmentZips: game_pkgs.map(x => x.url),
           gameVersion: GAME_LATEST_VERSION,
           server,
         });
@@ -171,7 +171,7 @@ export async function createHKRPGChannelClient({
         );
         return;
       } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
-        const updateTarget = diffs.find(x => x.version == gameVersion);
+        const updateTarget = patches.find(x => x.version == gameVersion);
         if (!updateTarget) {
           await locale.prompt(
             "UNSUPPORTED_VERSION",
@@ -204,14 +204,14 @@ export async function createHKRPGChannelClient({
     },
     async *predownload() {
       setShowPredownloadPrompt(false);
-      if (pre_download_game == null) return;
-      const updateTarget = pre_download_game.diffs.find(
+      if (pre_download.major == null) return;
+      const updateTarget = pre_download.patches.find(
         x => x.version == gameCurrentVersion()
       );
       if (updateTarget == null) return;
       const voicePacks = (
         await Promise.all(
-          updateTarget.voice_packs.map(async x => {
+          updateTarget.audio_pkgs.map(async x => {
             try {
               await stats(
                 join(
@@ -231,15 +231,20 @@ export async function createHKRPGChannelClient({
           assertValueDefined(x);
           return x;
         });
+      if (updateTarget.game_pkgs.length != 1) {
+        throw new Error(
+          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+        );
+      }
       yield* predownloadGameProgram({
         aria2,
-        updateFileZip: updateTarget.path,
+        updateFileZip: updateTarget.game_pkgs[0].url,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.path),
+        updateVoicePackZips: voicePacks.map(x => x.url),
       });
     },
     async *update() {
-      const updateTarget = diffs.find(x => x.version == gameCurrentVersion());
+      const updateTarget = patches.find(x => x.version == gameCurrentVersion());
       if (!updateTarget) {
         await locale.prompt(
           "UNSUPPORTED_VERSION",
@@ -256,7 +261,7 @@ export async function createHKRPGChannelClient({
       }
       const voicePacks = (
         await Promise.all(
-          updateTarget.voice_packs.map(async x => {
+          updateTarget.audio_pkgs.map(async x => {
             try {
               await stats(
                 join(
@@ -276,14 +281,19 @@ export async function createHKRPGChannelClient({
           assertValueDefined(x);
           return x;
         });
+      if (updateTarget.game_pkgs.length != 1) {
+        throw new Error(
+          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+        );
+      }
       yield* updateGameProgram({
         aria2,
         server,
         currentGameVersion: gameCurrentVersion(),
         updatedGameVersion: GAME_LATEST_VERSION,
-        updateFileZip: updateTarget.path,
+        updateFileZip: updateTarget.game_pkgs[0].url,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.path),
+        updateVoicePackZips: voicePacks.map(x => x.url),
       });
       batch(() => {
         setGameVersion(GAME_LATEST_VERSION);
@@ -372,9 +382,28 @@ async function checkGameState(locale: Locale, server: Server) {
 
 async function getLatestVersionInfo(
   server: Server
-): Promise<LauncherResourceData> {
-  const ret: LauncherResourceData = await (
+): Promise<HoyoConnectGamePackageMainfest> {
+  const ret: HoyoConnectGetGamePackagesResponse = await (
     await fetch(server.update_url)
   ).json();
-  return ret;
+  const game = ret.data.game_packages.find(x => x.game.biz == server.id);
+  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
+  return game;
+}
+
+async function getLatestAdvInfo(
+  locale: Locale,
+  server: Server
+): Promise<HoyoConnectGameId & HoyoConnectGameDisplay> {
+  const ret: HoyoConnectGetGamesResponse = await (
+    await fetch(
+      server.adv_url +
+        (server.id == "CN"
+          ? `&language=zh-cn` // CN server has no other language support
+          : `&language=${locale.get("CONTENT_LANG_ID")}`)
+    )
+  ).json();
+  const game = ret.data.games.find(x => x.biz == server.id);
+  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
+  return game;
 }

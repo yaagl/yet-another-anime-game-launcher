@@ -95,6 +95,76 @@ export interface LauncherContentData {
   retcode: number;
 }
 
+export interface HoyoConnectImage {
+  hover_url?: string;
+  link: string;
+  url: string;
+}
+
+export interface HoyoConnectGameId {
+  biz: string;
+  id: string;
+}
+
+export interface HoyoConnectGameDisplay {
+  display: {
+    language: string;
+    name: string;
+    subtitle: string;
+    background: HoyoConnectImage;
+    thumbnail: HoyoConnectImage;
+    logo: HoyoConnectImage;
+    icon: HoyoConnectImage;
+  };
+  display_status: string;
+}
+
+export interface HoyoConnectGetGamesResponse {
+  retcode: number;
+  message: string;
+  data: {
+    games: (HoyoConnectGameId & HoyoConnectGameDisplay)[];
+  };
+}
+
+export interface HoyoConnectGamePackages {
+  version: string;
+  res_list_url: string;
+  game_pkgs: {
+    url: string;
+    size: string;
+    md5: string;
+    decompressed_size: string;
+  }[];
+  audio_pkgs: {
+    decompressed_size: string;
+    language: string;
+    md5: string;
+    size: string;
+    url: string;
+  }[];
+}
+
+export interface HoyoConnectGamePackageMainfest {
+  game: HoyoConnectGameId;
+  main: {
+    major: HoyoConnectGamePackages;
+    patches: HoyoConnectGamePackages[];
+  };
+  pre_download: {
+    major: HoyoConnectGamePackages;
+    patches: HoyoConnectGamePackages[];
+  };
+}
+
+export interface HoyoConnectGetGamePackagesResponse {
+  retcode: number;
+  message: string;
+  data: {
+    game_packages: HoyoConnectGamePackageMainfest[];
+  };
+}
+
 export const VoicePacks = {
   Chinese: "zh-cn",
   "English(US)": "en-us",

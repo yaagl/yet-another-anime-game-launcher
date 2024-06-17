@@ -8,6 +8,7 @@ import { Server } from "../../../constants";
 import { Locale } from "../../../locale";
 import {
   assertValueDefined,
+  exec,
   getFreeSpace,
   getKey,
   getKeyOrDefault,
@@ -37,12 +38,24 @@ import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
 import { getGameVersion } from "../unity";
 import {
-  LauncherContentData,
-  LauncherResourceData,
+  HoyoConnectGameDisplay,
+  HoyoConnectGameId,
+  HoyoConnectGamePackageMainfest,
+  HoyoConnectGetGamePackagesResponse,
+  HoyoConnectGetGamesResponse,
   VoicePackNames,
 } from "../launcher-info";
 
 const CURRENT_SUPPORTED_VERSION = "4.7.0";
+
+async function fetch(url: string) {
+  const { stdOut } = await exec(["curl", url]);
+  return {
+    async json() {
+      return JSON.parse(stdOut);
+    },
+  };
+}
 
 export async function createHK4EChannelClient({
   server,
@@ -56,32 +69,23 @@ export async function createHK4EChannelClient({
   wine: Wine;
 }): Promise<ChannelClient> {
   const {
-    data: {
-      adv: { background, url, icon },
+    display: {
+      background: { url: background },
+      logo: { url: logo_url },
     },
-  }: LauncherContentData = await (
-    await fetch(
-      server.adv_url +
-        (server.id == "CN"
-          ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
-    )
-  ).json();
+  } = await getLatestAdvInfo(locale, server);
   const {
-    data: {
-      game: {
-        diffs,
-        latest: {
-          version: GAME_LATEST_VERSION,
-          segments,
-          decompressed_path,
-          voice_packs,
-          size,
-        },
+    main: {
+      major: {
+        version: GAME_LATEST_VERSION,
+        game_pkgs,
+        res_list_url: decompressed_path,
       },
-      pre_download_game,
+      patches,
     },
-  }: LauncherResourceData = await getLatestVersionInfo(server);
+    pre_download,
+  } = await getLatestVersionInfo(server);
+
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -94,11 +98,11 @@ export async function createHK4EChannelClient({
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      pre_download_game != null && //exist pre_download_game data in server response
+      pre_download.major != null && //exist pre_download_game data in server response
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
         gameInstalled && // game installed
-        gt(pre_download_game.latest.version, gameVersion) // predownload version is greater
+        gt(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -114,10 +118,10 @@ export async function createHK4EChannelClient({
     updateRequired,
     uiContent: {
       background,
-      iconImage: icon,
-      url,
+      url: "",
+      logo: logo_url,
     },
-    predownloadVersion: () => pre_download_game?.latest.version ?? "",
+    predownloadVersion: () => pre_download?.major?.version ?? "",
     dismissPredownload() {
       setShowPredownloadPrompt(false);
     },
@@ -126,8 +130,11 @@ export async function createHK4EChannelClient({
         await stats(join(selection, "pkg_version"));
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
-        const requiredSpaceGB =
-          Math.ceil(parseInt(size) / Math.pow(1024, 3)) * 1.2;
+        const totalSize = game_pkgs
+          .map(x => x.size)
+          .map(parseInt)
+          .reduce((a, b) => a + b, 0);
+        const requiredSpaceGB = Math.ceil(totalSize / Math.pow(1024, 3)) * 1.2;
         if (freeSpaceGB < requiredSpaceGB) {
           await locale.alert(
             "NO_ENOUGH_DISKSPACE",
@@ -140,7 +147,7 @@ export async function createHK4EChannelClient({
         yield* downloadAndInstallGameProgram({
           aria2,
           gameDir: selection,
-          gameSegmentZips: segments.map(x => x.path),
+          gameSegmentZips: game_pkgs.map(x => x.url),
           // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
           //   .path,
           gameVersion: GAME_LATEST_VERSION,
@@ -164,7 +171,7 @@ export async function createHK4EChannelClient({
         );
         return;
       } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
-        const updateTarget = diffs.find(x => x.version == gameVersion);
+        const updateTarget = patches.find(x => x.version == gameVersion);
         if (!updateTarget) {
           await locale.prompt(
             "UNSUPPORTED_VERSION",
@@ -197,14 +204,14 @@ export async function createHK4EChannelClient({
     },
     async *predownload() {
       setShowPredownloadPrompt(false);
-      if (pre_download_game == null) return;
-      const updateTarget = pre_download_game.diffs.find(
+      if (pre_download.major == null) return;
+      const updateTarget = pre_download.patches.find(
         x => x.version == gameCurrentVersion()
       );
       if (updateTarget == null) return;
       const voicePacks = (
         await Promise.all(
-          updateTarget.voice_packs.map(async x => {
+          updateTarget.audio_pkgs.map(async x => {
             try {
               await stats(
                 join(
@@ -224,15 +231,20 @@ export async function createHK4EChannelClient({
           assertValueDefined(x);
           return x;
         });
+      if (updateTarget.game_pkgs.length != 1) {
+        throw new Error(
+          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+        );
+      }
       yield* predownloadGameProgram({
         aria2,
-        updateFileZip: updateTarget.path,
+        updateFileZip: updateTarget.game_pkgs[0].url,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.path),
+        updateVoicePackZips: voicePacks.map(x => x.url),
       });
     },
     async *update() {
-      const updateTarget = diffs.find(x => x.version == gameCurrentVersion());
+      const updateTarget = patches.find(x => x.version == gameCurrentVersion());
       if (!updateTarget) {
         await locale.prompt(
           "UNSUPPORTED_VERSION",
@@ -249,7 +261,7 @@ export async function createHK4EChannelClient({
       }
       const voicePacks = (
         await Promise.all(
-          updateTarget.voice_packs.map(async x => {
+          updateTarget.audio_pkgs.map(async x => {
             try {
               await stats(
                 join(
@@ -269,14 +281,19 @@ export async function createHK4EChannelClient({
           assertValueDefined(x);
           return x;
         });
+      if (updateTarget.game_pkgs.length != 1) {
+        throw new Error(
+          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+        );
+      }
       yield* updateGameProgram({
         aria2,
         server,
         currentGameVersion: gameCurrentVersion(),
         updatedGameVersion: GAME_LATEST_VERSION,
-        updateFileZip: updateTarget.path,
+        updateFileZip: updateTarget.game_pkgs[0].url,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.path),
+        updateVoicePackZips: voicePacks.map(x => x.url),
       });
       batch(() => {
         setGameVersion(GAME_LATEST_VERSION);
@@ -337,7 +354,7 @@ export async function createHK4EChannelClient({
       const [PO] = await createPatchOff({ locale, config });
 
       return function () {
-        return [<W3 />, <PO />];
+        return ["Game Version: ", gameCurrentVersion(), <W3 />, <PO />];
       };
     },
   };
@@ -367,9 +384,28 @@ async function checkGameState(locale: Locale, server: Server) {
 
 async function getLatestVersionInfo(
   server: Server
-): Promise<LauncherResourceData> {
-  const ret: LauncherResourceData = await (
+): Promise<HoyoConnectGamePackageMainfest> {
+  const ret: HoyoConnectGetGamePackagesResponse = await (
     await fetch(server.update_url)
   ).json();
-  return ret;
+  const game = ret.data.game_packages.find(x => x.game.biz == server.id);
+  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
+  return game;
+}
+
+async function getLatestAdvInfo(
+  locale: Locale,
+  server: Server
+): Promise<HoyoConnectGameId & HoyoConnectGameDisplay> {
+  const ret: HoyoConnectGetGamesResponse = await (
+    await fetch(
+      server.adv_url +
+        (server.id == "CN"
+          ? `&language=zh-cn` // CN server has no other language support
+          : `&language=${locale.get("CONTENT_LANG_ID")}`)
+    )
+  ).json();
+  const game = ret.data.games.find(x => x.biz == server.id);
+  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
+  return game;
 }

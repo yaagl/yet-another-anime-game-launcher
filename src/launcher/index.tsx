@@ -55,7 +55,7 @@ export async function createLauncher({
     update,
     checkIntegrity,
     init,
-    uiContent: { background, url, iconImage, launchButtonLocation },
+    uiContent: { background, url, iconImage, launchButtonLocation, logo },
     dismissPredownload,
     predownloadVersion,
     createConfig,
@@ -122,16 +122,28 @@ export async function createLauncher({
           "background-image": `url(${background})`,
         }}
       >
-        <div
-          onClick={() => open(url)}
-          role="button"
-          class="version-icon"
-          style={{
-            "background-image": `url(${iconImage})`,
-            height: `${bh}px`,
-            width: `${bw}px`, //fixme: responsive size
-          }}
-        ></div>
+        {logo ? (
+          <div
+            class="game-logo"
+            style={{
+              "background-image": `url(${logo})`,
+              height: `${234}px`,
+              width: `${416}px`, //fixme: responsive size
+            }}
+          />
+        ) : null}
+        {iconImage ? (
+          <div
+            onClick={() => open(url)}
+            role="button"
+            class="version-icon"
+            style={{
+              "background-image": `url(${iconImage})`,
+              height: `${bh}px`,
+              width: `${bw}px`, //fixme: responsive size
+            }}
+          />
+        ) : null}
         <Flex h="100vh" direction={"column-reverse"}>
           <Flex
             direction={launchButtonLocation == "left" ? "row-reverse" : "row"}

@@ -16,8 +16,9 @@ export interface ChannelClient {
   uiContent: {
     background: string;
     url: string;
-    iconImage: string;
+    iconImage?: string;
     launchButtonLocation?: "left" | "right";
+    logo?: string;
   };
 
   dismissPredownload(): void;
