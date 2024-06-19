@@ -78,7 +78,7 @@ export async function* patchProgram(
   // FIXME: dirty hack
   if (
     !wine.attributes.isGamePortingToolkit &&
-    ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1
+    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
   ) {
     await forceMove(
       join(gameDir, server.dataDir, "globalgamemanagers"),
@@ -145,7 +145,7 @@ export async function* patchRevertProgram(
   // FIXME: dirty hack
   if (
     !wine.attributes.isGamePortingToolkit &&
-    ["hkrpg_cn", "hkrpg_os"].indexOf(server.id) === -1
+    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
   ) {
     await forceMove(
       join(gameDir, server.dataDir, "globalgamemanagers.bak"),
