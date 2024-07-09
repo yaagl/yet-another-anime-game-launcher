@@ -50,10 +50,10 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     case "cbjqcn":
       bundleId = config.applicationId + ".scz.cn";
       appDistributionName = config.cli.binaryName + " SCZ";
-    case "napcn":
+    case "napos":
       bundleId = config.applicationId + ".nap.os";
       appDistributionName = config.cli.binaryName + " ZZZ OS";
-    case "napos":
+    case "napcn":
       bundleId = config.applicationId + ".nap.cn";
       appDistributionName = config.cli.binaryName + " ZZZ";
       break;
