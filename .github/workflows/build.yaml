@@ -49,6 +49,8 @@ jobs:
           YAAGL_CHANNEL_CLIENT=bh3glb node ./build-app.js
           YAAGL_CHANNEL_CLIENT=hkrpgcn node ./build-app.js
           YAAGL_CHANNEL_CLIENT=hkrpgos node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=napcn node ./build-app.js
+          YAAGL_CHANNEL_CLIENT=napos node ./build-app.js
 
       # - name: Tar app
       #   run: |

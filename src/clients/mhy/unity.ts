@@ -1,7 +1,7 @@
 import { binaryPatternSearch, readBinary } from "@utils";
 import { join } from "path-browserify";
 
-export async function getGameVersion(gameDataDir: string) {
+export async function getGameVersion(gameDataDir: string, offset = 0x88) {
   const ggmPath = join(gameDataDir, "globalgamemanagers");
   const view = new Uint8Array(await readBinary(ggmPath));
   const index = binaryPatternSearch(
@@ -14,7 +14,7 @@ export async function getGameVersion(gameDataDir: string) {
   if (index == -1) {
     throw new Error("pattern not found"); //FIXME
   } else {
-    const len = index + 0x88;
+    const len = index + offset;
     const v = new DataView(view.buffer);
     const strlen = v.getUint32(len, true);
     const str = String.fromCharCode(...view.slice(len + 4, len + strlen + 4));

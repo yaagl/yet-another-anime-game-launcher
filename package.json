@@ -9,6 +9,7 @@
     "start-hkrpgos": "YAAGL_CHANNEL_CLIENT=hkrpgos vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p hkrpgos && cp neutralino.config.json hkrpgos/neutralino.config.json && rsync -rlptu dist hkrpgos && rsync -rlptu sidecar hkrpgos && rsync -rlptu src/icons hkrpgos/src && neu run -- --path=./hkrpgos",
     "start-cbjq": "YAAGL_CHANNEL_CLIENT=cbjq vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p cbjq && cp neutralino.config.json cbjq/neutralino.config.json && rsync -rlptu dist cbjq && rsync -rlptu sidecar cbjq && rsync -rlptu src/icons cbjq/src && neu run -- --path=./cbjq",
     "start-cbjqcn": "YAAGL_CHANNEL_CLIENT=cbjqcn vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p cbjqcn && cp neutralino.config.json cbjqcn/neutralino.config.json && rsync -rlptu dist cbjqcn && rsync -rlptu sidecar cbjqcn && rsync -rlptu src/icons cbjqcn/src && neu run -- --path=./cbjqcn",
+    "start-napcn": "YAAGL_CHANNEL_CLIENT=napcn vite build --mode=\"development\" && cp './neutralino.js' './dist/neutralino.js' && mkdir -p napcn && cp neutralino.config.json napcn/neutralino.config.json && rsync -rlptu dist napcn && rsync -rlptu sidecar napcn && rsync -rlptu src/icons napcn/src && neu run -- --path=./napcn",
     "dev": "vite",
     "build": "YAAGL_CHANNEL_CLIENT=hk4ecn vite build",
     "build-hk4eos": "YAAGL_CHANNEL_CLIENT=hk4eos vite build",
