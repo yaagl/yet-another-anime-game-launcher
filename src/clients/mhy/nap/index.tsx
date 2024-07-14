@@ -109,7 +109,9 @@ export async function createNAPChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
+  const updateRequired = () =>
+    // !HACK: ignore patch version!
+    lt(gameCurrentVersion(), GAME_LATEST_VERSION.substring(0, 3) + ".0");
   return {
     installState: installed,
     showPredownloadPrompt,
@@ -187,11 +189,11 @@ export async function createNAPChannelClient({
         await setKey("game_install_dir", selection);
         // FIXME: perform a integrity check?
       } else {
-        yield* checkIntegrityProgram({
-          aria2,
-          gameDir: selection,
-          remoteDir: decompressed_path,
-        });
+        // yield* checkIntegrityProgram({
+        //   aria2,
+        //   gameDir: selection,
+        //   remoteDir: decompressed_path,
+        // });
         // setGameInstalled
         batch(() => {
           setInstalled("INSTALLED");
@@ -326,11 +328,11 @@ export async function createNAPChannelClient({
       });
     },
     async *checkIntegrity() {
-      yield* checkIntegrityProgram({
-        aria2,
-        gameDir: _gameInstallDir(),
-        remoteDir: decompressed_path,
-      });
+      // yield* checkIntegrityProgram({
+      //   aria2,
+      //   gameDir: _gameInstallDir(),
+      //   remoteDir: decompressed_path,
+      // });
     },
     async *init(config: Config) {
       try {
