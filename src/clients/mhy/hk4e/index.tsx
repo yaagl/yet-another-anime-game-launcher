@@ -46,7 +46,7 @@ import {
   VoicePackNames,
 } from "../launcher-info";
 
-const CURRENT_SUPPORTED_VERSION = "4.7.0";
+const CURRENT_SUPPORTED_VERSION = "4.8.0";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -98,7 +98,7 @@ export async function createHK4EChannelClient({
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      pre_download.major != null && //exist pre_download_game data in server response
+      pre_download?.major != null && //exist pre_download_game data in server response
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
         gameInstalled && // game installed
