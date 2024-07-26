@@ -1,18 +1,14 @@
 # Yet another anime game launcher (Yaagl)
 
-
-|  |  |
-| --- | --- |
-| ![](/docs/hk4e41.png) | ![](/docs/bh66.png) |
-| ![](/docs/hsr105.png) |  |
-
-
 ## Current Supported Game Version: 
-### GI: 4.6.0 OS/CN **
-### ~~HI: 7.3 Global~~
-### ~~HSR: 2.0.0 OS/CN (For Intel Mac Only)~~
+### GI: 4.8.0 OS/CN **
+### HSR: 2.3.0 OS/CN
+### ZZZ: 1.0.0/1 OS/CN
 
-### **: For Apple Silicon users: Sonoma 14.4 is required
+#### **: For Apple Silicon users: Sonoma 14.4 is required
+
+## For Linux users
+[Anime Games Launcher](https://github.com/an-anime-team/anime-games-launcher) is a universal linux launcher for anime games
 
 <!-- ## Policy
 
@@ -40,7 +36,7 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
 
-## Development
+## Development (Outdated)
 
 ### Setup
 ```sh
@@ -71,13 +67,12 @@ node ./build-app.js
 
 ## Related projects
 
-* Yaagl is using custom `wine (crossover)` builds from [3Shain/winecx](https://github.com/3Shain/winecx)
 * Custom `neutralinojs` binary from [3Shain/neutralinojs](https://github.com/3Shain/neutralinojs)
 * [DXVK-macOS](https://github.com/Gcenx/DXVK-macOS)
 * [MoltenVK](https://github.com/KhronosGroup/MoltenVK)
 
 ## Special thanks
-* [An anime game launcher](https://github.com/an-anime-team/an-anime-game-launcher) for Linux users
+* An Anime Team
 * Krock, the game running on macOS can not come true without his patch (you can find the link to his work in this repository, while you have to make a little effort ;) )
 
 * mkrsym1, tackled IMO the most challenging AC component. It's a really remarkable and mind-blowing achievement.
