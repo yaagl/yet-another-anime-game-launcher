@@ -16,6 +16,7 @@ import { dirname, join } from "path-browserify";
 
 export interface WineAttribute {
   isGamePortingToolkit: boolean;
+  cx: boolean;
 }
 
 export async function createWine(options: {

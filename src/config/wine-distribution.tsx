@@ -61,7 +61,11 @@ export async function createWineDistroConfig({
         url: "not_applicable",
       },
     ].filter(
-      x => x.tag != "crossover" && x.tag != "whisky-dxvk" && x.tag != "whisky"
+      x =>
+        x.tag != "crossover" &&
+        x.tag != "crossover-d3dm" &&
+        x.tag != "whisky-dxvk" &&
+        x.tag != "whisky"
     )
   );
   (async () => {
@@ -81,7 +85,10 @@ export async function createWineDistroConfig({
       await setKey("wine_update_tag", tag);
       await setKey(
         "wine_update_url",
-        tag == "crossover" || tag == "whisky-dxvk" || tag == "whisky"
+        tag == "crossover" ||
+          tag == "crossover-d3dm" ||
+          tag == "whisky-dxvk" ||
+          tag == "whisky"
           ? "not_appliable"
           : arrayFind(wineVersions(), x => x.tag == tag).url
       );
@@ -106,7 +113,10 @@ export async function createWineDistroConfig({
                   each={[
                     ...wineVersions(),
                     ...(crossoverPresent
-                      ? [{ tag: "crossover", url: "not_appliable" }]
+                      ? [
+                          { tag: "crossover", url: "not_appliable" },
+                          { tag: "crossover-d3dm", url: "not_appliable" },
+                        ]
                       : []),
                     ...(whiskyPresent
                       ? [
@@ -131,20 +141,6 @@ export async function createWineDistroConfig({
           <Button size="sm" colorScheme="danger" onClick={applyChanges}>
             {locale.get("SETTING_WINE_VERSION_CONFIRM")}
           </Button>
-        </Show>,
-        <Show when={value() != config.wineDistro && value() == "crossover"}>
-          <Alert
-            status="info"
-            variant="left-accent"
-            onClick={() =>
-              open(
-                "https://github.com/3Shain/yet-another-anime-game-launcher/wiki/CrossOver:-use-latest-MoltenVK"
-              )
-            }
-          >
-            <AlertIcon mr="$2_5" />
-            {locale.get("SETTING_WINE_CROSSOVER_ALERT")}
-          </Alert>
         </Show>,
       ];
     },

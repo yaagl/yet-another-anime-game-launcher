@@ -39,6 +39,7 @@ export async function createWineInstallProgram({
     await rmrf_dangerously(wineAbsPrefix);
     if (
       wineTag === "crossover" ||
+      wineTag === "crossover-d3dm" ||
       wineTag == "whisky-dxvk" ||
       wineTag == "whisky"
     ) {
@@ -79,7 +80,7 @@ export async function createWineInstallProgram({
     }
 
     const wine64Bin =
-      wineTag === "crossover"
+      wineTag === "crossover" || wineTag === "crossover-d3dm"
         ? await getCrossoverBinary()
         : wineTag === "whisky-dxvk" || wineTag === "whisky"
         ? await getWhiskyBinary()
@@ -89,12 +90,15 @@ export async function createWineInstallProgram({
       prefix: wineAbsPrefix,
       attributes: {
         isGamePortingToolkit:
-          wineTag == "whisky" || wineTag.indexOf("gptk") >= 0,
+          wineTag == "whisky" ||
+          wineTag == "crossover-d3dm" ||
+          wineTag.indexOf("gptk") >= 0,
+        cx: wineTag == "crossover" || wineTag == "crossover-d3dm",
       },
     });
     await wine.exec("wineboot", ["-u"], {}, "/dev/null");
     await wine.exec("winecfg", ["-v", "win10"], {}, "/dev/null");
-    if (wineTag === "crossover") {
+    if (wineTag === "crossover" || wineTag === "crossover-d3dm") {
       await wine.exec(
         "rundll32",
         [

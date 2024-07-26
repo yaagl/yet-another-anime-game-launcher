@@ -7,20 +7,11 @@ import left_cmd_off from "../../../constants/left_cmd_off.reg?url";
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "../../../common-update-ui";
 import { Server } from "../../../constants";
-import {
-  mkdirp,
-  removeFile,
-  writeFile,
-  resolve,
-  log,
-  wait,
-  forceMove,
-  stats,
-  exec,
-} from "../../../utils";
+import { mkdirp, removeFile, writeFile, resolve, log } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
+import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 
 export async function* launchGameProgram({
   gameDir,
@@ -78,41 +69,35 @@ ${await (async () => {
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
-    await Promise.all([
-      wine.exec2(
-        "cmd",
-        ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
-        {
-          MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-          MVK_ALLOW_METAL_FENCES: "1",
-          WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-          DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-          ...(config.dxvkHud == ""
-            ? {}
-            : {
-                DXVK_HUD: config.dxvkHud,
-              }),
-          GIWINEHOSTS: `${server.hosts}`,
-          DXVK_STATE_CACHE_PATH: yaaglDir,
-          DXVK_LOG_PATH: yaaglDir,
-          DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-        },
-        logfile
-      ),
-      (async () => {
-        // while (processRunning) {
-        //   if ((await exec("cat",[logfile])).stdOut.includes("GCGMAH active")) {
-        //     await log("Game Launch Successful");
-        //     await forceMove(
-        //       join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
-        //       join(gameDir, atob("bWh5cGJhc2UuZGxs"))
-        //     );
-        //     break;
-        //   }
-        //   await wait(200);
-        // }
-      })(),
-    ]);
+    await wine.exec2(
+      "cmd",
+      ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
+      {
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+        ...(wine.attributes.isGamePortingToolkit
+          ? {
+              WINEDLLPATH_PREPEND: wine.attributes.cx
+                ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
+                : "",
+            }
+          : {
+              MVK_ALLOW_METAL_FENCES: "1",
+              WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+              DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+              ...(config.dxvkHud == ""
+                ? {}
+                : {
+                    DXVK_HUD: config.dxvkHud,
+                  }),
+              GIWINEHOSTS: `${server.hosts}`,
+              DXVK_STATE_CACHE_PATH: yaaglDir,
+              DXVK_LOG_PATH: yaaglDir,
+              DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
+            }),
+      },
+      logfile
+    );
+    await wine.waitUntilServerOff();
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));

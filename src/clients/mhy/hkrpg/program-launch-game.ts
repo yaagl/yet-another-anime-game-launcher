@@ -10,6 +10,7 @@ import { mkdirp, removeFile, writeFile, resolve, log } from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
+import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 
 export async function* launchGameProgram({
   gameDir,
@@ -60,7 +61,11 @@ cd /d "${wine.toWinePath(gameDir)}"
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         ...(wine.attributes.isGamePortingToolkit
-          ? {}
+          ? {
+              WINEDLLPATH_PREPEND: wine.attributes.cx
+                ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
+                : "",
+            }
           : {
               WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
               DXVK_ASYNC: config.dxvkAsync ? "1" : "",
@@ -72,8 +77,8 @@ cd /d "${wine.toWinePath(gameDir)}"
               DXVK_STATE_CACHE_PATH: yaaglDir,
               DXVK_LOG_PATH: yaaglDir,
               DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
+              GIWINEHOSTS: `${server.hosts}`,
             }),
-        GIWINEHOSTS: `${server.hosts}`,
       },
       logfile
     );

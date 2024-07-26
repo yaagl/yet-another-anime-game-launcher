@@ -38,6 +38,9 @@ export function build(
   const ret =
     Object.entries(env ?? {})
       .map(([key, value]) => {
+        if (!value) {
+          return "";
+        }
         return `${key}=${sanitize(value)} `; // I can trust key has no space right?
       })
       .join("") +

@@ -7,20 +7,11 @@ import left_cmd_off from "../../../constants/left_cmd_off.reg?url";
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "../../../common-update-ui";
 import { Server } from "../../../constants";
-import {
-  mkdirp,
-  removeFile,
-  writeFile,
-  resolve,
-  log,
-  wait,
-  forceMove,
-  stats,
-  exec,
-} from "../../../utils";
+import { mkdirp, removeFile, writeFile, resolve, log } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
+import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 
 export async function* launchGameProgram({
   gameDir,
@@ -84,18 +75,25 @@ ${await (async () => {
         ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
         {
           MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-          MVK_ALLOW_METAL_FENCES: "1",
-          WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-          DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-          ...(config.dxvkHud == ""
-            ? {}
+          ...(wine.attributes.isGamePortingToolkit
+            ? {
+                WINEDLLPATH_PREPEND: wine.attributes.cx
+                  ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
+                  : "",
+              }
             : {
-                DXVK_HUD: config.dxvkHud,
+                WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+                DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+                ...(config.dxvkHud == ""
+                  ? {}
+                  : {
+                      DXVK_HUD: config.dxvkHud,
+                    }),
+                DXVK_STATE_CACHE_PATH: yaaglDir,
+                DXVK_LOG_PATH: yaaglDir,
+                DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
+                GIWINEHOSTS: `${server.hosts}`,
               }),
-          GIWINEHOSTS: `${server.hosts}`,
-          DXVK_STATE_CACHE_PATH: yaaglDir,
-          DXVK_LOG_PATH: yaaglDir,
-          DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
         },
         logfile
       ),

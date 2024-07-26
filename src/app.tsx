@@ -104,7 +104,7 @@ export async function createApp() {
   if (wineReady) {
     const wine = await createWine({
       loaderBin:
-        wineTag == "crossover"
+        wineTag == "crossover" || wineTag == "crossover-d3dm"
           ? await getCrossoverBinary()
           : wineTag == "whisky-dxvk" || wineTag == "whisky"
           ? await getWhiskyBinary()
@@ -112,7 +112,10 @@ export async function createApp() {
       prefix: prefixPath,
       attributes: {
         isGamePortingToolkit:
-          wineTag == "whisky" || wineTag.indexOf("gptk") >= 0,
+          wineTag == "whisky" ||
+          wineTag == "crossover-d3dm" ||
+          wineTag.indexOf("gptk") >= 0,
+        cx: wineTag == "crossover" || wineTag == "crossover-d3dm",
       },
     });
     return await createLauncher({

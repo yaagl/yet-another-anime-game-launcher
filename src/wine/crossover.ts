@@ -24,6 +24,9 @@ export const getCrossoverBinary = async () => {
   }
 };
 
+export const CROSSOVER_RESOURCE =
+  "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver";
+
 export async function checkCrossover() {
   try {
     try {
