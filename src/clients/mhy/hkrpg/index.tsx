@@ -36,26 +36,11 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
-import {
-  HoyoConnectGameDisplay,
-  HoyoConnectGameId,
-  HoyoConnectGamePackageMainfest,
-  HoyoConnectGetGamePackagesResponse,
-  HoyoConnectGetGamesResponse,
-  VoicePackNames,
-} from "../launcher-info";
+import { VoicePackNames } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
+import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
 const CURRENT_SUPPORTED_VERSION = "2.3.0";
-
-async function fetch(url: string) {
-  const { stdOut } = await exec(["curl", url]);
-  return {
-    async json() {
-      return JSON.parse(stdOut);
-    },
-  };
-}
 
 export async function createHKRPGChannelClient({
   server,
@@ -69,10 +54,8 @@ export async function createHKRPGChannelClient({
   wine: Wine;
 }): Promise<ChannelClient> {
   const {
-    display: {
-      background: { url: background },
-      logo: { url: logo_url },
-    },
+    background: { url: background },
+    icon: { url: icon, link: icon_link },
   } = await getLatestAdvInfo(locale, server);
   const {
     main: {
@@ -117,8 +100,8 @@ export async function createHKRPGChannelClient({
     updateRequired,
     uiContent: {
       background,
-      url: "",
-      logo: logo_url,
+      iconImage: icon,
+      url: icon_link,
     },
     predownloadVersion: () => pre_download?.major?.version ?? "",
     dismissPredownload() {
@@ -378,32 +361,4 @@ async function checkGameState(locale: Locale, server: Server) {
       gameInstalled: false,
     } as const;
   }
-}
-
-async function getLatestVersionInfo(
-  server: Server
-): Promise<HoyoConnectGamePackageMainfest> {
-  const ret: HoyoConnectGetGamePackagesResponse = await (
-    await fetch(server.update_url)
-  ).json();
-  const game = ret.data.game_packages.find(x => x.game.biz == server.id);
-  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
-  return game;
-}
-
-async function getLatestAdvInfo(
-  locale: Locale,
-  server: Server
-): Promise<HoyoConnectGameId & HoyoConnectGameDisplay> {
-  const ret: HoyoConnectGetGamesResponse = await (
-    await fetch(
-      server.adv_url +
-        (server.id == "CN"
-          ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
-    )
-  ).json();
-  const game = ret.data.games.find(x => x.biz == server.id);
-  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
-  return game;
 }

@@ -4,8 +4,8 @@ import {
   ChannelClient,
   ChannelClientInstallState,
 } from "../../../channel-client";
-import { Server } from "../../../constants";
-import { Locale } from "../../../locale";
+import { Server } from "@constants";
+import { Locale } from "@locale";
 import {
   assertValueDefined,
   exec,
@@ -37,25 +37,11 @@ import {
 import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
 import { getGameVersion } from "../unity";
-import {
-  HoyoConnectGameDisplay,
-  HoyoConnectGameId,
-  HoyoConnectGamePackageMainfest,
-  HoyoConnectGetGamePackagesResponse,
-  HoyoConnectGetGamesResponse,
-  VoicePackNames,
-} from "../launcher-info";
+import { VoicePackNames } from "../launcher-info";
+import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "4.8.0";
-
-async function fetch(url: string) {
-  const { stdOut } = await exec(["curl", url]);
-  return {
-    async json() {
-      return JSON.parse(stdOut);
-    },
-  };
-}
+// no need to check supported version
+// const CURRENT_SUPPORTED_VERSION = "4.8.0";
 
 export async function createHK4EChannelClient({
   server,
@@ -69,10 +55,8 @@ export async function createHK4EChannelClient({
   wine: Wine;
 }): Promise<ChannelClient> {
   const {
-    display: {
-      background: { url: background },
-      logo: { url: logo_url },
-    },
+    background: { url: background },
+    icon: { url: icon, link: icon_link },
   } = await getLatestAdvInfo(locale, server);
   const {
     main: {
@@ -118,8 +102,8 @@ export async function createHK4EChannelClient({
     updateRequired,
     uiContent: {
       background,
-      url: "",
-      logo: logo_url,
+      iconImage: icon,
+      url: icon_link,
     },
     predownloadVersion: () => pre_download?.major?.version ?? "",
     dismissPredownload() {
@@ -163,14 +147,15 @@ export async function createHK4EChannelClient({
         return;
       }
       const gameVersion = await getGameVersion(join(selection, server.dataDir));
-      if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
-        await locale.alert(
-          "UNSUPPORTED_VERSION",
-          "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameVersion]
-        );
-        return;
-      } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
+      // if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
+      //   await locale.alert(
+      //     "UNSUPPORTED_VERSION",
+      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+      //     [gameVersion]
+      //   );
+      //   return;
+      // } else
+      if (lt(gameVersion, GAME_LATEST_VERSION)) {
         const updateTarget = patches.find(x => x.version == gameVersion);
         if (!updateTarget) {
           await locale.prompt(
@@ -300,17 +285,17 @@ export async function createHK4EChannelClient({
       });
     },
     async *launch(config: Config) {
-      if (
-        gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
-        !config.patchOff
-      ) {
-        await locale.alert(
-          "UNSUPPORTED_VERSION",
-          "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameCurrentVersion()]
-        );
-        return;
-      }
+      // if (
+      //   gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
+      //   !config.patchOff
+      // ) {
+      //   await locale.alert(
+      //     "UNSUPPORTED_VERSION",
+      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+      //     [gameCurrentVersion()]
+      //   );
+      //   return;
+      // }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
@@ -380,32 +365,4 @@ async function checkGameState(locale: Locale, server: Server) {
       gameInstalled: false,
     } as const;
   }
-}
-
-async function getLatestVersionInfo(
-  server: Server
-): Promise<HoyoConnectGamePackageMainfest> {
-  const ret: HoyoConnectGetGamePackagesResponse = await (
-    await fetch(server.update_url)
-  ).json();
-  const game = ret.data.game_packages.find(x => x.game.biz == server.id);
-  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
-  return game;
-}
-
-async function getLatestAdvInfo(
-  locale: Locale,
-  server: Server
-): Promise<HoyoConnectGameId & HoyoConnectGameDisplay> {
-  const ret: HoyoConnectGetGamesResponse = await (
-    await fetch(
-      server.adv_url +
-        (server.id == "CN"
-          ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
-    )
-  ).json();
-  const game = ret.data.games.find(x => x.biz == server.id);
-  if (!game) throw new Error(`failed to fetch game information: ${server.id}`);
-  return game;
 }

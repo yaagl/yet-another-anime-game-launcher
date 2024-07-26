@@ -119,11 +119,34 @@ export interface HoyoConnectGameDisplay {
   display_status: string;
 }
 
+export interface HoyoConnectGameBackground {
+  id: string;
+  background: {
+    url: string;
+    link: string;
+  };
+  icon: {
+    url: string;
+    hover_url: string;
+    link: string;
+  };
+}
+
 export interface HoyoConnectGetGamesResponse {
   retcode: number;
   message: string;
   data: {
     games: (HoyoConnectGameId & HoyoConnectGameDisplay)[];
+  };
+}
+
+export interface HoyoConnectGetAllGameBasicInfoResponse {
+  retcode: number;
+  message: string;
+  data: {
+    game_info_list: ({ game: HoyoConnectGameId } & {
+      backgrounds: HoyoConnectGameBackground[];
+    })[];
   };
 }
 
