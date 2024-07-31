@@ -58,7 +58,7 @@ mkdir -p "$EXTERNAL/hkrpg/os/files"
 # for file in * ; do mv "$file" "$(basename $file | base64 )"."${file##*.}" ; done
 # popd
 
-curl -sSL https://github.com/3Shain/neutralinojs/releases/download/v4.11.0-1/neutralinojs-v4.11.0-1.zip > neu.zip
+curl -sSL https://github.com/3Shain/neutralinojs/releases/download/v4.11.0-1/neutralinojs-v4.11.0.zip > neu.zip
 unzip -o -d bin neu.zip
 rm neu.zip
 

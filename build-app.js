@@ -198,9 +198,9 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   );
 
   // create an empty icon file in the app folder
-  await fs.ensureFile(
-    path.resolve(process.cwd(), `${appDistributionName}.app`, "Icon")
-  );
+  // await fs.ensureFile(
+  //   path.resolve(process.cwd(), `${appDistributionName}.app`, "Icon")
+  // );
 
   //
   await fs.writeFile(
@@ -279,7 +279,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
       process.cwd(),
       `${appDistributionName}.app`,
       "Contents",
-      "info.plist"
+      "Info.plist"
     ),
     `<?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
