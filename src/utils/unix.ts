@@ -4,7 +4,7 @@ import { exec, spawn, resolve, log } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
   return await exec(
-    [`/usr/bin/xattr`, "-r", "-d", attr, `${resolve(path)}`],
+    [`/usr/bin/xattr`, "-s", "-r", "-d", attr, `${resolve(path)}`],
     {},
     true
   );
