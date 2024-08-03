@@ -122,6 +122,23 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
+  async function setRetinaMode(state: boolean) {
+    await exec2("cmd", [
+      "/c",
+      "reg",
+      "add",
+      "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver",
+      "/v",
+      "RetinaMode",
+      "/t",
+      "REG_SZ",
+      "/d",
+      state ? "y" : "n",
+      "/f",
+    ]);
+    await waitUntilServerOff();
+  }
+
   return {
     exec,
     exec2,
@@ -130,6 +147,7 @@ export async function createWine(options: {
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
+    setRetinaMode,
     attributes: {
       ...options.distro.attributes,
     },

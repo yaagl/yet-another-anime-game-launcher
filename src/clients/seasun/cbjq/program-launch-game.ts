@@ -41,11 +41,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  if (config.retina) {
-    await putLocal(retina_on, resolve("retina.reg"));
-  } else {
-    await putLocal(retina_off, resolve("retina.reg"));
-  }
+  await wine.setRetinaMode(config.retina);
 
   if (config.leftCmd) {
     await putLocal(left_cmd_on, resolve("left_cmd.reg"));
@@ -55,6 +51,7 @@ export async function* launchGameProgram({
 
   const cmd = `@echo off
 cd "%~dp0"
+regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(
     join(gameDir, gameExecutable)
@@ -93,6 +90,7 @@ cd /d "${wine.toWinePath(gameDir)}"
               DXMT_LOG_PATH: yaaglDir,
               DXMT_CONFIG: "d3d11.preferredMaxFrameRate=60;",
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
+              GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
             }
           : {}),
       },
@@ -104,7 +102,6 @@ cd /d "${wine.toWinePath(gameDir)}"
     await log(String(e));
   }
 
-  await removeFile(resolve("retina.reg"));
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];

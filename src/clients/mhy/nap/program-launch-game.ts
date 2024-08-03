@@ -30,11 +30,7 @@ export async function* launchGameProgram({
   yield ["setStateText", "PATCHING"];
 
   // await putLocal(a, resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  if (config.retina) {
-    await putLocal(retina_on, resolve("retina.reg"));
-  } else {
-    await putLocal(retina_off, resolve("retina.reg"));
-  }
+  await wine.setRetinaMode(config.retina);
 
   if (config.leftCmd) {
     await putLocal(left_cmd_on, resolve("left_cmd.reg"));
@@ -44,24 +40,12 @@ export async function* launchGameProgram({
 
   const cmd = `@echo off
 cd "%~dp0"
-copy "${wine.toWinePath(join(gameDir, atob("bWh5cHJvdDMuc3lz")))}" "%TEMP%\\"
 copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
-regedit retina.reg
 regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
-${await (async () => {
-  if (config.fpsUnlock !== "default") {
-    return `"${wine.toWinePath(
-      resolve("./fpsunlock/genshin-force-fps.exe")
-    )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
-      join(gameDir, gameExecutable)
-    )}"`;
-  } else {
-    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
-  }
-})()}`;
+${wine.toWinePath(join(gameDir, gameExecutable))}`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
@@ -69,65 +53,51 @@ ${await (async () => {
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
-    await Promise.all([
-      wine.exec2(
-        "cmd",
-        ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
-        {
-          MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-          ...(wine.attributes.renderBackend == "gptk"
-            ? {
-                WINEDLLPATH_PREPEND: wine.attributes.crossover
-                  ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
-                  : "",
-              }
-            : {
-                WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-              }),
-          ...(wine.attributes.renderBackend == "dxvk"
-            ? {
-                DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-                ...(config.dxvkHud == ""
-                  ? {}
-                  : {
-                      DXVK_HUD: config.dxvkHud,
-                    }),
-                DXVK_STATE_CACHE_PATH: yaaglDir,
-                DXVK_LOG_PATH: yaaglDir,
-                DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-              }
-            : {}),
-          ...(wine.attributes.renderBackend == "dxmt"
-            ? {
-                WINEMSYNC: "1",
-                DXMT_LOG_PATH: yaaglDir,
-                DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
-              }
-            : {}),
-        },
-        logfile
-      ),
-      (async () => {
-        // while (processRunning) {
-        //   if ((await exec("cat",[logfile])).stdOut.includes("GCGMAH active")) {
-        //     await log("Game Launch Successful");
-        //     await forceMove(
-        //       join(gameDir, atob("bWh5cGJhc2UuZGxs") + ".bak"),
-        //       join(gameDir, atob("bWh5cGJhc2UuZGxs"))
-        //     );
-        //     break;
-        //   }
-        //   await wait(200);
-        // }
-      })(),
-    ]);
+    await wine.exec2(
+      "cmd",
+      ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
+      {
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+        ...(wine.attributes.renderBackend == "gptk"
+          ? {
+              WINEDLLPATH_PREPEND: wine.attributes.crossover
+                ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
+                : "",
+            }
+          : {
+              WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+            }),
+        ...(wine.attributes.renderBackend == "dxvk"
+          ? {
+              DXVK_ASYNC: config.dxvkAsync ? "1" : "",
+              ...(config.dxvkHud == ""
+                ? {}
+                : {
+                    DXVK_HUD: config.dxvkHud,
+                  }),
+              DXVK_STATE_CACHE_PATH: yaaglDir,
+              DXVK_LOG_PATH: yaaglDir,
+              DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
+            }
+          : {}),
+        ...(wine.attributes.renderBackend == "dxmt"
+          ? {
+              WINEMSYNC: "1",
+              DXMT_LOG_PATH: yaaglDir,
+              DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
+              GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
+            }
+          : {}),
+      },
+      logfile
+    );
+    await wine.waitUntilServerOff();
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
   }
 
   // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(resolve("retina.reg"));
   await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
