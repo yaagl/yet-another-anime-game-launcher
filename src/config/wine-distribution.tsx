@@ -1,6 +1,4 @@
 import {
-  Alert,
-  AlertIcon,
   Button,
   FormControl,
   FormLabel,
@@ -16,19 +14,10 @@ import {
   SelectValue,
 } from "@hope-ui/solid";
 import { createSignal, For, Show } from "solid-js";
-import { checkCrossover } from "../wine/crossover";
 import { Locale } from "../locale";
-import {
-  getKey,
-  setKey,
-  _safeRelaunch,
-  assertValueDefined,
-  arrayFind,
-  open,
-} from "../utils";
-import { WineVersionChecker } from "../wine";
+import { getKey, setKey, _safeRelaunch, assertValueDefined } from "../utils";
 import { Config } from "./config-def";
-import { checkWhisky } from "../wine/whisky";
+import { getWineDistributions } from "@wine";
 
 declare module "./config-def" {
   interface Config {
@@ -38,60 +27,58 @@ declare module "./config-def" {
 
 export async function createWineDistroConfig({
   locale,
-  wineVersionChecker,
   config,
 }: {
   locale: Locale;
-  wineVersionChecker: WineVersionChecker;
   config: Partial<Config>;
 }) {
   config.wineDistro = await getKey("wine_tag");
 
-  const crossoverPresent = await checkCrossover();
-
-  const whiskyPresent = await checkWhisky();
+  const versions = await getWineDistributions();
 
   assertValueDefined(config.wineDistro);
   const [value, setValue] = createSignal(config.wineDistro);
 
-  const [wineVersions, setwineVersions] = createSignal(
-    [
-      {
-        tag: config.wineDistro,
-        url: "not_applicable",
-      },
-    ].filter(
-      x =>
-        x.tag != "crossover" &&
-        x.tag != "crossover-d3dm" &&
-        x.tag != "whisky-dxvk" &&
-        x.tag != "whisky"
-    )
+  const [wineVersions] = createSignal<
+    {
+      tag: string;
+      url: string;
+      displayName: string;
+    }[]
+  >(
+    (() => {
+      if (versions.find(x => x.id === config.wineDistro)) {
+        return versions.map(x => ({
+          tag: x.id,
+          url: x.remoteUrl,
+          displayName: x.displayName,
+        }));
+      } else {
+        return [
+          {
+            tag: config.wineDistro,
+            url: "not_applicable",
+            displayName: config.wineDistro,
+          },
+          ...versions.map(x => ({
+            tag: x.id,
+            url: x.remoteUrl,
+            displayName: x.displayName,
+          })),
+        ];
+      }
+    })()
   );
-  (async () => {
-    const versions = await wineVersionChecker.getAllReleases();
-    if (versions.find(x => x.tag === config.wineDistro)) {
-      setwineVersions(versions);
-    } else {
-      setwineVersions(x => [...x, ...versions]);
-    }
-  })();
 
   async function applyChanges() {
     const tag = (config.wineDistro = value());
+    const distro = wineVersions().find(x => x.tag === tag);
+    if (!distro) return;
     await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
     {
       await setKey("wine_state", "update");
       await setKey("wine_update_tag", tag);
-      await setKey(
-        "wine_update_url",
-        tag == "crossover" ||
-          tag == "crossover-d3dm" ||
-          tag == "whisky-dxvk" ||
-          tag == "whisky"
-          ? "not_appliable"
-          : arrayFind(wineVersions(), x => x.tag == tag).url
-      );
+      await setKey("wine_update_url", distro.url);
       await _safeRelaunch();
     }
   }
@@ -109,26 +96,10 @@ export async function createWineDistroConfig({
             </SelectTrigger>
             <SelectContent>
               <SelectListbox>
-                <For
-                  each={[
-                    ...wineVersions(),
-                    ...(crossoverPresent
-                      ? [
-                          { tag: "crossover", url: "not_appliable" },
-                          { tag: "crossover-d3dm", url: "not_appliable" },
-                        ]
-                      : []),
-                    ...(whiskyPresent
-                      ? [
-                          { tag: "whisky-dxvk", url: "not_appliable" },
-                          { tag: "whisky", url: "not_appliable" },
-                        ]
-                      : []),
-                  ]}
-                >
+                <For each={[...wineVersions()]}>
                   {item => (
                     <SelectOption value={item.tag}>
-                      <SelectOptionText>{item.tag}</SelectOptionText>
+                      <SelectOptionText>{item.displayName}</SelectOptionText>
                       <SelectOptionIndicator />
                     </SelectOption>
                   )}

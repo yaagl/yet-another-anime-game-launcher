@@ -1,4 +1,3 @@
-import { createWineVersionChecker, Wine } from "@wine";
 import { openDir, fatal, open } from "@utils";
 import {
   Box,
@@ -26,6 +25,7 @@ import { Github } from "../github";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
 import { ChannelClient } from "../channel-client";
 import { createTaskQueueState } from "./task-queue";
+import { Wine } from "@wine";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -68,7 +68,6 @@ export async function createLauncher({
 }) {
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wine,
-    wineVersionChecker: await createWineVersionChecker(github),
     locale,
     gameInstallDir: installDir,
     configForChannelClient: createConfig,

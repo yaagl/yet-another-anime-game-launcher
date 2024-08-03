@@ -75,14 +75,17 @@ ${await (async () => {
         ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
         {
           MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-          ...(wine.attributes.isGamePortingToolkit
+          ...(wine.attributes.renderBackend == "gptk"
             ? {
-                WINEDLLPATH_PREPEND: wine.attributes.cx
+                WINEDLLPATH_PREPEND: wine.attributes.crossover
                   ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
                   : "",
               }
             : {
                 WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+              }),
+          ...(wine.attributes.renderBackend == "dxvk"
+            ? {
                 DXVK_ASYNC: config.dxvkAsync ? "1" : "",
                 ...(config.dxvkHud == ""
                   ? {}
@@ -92,8 +95,14 @@ ${await (async () => {
                 DXVK_STATE_CACHE_PATH: yaaglDir,
                 DXVK_LOG_PATH: yaaglDir,
                 DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-                GIWINEHOSTS: `${server.hosts}`,
-              }),
+              }
+            : {}),
+          ...(wine.attributes.renderBackend == "dxmt"
+            ? {
+                DXMT_LOG_PATH: yaaglDir,
+                DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
+              }
+            : {}),
         },
         logfile
       ),

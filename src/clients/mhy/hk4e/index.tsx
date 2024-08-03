@@ -30,8 +30,8 @@ import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
+  checkAndDownloadDXMT,
   checkAndDownloadDXVK,
-  checkAndDownloadFpsUnlocker,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { createWorkaround3Config } from "./config/workaround-3";
@@ -299,9 +299,11 @@ export async function createHK4EChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      yield* checkAndDownloadDXVK(aria2);
-      if (config.fpsUnlock != "default") {
-        yield* checkAndDownloadFpsUnlocker(aria2);
+      if (wine.attributes.renderBackend == "dxvk") {
+        yield* checkAndDownloadDXVK(aria2);
+      }
+      if (wine.attributes.renderBackend == "dxmt") {
+        yield* checkAndDownloadDXMT(aria2);
       }
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),

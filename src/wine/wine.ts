@@ -11,19 +11,21 @@ import {
   stats,
   resolve,
 } from "@utils";
-import cpu_db from "../constants/cpu_db";
 import { dirname, join } from "path-browserify";
-
-export interface WineAttribute {
-  isGamePortingToolkit: boolean;
-  cx: boolean;
-}
+import { WineDistribution } from "./distro";
+import { getCrossoverBinary } from "./crossover";
+import { getWhiskyBinary } from "./whisky";
 
 export async function createWine(options: {
-  loaderBin: string;
   prefix: string;
-  attributes: WineAttribute;
+  distro: WineDistribution;
 }) {
+  const loaderBin = options.distro.attributes.crossover
+    ? await getCrossoverBinary()
+    : options.distro.attributes.whisky
+    ? await getWhiskyBinary()
+    : await getCorrectWineBinary();
+
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
   }
@@ -36,8 +38,8 @@ export async function createWine(options: {
   ) {
     return await unixExec(
       program == "copy"
-        ? [options.loaderBin, "cmd", "/c", program, ...args]
-        : [options.loaderBin, program, ...args],
+        ? [loaderBin, "cmd", "/c", program, ...args]
+        : [loaderBin, program, ...args],
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -55,8 +57,8 @@ export async function createWine(options: {
   ) {
     return await unixExec2(
       program == "copy"
-        ? [options.loaderBin, "cmd", "/c", program, ...args]
-        : [options.loaderBin, program, ...args],
+        ? [loaderBin, "cmd", "/c", program, ...args]
+        : [loaderBin, program, ...args],
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -67,12 +69,9 @@ export async function createWine(options: {
   }
 
   async function waitUntilServerOff() {
-    return await unixExec2(
-      [join(dirname(options.loaderBin), "wineserver"), "-w"],
-      {
-        ...getEnvironmentVariables(),
-      }
-    );
+    return await unixExec2([join(dirname(loaderBin), "wineserver"), "-w"], {
+      ...getEnvironmentVariables(),
+    });
   }
 
   function toWinePath(absPath: string) {
@@ -99,7 +98,7 @@ export async function createWine(options: {
           "to",
           "do",
           "script",
-          `"${build([options.loaderBin, "cmd"], {
+          `"${build([loaderBin, "cmd"], {
             ...getEnvironmentVariables(),
             WINEPATH: toWinePath(gameDir),
           })
@@ -123,19 +122,6 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  const cpuInfo = await getCPUInfo();
-  await log(JSON.stringify(cpuInfo));
-  const fakeCpu: Record<string, string> =
-    cpuInfo.model.indexOf("Apple") >= 0
-      ? cpuInfo.logicalThreads in cpu_db
-        ? {
-            GIWINECPUNAME: cpu_db[cpuInfo.logicalThreads as 8][0].name,
-            GIWINECPUFREQ: cpu_db[cpuInfo.logicalThreads as 8][0].frequency,
-            GIWINECPUVID: cpu_db[cpuInfo.logicalThreads as 8][0].vendor,
-          }
-        : {}
-      : {};
-
   return {
     exec,
     exec2,
@@ -144,7 +130,9 @@ export async function createWine(options: {
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
-    attributes: options.attributes,
+    attributes: {
+      ...options.distro.attributes,
+    },
   };
 }
 

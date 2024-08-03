@@ -19,25 +19,11 @@ import {
 import { Config } from "@config";
 import { disableUnityFeature } from "./unity";
 import { Wine } from "@wine";
+import { DXMT_FILES, DXVK_FILES } from "src/downloadable-resource";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
 }
-
-const dxvkFiles = [
-  {
-    name: "dxgi",
-  },
-  {
-    name: "d3d9",
-  },
-  {
-    name: "d3d10core",
-  },
-  {
-    name: "d3d11",
-  },
-];
 
 export async function* patchProgram(
   gameDir: string,
@@ -77,7 +63,7 @@ export async function* patchProgram(
   }
   // FIXME: dirty hack
   if (
-    !wine.attributes.isGamePortingToolkit &&
+    wine.attributes.renderBackend == "dxvk" &&
     ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
   ) {
     await forceMove(
@@ -92,13 +78,16 @@ export async function* patchProgram(
     );
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (!wine.attributes.isGamePortingToolkit) {
-    for (const f of dxvkFiles) {
-      await forceMove(
-        join(system32Dir, f.name + ".dll"),
-        join(system32Dir, f.name + ".dll.bak")
-      );
-      await cp(`./dxvk/${f.name}.dll`, join(system32Dir, f.name + ".dll"));
+  if (wine.attributes.renderBackend == "dxvk") {
+    for (const f of DXVK_FILES) {
+      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
+      await cp(`./dxvk/${f}`, join(system32Dir, f));
+    }
+  }
+  if (wine.attributes.renderBackend == "dxmt") {
+    for (const f of DXMT_FILES) {
+      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
+      await cp(`./dxmt/${f}`, join(system32Dir, f));
     }
   }
   if (config.reshade) {
@@ -144,7 +133,7 @@ export async function* patchRevertProgram(
   }
   // FIXME: dirty hack
   if (
-    !wine.attributes.isGamePortingToolkit &&
+    wine.attributes.renderBackend == "dxvk" &&
     ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
   ) {
     await forceMove(
@@ -153,12 +142,14 @@ export async function* patchRevertProgram(
     );
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (!wine.attributes.isGamePortingToolkit) {
-    for (const f of dxvkFiles) {
-      await forceMove(
-        join(system32Dir, f.name + ".dll.bak"),
-        join(system32Dir, f.name + ".dll")
-      );
+  if (wine.attributes.renderBackend == "dxvk") {
+    for (const f of DXVK_FILES) {
+      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
+    }
+  }
+  if (wine.attributes.renderBackend == "dxmt") {
+    for (const f of DXMT_FILES) {
+      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
     }
   }
   if (config.reshade) {

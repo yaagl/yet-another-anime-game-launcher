@@ -96,27 +96,13 @@ export async function createApp() {
     }
   }
 
-  const { wineReady, wineUpdate, wineUpdateTag, wineTag } = await checkWine(
-    github
-  );
+  const wineStatus = await checkWine(github);
   const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
 
-  if (wineReady) {
+  if (wineStatus.wineReady) {
     const wine = await createWine({
-      loaderBin:
-        wineTag == "crossover" || wineTag == "crossover-d3dm"
-          ? await getCrossoverBinary()
-          : wineTag == "whisky-dxvk" || wineTag == "whisky"
-          ? await getWhiskyBinary()
-          : await getCorrectWineBinary(),
       prefix: prefixPath,
-      attributes: {
-        isGamePortingToolkit:
-          wineTag == "whisky" ||
-          wineTag == "crossover-d3dm" ||
-          wineTag.indexOf("gptk") >= 0,
-        cx: wineTag == "crossover" || wineTag == "crossover-d3dm",
-      },
+      distro: wineStatus.wineDistribution,
     });
     return await createLauncher({
       wine,
@@ -131,9 +117,8 @@ export async function createApp() {
   } else {
     return await createWineInstallProgram({
       aria2,
-      wineUpdateTarGzFile: wineUpdate,
       wineAbsPrefix: prefixPath,
-      wineTag: wineUpdateTag,
+      wineDistro: wineStatus.wineDistribution,
       locale,
     });
   }

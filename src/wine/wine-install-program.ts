@@ -13,46 +13,32 @@ import {
   resolve,
 } from "@utils";
 import { ENSURE_HOSTS } from "../clients/secret";
-import { CROSSOVER_DATA, getCrossoverBinary } from "./crossover";
+import { CROSSOVER_DATA } from "./crossover";
 import { ensureHosts } from "../hosts";
-import { createWine, getCorrectWineBinary } from "./wine";
+import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
-import { getWhiskyBinary } from "./whisky";
+import { WineDistribution } from "./distro";
 
 export async function createWineInstallProgram({
-  // github:
   aria2,
-  wineUpdateTarGzFile,
   wineAbsPrefix,
-  wineTag,
+  wineDistro,
   locale,
 }: {
   aria2: Aria2;
   locale: Locale;
-  wineUpdateTarGzFile: string;
   wineAbsPrefix: string;
-  wineTag: string;
+  wineDistro: WineDistribution;
 }) {
   async function* program(): CommonUpdateProgram {
     const wineBinaryDir = resolve("./wine");
 
     await rmrf_dangerously(wineAbsPrefix);
-    if (
-      wineTag === "crossover" ||
-      wineTag === "crossover-d3dm" ||
-      wineTag == "whisky-dxvk" ||
-      wineTag == "whisky"
-    ) {
-      // yield* checkAndDownloadMoltenVK(aria2);
-      yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
-
-      await ensureHosts(ENSURE_HOSTS);
-      yield ["setUndeterminedProgress"];
-    } else {
+    if (!wineDistro.attributes.crossover && !wineDistro.attributes.whisky) {
       yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
       const wineTarPath = resolve("./wine.tar.gz");
       for await (const progress of aria2.doStreamingDownload({
-        uri: wineUpdateTarGzFile,
+        uri: wineDistro.remoteUrl,
         absDst: wineTarPath,
       })) {
         yield [
@@ -79,26 +65,18 @@ export async function createWineInstallProgram({
       await xattrRemove("com.apple.quarantine", wineBinaryDir);
     }
 
-    const wine64Bin =
-      wineTag === "crossover" || wineTag === "crossover-d3dm"
-        ? await getCrossoverBinary()
-        : wineTag === "whisky-dxvk" || wineTag === "whisky"
-        ? await getWhiskyBinary()
-        : await getCorrectWineBinary();
+    yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+
+    yield ["setUndeterminedProgress"];
+    await ensureHosts(ENSURE_HOSTS);
+
     const wine = await createWine({
-      loaderBin: wine64Bin,
       prefix: wineAbsPrefix,
-      attributes: {
-        isGamePortingToolkit:
-          wineTag == "whisky" ||
-          wineTag == "crossover-d3dm" ||
-          wineTag.indexOf("gptk") >= 0,
-        cx: wineTag == "crossover" || wineTag == "crossover-d3dm",
-      },
+      distro: wineDistro,
     });
     await wine.exec("wineboot", ["-u"], {}, "/dev/null");
     await wine.exec("winecfg", ["-v", "win10"], {}, "/dev/null");
-    if (wineTag === "crossover" || wineTag === "crossover-d3dm") {
+    if (wineDistro.attributes.crossover) {
       await wine.exec(
         "rundll32",
         [
@@ -127,7 +105,7 @@ export async function createWineInstallProgram({
     }
 
     await setKey("wine_state", "ready");
-    await setKey("wine_tag", wineTag);
+    await setKey("wine_tag", wineDistro.id);
     await setKey("wine_update_url", null);
     await setKey("wine_update_tag", null);
     const netbiosname = `DESKTOP-${generateRandomString(7)}`; // exactly 15 chars

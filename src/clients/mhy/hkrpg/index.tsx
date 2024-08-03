@@ -30,8 +30,8 @@ import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
+  checkAndDownloadDXMT,
   checkAndDownloadDXVK,
-  checkAndDownloadFpsUnlocker,
   checkAndDownloadJadeite,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
@@ -297,7 +297,12 @@ export async function createHKRPGChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      yield* checkAndDownloadDXVK(aria2);
+      if (wine.attributes.renderBackend == "dxvk") {
+        yield* checkAndDownloadDXVK(aria2);
+      }
+      if (wine.attributes.renderBackend == "dxmt") {
+        yield* checkAndDownloadDXMT(aria2);
+      }
       yield* checkAndDownloadJadeite(aria2);
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),

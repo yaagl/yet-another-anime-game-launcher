@@ -22,7 +22,7 @@ import {
 } from "@hope-ui/solid";
 import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../constants";
 import { Locale } from "../locale";
-import { Wine, WineVersionChecker } from "../wine";
+import { Wine } from "../wine";
 import { Config } from "./config-def";
 import { createDxvkAsyncConfig } from "./dxvk-async";
 import { createDxvkHUDConfig } from "./dxvk-hud";
@@ -39,13 +39,11 @@ import createReShade from "./reshade";
 
 export async function createConfiguration({
   wine,
-  wineVersionChecker,
   locale,
   gameInstallDir,
   configForChannelClient,
 }: {
   wine: Wine;
-  wineVersionChecker: WineVersionChecker;
   locale: Locale;
   gameInstallDir: () => string;
   configForChannelClient: (
@@ -57,7 +55,6 @@ export async function createConfiguration({
   const [WD] = await createWineDistroConfig({
     locale,
     config,
-    wineVersionChecker,
   });
   const [DA] = await createDxvkAsyncConfig({ locale, config });
   const [DH] = await createDxvkHUDConfig({ locale, config });

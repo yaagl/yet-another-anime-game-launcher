@@ -30,8 +30,8 @@ import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
+  checkAndDownloadDXMT,
   checkAndDownloadDXVK,
-  checkAndDownloadFpsUnlocker,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import createPatchOff from "./config/patch-off";
@@ -298,9 +298,11 @@ export async function createNAPChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      yield* checkAndDownloadDXVK(aria2);
-      if (config.fpsUnlock != "default") {
-        yield* checkAndDownloadFpsUnlocker(aria2);
+      if (wine.attributes.renderBackend == "dxvk") {
+        yield* checkAndDownloadDXVK(aria2);
+      }
+      if (wine.attributes.renderBackend == "dxmt") {
+        yield* checkAndDownloadDXMT(aria2);
       }
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),

@@ -32,8 +32,8 @@ import { patchRevertProgram } from "./program-patch-game";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
+  checkAndDownloadDXMT,
   checkAndDownloadDXVK,
-  checkAndDownloadFpsUnlocker,
   checkAndDownloadJadeite,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
@@ -185,11 +185,13 @@ export async function createCBJQChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      yield* checkAndDownloadDXVK(aria2);
-      yield* checkAndDownloadJadeite(aria2);
-      if (config.fpsUnlock != "default") {
-        yield* checkAndDownloadFpsUnlocker(aria2);
+      if (wine.attributes.renderBackend == "dxvk") {
+        yield* checkAndDownloadDXVK(aria2);
       }
+      if (wine.attributes.renderBackend == "dxmt") {
+        yield* checkAndDownloadDXMT(aria2);
+      }
+      yield* checkAndDownloadJadeite(aria2);
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),
         wine,

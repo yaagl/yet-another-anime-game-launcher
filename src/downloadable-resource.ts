@@ -52,7 +52,12 @@ export async function* checkAndDownloadMoltenVK(
   setKey("installed_moltenvk_version", CURRENT_MVK_VERSION);
 }
 
-const dxvkFiles = ["d3d9.dll", "d3d10core.dll", "d3d11.dll", "dxgi.dll"];
+export const DXVK_FILES = [
+  "d3d9.dll",
+  "d3d10core.dll",
+  "d3d11.dll",
+  "dxgi.dll",
+];
 const CURRENT_DXVK_VERSION = "1.10.4-alpha.20230402"; // there is no 1.10.4! I have to make up something greater than 1.10.3
 const CURRENT_JADEITE_VERSION = "3.2.0";
 
@@ -68,7 +73,7 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
 
   await mkdirp("./dxvk");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  for (const file of dxvkFiles) {
+  for (const file of DXVK_FILES) {
     for await (const progress of aria2.doStreamingDownload({
       uri: `https://github.com/3Shain/winecx/releases/download/gi-wine-1.0/${file}`,
       absDst: resolve(`./dxvk/${file}`),
@@ -129,38 +134,39 @@ export async function* checkAndDownloadJadeite(
   setKey("installed_jadeite_version", CURRENT_JADEITE_VERSION);
 }
 
-const CURRENT_FPSUNLOCK_VERSION = "0.1.2";
+export const DXMT_FILES = ["d3d10core.dll", "d3d11.dll", "dxgi.dll"];
+const CURRENT_DXMT_VERSION = "0.0.1";
 
-export async function* checkAndDownloadFpsUnlocker(
-  aria2: Aria2
-): CommonUpdateProgram {
+export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
-    (await fileOrDirExists("./fpsunlock/genshin-force-fps.exe")) &&
     eq(
-      CURRENT_FPSUNLOCK_VERSION,
-      await getKeyOrDefault("installed_fps_unlock", "0.0.0")
+      CURRENT_DXMT_VERSION,
+      await getKeyOrDefault("installed_dxmt_version", "0.0.0")
     )
   ) {
     return;
   }
 
-  await mkdirp("./fpsunlock");
+  await mkdirp("./dxmt");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  for await (const progress of aria2.doStreamingDownload({
-    uri: "https://github.com/y0soro/genshin-force-fps-rs/releases/download/v0.1.2/genshin-force-fps.exe",
-    absDst: resolve("./fpsunlock/genshin-force-fps.exe"),
-  })) {
-    yield [
-      "setProgress",
-      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
-    ];
-    yield [
-      "setStateText",
-      "DOWNLOADING_ENVIRONMENT_SPEED",
-      `${humanFileSize(Number(progress.downloadSpeed))}`,
-    ];
+  for (const file of DXMT_FILES) {
+    for await (const progress of aria2.doStreamingDownload({
+      uri: `https://github.com/3Shain/wine/releases/download/v9.9-mingw/${file}`,
+      absDst: resolve(`./dxmt/${file}`),
+    })) {
+      yield [
+        "setProgress",
+        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      ];
+      yield [
+        "setStateText",
+        "DOWNLOADING_ENVIRONMENT_SPEED",
+        `${humanFileSize(Number(progress.downloadSpeed))}`,
+      ];
+    }
   }
-  setKey("installed_fps_unlock", CURRENT_FPSUNLOCK_VERSION);
+
+  setKey("installed_dxmt_version", CURRENT_DXMT_VERSION);
 }
 
 const CURRENT_RESHADE_VERSION = "5.8.0";
