@@ -99,6 +99,7 @@ ${await (async () => {
             : {}),
           ...(wine.attributes.renderBackend == "dxmt"
             ? {
+                WINEMSYNC: "1",
                 DXMT_LOG_PATH: yaaglDir,
                 DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
               }

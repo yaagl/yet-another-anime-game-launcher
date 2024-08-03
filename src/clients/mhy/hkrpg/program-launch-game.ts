@@ -84,6 +84,7 @@ cd /d "${wine.toWinePath(gameDir)}"
           : {}),
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
+              WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
               DXMT_CONFIG: "d3d11.preferredMaxFrameRate=60;",
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
