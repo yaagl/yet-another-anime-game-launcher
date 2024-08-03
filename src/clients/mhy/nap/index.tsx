@@ -146,7 +146,10 @@ export async function createNAPChannelClient({
         await setKey("game_install_dir", selection);
         return;
       }
-      const gameVersion = await getGameVersion(join(selection, server.dataDir));
+      const gameVersion = await getGameVersion(
+        join(selection, server.dataDir),
+        0xc4
+      );
       if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
         await locale.alert(
           "UNSUPPORTED_VERSION",
