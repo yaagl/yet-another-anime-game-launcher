@@ -1,8 +1,3 @@
-import retina_on from "../../../constants/retina_on.reg?url";
-import retina_off from "../../../constants/retina_off.reg?url";
-import left_cmd_on from "../../../constants/left_cmd_on.reg?url";
-import left_cmd_off from "../../../constants/left_cmd_off.reg?url";
-
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { Server } from "@constants";
@@ -37,17 +32,10 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await wine.setRetinaMode(config.retina);
-
-  if (config.leftCmd) {
-    await putLocal(left_cmd_on, resolve("left_cmd.reg"));
-  } else {
-    await putLocal(left_cmd_off, resolve("left_cmd.reg"));
-  }
+  await wine.setProps(config);
 
   const cmd = `@echo off
 cd "%~dp0"
-regedit left_cmd.reg
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(resolve("./jadeite/jadeite.exe"))}" "${wine.toWinePath(
     join(gameDir, gameExecutable)
@@ -88,7 +76,9 @@ cd /d "${wine.toWinePath(gameDir)}"
                 DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
                 GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
               }
-            : {}),
+            : {
+                WINEESYNC: "1",
+              }),
         },
         logfile
       ),
@@ -112,7 +102,6 @@ cd /d "${wine.toWinePath(gameDir)}"
     await log(String(e));
   }
 
-  await removeFile(resolve("left_cmd.reg"));
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);

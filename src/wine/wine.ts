@@ -10,6 +10,7 @@ import {
   generateRandomString,
   stats,
   resolve,
+  writeFile,
 } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
@@ -80,7 +81,6 @@ export async function createWine(options: {
 
   function getEnvironmentVariables() {
     return {
-      WINEESYNC: "1",
       WINEDEBUG: "fixme-all,err-unwind,+timestamp",
       WINEPREFIX: options.prefix,
     };
@@ -122,20 +122,23 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  async function setRetinaMode(state: boolean) {
-    await exec2("cmd", [
-      "/c",
-      "reg",
-      "add",
-      "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver",
-      "/v",
-      "RetinaMode",
-      "/t",
-      "REG_SZ",
-      "/d",
-      state ? "y" : "n",
-      "/f",
-    ]);
+  async function setProps(props: { retina: boolean; leftCmd: boolean }) {
+    const cmd = `@echo off
+cd "%~dp0"
+reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ /d ${
+      props.retina ? "y" : "n"
+    } /f
+reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t REG_SZ /d ${
+      props.leftCmd ? "y" : "n"
+    } /f
+`;
+    await writeFile(resolve("winedrv_config.bat"), cmd);
+    await exec(
+      "cmd",
+      ["/c", `${toWinePath(resolve("./winedrv_config.bat"))}`],
+      {},
+      "/dev/null"
+    );
     await waitUntilServerOff();
   }
 
@@ -147,7 +150,7 @@ export async function createWine(options: {
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
-    setRetinaMode,
+    setProps,
     attributes: {
       ...options.distro.attributes,
     },
