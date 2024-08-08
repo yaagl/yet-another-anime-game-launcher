@@ -28,6 +28,16 @@ This is a list of people/organization violating Yaagl policies -->
 
 Use it at your own risk. Or enjoying it with a new f2p account.
 
+## Support
+
+[Our Discord server](https://discord.gg/HrV52MgSC2) is the **ONLY** place providing support if you have any issue just using this application. 
+
+**DON'T FILE AN ISSUE** unless it's a technical problem coming with a clear root cause. 
+
+> Simply put _My game doesn't launch_ or _I can't login_ without telling any technical detail is not acceptable, please go to the Discord server instead of abusing Github Issues
+
+**DON'T ASK FOR SUPPORT IN OTHER COMMUNITY**, especially the official one.
+
 ## Install
 
 - Go to [Release](https://github.com/3Shain/yet-another-anime-game-launcher/releases/latest) and download the latest version.
@@ -35,7 +45,7 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 - Uncompress and copy the resulting application to your `/Applications` folder. (Do not open the application from Downloads folder).
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
-
+<!-- 
 ## Development (Outdated)
 
 ### Setup
@@ -59,11 +69,11 @@ pnpm run start-hk4eos
 ### Build
 ```sh
 node ./build-app.js
-```
+``` -->
 
 ## Uninstall (completely)
 1. Drag app to the bin
-2. Delete folder `~/Library/Application Support/Yaagl` or `~/Library/Application Support/Yaagl OS` if you are using oversea version
+2. Delete folder `~/Library/Application Support/Yaagl` or `~/Library/Application Support/Yaagl OS` if you are using oversea version. (For HSR and ZZZ the name of folder is slightly different)
 
 ## Related projects
 
