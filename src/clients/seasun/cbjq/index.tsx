@@ -52,7 +52,7 @@ const getGameVersion = async (gameDir: string) => {
   return localResourceData.projectVersion;
 };
 
-const CURRENT_SUPPORTED_VERSION = "1.8.0";
+const CURRENT_SUPPORTED_VERSION = "2.0.0";
 
 export async function createCBJQChannelClient({
   server,
