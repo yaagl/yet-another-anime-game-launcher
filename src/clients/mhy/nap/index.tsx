@@ -47,7 +47,7 @@ export async function getGameVersion(gameDataDir: string, offset: number) {
   const res = join(gameDataDir, "resources.assets");
   // dirty fix
   const md5sum = (await md5(res)).toLowerCase();
-  if(md5sum == "9210cde58b1d5df1a3224c3786139e01") return "1.0.1";
+  if (md5sum == "9210cde58b1d5df1a3224c3786139e01") return "1.0.1";
   return ret;
 }
 
