@@ -12,6 +12,7 @@ import {
   getFreeSpace,
   getKey,
   getKeyOrDefault,
+  md5,
   setKey,
   stats,
   waitImageReady,
@@ -35,11 +36,20 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import createPatchOff from "./config/patch-off";
-import { getGameVersion } from "../unity";
+import { getGameVersion as _getGameVersion } from "../unity";
 import { VoicePackNames } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "1.0.1";
+const CURRENT_SUPPORTED_VERSION = "1.1.0";
+
+export async function getGameVersion(gameDataDir: string, offset: number) {
+  const ret = await _getGameVersion(gameDataDir, offset);
+  const res = join(gameDataDir, "resources.assets");
+  // dirty fix
+  const md5sum = (await md5(res)).toLowerCase();
+  if(md5sum == "9210cde58b1d5df1a3224c3786139e01") return "1.0.1";
+  return ret;
+}
 
 export async function createNAPChannelClient({
   server,
@@ -92,9 +102,7 @@ export async function createNAPChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () =>
-    // !HACK: ignore patch version!
-    lt(gameCurrentVersion(), GAME_LATEST_VERSION.substring(0, 3) + ".0");
+  const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
     installState: installed,
     showPredownloadPrompt,
