@@ -40,7 +40,7 @@ import { VoicePackNames } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.4.0";
+const CURRENT_SUPPORTED_VERSION = "2.5.0";
 
 export async function createHKRPGChannelClient({
   server,
