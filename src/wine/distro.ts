@@ -63,6 +63,15 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
       renderBackend: "gptk",
     },
   },
+  {
+    id: "hsr-gptk2",
+    displayName: "Wine 7.7 GPTK2",
+    remoteUrl:
+      "https://github.com/1146839821/wine/releases/download/0.0.1/wine.tar.gz",
+    attributes: {
+      renderBackend: "gptk",
+    },
+  },
 ];
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
