@@ -8,6 +8,7 @@ export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "dxvk" | "gptk";
   crossover: boolean;
   whisky: boolean;
+  community: boolean;
 }
 
 export interface WineDistribution {
@@ -64,12 +65,13 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     },
   },
   {
-    id: "hsr-gptk2",
-    displayName: "Wine 7.7 GPTK2",
+    id: "community-hsr-gptk",
+    displayName: "GPTK (Community Ver.)",
     remoteUrl:
       "https://github.com/1146839821/wine/releases/download/0.0.1/wine.tar.gz",
     attributes: {
       renderBackend: "gptk",
+      community:true
     },
   },
 ];

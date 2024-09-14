@@ -108,4 +108,7 @@ export const de_DE: typeof zh_CN = {
     "Ihre aktuelle Spielversion ({0}) ist zu alt, um inkrementell aktualisiert zu werden. Bitte installieren Sie das Spiel neu.",
 
   PREDOWNLOAD_READY: "Pre-Download {0}",
+
+  COMMUNITY_WARNING:"Gemeiner alarm.",
+  COMMUNITY_WINE_ALERT:"Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
 };

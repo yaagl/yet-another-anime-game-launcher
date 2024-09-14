@@ -106,4 +106,7 @@ export const en: typeof zh_CN = {
     "Your current game version ({0}) is too old to update incrementally. Please re-install the game.",
 
   PREDOWNLOAD_READY: "Pre-download {0}",
+
+  COMMUNITY_WARNING:"Community Warning",
+  COMMUNITY_WINE_ALERT:"The current selection is the Community version, this version is not officially supported, please do not report any issues",
 };

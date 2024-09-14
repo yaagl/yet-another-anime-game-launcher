@@ -107,4 +107,7 @@ export const vi_VN: typeof zh_CN = {
   GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
 
   PREDOWNLOAD_READY: en.PREDOWNLOAD_READY,
+
+  COMMUNITY_WARNING:"Cảnh báo phiên bản cộng đồng",
+  COMMUNITY_WINE_ALERT:"Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
 };
