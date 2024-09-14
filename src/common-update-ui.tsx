@@ -7,7 +7,7 @@ import { UPDATE_UI_IMAGE } from "./clients";
 
 export function createCommonUpdateUI(
   locale: Locale,
-  program: () => CommonUpdateProgram
+  program: () => CommonUpdateProgram,
 ) {
   let confirmRestart: (v: unknown) => void;
   const confirmRestartPromise = new Promise(res => {

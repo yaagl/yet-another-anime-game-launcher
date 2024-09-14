@@ -27,8 +27,8 @@ export async function createWorkaround3Config({
       import.meta.env["YAAGL_CHANNEL_CLIENT"] == "hk4eos"
         ? false
         : model.includes("Apple") // HACK: the app runs on rosetta
-        ? true
-        : false; // default value
+          ? true
+          : false; // default value
   }
 
   const [value, setValue] = createSignal(config.workaround3);

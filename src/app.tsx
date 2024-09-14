@@ -87,11 +87,11 @@ export async function createApp() {
       await locale.prompt(
         "NEW_VERSION_AVALIABLE",
         "NEW_VERSION_AVALIABLE_DESC",
-        [version, description]
+        [version, description],
       )
     ) {
       return createCommonUpdateUI(locale, () =>
-        downloadProgram(aria2, downloadUrl)
+        downloadProgram(aria2, downloadUrl),
       );
     }
   }

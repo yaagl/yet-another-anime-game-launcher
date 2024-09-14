@@ -51,7 +51,7 @@ export async function* downloadAndInstallGameProgram({
     yield [
       "setProgress",
       Number(
-        (progress.completedLength * BigInt(10000)) / progress.totalLength
+        (progress.completedLength * BigInt(10000)) / progress.totalLength,
       ) / 100,
     ];
   }

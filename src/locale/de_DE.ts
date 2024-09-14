@@ -109,6 +109,7 @@ export const de_DE: typeof zh_CN = {
 
   PREDOWNLOAD_READY: "Pre-Download {0}",
 
-  COMMUNITY_WARNING:"Gemeiner alarm.",
-  COMMUNITY_WINE_ALERT:"Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
+  COMMUNITY_WARNING: "Gemeiner alarm.",
+  COMMUNITY_WINE_ALERT:
+    "Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
 };

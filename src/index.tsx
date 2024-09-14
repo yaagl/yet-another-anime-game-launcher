@@ -8,15 +8,15 @@ import { fatal } from "./utils";
 function createPlates(
   tag: string,
   color: Record<string, string>,
-  colortag: string
+  colortag: string,
 ) {
   return Object.fromEntries(
     new Array(12)
       .fill(1)
       .map(
         (_, i) =>
-          [`${tag}${i + 1}`, color[`${colortag}${i + 1}`] as string] as const
-      )
+          [`${tag}${i + 1}`, color[`${colortag}${i + 1}`] as string] as const,
+      ),
   );
 }
 
@@ -45,7 +45,7 @@ if (typeof Neutralino == "undefined") {
             </NotificationsProvider>
           </HopeProvider>
         ),
-        document.getElementById("root") as HTMLElement
+        document.getElementById("root") as HTMLElement,
       );
       Neutralino.window.show();
     })

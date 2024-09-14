@@ -5,17 +5,21 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [tsconfigPaths(), {
-    name: "channel-client switcher",
-    load:  (id) => {
-      if(id.endsWith("/src/clients/index.ts")) {
-        const cc = process.env["YAAGL_CHANNEL_CLIENT"] ?? "hk4ecn";
-        console.info(`Building channel client ${cc}`);
-        return `export * from './${cc}'`;
-      }
-      return null;
-    }
-  }, solidPlugin()],
+  plugins: [
+    tsconfigPaths(),
+    {
+      name: "channel-client switcher",
+      load: id => {
+        if (id.endsWith("/src/clients/index.ts")) {
+          const cc = process.env["YAAGL_CHANNEL_CLIENT"] ?? "hk4ecn";
+          console.info(`Building channel client ${cc}`);
+          return `export * from './${cc}'`;
+        }
+        return null;
+      },
+    },
+    solidPlugin(),
+  ],
 
   envPrefix: ["VITE_", "YAAGL_"],
   build: {

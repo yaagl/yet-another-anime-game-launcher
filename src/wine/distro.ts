@@ -71,7 +71,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
       "https://github.com/1146839821/wine/releases/download/0.0.1/wine.tar.gz",
     attributes: {
       renderBackend: "gptk",
-      community:true
+      community: true,
     },
   },
 ];
@@ -98,7 +98,7 @@ export async function getWineDistributions(): Promise<WineDistribution[]> {
           renderBackend: "gptk",
           crossover: true,
         },
-      }
+      },
     );
   }
 
@@ -121,7 +121,7 @@ export async function getWineDistributions(): Promise<WineDistribution[]> {
           renderBackend: "gptk",
           whisky: true,
         },
-      }
+      },
     );
   }
 
@@ -141,11 +141,11 @@ export type WineStatus =
 export async function checkWine(github: Github): Promise<WineStatus> {
   const wine_versions = await getWineDistributions();
   const defaultDistro = wine_versions.find(
-    x => x.id == DEFAULT_WINE_DISTRO_TAG
+    x => x.id == DEFAULT_WINE_DISTRO_TAG,
   );
   if (!defaultDistro) {
     throw new Error(
-      "can not find default wine version: " + DEFAULT_WINE_DISTRO_TAG
+      "can not find default wine version: " + DEFAULT_WINE_DISTRO_TAG,
     );
   }
   try {

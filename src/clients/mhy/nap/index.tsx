@@ -82,11 +82,11 @@ export async function createNAPChannelClient({
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
-    server
+    server,
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : "NOT_INSTALLED",
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
@@ -94,13 +94,13 @@ export async function createNAPChannelClient({
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
         gameInstalled && // game installed
-        gt(pre_download.major.version, gameVersion) // predownload version is greater
+        gt(pre_download.major.version, gameVersion), // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
-    gameInstallDir ?? ""
+    gameInstallDir ?? "",
   );
   const [gameCurrentVersion, setGameVersion] = createSignal(
-    gameVersion ?? "0.0.0"
+    gameVersion ?? "0.0.0",
   );
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
@@ -131,7 +131,7 @@ export async function createNAPChannelClient({
           await locale.alert(
             "NO_ENOUGH_DISKSPACE",
             "NO_ENOUGH_DISKSPACE_DESC",
-            [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
+            [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)],
           );
           return;
         }
@@ -156,13 +156,13 @@ export async function createNAPChannelClient({
       }
       const gameVersion = await getGameVersion(
         join(selection, server.dataDir),
-        0xc4
+        0xc4,
       );
       if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
         await locale.alert(
           "UNSUPPORTED_VERSION",
           "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameVersion]
+          [gameVersion],
         );
         return;
       } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
@@ -171,7 +171,7 @@ export async function createNAPChannelClient({
           await locale.prompt(
             "UNSUPPORTED_VERSION",
             "GAME_VERSION_TOO_OLD_DESC",
-            [gameVersion]
+            [gameVersion],
           );
           return;
         }
@@ -201,7 +201,7 @@ export async function createNAPChannelClient({
       setShowPredownloadPrompt(false);
       if (pre_download?.major == null) return;
       const updateTarget = pre_download.patches.find(
-        x => x.version == gameCurrentVersion()
+        x => x.version == gameCurrentVersion(),
       );
       if (updateTarget == null) return;
       const voicePacks = (
@@ -211,14 +211,14 @@ export async function createNAPChannelClient({
               await stats(
                 join(
                   _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
+                  `Audio_${VoicePackNames[x.language]}_pkg_version`,
+                ),
               );
               return x;
             } catch {
               return null;
             }
-          })
+          }),
         )
       )
         .filter(x => x != null)
@@ -228,7 +228,7 @@ export async function createNAPChannelClient({
         });
       if (updateTarget.game_pkgs.length != 1) {
         throw new Error(
-          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+          "assertation failed (game_pkgs.length!= 1)! please file an issue.",
         );
       }
       yield* predownloadGameProgram({
@@ -244,7 +244,7 @@ export async function createNAPChannelClient({
         await locale.prompt(
           "UNSUPPORTED_VERSION",
           "GAME_VERSION_TOO_OLD_DESC",
-          [gameCurrentVersion()]
+          [gameCurrentVersion()],
         );
         batch(() => {
           setInstalled("NOT_INSTALLED");
@@ -261,14 +261,14 @@ export async function createNAPChannelClient({
               await stats(
                 join(
                   _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
+                  `Audio_${VoicePackNames[x.language]}_pkg_version`,
+                ),
               );
               return x;
             } catch {
               return null;
             }
-          })
+          }),
         )
       )
         .filter(x => x != null)
@@ -278,7 +278,7 @@ export async function createNAPChannelClient({
         });
       if (updateTarget.game_pkgs.length != 1) {
         throw new Error(
-          "assertation failed (game_pkgs.length!= 1)! please file an issue."
+          "assertation failed (game_pkgs.length!= 1)! please file an issue.",
         );
       }
       yield* updateGameProgram({
@@ -302,7 +302,7 @@ export async function createNAPChannelClient({
         await locale.alert(
           "UNSUPPORTED_VERSION",
           "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameCurrentVersion()]
+          [gameCurrentVersion()],
         );
         return;
       }

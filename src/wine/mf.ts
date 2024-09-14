@@ -28,7 +28,7 @@ const MF_SRVS = ["colorcnv", "msmpeg2adec", "msmpeg2vdec"];
 
 export async function* installMediaFoundation(
   aria2: Aria2,
-  wine: Wine
+  wine: Wine,
 ): CommonUpdateProgram {
   for (const dll of MF_DLLS) {
     yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
@@ -39,7 +39,7 @@ export async function* installMediaFoundation(
         "drive_c",
         "windows",
         "system32",
-        `${dll}.dll.downloading`
+        `${dll}.dll.downloading`,
       ),
     })) {
       yield [
@@ -58,9 +58,9 @@ export async function* installMediaFoundation(
         "drive_c",
         "windows",
         "system32",
-        `${dll}.dll.downloading`
+        `${dll}.dll.downloading`,
       ),
-      join(wine.prefix, "drive_c", "windows", "system32", `${dll}.dll`)
+      join(wine.prefix, "drive_c", "windows", "system32", `${dll}.dll`),
     );
     await wine.exec(
       "reg",
@@ -74,7 +74,7 @@ export async function* installMediaFoundation(
         "/f",
       ],
       {},
-      "/dev/null"
+      "/dev/null",
     );
   }
   yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
@@ -83,7 +83,7 @@ export async function* installMediaFoundation(
     "regedit",
     [wine.toWinePath(resolve("mf.reg"))],
     {},
-    "/dev/null"
+    "/dev/null",
   );
   await removeFile("mf.reg");
   await writeFile("wmf.reg", wmf);
@@ -91,7 +91,7 @@ export async function* installMediaFoundation(
     "regedit",
     [wine.toWinePath(resolve("wmf.reg"))],
     {},
-    "/dev/null"
+    "/dev/null",
   );
   await removeFile("wmf.reg");
   for (const srv of MF_SRVS) {

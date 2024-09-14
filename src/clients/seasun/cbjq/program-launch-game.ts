@@ -42,7 +42,7 @@ export async function* launchGameProgram({
 cd "%~dp0"
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(
-    join(gameDir, gameExecutable)
+    join(gameDir, gameExecutable),
   )}" -FeatureLevelES31 -ChannelID=${server.channel}`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, config);
@@ -84,7 +84,7 @@ cd /d "${wine.toWinePath(gameDir)}"
               WINEESYNC: "1",
             }),
       },
-      logfile
+      logfile,
     );
     await wine.waitUntilServerOff();
   } catch (e: unknown) {

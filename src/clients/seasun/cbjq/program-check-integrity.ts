@@ -69,7 +69,7 @@ export async function* checkIntegrityProgram({
     const localPath = join(gameDir, remoteName);
     const remotePath = join(server.dlc, resourceData.pathOffset, md5).replace(
       ":/",
-      "://"
+      "://",
     ); //....join: wtf?
     yield ["setUndeterminedProgress"];
     yield ["setStateText", "FIXING_FILES", String(count), String(toFix.length)];

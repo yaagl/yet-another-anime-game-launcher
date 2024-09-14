@@ -19,14 +19,14 @@ async function fetch(url: string) {
 
 export async function getLatestAdvInfo(
   locale: Locale,
-  server: Server
+  server: Server,
 ): Promise<HoyoConnectGameBackground> {
   const ret: HoyoConnectGetAllGameBasicInfoResponse = await (
     await fetch(
       server.adv_url +
         (server.id == "CN"
           ? `&language=zh-cn` // CN server has no other language support
-          : `&language=${locale.get("CONTENT_LANG_ID")}`)
+          : `&language=${locale.get("CONTENT_LANG_ID")}`),
     )
   ).json();
   const game = ret.data.game_info_list.find(x => x.game.biz == server.id);
@@ -36,7 +36,7 @@ export async function getLatestAdvInfo(
 }
 
 export async function getLatestVersionInfo(
-  server: Server
+  server: Server,
 ): Promise<HoyoConnectGamePackageMainfest> {
   const ret: HoyoConnectGetGamePackagesResponse = await (
     await fetch(server.update_url)

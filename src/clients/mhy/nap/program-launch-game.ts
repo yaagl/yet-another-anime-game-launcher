@@ -28,7 +28,7 @@ export async function* launchGameProgram({
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
+    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw==")),
   )}" "%WINDIR%\\system32\\"
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(join(gameDir, gameExecutable))}"`;
@@ -77,7 +77,7 @@ cd /d "${wine.toWinePath(gameDir)}"
               WINEESYNC: "1",
             }),
       },
-      logfile
+      logfile,
     );
     await wine.waitUntilServerOff();
   } catch (e: unknown) {

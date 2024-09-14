@@ -107,6 +107,7 @@ export const ko_KR: typeof zh_CN = {
 
   PREDOWNLOAD_READY: "사전 다운로드 {0}",
 
-  COMMUNITY_WARNING:"커뮤니티 버전 경고",
-  COMMUNITY_WINE_ALERT:"현재 커뮤니티 버전이 선택되었습니다.이 버전은 공식적으로 지원되지 않습니다. 보고하지 마십시오",
+  COMMUNITY_WARNING: "커뮤니티 버전 경고",
+  COMMUNITY_WINE_ALERT:
+    "현재 커뮤니티 버전이 선택되었습니다.이 버전은 공식적으로 지원되지 않습니다. 보고하지 마십시오",
 };

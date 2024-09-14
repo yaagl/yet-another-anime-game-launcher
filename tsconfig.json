@@ -12,7 +12,7 @@
     "types": ["vite/client"],
     "noEmit": true,
     "isolatedModules": true,
-    "skipLibCheck":true,
+    "skipLibCheck": true,
     "paths": {
       "@config": ["src/config/index.tsx"],
       "@config/*": ["src/config/*"],
@@ -22,8 +22,8 @@
       "@constants": ["src/constants/index.ts"],
       "@aria2": ["src/aria2.ts"],
       "@wine": ["src/wine/index.ts"],
-      "@common-update-ui": ["src/common-update-ui.tsx"],
+      "@common-update-ui": ["src/common-update-ui.tsx"]
     }
   },
-  "include": ["src/**/*.ts","src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

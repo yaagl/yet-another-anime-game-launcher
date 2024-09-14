@@ -40,8 +40,8 @@ export async function* downloadAndInstallGameProgram({
       yield* downloadOrRecover(
         aria2,
         segment,
-        join(downloadTmp, basename(segment))
-      )
+        join(downloadTmp, basename(segment)),
+      ),
     );
   }
 
@@ -49,7 +49,7 @@ export async function* downloadAndInstallGameProgram({
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
   const gameFileTmp = join(
     downloadTmp,
-    basename(`${gameSegmentZips[0]}`.replace(".001", ""))
+    basename(`${gameSegmentZips[0]}`.replace(".001", "")),
   );
 
   await exec([
@@ -72,18 +72,18 @@ export async function* downloadAndInstallGameProgram({
 game_version=${gameVersion}
 channel=${server.channel_id}
 sub_channel=${server.subchannel_id}
-cps=${server.cps}`
+cps=${server.cps}`,
   );
 }
 
 async function* downloadOrRecover(
   aria2: Aria2,
   remoteUrl: string,
-  localTempUrl: string
+  localTempUrl: string,
 ): CommonUpdateProgram<() => Promise<void>> {
   try {
     await getKey(
-      `predownloaded_${(await sha1sum(basename(remoteUrl))).slice(0, 32)}`
+      `predownloaded_${(await sha1sum(basename(remoteUrl))).slice(0, 32)}`,
     );
     await stats(localTempUrl);
   } catch (e) {
@@ -109,20 +109,20 @@ async function* downloadOrRecover(
       yield [
         "setProgress",
         Number(
-          (progress.completedLength * BigInt(10000)) / progress.totalLength
+          (progress.completedLength * BigInt(10000)) / progress.totalLength,
         ) / 100,
       ];
     }
     await setKey(
       `predownloaded_${(await sha1sum(basename(remoteUrl))).slice(0, 32)}`,
-      "1"
+      "1",
     );
   }
   return async () => {
     await removeFile(localTempUrl);
     await setKey(
       `predownloaded_${(await sha1sum(basename(remoteUrl))).slice(0, 32)}`,
-      null
+      null,
     );
   };
 }

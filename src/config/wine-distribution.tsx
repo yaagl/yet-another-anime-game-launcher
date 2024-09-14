@@ -70,7 +70,7 @@ export async function createWineDistroConfig({
           })),
         ];
       }
-    })()
+    })(),
   );
 
   async function applyChanges() {
@@ -80,9 +80,9 @@ export async function createWineDistroConfig({
 
     // If Community Version is selected, a warning message pops up
     if (distro.community) {
-      await locale.alert("COMMUNITY_WARNING","COMMUNITY_WINE_ALERT");
+      await locale.alert("COMMUNITY_WARNING", "COMMUNITY_WINE_ALERT");
     }
-    
+
     await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
     {
       await setKey("wine_state", "update");

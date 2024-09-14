@@ -31,6 +31,6 @@ export interface ChannelClient {
   init(config: Config): CommonUpdateProgram;
   createConfig(
     locale: Locale,
-    config: Partial<Config>
+    config: Partial<Config>,
   ): Promise<() => JSXElement>;
 }

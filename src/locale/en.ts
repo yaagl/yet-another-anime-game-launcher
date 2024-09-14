@@ -107,6 +107,7 @@ export const en: typeof zh_CN = {
 
   PREDOWNLOAD_READY: "Pre-download {0}",
 
-  COMMUNITY_WARNING:"Community Warning",
-  COMMUNITY_WINE_ALERT:"The current selection is the Community version, this version is not officially supported, please do not report any issues",
+  COMMUNITY_WARNING: "Community Warning",
+  COMMUNITY_WINE_ALERT:
+    "The current selection is the Community version, this version is not officially supported, please do not report any issues",
 };

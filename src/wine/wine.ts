@@ -24,8 +24,8 @@ export async function createWine(options: {
   const loaderBin = options.distro.attributes.crossover
     ? await getCrossoverBinary()
     : options.distro.attributes.whisky
-    ? await getWhiskyBinary()
-    : await getCorrectWineBinary();
+      ? await getWhiskyBinary()
+      : await getCorrectWineBinary();
 
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
@@ -35,7 +35,7 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | undefined = undefined,
   ) {
     return await unixExec(
       program == "copy"
@@ -46,7 +46,7 @@ export async function createWine(options: {
         ...(env ?? {}),
       },
       false,
-      log_file
+      log_file,
     );
   }
 
@@ -54,7 +54,7 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | undefined = undefined,
   ) {
     return await unixExec2(
       program == "copy"
@@ -65,7 +65,7 @@ export async function createWine(options: {
         ...(env ?? {}),
       },
       false,
-      log_file
+      log_file,
     );
   }
 
@@ -110,7 +110,7 @@ export async function createWine(options: {
       ],
       {},
       false,
-      "/dev/null"
+      "/dev/null",
     );
   }
 
@@ -137,7 +137,7 @@ reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t 
       "cmd",
       ["/c", `${toWinePath(resolve("./winedrv_config.bat"))}`],
       {},
-      "/dev/null"
+      "/dev/null",
     );
     await waitUntilServerOff();
   }
@@ -168,6 +168,5 @@ export async function getCorrectWineBinary() {
   }
 }
 
-export type Wine = ReturnType<typeof createWine> extends Promise<infer T>
-  ? T
-  : never;
+export type Wine =
+  ReturnType<typeof createWine> extends Promise<infer T> ? T : never;

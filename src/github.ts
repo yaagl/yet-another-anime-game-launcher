@@ -9,7 +9,7 @@ export async function createGithubEndpoint() {
       fetch(`${prefix}https://api.github.com/octocat`)
         .then(x => x.text())
         .then(x => prefix)
-        .catch(() => timeout(5000))
+        .catch(() => timeout(5000)),
     ),
     timeout(5000),
   ]);
@@ -22,7 +22,7 @@ export async function createGithubEndpoint() {
         return x.json();
       }
       return Promise.reject(
-        new Error(`Request failed: ${x.status} ${x.statusText} (${x.url})`)
+        new Error(`Request failed: ${x.status} ${x.statusText} (${x.url})`),
       );
     });
   }
@@ -37,11 +37,8 @@ export async function createGithubEndpoint() {
   };
 }
 
-export type Github = ReturnType<typeof createGithubEndpoint> extends Promise<
-  infer T
->
-  ? T
-  : never;
+export type Github =
+  ReturnType<typeof createGithubEndpoint> extends Promise<infer T> ? T : never;
 
 export interface GithubReleaseInfo {
   url: string;

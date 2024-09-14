@@ -26,7 +26,7 @@ export function wait(ms: number): Promise<number> {
 export async function sha256_16(str: string) {
   const buf = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(str)
+    new TextEncoder().encode(str),
   );
   return Array.prototype.map
     .call(new Uint8Array(buf), x => ("00" + x.toString(16)).slice(-2))
@@ -75,7 +75,7 @@ export function humanFileSize(bytes: number, si = false, dp = 1) {
 }
 
 export function assertValueDefined<V>(
-  value: V
+  value: V,
 ): asserts value is NonNullable<V> {
   if (value === null || value === undefined) {
     throw new Error("Assertation failed: value is either null or undefined.");
@@ -84,7 +84,7 @@ export function assertValueDefined<V>(
 
 export function arrayFind<T>(
   array: Array<T>,
-  predict: (value: T) => boolean
+  predict: (value: T) => boolean,
 ): T {
   const ret = array.find(predict);
   if (ret === undefined) {
