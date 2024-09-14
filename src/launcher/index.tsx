@@ -86,7 +86,7 @@ export async function createLauncher({
     const bw = 136;
 
     const [statusText, progress, programBusy, taskQueue] = createTaskQueueState(
-      { locale }
+      { locale },
     );
     taskQueue.next(() => init(config));
 

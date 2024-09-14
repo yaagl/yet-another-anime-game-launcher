@@ -32,7 +32,7 @@ export async function* downloadAndInstallGameProgram({
       join(server.dlc, resourceData.pathOffset, pak.hash).replace(":/", "://"), //....join: wtf?
       join(gameDir, pak.name),
       index++,
-      resourceData.paks.length
+      resourceData.paks.length,
     );
   }
 
@@ -44,7 +44,7 @@ async function* downloadOrRecover(
   remoteUrl: string,
   localUrl: string,
   fileIndex: number,
-  totalFileCount: number
+  totalFileCount: number,
 ): CommonUpdateProgram<void> {
   try {
     await stats(localUrl);
@@ -72,7 +72,7 @@ async function* downloadOrRecover(
       yield [
         "setProgress",
         Number(
-          (progress.completedLength * BigInt(10000)) / progress.totalLength
+          (progress.completedLength * BigInt(10000)) / progress.totalLength,
         ) / 100,
       ];
     }

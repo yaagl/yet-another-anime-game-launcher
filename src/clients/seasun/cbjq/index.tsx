@@ -45,7 +45,7 @@ import { updateGameProgram } from "./program-update-game";
 const getGameVersion = async (gameDir: string) => {
   const local_manifest = join(gameDir, "manifest.json");
   const localResourceData: LauncherResourceData = await readFile(
-    local_manifest
+    local_manifest,
   ).then(content => {
     return JSON.parse(content);
   });
@@ -72,21 +72,21 @@ export async function createCBJQChannelClient({
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
-    server
+    server,
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : "NOT_INSTALLED",
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      false // TODO
+      false, // TODO
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
-    gameInstallDir ?? ""
+    gameInstallDir ?? "",
   );
   const [gameCurrentVersion, setGameVersion] = createSignal(
-    gameVersion ?? "0.0.0"
+    gameVersion ?? "0.0.0",
   );
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
@@ -129,7 +129,7 @@ export async function createCBJQChannelClient({
         await locale.alert(
           "UNSUPPORTED_VERSION",
           "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameVersion]
+          [gameVersion],
         );
         return;
       } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
@@ -178,7 +178,7 @@ export async function createCBJQChannelClient({
         await locale.alert(
           "UNSUPPORTED_VERSION",
           "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameCurrentVersion()]
+          [gameCurrentVersion()],
         );
         return;
       }
@@ -265,7 +265,7 @@ async function fetch(url: string) {
 }
 
 async function getLatestVersionInfo(
-  server: Server
+  server: Server,
 ): Promise<LauncherResourceData> {
   const ret: LauncherResourceData = await (await fetch(server.manifest)).json();
   return ret;

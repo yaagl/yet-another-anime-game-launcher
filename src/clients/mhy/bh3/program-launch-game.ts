@@ -38,7 +38,7 @@ export async function* launchGameProgram({
 cd "%~dp0"
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(resolve("./jadeite/jadeite.exe"))}" "${wine.toWinePath(
-    join(gameDir, gameExecutable)
+    join(gameDir, gameExecutable),
   )}"`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
@@ -80,7 +80,7 @@ cd /d "${wine.toWinePath(gameDir)}"
                 WINEESYNC: "1",
               }),
         },
-        logfile
+        logfile,
       ),
       (async () => {
         // while (processRunning) {

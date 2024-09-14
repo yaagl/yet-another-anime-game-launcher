@@ -36,7 +36,7 @@ function exec_osa(cmd: string): Promise<string[]> {
         "script",
         `"${cmd.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`,
       ].join(" "),
-    ])
+    ]),
   );
 }
 
@@ -48,7 +48,7 @@ function buildTest(name: string, exec: (cmd: string) => Promise<string[]>) {
 
     it("solo command with space", () => {
       expect(build(["/usr/bin/folder with space/command"])).toBe(
-        "/usr/bin/folder\\ with\\ space/command"
+        "/usr/bin/folder\\ with\\ space/command",
       );
     });
 
@@ -112,7 +112,7 @@ function buildTest(name: string, exec: (cmd: string) => Promise<string[]>) {
       const cmd = build(["echo", literal, rawString("|"), "base64"]);
       console.log(cmd);
       expect((await exec(cmd))[0]).toBe(
-        Buffer.from(literal + "\n").toString("base64")
+        Buffer.from(literal + "\n").toString("base64"),
       );
       //                                                      ^ waste my time
     });

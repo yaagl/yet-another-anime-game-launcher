@@ -26,7 +26,7 @@ export async function putLocal(url: string, dest: string) {
 export async function* patchProgram(
   gameDir: string,
   wine: Wine,
-  config: Config
+  config: Config,
 ): CommonUpdateProgram {
   if ((await getKeyOrDefault("patched", "NOTFOUND")) != "NOTFOUND") {
     return;
@@ -48,7 +48,7 @@ export async function* patchProgram(
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
       resolve("./reshade/d3dcompiler_47.dll"),
-      join(gameDir, "d3dcompiler_47.dll")
+      join(gameDir, "d3dcompiler_47.dll"),
     );
   }
   setKey("patched", "1");
@@ -57,7 +57,7 @@ export async function* patchProgram(
 export async function* patchRevertProgram(
   gameDir: string,
   wine: Wine,
-  config: Config
+  config: Config,
 ): CommonUpdateProgram {
   try {
     await getKey("patched");

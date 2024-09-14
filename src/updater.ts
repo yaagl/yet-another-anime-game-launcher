@@ -27,7 +27,7 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
       updateVersion = "hk4ecn";
     }
     const latest: GithubReleaseInfo = (await deps.github.api(
-      `/repos/${owner}/${repo}/releases/latest`
+      `/repos/${owner}/${repo}/releases/latest`,
     )) as GithubReleaseInfo;
     const update_neu = `resources_${updateVersion}.neu`;
     const neu = latest.assets.find(x => x.name == update_neu);
@@ -49,13 +49,12 @@ export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
   }
 }
 
-export type Updater = ReturnType<typeof createUpdater> extends Promise<infer T>
-  ? T
-  : never;
+export type Updater =
+  ReturnType<typeof createUpdater> extends Promise<infer T> ? T : never;
 
 export async function* downloadProgram(
   aria2: Aria2,
-  url: string
+  url: string,
 ): CommonUpdateProgram {
   yield ["setStateText", "DOWNLOADING_UPDATE_FILE"];
   for await (const progress of aria2.doStreamingDownload({

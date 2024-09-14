@@ -7,7 +7,7 @@ export function resolve(path: string): string {
       import.meta.env.PROD
         ? window.NL_PATH
         : join(window.NL_CWD, window.NL_PATH),
-      path
+      path,
     );
     // await Neutralino.os.showMessageBox("1", command, "OK");
     if (!path.startsWith("/") || path == "/")
@@ -20,17 +20,17 @@ export async function exec(
   segments: CommandSegments,
   env?: { [key: string]: string },
   sudo = false,
-  log_redirect: string | undefined = undefined
+  log_redirect: string | undefined = undefined,
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = build(
     [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
-    env
+    env,
   );
   await log(sudo ? runInSudo(cmd) : cmd);
   const ret = await Neutralino.os.execCommand(sudo ? runInSudo(cmd) : cmd, {});
   if (ret.exitCode != 0) {
     throw new Error(
-      `Command return non-zero code (${ret.exitCode}) \n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
+      `Command return non-zero code (${ret.exitCode}) \n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`,
     );
   }
   return ret;
@@ -40,11 +40,11 @@ export async function exec2(
   segments: CommandSegments,
   env?: { [key: string]: string },
   sudo = false,
-  log_redirect: string | undefined = undefined
+  log_redirect: string | undefined = undefined,
 ): Promise<Neutralino.os.ExecCommandResult> {
   const cmd = build(
     [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
-    env
+    env,
   );
   await log(cmd);
   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
@@ -68,8 +68,8 @@ export async function exec2(
           } else {
             rej(
               new Error(
-                `Command return non-zero code (${exit}) \n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
-              )
+                `Command return non-zero code (${exit}) \n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`,
+              ),
             );
           }
 
@@ -107,7 +107,7 @@ export function tar_extract(src: string, dst: string) {
 
 export async function spawn(
   segments: CommandSegments,
-  env?: { [key: string]: string }
+  env?: { [key: string]: string },
 ) {
   const cmd = build(segments, env);
   await log(cmd);
@@ -124,7 +124,7 @@ export async function getKey(key: string): Promise<string> {
 
 export async function getKeyOrDefault(
   key: string,
-  defaultValue: string
+  defaultValue: string,
 ): Promise<string> {
   try {
     return await getKey(key);
@@ -157,7 +157,7 @@ export async function fatal(error: unknown) {
   await Neutralino.os.showMessageBox(
     "Fatal error",
     `${error instanceof Error ? String(error) : JSON.stringify(error)}`,
-    "OK"
+    "OK",
   );
   await shutdown();
   Neutralino.app.exit(-1);

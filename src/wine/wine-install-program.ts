@@ -44,7 +44,7 @@ export async function createWineInstallProgram({
         yield [
           "setProgress",
           Number(
-            (progress.completedLength * BigInt(100)) / progress.totalLength
+            (progress.completedLength * BigInt(100)) / progress.totalLength,
           ),
         ];
         yield [
@@ -86,13 +86,13 @@ export async function createWineInstallProgram({
           "Z:" + `${CROSSOVER_DATA}/crossover.inf`.replaceAll("/", "\\"),
         ],
         {},
-        "/dev/null"
+        "/dev/null",
       );
       await wine.exec(
         "rundll32",
         ["mscoree.dll,wine_install_mono"],
         {},
-        "/dev/null"
+        "/dev/null",
       );
     }
 

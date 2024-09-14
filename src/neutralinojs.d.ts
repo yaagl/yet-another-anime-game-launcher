@@ -98,7 +98,7 @@ declare namespace Neutralino {
      */
     function broadcast<T>(
       eventName: string,
-      data?: T
+      data?: T,
     ): Promise<events.BroadcastResponse>;
   }
 
@@ -298,7 +298,7 @@ declare namespace Neutralino {
      */
     function log(
       message: string,
-      type?: "INFO" | "WARNING" | "ERROR"
+      type?: "INFO" | "WARNING" | "ERROR",
     ): Promise<void>;
   }
 
@@ -327,47 +327,47 @@ declare namespace Neutralino {
     function on(eventName: "ready", handler: Handler<null>): Promise<Response>;
     function on(
       eventName: "trayMenuItemClicked",
-      handler: Handler<Neutralino.os.TrayMenuItem>
+      handler: Handler<Neutralino.os.TrayMenuItem>,
     ): Promise<Response>;
     function on(
       eventName: "windowClose",
-      handler: Handler<null>
+      handler: Handler<null>,
     ): Promise<Response>;
     function on(
       eventName: "serverOffline",
-      handler: Handler<null>
+      handler: Handler<null>,
     ): Promise<Response>;
     function on(
       eventName: "clientConnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function on(
       eventName: "clientDisconnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function on(
       eventName: "appClientConnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function on(
       eventName: "appClientDisconnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function on(
       eventName: "extClientConnect",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function on(
       eventName: "extClientDisconnect",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function on(
       eventName: "extensionReady",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function on(
       eventName: "spawnedProcess",
-      handler: Handler<Neutralino.os.SpawnProcessResult>
+      handler: Handler<Neutralino.os.SpawnProcessResult>,
     ): Promise<Response>;
     function on<T>(eventName: string, handler: Handler<T>): Promise<Response>;
 
@@ -381,47 +381,47 @@ declare namespace Neutralino {
     function off(eventName: "ready", handler: Handler<null>): Promise<Response>;
     function off(
       eventName: "trayMenuItemClicked",
-      handler: Handler<Neutralino.os.TrayMenuItem>
+      handler: Handler<Neutralino.os.TrayMenuItem>,
     ): Promise<Response>;
     function off(
       eventName: "windowClose",
-      handler: Handler<null>
+      handler: Handler<null>,
     ): Promise<Response>;
     function off(
       eventName: "serverOffline",
-      handler: Handler<null>
+      handler: Handler<null>,
     ): Promise<Response>;
     function off(
       eventName: "clientConnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function off(
       eventName: "clientDisconnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function off(
       eventName: "appClientConnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function off(
       eventName: "appClientDisconnect",
-      handler: Handler<number>
+      handler: Handler<number>,
     ): Promise<Response>;
     function off(
       eventName: "extClientConnect",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function off(
       eventName: "extClientDisconnect",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function off(
       eventName: "extensionReady",
-      handler: Handler<string>
+      handler: Handler<string>,
     ): Promise<Response>;
     function off(
       eventName: "spawnedProcess",
-      handler: Handler<Neutralino.os.SpawnProcessResult>
+      handler: Handler<Neutralino.os.SpawnProcessResult>,
     ): Promise<Response>;
     function off<T>(eventName: string, handler: Handler<T>): Promise<Response>;
 
@@ -435,35 +435,35 @@ declare namespace Neutralino {
     function dispatch(event: "ready", data: null): Promise<Response>;
     function dispatch(
       event: "trayMenuItemClicked",
-      data: Neutralino.os.TrayMenuItem
+      data: Neutralino.os.TrayMenuItem,
     ): Promise<Response>;
     function dispatch(event: "windowClose", data: null): Promise<Response>;
     function dispatch(event: "serverOffline", data: null): Promise<Response>;
     function dispatch(event: "clientConnect", data: number): Promise<Response>;
     function dispatch(
       event: "clientDisconnect",
-      data: number
+      data: number,
     ): Promise<Response>;
     function dispatch(
       event: "appClientConnect",
-      data: number
+      data: number,
     ): Promise<Response>;
     function dispatch(
       event: "appClientDisconnect",
-      data: number
+      data: number,
     ): Promise<Response>;
     function dispatch(
       event: "extClientConnect",
-      data: string
+      data: string,
     ): Promise<Response>;
     function dispatch(
       event: "extClientDisconnect",
-      data: string
+      data: string,
     ): Promise<Response>;
     function dispatch(event: "extensionReady", data: string): Promise<Response>;
     function dispatch(
       event: "spawnedProcess",
-      data: Neutralino.os.SpawnProcessResult
+      data: Neutralino.os.SpawnProcessResult,
     ): Promise<Response>;
     function dispatch<T>(event: string, data?: T): Promise<Response>;
 
@@ -481,7 +481,7 @@ declare namespace Neutralino {
     function broadcast(event: "ready", data: null): Promise<void>;
     function broadcast(
       event: "trayMenuItemClicked",
-      data: Neutralino.os.TrayMenuItem
+      data: Neutralino.os.TrayMenuItem,
     ): Promise<void>;
     function broadcast(event: "windowClose", data: null): Promise<void>;
     function broadcast(event: "serverOffline", data: null): Promise<void>;
@@ -490,17 +490,17 @@ declare namespace Neutralino {
     function broadcast(event: "appClientConnect", data: number): Promise<void>;
     function broadcast(
       event: "appClientDisconnect",
-      data: number
+      data: number,
     ): Promise<void>;
     function broadcast(event: "extClientConnect", data: string): Promise<void>;
     function broadcast(
       event: "extClientDisconnect",
-      data: string
+      data: string,
     ): Promise<void>;
     function broadcast(event: "extensionReady", data: string): Promise<void>;
     function broadcast(
       event: "spawnedProcess",
-      data: Neutralino.os.SpawnProcessResult
+      data: Neutralino.os.SpawnProcessResult,
     ): Promise<Response>;
     function broadcast<T>(event: string, data?: T): Promise<BroadcastResponse>;
   }
@@ -536,7 +536,7 @@ declare namespace Neutralino {
     function dispatch(
       extensionId: string,
       eventName: string,
-      data?: any
+      data?: any,
     ): Promise<void>;
 
     /**
@@ -640,7 +640,7 @@ declare namespace Neutralino {
      */
     function writeBinaryFile(
       filename: string,
-      data: ArrayBuffer
+      data: ArrayBuffer,
     ): Promise<void>;
 
     /**
@@ -657,7 +657,7 @@ declare namespace Neutralino {
      */
     function appendBinaryFile(
       filename: string,
-      data: ArrayBuffer
+      data: ArrayBuffer,
     ): Promise<void>;
 
     /**
@@ -892,7 +892,7 @@ declare namespace Neutralino {
      */
     function execCommand(
       command: string,
-      options?: ExecCommandOptions
+      options?: ExecCommandOptions,
     ): Promise<ExecCommandResult>;
 
     /**
@@ -949,7 +949,7 @@ declare namespace Neutralino {
     function updateSpawnedProcess(
       id: number,
       action: "stdIn" | "stdInEnd" | "exit",
-      data?: object
+      data?: object,
     ): Promise<void>;
 
     /**
@@ -989,7 +989,7 @@ declare namespace Neutralino {
      */
     function showOpenDialog(
       title?: string,
-      options?: OpenDialogOptions
+      options?: OpenDialogOptions,
     ): Promise<string[]>;
 
     /**
@@ -1008,7 +1008,7 @@ declare namespace Neutralino {
      */
     function showSaveDialog(
       title?: string,
-      options?: SaveDialogOptions
+      options?: SaveDialogOptions,
     ): Promise<string>;
 
     /**
@@ -1023,7 +1023,7 @@ declare namespace Neutralino {
      */
     function showFolderDialog(
       title?: string,
-      options?: FolderDialogOptions
+      options?: FolderDialogOptions,
     ): Promise<string>;
 
     /**
@@ -1039,7 +1039,7 @@ declare namespace Neutralino {
     function showNotification(
       title: string,
       content: string,
-      icon?: Icon
+      icon?: Icon,
     ): Promise<void>;
 
     /**
@@ -1070,7 +1070,7 @@ declare namespace Neutralino {
         | "YES_NO_CANCEL"
         | "RETRY_CANCEL"
         | "ABORT_RETRY_IGNORE",
-      icon?: Icon
+      icon?: Icon,
     ): Promise<string>;
 
     /**
@@ -1108,7 +1108,7 @@ declare namespace Neutralino {
         | "video"
         | "downloads"
         | "savedGames1"
-        | "savedGames2"
+        | "savedGames2",
     ): Promise<string>;
 
     /**

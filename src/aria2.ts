@@ -70,6 +70,5 @@ export async function createAria2({
   };
 }
 
-export type Aria2 = ReturnType<typeof createAria2> extends Promise<infer T>
-  ? T
-  : never;
+export type Aria2 =
+  ReturnType<typeof createAria2> extends Promise<infer T> ? T : never;

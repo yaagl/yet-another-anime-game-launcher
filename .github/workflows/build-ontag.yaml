@@ -2,7 +2,7 @@ name: "Build Latest (when new tag created)"
 on:
   push:
     tags:
-      - '*'
+      - "*"
 env:
   YAAGL_VERSION: ${{ github.ref_name }}
 permissions:

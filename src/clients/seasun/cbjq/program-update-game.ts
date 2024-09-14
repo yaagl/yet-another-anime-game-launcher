@@ -19,14 +19,14 @@ export async function* updateGameProgram({
   yield ["setUndeterminedProgress"];
   const local_manifest = join(gameDir, "manifest.json");
   const localResourceData: LauncherResourceData = await readFile(
-    local_manifest
+    local_manifest,
   ).then(
     content => {
       return JSON.parse(content);
     },
     () => {
       return { ...resourceData, paks: [] };
-    }
+    },
   );
   const normalizePaks = (data: LauncherResourceData) =>
     data.paks.map(p => [p.hash, p] as const);
@@ -60,7 +60,7 @@ export async function* updateGameProgram({
     const localPath = join(gameDir, remoteName);
     const remotePath = join(server.dlc, resourceData.pathOffset, hash).replace(
       ":/",
-      "://"
+      "://",
     ); //....join: wtf?
     yield ["setUndeterminedProgress"];
     yield ["setStateText", "FIXING_FILES", String(count), String(toAdd.length)];

@@ -33,7 +33,7 @@ const sanitize = (str: string) =>
 
 export function build(
   command: CommandSegments,
-  env?: { [key: string]: string }
+  env?: { [key: string]: string },
 ): string {
   const ret =
     Object.entries(env ?? {})

@@ -25,7 +25,7 @@ export async function* downloadAndInstallGameProgram({
 }): CommonUpdateProgram {
   if (gameSegmentZips.length > 1) {
     throw new Error(
-      "Assertation failed (gameSegmentZips.length > 1)! please file an issue."
+      "Assertation failed (gameSegmentZips.length > 1)! please file an issue.",
     );
   }
   const gameFileZip = gameSegmentZips[0];
@@ -54,7 +54,7 @@ export async function* downloadAndInstallGameProgram({
     yield [
       "setProgress",
       Number(
-        (progress.completedLength * BigInt(10000)) / progress.totalLength
+        (progress.completedLength * BigInt(10000)) / progress.totalLength,
       ) / 100,
     ];
   }
@@ -69,6 +69,6 @@ export async function* downloadAndInstallGameProgram({
 game_version=${gameVersion}
 channel=${server.channel_id}
 sub_channel=${server.subchannel_id}
-cps=${server.cps}`
+cps=${server.cps}`,
   );
 }
