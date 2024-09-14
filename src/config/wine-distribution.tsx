@@ -44,6 +44,7 @@ export async function createWineDistroConfig({
       tag: string;
       url: string;
       displayName: string;
+      community?: boolean;
     }[]
   >(
     (() => {
@@ -52,6 +53,7 @@ export async function createWineDistroConfig({
           tag: x.id,
           url: x.remoteUrl,
           displayName: x.displayName,
+          community: x.attributes.community,
         }));
       } else {
         return [
@@ -64,6 +66,7 @@ export async function createWineDistroConfig({
             tag: x.id,
             url: x.remoteUrl,
             displayName: x.displayName,
+            community: x.attributes.community,
           })),
         ];
       }
@@ -74,6 +77,10 @@ export async function createWineDistroConfig({
     const tag = (config.wineDistro = value());
     const distro = wineVersions().find(x => x.tag === tag);
     if (!distro) return;
+    // If Community Version is selected, a warning message pops up
+    if (distro.community) {
+      await locale.alert("COMMUNITY_WARNING", "COMMUNITY_WINE_ALERT");
+    }
     await locale.alert("RELAUNCH_REQUIRED", "RELAUNCH_REQUIRED_DESC");
     {
       await setKey("wine_state", "update");
