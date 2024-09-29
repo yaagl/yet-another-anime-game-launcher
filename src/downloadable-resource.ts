@@ -135,7 +135,14 @@ export async function* checkAndDownloadJadeite(
 }
 
 export const DXMT_FILES = ["d3d10core.dll", "d3d11.dll", "dxgi.dll"];
-const CURRENT_DXMT_VERSION = "0.0.1";
+
+const DXMT_FILES_WITH_UNIXLIB = [
+  ...DXMT_FILES,
+  "winemetal.dll",
+  "winemetal.so",
+];
+
+const CURRENT_DXMT_VERSION = "0.0.2";
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -149,9 +156,9 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
 
   await mkdirp("./dxmt");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  for (const file of DXMT_FILES) {
+  for (const file of DXMT_FILES_WITH_UNIXLIB) {
     for await (const progress of aria2.doStreamingDownload({
-      uri: `https://github.com/3Shain/wine/releases/download/v9.9-mingw/${file}`,
+      uri: `https://github.com/3Shain/wine/releases/download/dxmt-0/${file}`,
       absDst: resolve(`./dxmt/${file}`),
     })) {
       yield [
