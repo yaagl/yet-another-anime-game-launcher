@@ -101,4 +101,8 @@ export const zh_CN = {
     "当前游戏版本({0})太过久远，无法增量更新。请重新安装游戏。",
 
   PREDOWNLOAD_READY: "预载{0}版本",
+
+  COMMUNITY_WARNING: "社区版警告",
+  COMMUNITY_WINE_ALERT:
+    "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
 };
