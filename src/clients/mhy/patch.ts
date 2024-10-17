@@ -89,6 +89,14 @@ export async function* patchProgram(
       await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
       await cp(`./dxmt/${f}`, join(system32Dir, f));
     }
+    await cp(
+      `./dxmt/winemetal.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+    );
+    await cp(
+      `./dxmt/winemetal.so`,
+      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+    );
   }
   if (config.reshade) {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
