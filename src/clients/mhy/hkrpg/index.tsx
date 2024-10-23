@@ -40,7 +40,7 @@ import { VoicePackNames } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.5.0";
+const CURRENT_SUPPORTED_VERSION = "2.6.0";
 
 export async function createHKRPGChannelClient({
   server,
@@ -171,11 +171,11 @@ export async function createHKRPGChannelClient({
         await setKey("game_install_dir", selection);
         // FIXME: perform a integrity check?
       } else {
-        // yield* checkIntegrityProgram({
-        //   aria2,
-        //   gameDir: selection,
-        //   remoteDir: decompressed_path,
-        // });
+        yield* checkIntegrityProgram({
+          aria2,
+          gameDir: selection,
+          remoteDir: decompressed_path,
+        });
         // setGameInstalled
         batch(() => {
           setInstalled("INSTALLED");
@@ -314,11 +314,11 @@ export async function createHKRPGChannelClient({
     },
     async *checkIntegrity() {
       // FIXME: no pkg_version?
-      // yield* checkIntegrityProgram({
-      //   aria2,
-      //   gameDir: _gameInstallDir(),
-      //   remoteDir: decompressed_path,
-      // });
+      yield* checkIntegrityProgram({
+        aria2,
+        gameDir: _gameInstallDir(),
+        remoteDir: decompressed_path,
+      });
     },
     async *init(config: Config) {
       try {
