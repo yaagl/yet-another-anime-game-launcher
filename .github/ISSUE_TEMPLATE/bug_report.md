@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug report (for contributor/developer)
+about: Create a report to help us improve. If you just want to ask for support, !!!please go to our Discord server instead!!
 title: ''
 labels: ''
 assignees: ''
@@ -19,6 +19,7 @@ If applicable, add screenshots to help explain your problem.
  - CPU: [e.g. Apple M1, Intel i7 9750H ]
  - Dedicated GPU (if any): [e.g.  AMD Radeon Pro 5300M ]
  - RAM: [e.g. 16G ]
+ - Wine Distribution: [check it in Setting]
 
 **Additional context**
 Add any other context about the problem here.
