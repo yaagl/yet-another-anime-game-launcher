@@ -18,6 +18,7 @@ import {
   exec,
   getKeyOrDefault,
   fileOrDirExists,
+  extract7z,
 } from "@utils";
 import { gte } from "semver";
 
@@ -80,9 +81,8 @@ async function* downloadAndPatch(
   }
 
   yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
-  for await (const [dec, total] of doStreamUnzip(updateFileTmp, gameDir)) {
-    yield ["setProgress", (dec / total) * 100];
-  }
+  yield ["setUndeterminedProgress"];
+  await extract7z(updateFileTmp, gameDir);
   await removeFile(updateFileTmp);
 
   yield ["setStateText", "PATCHING"];
