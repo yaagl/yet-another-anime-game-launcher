@@ -1,9 +1,9 @@
 # Yet another anime game launcher (Yaagl)
 
 ## Current Supported Game Version: 
-### GI: 5.0.0 OS/CN **
-### HSR: 2.5.0 OS/CN
-### ZZZ: 1.2.0 OS/CN
+### GI: 5.1.0+ OS/CN **
+### HSR: 2.6.0 OS/CN
+### ZZZ: 1.3.0 OS/CN
 
 #### **: For Apple Silicon users: Sonoma 14.4 is required
 
