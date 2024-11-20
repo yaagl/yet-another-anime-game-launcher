@@ -360,11 +360,19 @@ async function checkGameState(locale: Locale, server: Server) {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
+      gameVersion: await getGameVersion(join(gameDir, server.dataDir), 0xac),
     } as const;
   } catch {
-    return {
-      gameInstalled: false,
-    } as const;
+    try {
+      return {
+        gameInstalled: true,
+        gameInstallDir: gameDir,
+        gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
+      } as const;
+    } catch {
+      return {
+        gameInstalled: false,
+      } as const;
+    }
   }
 }
