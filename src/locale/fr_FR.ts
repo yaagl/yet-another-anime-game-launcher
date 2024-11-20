@@ -7,7 +7,7 @@ export const fr_FR: typeof zh_CN = {
   UPDATING: "Mise à jour",
   DOWNLOADING: "Téléchargement",
   FIXING_FILES: "Correction des fichiers de jeu {0}/{1}",
-  PATCHING: "Correction des fichiers de jeu",
+  PATCHING: "Ajout de correctifs sur les fichiers du jeu",
   GAME_RUNNING: "Le jeu est lancé (NE FERMEZ PAS LE LANCEUR)",
   REVERT_PATCHING: "Réversion des correctifs",
   SCANNING_FILES:
@@ -35,7 +35,7 @@ export const fr_FR: typeof zh_CN = {
     "Le lanceur n’a pas pu accéder aux fichiers du jeu.\nVeuillez ajuster le répertoire d’installation du jeu après ce message.\n\nSi ce message apparaît plusieurs fois, veuillez vous assurer que le lanceur a l’autorisation d’accéder au répertoire du jeu.",
   GAME_DIR_CHANGED: "Le chemin d’accès au répertoire de jeu a changé.",
   GAME_DIR_CHANGED_DESC:
-    "Vous avez modifié le chemin d’accès de votre jeu. Cette opération n’est pas prise en charge, mais vous pouvez la modifier plus tard.",
+    "Vous avez modifié le chemin d’accès de votre jeu. Cette opération n’est pas prise en charge, mais vous pouvez modifier cela plus tard.",
 
   NEW_VERSION_AVALIABLE: "Une nouvelle mise à jour est disponible",
   NEW_VERSION_AVALIABLE_DESC:
@@ -93,7 +93,7 @@ export const fr_FR: typeof zh_CN = {
     "Pour utiliser Crossover, il y a une étape manuelle supplémentaire. Cliquez ici pour en savoir plus.",
 
   SETTING_FPS_UNLOCK: "Déverrouiller la limite de FPS",
-  SETTING_FPS_UNLOCK_DEFAULT: "Désactivé",
+  SETTING_FPS_UNLOCK_DEFAULT: "Désactivée",
 
   SETTING_ADVANCED: "Avancé",
   SETTING_ADVANCED_ALERT:
