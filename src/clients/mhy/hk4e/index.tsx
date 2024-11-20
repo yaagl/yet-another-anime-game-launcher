@@ -146,7 +146,9 @@ export async function createHK4EChannelClient({
         await setKey("game_install_dir", selection);
         return;
       }
-      const gameVersion = await getGameVersion(join(selection, server.dataDir));
+      const gameVersion = await getGameVersionGI(
+        join(selection, server.dataDir)
+      );
       // if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
       //   await locale.alert(
       //     "UNSUPPORTED_VERSION",
@@ -347,6 +349,14 @@ export async function createHK4EChannelClient({
   };
 }
 
+async function getGameVersionGI(gameDataDir: string) {
+  try {
+    return await getGameVersion(gameDataDir, 0xac);
+  } catch {
+    return await getGameVersion(gameDataDir);
+  }
+}
+
 async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";
   try {
@@ -360,19 +370,11 @@ async function checkGameState(locale: Locale, server: Server) {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir), 0xac),
+      gameVersion: await getGameVersionGI(join(gameDir, server.dataDir)),
     } as const;
   } catch {
-    try {
-      return {
-        gameInstalled: true,
-        gameInstallDir: gameDir,
-        gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
-      } as const;
-    } catch {
-      return {
-        gameInstalled: false,
-      } as const;
-    }
+    return {
+      gameInstalled: false,
+    } as const;
   }
 }
