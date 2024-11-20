@@ -12,12 +12,13 @@ import {
   getFreeSpace,
   getKey,
   getKeyOrDefault,
+  log,
   setKey,
   stats,
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt } from "semver";
+import { gt, lt, SemVer } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "../program-check-integrity";
 import {
@@ -351,7 +352,9 @@ export async function createHK4EChannelClient({
 
 async function getGameVersionGI(gameDataDir: string) {
   try {
-    return await getGameVersion(gameDataDir, 0xac);
+    const ret = await getGameVersion(gameDataDir, 0xac);
+    await log(String(new SemVer(ret)));
+    return ret;
   } catch {
     return await getGameVersion(gameDataDir);
   }
