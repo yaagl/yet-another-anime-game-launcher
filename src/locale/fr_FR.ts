@@ -45,7 +45,7 @@ export const fr_FR: typeof zh_CN = {
 
   UPGRADE_FUNCTION_TBD: "Actuellement, la mise à jour n’est pas mise en œuvre.",
 
-  DECOMPRESS_FILE_PROGRESS: "Decompression des fichiers",
+  DECOMPRESS_FILE_PROGRESS: "Décompression des fichiers",
   ALLOCATING_FILE: "Allocation des fichiers sur le disque",
   DOWNLOADING_FILE_PROGRESS: "Téléchargement du fichier: {0} ({2}/{3}) {1}/s",
 
