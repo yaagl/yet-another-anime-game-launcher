@@ -2,6 +2,7 @@ import { zh_CN } from "./zh_CN";
 import { en } from "./en";
 import { vi_VN } from "./vi_VN";
 import { es_ES } from "./es_ES";
+import { fr_FR } from "./fr_FR";
 import { ru_RU } from "./ru_RU";
 import { ko_KR } from "./ko_KR";
 import { de_DE } from "./de_DE";
@@ -19,6 +20,7 @@ export const locales = {
   en,
   vi_vn: vi_VN,
   es_es: es_ES,
+  fr_FR: fr_FR,
   ru_ru: ru_RU,
   ko_kr: ko_KR,
   de_de: de_DE,

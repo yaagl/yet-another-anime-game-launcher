@@ -39,7 +39,7 @@ export const en: typeof zh_CN = {
   NEW_VERSION_AVALIABLE_DESC:
     "Would you like to update launcher to version {0}?\n Changes:\n{1}",
 
-  DOWNLOADING_UPDATE_FILE: "Downloding update files",
+  DOWNLOADING_UPDATE_FILE: "Downloading update files",
 
   UPGRADE_FUNCTION_TBD: "Currently, updating is not implemented.",
 
