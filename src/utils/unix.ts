@@ -115,6 +115,79 @@ export async function* doStreamUnzip(
   throw new Error("unzip exited with code " + processExitCode);
 }
 
+export async function* doStreamUn7z(
+  sources: string[],
+  destination: string
+): AsyncGenerator<readonly [number, number], void, unknown> {
+  const logFile = resolve("decompress.log");
+  let processExit = false,
+    processExitCode = 0;
+
+  const mainFile = sources.find(file => file.endsWith(".001"));
+  if (!mainFile) throw new Error("Missing main .001 file for decompression!");
+
+  const totalLines = Number(
+    (
+      await exec([
+        resolve("./sidecar/7z/7zz"),
+        "l",
+        mainFile,
+        rawString("|"),
+        "tee",
+        logFile,
+        rawString("|"),
+        "wc",
+        "-l",
+      ])
+    ).stdOut
+      .trim()
+      .split(" ")[0]
+  );
+
+  // Extract the. 7z file
+  const { id } = await spawn([
+    resolve("./sidecar/7z/7zz"),
+    "x",
+    `-o${destination}`,
+    mainFile, //Just need to transfer the. 001 file
+    rawString("|"),
+    "tee",
+    logFile,
+    rawString("&>"),
+    "/dev/null",
+  ]);
+
+  const handler: Neutralino.events.Handler<
+    Neutralino.os.SpawnProcessResult
+  > = event => {
+    if (!event) return;
+    if (event.detail.id == id) {
+      if (event.detail["action"] == "exit") {
+        processExit = true;
+        processExitCode = Number(event.detail["data"]);
+      }
+    }
+  };
+
+  await Neutralino.events.on("spawnedProcess", handler);
+
+  while (processExit == false) {
+    await wait(200);
+    const dNumber = Number(
+      (await exec(["wc", "-l", rawString("<"), logFile])).stdOut
+        .trim()
+        .split(" ")[0]
+    );
+    yield [dNumber, totalLines] as const;
+  }
+
+  await Neutralino.events.off("spawnedProcess", handler);
+
+  if (processExitCode != 0) {
+    throw new Error("7z exited with code " + processExitCode);
+  }
+}
+
 export async function extract7z(source: string, destination: string) {
   return await exec([
     resolve("./sidecar/7z/7zz"),
