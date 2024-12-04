@@ -32,53 +32,18 @@ export async function getGameVersion2019(gameDataDir: string) {
   if (index == -1) {
     throw new Error("pattern not found"); //FIXME
   } else {
-    let str = "";
-    let offset = 0;
-    try {
-      for (let i = 0; i < 3; i++) {
-        for (;;) {
-          const w = view[index + 0x40 + offset];
-          if (w - 48 == -2) {
-            // dot
-            str += ".";
-            offset++;
-            break;
-          } else if (w - 48 >= 0 && w - 48 < 10) {
-            // decimal
-            str += String.fromCharCode(w);
-            offset++;
-            continue;
-          } else if (i == 2) {
-            return str;
-          } else {
-            throw new Error("Falied to parse version");
-          }
-        }
-      }
-    } catch {
-      // second attempt
-      for (let i = 0; i < 3; i++) {
-        for (;;) {
-          const w = view[index + 0x35 + offset];
-          if (w - 48 == -2) {
-            // dot
-            str += ".";
-            offset++;
-            break;
-          } else if (w - 48 >= 0 && w - 48 < 10) {
-            // decimal
-            str += String.fromCharCode(w);
-            offset++;
-            continue;
-          } else if (i == 2) {
-            return str;
-          } else {
-            throw new Error("Falied to parse version");
-          }
-        }
+    for (let j = index; j < index + 0x80; j++) {
+      if (view[j] == 0x2e && view[j + 2] == 0x2e) {
+        return (
+          String.fromCharCode(view[j - 1]) +
+          "." +
+          String.fromCharCode(view[j + 1]) +
+          "." +
+          String.fromCharCode(view[j + 3])
+        );
       }
     }
-    throw new Error("Assertation: unreachable");
+    throw new Error("Falied to parse version");
   }
 }
 
