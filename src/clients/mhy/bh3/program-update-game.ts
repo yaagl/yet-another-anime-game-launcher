@@ -141,51 +141,6 @@ export async function* updateGameProgram({
   updateVoicePackZips: string[];
 }): CommonUpdateProgram {
   yield ["setStateText", "UPDATING"];
-  // 3.6.0
-  if (gte(updatedGameVersion, "3.6.0")) {
-    if (
-      await fileOrDirExists(
-        join(
-          gameDir,
-          server.dataDir,
-          "StreamingAssets",
-          "Audio",
-          "GeneratedSoundBanks",
-          "Windows"
-        )
-      )
-    ) {
-      await mkdirp(
-        join(gameDir, server.dataDir, "StreamingAssets", "AudioAssets")
-      );
-      await exec([
-        "/bin/cp",
-        "-R",
-        "-f",
-        join(
-          gameDir,
-          server.dataDir,
-          "StreamingAssets",
-          "Audio",
-          "GeneratedSoundBanks",
-          "Windows"
-        ) + "/.",
-        join(gameDir, server.dataDir, "StreamingAssets", "AudioAssets"),
-      ]);
-      await exec([
-        "rm",
-        "-rf",
-        join(
-          gameDir,
-          server.dataDir,
-          "StreamingAssets",
-          "Audio",
-          "GeneratedSoundBanks",
-          "Windows"
-        ),
-      ]);
-    }
-  }
 
   yield* downloadAndPatch(updateFileZip, gameDir, aria2);
 
