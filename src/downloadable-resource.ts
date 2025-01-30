@@ -142,7 +142,7 @@ const DXMT_FILES_WITH_UNIXLIB = [
   "winemetal.so",
 ];
 
-const CURRENT_DXMT_VERSION = "0.0.3";
+const CURRENT_DXMT_VERSION = "0.21.0";
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -158,7 +158,7 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for (const file of DXMT_FILES_WITH_UNIXLIB) {
     for await (const progress of aria2.doStreamingDownload({
-      uri: `https://github.com/3Shain/wine/releases/download/dxmt-1/${file}`,
+      uri: `https://github.com/3Shain/wine/releases/download/dxmt-21/${file}`,
       absDst: resolve(`./dxmt/${file}`),
     })) {
       yield [

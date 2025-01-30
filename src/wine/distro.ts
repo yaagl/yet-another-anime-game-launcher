@@ -21,7 +21,7 @@ export interface WineDistribution {
 const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   {
     id: "9.9-dxmt",
-    displayName: "Wine 9.9 DXMT (Experimental)",
+    displayName: "Wine 9.9 DXMT",
     remoteUrl:
       "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
     attributes: {
