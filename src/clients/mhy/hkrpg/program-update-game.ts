@@ -91,11 +91,25 @@ async function* downloadAndPatch(
     await readAllLinesIfExists(join(gameDir, "deletefiles.txt"))
   ).filter(x => x.trim() != "");
 
+  async function readJsonIfExists(filePath: string): Promise<any> {
+    try {
+      const content = await readAllLinesIfExists(filePath);
+      return JSON.parse(content.join("\n"));
+    } catch (error) {
+      return { diff_map: [] };
+    }
+  }
   const diffList: {
-    remoteName: string;
-  }[] = (await readAllLinesIfExists(join(gameDir, "hdifffiles.txt")))
-    .filter(x => x.trim() != "")
-    .map(x => JSON.parse(x));
+    sourceFile: string;
+    targetFile: string;
+    patchFile: string;
+  }[] = (await readJsonIfExists(join(gameDir, "hdiffmap.json"))).diff_map.map(
+    (entry: any) => ({
+      sourceFile: entry.source_file_name,
+      targetFile: entry.target_file_name,
+      patchFile: entry.patch_file_name,
+    })
+  );
 
   const patchCount = deleteList.length + diffList.length;
   let doneCount = 0;
@@ -108,18 +122,18 @@ async function* downloadAndPatch(
   await removeFileIfExists(join(gameDir, "deletefiles.txt"));
   // diff files
 
-  for (const { remoteName: file } of diffList) {
+  for (const { sourceFile, patchFile, targetFile } of diffList) {
     await hpatchz(
-      join(gameDir, file),
-      join(gameDir, file + ".hdiff"),
-      join(gameDir, file + ".patched")
+      join(gameDir, sourceFile),
+      join(gameDir, patchFile),
+      join(gameDir, targetFile)
     );
-    await forceMove(join(gameDir, file + ".patched"), join(gameDir, file));
-    await removeFile(join(gameDir, file + ".hdiff"));
+    // await forceMove(join(gameDir, sourceFile), join(gameDir,targetFile));
+    await removeFile(join(gameDir, patchFile));
     doneCount++;
     yield ["setProgress", (doneCount / patchCount) * 100];
   }
-  await removeFileIfExists(join(gameDir, "hdifffiles.txt"));
+  await removeFileIfExists(join(gameDir, "hdiffmap.json"));
   yield ["setUndeterminedProgress"];
 }
 
