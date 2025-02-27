@@ -73,3 +73,20 @@ export async function createAria2({
 export type Aria2 = ReturnType<typeof createAria2> extends Promise<infer T>
   ? T
   : never;
+
+export async function createAria2Retry({
+  host,
+  port,
+}: {
+  host: string;
+  port: number;
+}): Promise<Aria2> {
+  for (let i = 0; i < 10; i++) {
+    try {
+      return await createAria2({ host, port });
+    } catch {
+      await log("Fail to create aria2 rpc, retrying...");
+    }
+  }
+  throw new Error("Fail to create aria2 rpc");
+}
