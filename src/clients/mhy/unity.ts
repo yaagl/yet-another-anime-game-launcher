@@ -1,4 +1,4 @@
-import { binaryPatternSearch, readBinary } from "@utils";
+import { binaryPatternSearch, md5, readBinary } from "@utils";
 import { join } from "path-browserify";
 
 export async function getGameVersion(gameDataDir: string, offset = 0x88) {
@@ -30,7 +30,12 @@ export async function getGameVersion2019(gameDataDir: string) {
     [0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79]
   );
   if (index == -1) {
-    throw new Error("pattern not found"); //FIXME
+    // workaround
+    const ggmMD5 = (await md5(ggmPath)).toLowerCase();
+    if (ggmMD5 == "57dad95088363b87e0c1ab614fe9431c") {
+      return "3.1.0";
+    }
+    return "9.99.99";
   } else {
     for (let j = index; j < index + 0x80; j++) {
       if (view[j] == 0x2e && view[j + 2] == 0x2e) {
