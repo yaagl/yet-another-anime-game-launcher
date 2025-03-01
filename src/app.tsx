@@ -11,7 +11,7 @@ import {
   exit,
   rawString,
 } from "./utils";
-import { createAria2 } from "./aria2";
+import { createAria2Retry } from "./aria2";
 import {
   checkWine,
   createWine,
@@ -73,7 +73,7 @@ export async function createApp() {
     return true;
   });
   const aria2 = await Promise.race([
-    createAria2({ host: "127.0.0.1", port: aria2_port }),
+    createAria2Retry({ host: "127.0.0.1", port: aria2_port }),
     timeout(10000),
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
