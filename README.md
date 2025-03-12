@@ -3,7 +3,7 @@
 ## Current Supported Game Version: 
 ### GI: 5.3.0+ OS/CN **
 ### HSR: 3.1.0 OS/CN
-### ZZZ: 1.5.0 OS/CN
+### ZZZ: 1.6.0 OS/CN
 
 #### **: For Apple Silicon users: Sonoma 14.4 is required
 
