@@ -140,6 +140,7 @@ const DXMT_FILES_WITH_UNIXLIB = [
   ...DXMT_FILES,
   "winemetal.dll",
   "winemetal.so",
+  "nvngx.dll",
 ];
 
 const CURRENT_DXMT_VERSION = "0.31.0";
