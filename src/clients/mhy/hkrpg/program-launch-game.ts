@@ -24,6 +24,7 @@ export async function* launchGameProgram({
   yield ["setStateText", "PATCHING"];
 
   await wine.setProps(config);
+  if (wine.attributes.renderBackend == "dxmt") await wine.setNVExtension();
 
   const cmd = `@echo off
 cd "%~dp0"
@@ -69,7 +70,8 @@ cd /d "${wine.toWinePath(gameDir)}"
           ? {
               WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
-              DXMT_CONFIG: "d3d11.preferredMaxFrameRate=60;",
+              DXMT_CONFIG:
+                "d3d11.preferredMaxFrameRate=60;dxgi.customVendorId=10de;dxgi.customDeviceId=2684",
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
               GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
             }

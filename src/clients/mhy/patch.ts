@@ -97,6 +97,13 @@ export async function* patchProgram(
       `./dxmt/winemetal.so`,
       resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
     );
+    if (server.id.startsWith("hkrpg")) {
+      await cp(
+        `./dxmt/nvngx.dll`,
+        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+      );
+      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+    }
   }
   if (config.reshade) {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
