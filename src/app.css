@@ -30,6 +30,7 @@ body {
   right: 10vw;
   bottom: calc(23vh - 2px);
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .launch-button button {
