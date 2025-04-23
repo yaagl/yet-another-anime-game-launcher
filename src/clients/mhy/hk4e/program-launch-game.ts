@@ -39,10 +39,7 @@ ${await (async () => {
       join(gameDir, gameExecutable)
     )}"`;
   } else {
-    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"${
-      /* workaround 10351-4001 */
-      " -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1"
-    }`;
+    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
   }
 })()}`;
   await writeFile(resolve("config.bat"), cmd);
