@@ -114,4 +114,6 @@ export const fr_FR: typeof zh_CN = {
   COMMUNITY_WARNING: "Avertissement Communautaire",
   COMMUNITY_WINE_ALERT:
     "La sélection actuelle est la version communautaire, cette version n’est pas officiellement prise en charge, veuillez ne pas signaler de problèmes",
+
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
 };
