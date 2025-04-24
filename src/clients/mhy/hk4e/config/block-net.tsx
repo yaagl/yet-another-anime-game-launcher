@@ -13,9 +13,9 @@ declare module "@config/config-def" {
 const CONFIG_KEY = "config_block_net";
 
 export default async function ({
-                                 locale,
-                                 config,
-                               }: {
+  locale,
+  config,
+}: {
   config: Partial<Config>;
   locale: Locale;
 }) {

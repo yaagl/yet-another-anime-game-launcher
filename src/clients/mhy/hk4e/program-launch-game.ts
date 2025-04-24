@@ -11,7 +11,7 @@ import {
   exec,
   rawString,
   build,
-  runInSudo
+  runInSudo,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
