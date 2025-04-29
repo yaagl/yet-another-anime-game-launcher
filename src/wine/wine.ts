@@ -122,7 +122,11 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  async function setProps(props: { retina: boolean; leftCmd: boolean }) {
+  async function setProps(props: {
+    retina: boolean;
+    leftCmd: boolean;
+    dpi: number;
+  }) {
     const cmd = `@echo off
 cd "%~dp0"
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ /d ${
@@ -130,6 +134,9 @@ reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ 
     } /f
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t REG_SZ /d ${
       props.leftCmd ? "y" : "n"
+    } /f
+reg add "HKEY_CURRENT_USER\\Control Panel\\Desktop" /v LogPixels /t REG_DWORD /d ${
+      props.dpi
     } /f
 `;
     await writeFile(resolve("winedrv_config.bat"), cmd);
