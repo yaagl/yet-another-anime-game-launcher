@@ -111,4 +111,6 @@ export const vi_VN: typeof zh_CN = {
   COMMUNITY_WARNING: "Cảnh báo phiên bản cộng đồng",
   COMMUNITY_WINE_ALERT:
     "Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
+
+  SETTING_DPI: "DPI",
 };
