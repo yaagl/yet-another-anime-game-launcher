@@ -4,8 +4,8 @@ interface unparsedDisplay {
   _name: string;
   spdisplays_connection_type: string | undefined;
   spdisplays_main: string | undefined;
-  _spdisplays_pixels: string;         // Appears to be the internal render resolution
-  _spdisplays_resolution: string;     // The resolution that the display is set to (Shown in settings)
+  _spdisplays_pixels: string; // Appears to be the internal render resolution
+  _spdisplays_resolution: string; // The resolution that the display is set to (Shown in settings)
   spdisplays_pixelresolution: string; // The real resolution of the display
 }
 
@@ -19,11 +19,11 @@ interface Display {
   name: string;
   internal: boolean;
   primary: boolean;
-  hiDPI: boolean;
-  renderResolution: number[];
-  scaledResolution: number[];
-  physicalResolution: number[] | undefined;
-  refreshRate: number;
+  hiDPI: boolean | undefined;
+  renderResolution: [number, number] | undefined;
+  scaledResolution: [number, number] | undefined;
+  physicalResolution: [number, number] | undefined;
+  refreshRate: number | undefined;
 }
 
 interface DisplayAdapter {
@@ -38,31 +38,31 @@ interface DisplayConfiguration {
 }
 
 function parseDisplay(displayJson: unparsedDisplay): Display {
-  const name: string = displayJson._name;
-  const internal: boolean = (
-    displayJson.spdisplays_connection_type ?? "external"
-  ).includes("internal");
-  const primary: boolean = (displayJson.spdisplays_main ?? "no").includes(
-    "yes"
+  const name = displayJson._name;
+  const internal = (displayJson.spdisplays_connection_type ?? "").includes(
+    "internal"
   );
-  const renderResolution: number[] =
-    displayJson._spdisplays_pixels
-      .split("x")
-      .map((item: string) => parseInt(item)) ?? [];
-  const scaledResolution: number[] =
-    displayJson._spdisplays_resolution
-      .split("@")[0]
-      .split("x")
-      .map((item: string) => parseInt(item)) ?? [];
-  const physicalResolution: number[] | undefined = ((str: string): number[] | undefined => {
+  const primary = (displayJson.spdisplays_main ?? "").includes("yes");
+
+  function parseResolution(str: string): [number, number] | undefined {
     const matches = str.match(/(\d+)\s*[×xX]\s*(\d+)/);
     return matches ? [parseInt(matches[1]), parseInt(matches[2])] : undefined;
-  })(displayJson.spdisplays_pixelresolution)
+  }
 
-  const hiDPI: boolean = renderResolution[0] != scaledResolution[0];
-  const refreshRate: number = parseFloat(
-    displayJson._spdisplays_resolution.split("@")[1].split("Hz")[0]
+  const renderResolution = parseResolution(displayJson._spdisplays_pixels);
+  const scaledResolution = parseResolution(displayJson._spdisplays_resolution);
+  const physicalResolution = parseResolution(
+    displayJson.spdisplays_pixelresolution
   );
+
+  const hiDPI =
+    renderResolution == undefined || scaledResolution == undefined
+      ? undefined
+      : renderResolution[0] != scaledResolution[0];
+  const refreshRate = (str => {
+    const matches = str.match(/@\s*([\d.]+)\s*Hz/i);
+    return matches ? parseFloat(matches[1]) : undefined;
+  })(displayJson._spdisplays_resolution);
 
   return {
     name: name,
@@ -77,9 +77,8 @@ function parseDisplay(displayJson: unparsedDisplay): Display {
 }
 
 function parseAdapter(adapterJson: unparsedAdapter): DisplayAdapter {
-  const name: string = adapterJson._name;
-  const metalSupport: string | undefined =
-    adapterJson.spdisplays_mtlgpufamilysupport ?? undefined;
+  const name = adapterJson._name;
+  const metalSupport = adapterJson.spdisplays_mtlgpufamilysupport ?? undefined;
   const displays: Display[] = [];
   for (const displayJson of adapterJson.spdisplays_ndrvs ?? []) {
     displays.push(parseDisplay(displayJson));
@@ -95,6 +94,7 @@ function parseAdapter(adapterJson: unparsedAdapter): DisplayAdapter {
 function parseDisplayConfiguration(configJson: string) {
   const displayAdapterArray: unparsedAdapter[] =
     JSON.parse(configJson).SPDisplaysDataType ?? [];
+
   const displayAdapters: DisplayAdapter[] = [];
   for (const adapterJson of displayAdapterArray) {
     displayAdapters.push(parseAdapter(adapterJson));
@@ -120,4 +120,13 @@ export async function getDisplayConfiguration(): Promise<DisplayConfiguration> {
   ).stdOut.toString();
 
   return parseDisplayConfiguration(cmdOutput);
+}
+
+export async function getDefaultDisplayScreenSize(): Promise<
+  number | undefined
+> {
+  const cmd_inch = `ioreg -l | awk -F\\" '/product-name/ {if (match($4, /[0-9]+-inch/)) {print substr($4, RSTART, RLENGTH-5)}}'`;
+  return parseInt(
+    (await exec(["/bin/bash", "-c", cmd_inch], {}, false)).stdOut.toString()
+  );
 }

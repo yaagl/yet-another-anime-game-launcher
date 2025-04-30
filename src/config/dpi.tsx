@@ -17,7 +17,7 @@ import { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
 import { Config, NOOP } from "./config-def";
 import { exec, log } from "@utils";
-import { getDisplayConfiguration } from "@utils";
+import { getDisplayConfiguration, getDefaultDisplayScreenSize } from "@utils";
 
 declare module "./config-def" {
   interface Config {
@@ -32,17 +32,23 @@ async function getOptimalDPI(defaultDPI = 96): Promise<number> {
   );
   const hasExternal = dispConfig.displays.length != 1;
   try {
-    const retinaEnabled =  (await getKey("config_retina")) == "true";
+    const retinaEnabled = (await getKey("config_retina")) == "true";
   } catch {
-    const retinaEnabled =  false; // default value
+    const retinaEnabled = false; // default value
   }
 
   if (!hasExternal) {
     try {
-      const cmd_inch = `ioreg -l | awk -F\\" '/product-name/ {if (match($4, /[0-9]+-inch/)) {print substr($4, RSTART, RLENGTH-5)}}'`;
-      const inch = parseInt(
-        (await exec(["/bin/bash", "-c", cmd_inch], {}, false)).stdOut.toString()
-      );
+      const inch = await getDefaultDisplayScreenSize();
+      const res = dispConfig.displays[0].renderResolution;
+
+      if (inch === undefined || res === undefined) {
+        await log(
+          `Failed to get screen size or resolution ; defaulting to ${defaultDPI}DPI`
+        );
+        return defaultDPI;
+      }
+
       if (inch < 10 || inch > 32) {
         await log(
           `Abnormal screen size of ${inch} inch detected.` +
@@ -51,16 +57,21 @@ async function getOptimalDPI(defaultDPI = 96): Promise<number> {
         return defaultDPI;
       }
 
-      const res = dispConfig.displays[0].renderResolution;
       const dpi = Math.round(
         Math.sqrt(Math.pow(res[0], 2) + Math.pow(res[1], 2)) / inch
       );
       await log(
         `Screen size detected as ${inch} inch and resolution as ${res[0]}x${res[1]} with DPI ${dpi}`
       );
+
       return dpi;
     } catch (e) {
-      await log("Error getting screen size: " + e);
+      await log(
+        "Error getting screen size: " +
+          e +
+          "\n" +
+          `Defaulting to ${defaultDPI}DPI`
+      );
     }
   }
   //TODO Default DPI settings for external monitor
