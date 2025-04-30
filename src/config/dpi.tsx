@@ -51,7 +51,7 @@ async function getOptimalDPI(defaultDPI = 96): Promise<number> {
         return defaultDPI;
       }
 
-      const res = dispConfig.displays[0].resolution;
+      const res = dispConfig.displays[0].renderResolution;
       const dpi = Math.round(
         Math.sqrt(Math.pow(res[0], 2) + Math.pow(res[1], 2)) / inch
       );
