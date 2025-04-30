@@ -105,4 +105,6 @@ export const zh_CN = {
   COMMUNITY_WARNING: "社区版警告",
   COMMUNITY_WINE_ALERT:
     "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
+
+  SETTING_DPI: "DPI",
 };
