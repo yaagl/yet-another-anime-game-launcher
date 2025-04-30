@@ -2,6 +2,9 @@ import { exec } from "./neu";
 
 interface unparsedDisplay {
   _name: string;
+  "_spdisplays_display-product-id": string;
+  "_spdisplays_display-serial-number": string;
+  "_spdisplays_display-vendor-id": string;
   spdisplays_connection_type: string | undefined;
   spdisplays_main: string | undefined;
   _spdisplays_pixels: string; // Appears to be the internal render resolution
@@ -15,8 +18,11 @@ interface unparsedAdapter {
   spdisplays_mtlgpufamilysupport: string | undefined;
 }
 
-interface Display {
+export interface Display {
   name: string;
+  productId: string;
+  serialNumber: string;
+  vendorId: string;
   internal: boolean;
   primary: boolean;
   hiDPI: boolean | undefined;
@@ -26,19 +32,23 @@ interface Display {
   refreshRate: number | undefined;
 }
 
-interface DisplayAdapter {
+export interface DisplayAdapter {
   name: string;
   metalSupport: string | undefined;
   displays: Display[];
 }
 
-interface DisplayConfiguration {
+export interface DisplayConfiguration {
   displayAdapters: DisplayAdapter[];
   displays: Display[];
 }
 
 function parseDisplay(displayJson: unparsedDisplay): Display {
   const name = displayJson._name;
+  const productId = displayJson["_spdisplays_display-product-id"];
+  const serialNumber = displayJson["_spdisplays_display-serial-number"];
+  const vendorId = displayJson["_spdisplays_display-vendor-id"];
+
   const internal = (displayJson.spdisplays_connection_type ?? "").includes(
     "internal"
   );
@@ -66,6 +76,9 @@ function parseDisplay(displayJson: unparsedDisplay): Display {
 
   return {
     name: name,
+    productId: productId,
+    serialNumber: serialNumber,
+    vendorId: vendorId,
     internal: internal,
     primary: primary,
     hiDPI: hiDPI,

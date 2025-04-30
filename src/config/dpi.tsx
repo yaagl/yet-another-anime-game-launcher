@@ -11,13 +11,22 @@ import {
   SelectOption,
   SelectOptionText,
   SelectOptionIndicator,
+  Button,
+  HStack,
+  Spacer,
 } from "@hope-ui/solid";
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, Show } from "solid-js";
 import { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
 import { Config, NOOP } from "./config-def";
 import { exec, log } from "@utils";
-import { getDisplayConfiguration, getDefaultDisplayScreenSize } from "@utils";
+import {
+  getDisplayConfiguration,
+  getDefaultDisplayScreenSize,
+  Display,
+} from "@utils";
+
+const [resetDPISignal, setResetDPISignal] = createSignal(false);
 
 declare module "./config-def" {
   interface Config {
@@ -25,76 +34,104 @@ declare module "./config-def" {
   }
 }
 
-async function getOptimalDPI(defaultDPI = 96): Promise<number> {
+export async function externalResetDPI() {
+  setResetDPISignal(true);
+  await new Promise(resolve => setTimeout(resolve, 0));
+  setResetDPISignal(false);
+}
+
+async function getOptimalDPI(
+  defaultPhysicalDPI = 192,
+  retinaCompensationFactor = 0.9
+): Promise<number> {
   const dispConfig = await getDisplayConfiguration();
   await log(
     "Current display configuration:\n" + JSON.stringify(dispConfig, null, 2)
   );
-  const hasExternal = dispConfig.displays.length != 1;
+
+  const hasExternal = dispConfig.displays.length != 1; // Assuming headless mode is not supported
+
+  let retinaEnabled = false;
   try {
-    const retinaEnabled = (await getKey("config_retina")) == "true";
+    retinaEnabled = (await getKey("config_retina")) == "true";
   } catch {
-    const retinaEnabled = false; // default value
+    retinaEnabled = false; // default value
   }
+
+  let physicalDPI = defaultPhysicalDPI;
+  let optimalDPI = physicalDPI;
 
   if (!hasExternal) {
-    try {
-      const inch = await getDefaultDisplayScreenSize();
-      const res = dispConfig.displays[0].renderResolution;
+    const display = dispConfig.displays[0];
+    const inch = await getDefaultDisplayScreenSize();
+    const res = display.physicalResolution;
 
-      if (inch === undefined || res === undefined) {
-        await log(
-          `Failed to get screen size or resolution ; defaulting to ${defaultDPI}DPI`
-        );
-        return defaultDPI;
-      }
-
-      if (inch < 10 || inch > 32) {
-        await log(
-          `Abnormal screen size of ${inch} inch detected.` +
-            `Defaulting to 96DPI.`
-        );
-        return defaultDPI;
-      }
-
-      const dpi = Math.round(
+    if (inch === undefined || res === undefined) {
+      await log(
+        `Failed to get screen size or resolution.` +
+          `Assuming screen is ${defaultPhysicalDPI} DPI.`
+      );
+    } else if (inch < 10 || inch > 32) {
+      await log(
+        `Abnormal screen size of ${inch} inch detected.` +
+          `Assuming screen is ${defaultPhysicalDPI} DPI.`
+      );
+    } else {
+      await log(
+        `Screen size detected as ${inch} inch and resolution as ${res[0]}x${res[1]}`
+      );
+      physicalDPI = Math.round(
         Math.sqrt(Math.pow(res[0], 2) + Math.pow(res[1], 2)) / inch
       );
-      await log(
-        `Screen size detected as ${inch} inch and resolution as ${res[0]}x${res[1]} with DPI ${dpi}`
-      );
+    }
 
-      return dpi;
-    } catch (e) {
-      await log(
-        "Error getting screen size: " +
-          e +
-          "\n" +
-          `Defaulting to ${defaultDPI}DPI`
-      );
+    if (retinaEnabled) {
+      if (
+        display.renderResolution == undefined ||
+        display.physicalResolution == undefined
+      ) {
+        await log(
+          `Failed to get screen resolution` +
+            `Assuming retina resolution is equal to physical resolution.`
+        );
+        optimalDPI = physicalDPI;
+      } else {
+        optimalDPI = Math.round(
+          (display.renderResolution[0] / display.physicalResolution[0]) *
+            physicalDPI
+        );
+      }
+      optimalDPI = Math.round(optimalDPI * retinaCompensationFactor); // fixme: for some reason, this is needed to match scale.
+    } else {
+      if (
+        display.scaledResolution == undefined ||
+        display.physicalResolution == undefined
+      ) {
+        await log(
+          `Failed to get screen resolution` +
+            `Assuming scaled resolution is half of physical resolution.`
+        );
+        optimalDPI = Math.round(physicalDPI / 2);
+      } else {
+        optimalDPI = Math.round(
+          (display.scaledResolution[0] / display.physicalResolution[0]) *
+            physicalDPI
+        );
+      }
+    }
+
+    return optimalDPI;
+  } else {
+    if (retinaEnabled) {
+      return Math.round(physicalDPI);
+    } else {
+      return Math.round(physicalDPI / 2);
     }
   }
-  //TODO Default DPI settings for external monitor
-  return defaultDPI;
 }
 
-export async function createDPIConfig({
-  locale,
-  config,
-}: {
-  config: Partial<Config>;
-  locale: Locale;
-}) {
-  const optimalDPI = await getOptimalDPI();
-
-  try {
-    config.dpi = parseInt(await getKey("config_dpi"));
-  } catch {
-    config.dpi = optimalDPI; // default value
-  }
-
-  const [value, setValue] = createSignal(config.dpi);
-  const dpiPresets = [25, 50, 75, 100, 150, 200].map(item => {
+function getDPIPresets(optimalDPI: number) {
+  return [25, 50, 75, 100, 150, 200].map(item => {
     return {
       displayName:
         item.toString() +
@@ -105,6 +142,26 @@ export async function createDPIConfig({
       dpi: Math.round((optimalDPI * item) / 100),
     };
   });
+}
+
+export async function createDPIConfig({
+  locale,
+  config,
+}: {
+  config: Partial<Config>;
+  locale: Locale;
+}) {
+  let optimalDPI = await getOptimalDPI();
+
+  try {
+    config.dpi = parseInt(await getKey("config_dpi"));
+  } catch {
+    config.dpi = optimalDPI; // default value
+  }
+
+  const [value, setValue] = createSignal(config.dpi);
+  const [dpiPresets, setDpiPresets] = createSignal(getDPIPresets(optimalDPI));
+  const [visible, setVisible] = createSignal(true);
 
   async function onSave(apply: boolean) {
     assertValueDefined(config.dpi);
@@ -118,9 +175,27 @@ export async function createDPIConfig({
     return NOOP;
   }
 
+  async function resetDPI() {
+    optimalDPI = await getOptimalDPI();
+    setDpiPresets(getDPIPresets(optimalDPI));
+    setValue(optimalDPI);
+
+    setVisible(false);
+    await new Promise(resolve => setTimeout(resolve, 0)); // fixme: dirty approach to force re-render
+    setVisible(true);
+
+    log(JSON.stringify(dpiPresets()));
+
+    await log(JSON.stringify(await Neutralino.window.getPosition()));
+  }
+
   createEffect(() => {
     value();
     onSave(true);
+
+    if (resetDPISignal()) {
+      resetDPI();
+    }
   });
 
   return [
@@ -128,25 +203,35 @@ export async function createDPIConfig({
       return [
         <FormControl id="dpi">
           <FormLabel>{locale.get("SETTING_DPI")}</FormLabel>
-          <Select value={value()} onChange={setValue}>
-            <SelectTrigger>
-              <SelectPlaceholder>Choose an option</SelectPlaceholder>
-              <SelectValue />
-              <SelectIcon />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectListbox>
-                <For each={[...dpiPresets]}>
-                  {item => (
-                    <SelectOption value={item.dpi}>
-                      <SelectOptionText>{item.displayName}</SelectOptionText>
-                      <SelectOptionIndicator />
-                    </SelectOption>
-                  )}
-                </For>
-              </SelectListbox>
-            </SelectContent>
-          </Select>
+          <HStack>
+            <Show when={visible()}>
+              <Select value={value()} onChange={setValue}>
+                <SelectTrigger>
+                  <SelectPlaceholder>Choose an option</SelectPlaceholder>
+                  <SelectValue />
+                  <SelectIcon />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectListbox>
+                    <For each={dpiPresets()}>
+                      {item => (
+                        <SelectOption value={item.dpi}>
+                          <SelectOptionText>
+                            {item.displayName}
+                          </SelectOptionText>
+                          <SelectOptionIndicator />
+                        </SelectOption>
+                      )}
+                    </For>
+                  </SelectListbox>
+                </SelectContent>
+              </Select>
+              <Spacer px={5}></Spacer>
+              <Button px={5} onClick={resetDPI}>
+                Reset
+              </Button>
+            </Show>
+          </HStack>
         </FormControl>,
       ];
     },
