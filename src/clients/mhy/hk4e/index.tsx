@@ -37,6 +37,7 @@ import {
 } from "../../../downloadable-resource";
 import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
+import createBlockNet from "./config/block-net";
 import { getGameVersion } from "../unity";
 import { VoicePackNames } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
@@ -342,9 +343,10 @@ export async function createHK4EChannelClient({
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [W3] = await createWorkaround3Config({ locale, config });
       const [PO] = await createPatchOff({ locale, config });
+      const [BN] = await createBlockNet({ locale, config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <W3 />, <PO />];
+        return ["Game Version: ", gameCurrentVersion(), <W3 />, <PO />, <BN />];
       };
     },
   };
