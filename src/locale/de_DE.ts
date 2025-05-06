@@ -112,4 +112,6 @@ export const de_DE: typeof zh_CN = {
   COMMUNITY_WARNING: "Gemeiner alarm.",
   COMMUNITY_WINE_ALERT:
     "Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
+
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
 };
