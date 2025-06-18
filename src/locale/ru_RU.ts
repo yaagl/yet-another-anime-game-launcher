@@ -68,6 +68,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_RETINA: "Режим Retina",
   SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
   SETTING_TURN_OFF_AC_PATCH: "выключи патч AC",
+  SETTING_CUSTOM_RESOLUTION: "Пользовательское разрешение",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",
 
