@@ -70,6 +70,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_RETINA: "Chế độ Retina",
   SETTING_LEFT_CMD: "Ánh xạ CMD trái sang CTRL",
   SETTING_TURN_OFF_AC_PATCH: "tắt bản vá AC",
+  SETTING_CUSTOM_RESOLUTION: "Độ phân giải tùy chỉnh",
   SETTING_SAVE: "Lưu",
   SETTING_CANCEL: "Huỷ",
 
