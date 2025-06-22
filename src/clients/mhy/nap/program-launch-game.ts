@@ -25,7 +25,7 @@ export async function* launchGameProgram({
 
   await wine.setProps(config);
 
-  const args = []
+  const args = [];
   if (config.resolutionCustom) {
     args.push("-screen-width", config.resolutionWidth);
     args.push("-screen-height", config.resolutionHeight);

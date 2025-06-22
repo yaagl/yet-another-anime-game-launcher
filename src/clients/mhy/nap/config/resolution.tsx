@@ -1,4 +1,15 @@
-import { FormControl, FormLabel, Box, Checkbox, Input, InputGroup, InputAddon, InputLeftAddon, HStack, VStack } from "@hope-ui/solid";
+import {
+  FormControl,
+  FormLabel,
+  Box,
+  Checkbox,
+  Input,
+  InputGroup,
+  InputAddon,
+  InputLeftAddon,
+  HStack,
+  VStack,
+} from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
@@ -104,7 +115,7 @@ async function createWidth({
   try {
     config.resolutionWidth = await getKey(CONFIG_KEY_WIDTH);
   } catch {
-    config.resolutionWidth = '1920'; // default value
+    config.resolutionWidth = "1920"; // default value
   }
 
   const [value, setValue] = createSignal(config.resolutionWidth);
@@ -131,7 +142,7 @@ async function createWidth({
       return (
         <Input
           value={value()}
-          onChange={(e) => setValue(e.currentTarget.value)}
+          onChange={e => setValue(e.currentTarget.value)}
         />
       );
     },
@@ -148,7 +159,7 @@ async function createHeight({
   try {
     config.resolutionHeight = await getKey(CONFIG_KEY_HEIGHT);
   } catch {
-    config.resolutionHeight = '1920'; // default value
+    config.resolutionHeight = "1920"; // default value
   }
 
   const [value, setValue] = createSignal(config.resolutionHeight);
@@ -175,7 +186,7 @@ async function createHeight({
       return (
         <Input
           value={value()}
-          onChange={(e) => setValue(e.currentTarget.value)}
+          onChange={e => setValue(e.currentTarget.value)}
         />
       );
     },
