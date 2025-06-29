@@ -148,6 +148,8 @@ cd "%~dp0"
 reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global" /v "{41FCC608-8496-4DEF-B43E-7D9BD675A6FF}" /t REG_BINARY /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\nvlddmkm" /v "{41FCC608-8496-4DEF-B43E-7D9BD675A6FF}" /t REG_BINARY /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v FullPath /t REG_SZ /d "C:\\Windows\\System32" /f
+reg add HKLM\System\CurrentControlSet\Control\ComputerName\ActiveComputerName /v ComputerName /t REG_SZ /d STEAMDECK /f
+reg add HKLM\System\CurrentControlSet\Control\ComputerName\ComputerName /v ComputerName /t REG_SZ /d STEAMDECK /f
 `;
     await writeFile(resolve("winedrv_config.bat"), cmd);
     await exec(
