@@ -52,7 +52,8 @@ ${await (async () => {
     )}"`;
   } else {
     return `"${wine.toWinePath(join(gameDir, gameExecutable))}"${
-      /* workaround 10351-4001 */
+      /* workaround 10351-4001 only for global */
+      server.id == "hk4e_global"
       " -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1"
     }`;
   }
