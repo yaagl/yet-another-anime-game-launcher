@@ -1,11 +1,11 @@
 # Yet another anime game launcher (Yaagl)
 
-## Current Supported Game Version: 
+## Current Supported Game Version:
 ### GI: 5.3.0+ OS/CN **
-### HSR: 3.2.0 OS/CN
-### ZZZ: 1.7.0 OS/CN
+### HSR: 3.3.0 OS/CN
+### ZZZ: 2.0.0 OS/CN
 
-#### **: For Apple Silicon users: Sonoma 14.4 is required
+#### **: For Apple Silicon users: Sonoma 14.4 is required. Version 5.6 and up requires an external tool(Crossover, Whisky, Kegworks etc.,) to update the game for now.
 
 ## For Linux users
 [Anime Games Launcher](https://github.com/an-anime-team/anime-games-launcher) is a universal linux launcher for anime games
@@ -30,9 +30,9 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 ## Support
 
-[Our Discord server](https://discord.gg/HrV52MgSC2) is the **ONLY** place providing support if you have any issue just using this application. 
+[Our Discord server](https://discord.gg/HrV52MgSC2) is the **ONLY** place providing support if you have any issue just using this application.
 
-**DON'T FILE AN ISSUE** unless it's a technical problem coming with a clear root cause. 
+**DON'T FILE AN ISSUE** unless it's a technical problem coming with a clear root cause.
 
 > Simply put _My game doesn't launch_ or _I can't login_ without telling any technical detail is not acceptable, please go to the Discord server instead of abusing Github Issues
 
@@ -45,7 +45,7 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 - Uncompress and copy the resulting application to your `/Applications` folder. (Do not open the application from Downloads folder).
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
-<!-- 
+<!--
 ## Development (Outdated)
 
 ### Setup
