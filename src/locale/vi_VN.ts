@@ -112,5 +112,7 @@ export const vi_VN: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
 
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+
   SETTING_DPI: "DPI",
 };

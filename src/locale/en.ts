@@ -111,5 +111,7 @@ export const en: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "The current selection is the Community version, this version is not officially supported, please do not report any issues",
 
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+
   SETTING_DPI: "DPI",
 };
