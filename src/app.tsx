@@ -27,6 +27,7 @@ import { createLocale } from "./locale";
 import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
 import { getWhiskyBinary } from "./wine/whisky";
+import { createSophonRetry } from "./sophon";
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -78,6 +79,11 @@ export async function createApp() {
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
 
+  const sophon = await Promise.race([
+    createSophonRetry({ baseUrl: "http://localhost:8000"}),
+    timeout(10000),
+  ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
+
   const { latest, downloadUrl, description, version } = await createUpdater({
     github,
     aria2,
@@ -111,6 +117,7 @@ export async function createApp() {
       channelClient: await createClient({
         wine,
         aria2,
+        sophon,
         locale,
       }),
     });

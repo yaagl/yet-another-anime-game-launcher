@@ -29,6 +29,7 @@ import { downloadAndInstallGameProgram } from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
 import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
+import { Sophon } from "@sophon";
 import { Wine } from "@wine";
 import {
   checkAndDownloadDXMT,
@@ -49,11 +50,13 @@ export async function createHK4EChannelClient({
   server,
   locale,
   aria2,
+  sophon,
   wine,
 }: {
   server: Server;
   locale: Locale;
   aria2: Aria2;
+  sophon: Sophon;
   wine: Wine;
 }): Promise<ChannelClient> {
   const {
@@ -131,13 +134,9 @@ export async function createHK4EChannelClient({
         }
 
         yield* downloadAndInstallGameProgram({
-          aria2,
+          sophonClient: sophon,
           gameDir: selection,
-          gameSegmentZips: game_pkgs.map(x => x.url),
-          // gameAudioZip: voice_packs.find((x) => x.language == "zh-cn")!
-          //   .path,
-          gameVersion: GAME_LATEST_VERSION,
-          server,
+          installReltype: "os",
         });
         // setGameInstalled
         batch(() => {
