@@ -11,4 +11,5 @@ export type SuppportedContentLangId =
   | "ko-kr"
   | "zh-cn"
   | "zh-tw"
-  | "vi-vn";
+  | "vi-vn"
+  | "th-th";
