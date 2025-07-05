@@ -29,6 +29,7 @@ import { createDxvkHUDConfig } from "./dxvk-hud";
 import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
+import { createDPIConfig } from "@config/dpi";
 import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import createLocaleConfig from "./ui-locale";
@@ -60,6 +61,7 @@ export async function createConfiguration({
   const [DH] = await createDxvkHUDConfig({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
+  const [D] = await createDPIConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
     locale,
@@ -138,6 +140,7 @@ export async function createConfiguration({
                       <DH />
                       <MH />
                       <R />
+                      <D />
                       <LC />
                       <Divider />
                       <UL />
