@@ -20,7 +20,7 @@ import {
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
 import { Config } from "@config";
-import { checkIntegrityProgram } from "../program-check-integrity";
+import { checkIntegrityProgram } from "./program-check-integrity";
 import {
   predownloadGameProgram,
   updateGameProgram,
@@ -177,9 +177,8 @@ export async function createHK4EChannelClient({
         // FIXME: perform a integrity check?
       } else {
         yield* checkIntegrityProgram({
-          aria2,
+          sophon,
           gameDir: selection,
-          remoteDir: decompressed_path,
         });
         // setGameInstalled
         batch(() => {
@@ -318,9 +317,8 @@ export async function createHK4EChannelClient({
     },
     async *checkIntegrity() {
       yield* checkIntegrityProgram({
-        aria2,
+        sophon,
         gameDir: _gameInstallDir(),
-        remoteDir: decompressed_path,
       });
     },
     async *init(config: Config) {
@@ -333,9 +331,8 @@ export async function createHK4EChannelClient({
         yield* patchRevertProgram(_gameInstallDir(), wine, server, config);
       } catch {
         yield* checkIntegrityProgram({
-          aria2,
+          sophon,
           gameDir: _gameInstallDir(),
-          remoteDir: decompressed_path,
         });
       }
     },

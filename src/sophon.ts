@@ -5,6 +5,11 @@ export interface SophonInstallOptions {
   install_reltype: string; // "os", "cn", or "bb"
 }
 
+export interface SophonRepairOptions {
+  gamedir: string;
+  repair_mode: string;
+}
+
 export interface SophonProgressEvent {
   type: string;
   task_id: string;
@@ -21,7 +26,6 @@ export class SophonClient {
   }
 
   async startInstallation(options: SophonInstallOptions): Promise<string> {
-    log("djuafkla")
     log(`Starting installation with options: ${JSON.stringify(options)}`);
 
     const response = await fetch(`${this.baseUrl}/api/install`, {
@@ -41,7 +45,27 @@ export class SophonClient {
     return result.task_id;
   }
 
-  async* streamInstallationProgress(taskId: string): AsyncGenerator<SophonProgressEvent> {
+  async startRepair(options: SophonRepairOptions): Promise<string> {
+    log(`Starting repair with options: ${JSON.stringify(options)}`);
+
+    const response = await fetch(`${this.baseUrl}/api/repair`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(options),
+    });
+    log(`Repair response status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`Repair request failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.task_id;
+  }
+
+  async* streamOperationProgress(taskId: string): AsyncGenerator<SophonProgressEvent> {
     const ws = new WebSocket(`${this.wsUrl}/ws/${taskId}`);
 
     const messageQueue: SophonProgressEvent[] = [];
@@ -57,9 +81,9 @@ export class SophonClient {
       const message = JSON.parse(event.data) as SophonProgressEvent;
       messageQueue.push(message);
 
-      if (message.type === 'download_end' || message.type === 'download_error') {
+      if (message.type === 'job_end' || message.type === 'job_error' || message.type === 'error') {
         isCompleted = true;
-        if (message.type === 'download_error') {
+        if (message.type === 'job_error' || message.type === 'error') {
           error = message.error || 'Unknown error';
         }
       }
@@ -89,8 +113,8 @@ export class SophonClient {
         const message = messageQueue.shift()!;
         yield message;
 
-        if (message.type === 'error') {
-          throw new Error(message.error || 'Installation failed');
+        if (message.type === 'error' || message.type === 'job_error') {
+          throw new Error(message.error || 'Operation failed');
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -152,7 +176,7 @@ export async function createSophonRetry({
     try {
       return await createSophon({ baseUrl });
     } catch (error) {
-      console.log("Failed to create sophon client, retrying...", error);
+      log("Failed to create sophon client, retrying..." + error);
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }

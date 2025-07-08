@@ -22,9 +22,9 @@ export async function* downloadAndInstallGameProgram({
   })
   log (`Installation task started with ID: ${task_id}`);
 
-    for await (const progress of sophonClient.streamInstallationProgress(task_id)) {
+    for await (const progress of sophonClient.streamOperationProgress(task_id)) {
     switch (progress.type) {
-      case "download_start":
+      case "job_start":
         yield ["setUndeterminedProgress"];
         yield ["setStateText", "ALLOCATING_FILE"];
         break;
