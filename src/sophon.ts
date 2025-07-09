@@ -3,11 +3,19 @@ import { log } from "@utils";
 export interface SophonInstallOptions {
   gamedir: string;
   install_reltype: string; // "os", "cn", or "bb"
+  tempdir?: string;
 }
 
 export interface SophonRepairOptions {
   gamedir: string;
   repair_mode: string;
+  tempdir?: string;
+}
+
+export interface SophonUpdateOptions {
+  gamedir: string;
+  predownload: boolean;
+  tempdir?: string;
 }
 
 export interface SophonProgressEvent {
@@ -59,6 +67,26 @@ export class SophonClient {
 
     if (!response.ok) {
       throw new Error(`Repair request failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.task_id;
+  }
+
+  async startUpdate(options: SophonUpdateOptions): Promise<string> {
+    log(`Starting update with options: ${JSON.stringify(options)}`);
+
+    const response = await fetch(`${this.baseUrl}/api/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(options),
+    });
+    log(`Update response status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`Update request failed: ${response.statusText}`);
     }
 
     const result = await response.json();

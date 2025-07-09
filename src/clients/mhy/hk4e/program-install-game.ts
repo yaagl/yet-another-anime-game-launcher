@@ -16,13 +16,13 @@ export async function* downloadAndInstallGameProgram({
   yield ["setUndeterminedProgress"];
   log("Starting game installation process...");
 
-  const task_id = await sophonClient.startInstallation({
+  const taskId = await sophonClient.startInstallation({
     gamedir: gameDir,
     install_reltype: installReltype,
   })
-  log (`Installation task started with ID: ${task_id}`);
+  log (`Installation task started with ID: ${taskId}`);
 
-    for await (const progress of sophonClient.streamOperationProgress(task_id)) {
+    for await (const progress of sophonClient.streamOperationProgress(taskId)) {
     switch (progress.type) {
       case "job_start":
         yield ["setUndeterminedProgress"];
@@ -35,7 +35,7 @@ export async function* downloadAndInstallGameProgram({
           "setStateText",
           "DOWNLOADING_FILE_PROGRESS",
           basename(progress.filename),
-          humanFileSize(progress.overall_progress.download_speed), // Use chunk_size as speed approximation
+          humanFileSize(progress.overall_progress.download_speed),
           humanFileSize(progress.overall_progress.downloaded_size),
           humanFileSize(progress.overall_progress.total_size),
         ];

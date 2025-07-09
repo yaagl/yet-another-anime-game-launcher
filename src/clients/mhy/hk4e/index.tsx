@@ -75,7 +75,7 @@ export async function createHK4EChannelClient({
     pre_download,
   } = await getLatestVersionInfo(server);
 
-  const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hkrpg")
+  const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hk4e")
   const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
 
@@ -235,8 +235,8 @@ export async function createHK4EChannelClient({
       });
     },
     async *update() {
-      const updateTarget = patches.find(x => x.version == gameCurrentVersion());
-      if (!updateTarget) {
+      const updatable = UPDATABLE_VERSIONS.includes(gameCurrentVersion())
+      if (!updatable) {
         await locale.prompt(
           "UNSUPPORTED_VERSION",
           "GAME_VERSION_TOO_OLD_DESC",
@@ -250,41 +250,11 @@ export async function createHK4EChannelClient({
         await setKey("game_install_dir", null);
         return;
       }
-      const voicePacks = (
-        await Promise.all(
-          updateTarget.audio_pkgs.map(async x => {
-            try {
-              await stats(
-                join(
-                  _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
-              );
-              return x;
-            } catch {
-              return null;
-            }
-          })
-        )
-      )
-        .filter(x => x != null)
-        .map(x => {
-          assertValueDefined(x);
-          return x;
-        });
-      if (updateTarget.game_pkgs.length != 1) {
-        throw new Error(
-          "assertation failed (game_pkgs.length!= 1)! please file an issue."
-        );
-      }
       yield* updateGameProgram({
-        aria2,
-        server,
-        currentGameVersion: gameCurrentVersion(),
-        updatedGameVersion: LATEST_GAME_VERSION,
-        updateFileZip: updateTarget.game_pkgs[0].url,
+        sophon,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.url),
+        server,
+        updatedGameVersion: LATEST_GAME_VERSION,
       });
       batch(() => {
         setGameVersion(LATEST_GAME_VERSION);

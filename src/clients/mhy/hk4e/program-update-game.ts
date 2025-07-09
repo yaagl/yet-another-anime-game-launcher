@@ -1,5 +1,6 @@
 import { join, basename } from "path-browserify";
 import { Aria2 } from "../../../aria2";
+import { Sophon } from "@sophon";
 import { CommonUpdateProgram } from "../../../common-update-ui";
 import { Server } from "../../../constants";
 import {
@@ -25,113 +26,149 @@ import { gte } from "semver";
 //https://stackoverflow.com/a/69399958
 
 async function* downloadAndPatch(
-  updateFileZip: string,
+  sophon: Sophon,
   gameDir: string,
-  aria2: Aria2
 ): CommonUpdateProgram {
-  const downloadTmp = join(gameDir, ".ariatmp");
-  await mkdirp(downloadTmp);
-  const updateFileTmp = join(downloadTmp, basename(updateFileZip));
-
-  try {
-    await getKey(
-      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`
-    );
-    await stats(updateFileTmp);
-  } catch {
-    yield ["setUndeterminedProgress"];
-    yield ["setStateText", "ALLOCATING_FILE"];
-    let gameFileStart = false;
-    for await (const progress of aria2.doStreamingDownload({
-      uri: updateFileZip,
-      absDst: updateFileTmp,
-    })) {
-      if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
-        continue;
-      }
-      gameFileStart = true;
-      yield [
-        "setStateText",
-        "DOWNLOADING_FILE_PROGRESS",
-        basename(updateFileZip),
-        humanFileSize(Number(progress.downloadSpeed)),
-        humanFileSize(Number(progress.completedLength)),
-        humanFileSize(Number(progress.totalLength)),
-      ];
-      yield [
-        "setProgress",
-        Number(
-          (progress.completedLength * BigInt(10000)) / progress.totalLength
-        ) / 100,
-      ];
-    }
-  } finally {
-    await setKey(
-      `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`,
-      null
-    );
-  }
-
-  yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
-  for await (const [dec, total] of doStreamUnzip(updateFileTmp, gameDir)) {
-    yield ["setProgress", (dec / total) * 100];
-  }
-  await removeFile(updateFileTmp);
-
-  yield ["setStateText", "PATCHING"];
-  // delete files
-  const deleteList = (
-    await readAllLinesIfExists(join(gameDir, "deletefiles.txt"))
-  ).filter(x => x.trim() != "");
-
-  const diffList: {
-    remoteName: string;
-  }[] = (await readAllLinesIfExists(join(gameDir, "hdifffiles.txt")))
-    .filter(x => x.trim() != "")
-    .map(x => JSON.parse(x));
-
-  const patchCount = deleteList.length + diffList.length;
-  let doneCount = 0;
-
-  for (const file of deleteList) {
-    await removeFile(join(gameDir, file));
-    doneCount++;
-    yield ["setProgress", (doneCount / patchCount) * 100];
-  }
-  await removeFileIfExists(join(gameDir, "deletefiles.txt"));
-  // diff files
-
-  for (const { remoteName: file } of diffList) {
-    await hpatchz(
-      join(gameDir, file),
-      join(gameDir, file + ".hdiff"),
-      join(gameDir, file + ".patched")
-    );
-    await forceMove(join(gameDir, file + ".patched"), join(gameDir, file));
-    await removeFile(join(gameDir, file + ".hdiff"));
-    doneCount++;
-    yield ["setProgress", (doneCount / patchCount) * 100];
-  }
-  await removeFileIfExists(join(gameDir, "hdifffiles.txt"));
+  const downloadTmp = join(gameDir, ".tmp");
+  const taskId = await sophon.startUpdate({
+    gamedir: gameDir,
+    tempdir: downloadTmp,
+    predownload: false,
+  })
   yield ["setUndeterminedProgress"];
+  yield ["setStateText", "ALLOCATING_FILE"];
+  for await (const progress of sophon.streamOperationProgress(taskId)) {
+    switch (progress.type) {
+      case "delete_file":
+        yield ["setStateText", "PATCHING"]
+        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        break;
+
+      case "ldiff_download_complete":
+        yield [
+          "setStateText",
+          "DOWNLOADING_FILE_PROGRESS",
+          basename(progress.filename),
+          humanFileSize(progress.overall_progress.download_speed),
+          humanFileSize(progress.overall_progress.downloaded_size),
+          humanFileSize(progress.overall_progress.total_size),
+        ];
+        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        break;
+
+      case "chunk_progress":
+        yield [
+          "setStateText",
+          "DOWNLOADING_FILE_PROGRESS",
+          basename(progress.filename),
+          humanFileSize(progress.overall_progress.download_speed),
+          humanFileSize(progress.overall_progress.downloaded_size),
+          humanFileSize(progress.overall_progress.total_size),
+        ];
+        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        break;
+
+      case "delete_ldiff_file":
+        yield ["setStateText", "PATCHING"]
+        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        break;
+    }
+  }
+  yield ["setUndeterminedProgress"]
+
+  // try {
+  //   await getKey(
+  //     `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`
+  //   );
+  //   await stats(updateFileTmp);
+  // } catch {
+  //   yield ["setUndeterminedProgress"];
+  //   yield ["setStateText", "ALLOCATING_FILE"];
+  //   let gameFileStart = false;
+  //   for await (const progress of aria2.doStreamingDownload({
+  //     uri: updateFileZip,
+  //     absDst: updateFileTmp,
+  //   })) {
+  //     if (!gameFileStart && progress.downloadSpeed == BigInt(0)) {
+  //       continue;
+  //     }
+  //     gameFileStart = true;
+  //     yield [
+  //       "setStateText",
+  //       "DOWNLOADING_FILE_PROGRESS",
+  //       basename(updateFileZip),
+  //       humanFileSize(Number(progress.downloadSpeed)),
+  //       humanFileSize(Number(progress.completedLength)),
+  //       humanFileSize(Number(progress.totalLength)),
+  //     ];
+  //     yield [
+  //       "setProgress",
+  //       Number(
+  //         (progress.completedLength * BigInt(10000)) / progress.totalLength
+  //       ) / 100,
+  //     ];
+  //   }
+  // } finally {
+  //   await setKey(
+  //     `predownloaded_${(await sha1sum(basename(updateFileZip))).slice(0, 32)}`,
+  //     null
+  //   );
+  // }
+  //
+  // yield ["setStateText", "DECOMPRESS_FILE_PROGRESS"];
+  // for await (const [dec, total] of doStreamUnzip(updateFileTmp, gameDir)) {
+  //   yield ["setProgress", (dec / total) * 100];
+  // }
+  // await removeFile(updateFileTmp);
+  //
+  // yield ["setStateText", "PATCHING"];
+  // // delete files
+  // const deleteList = (
+  //   await readAllLinesIfExists(join(gameDir, "deletefiles.txt"))
+  // ).filter(x => x.trim() != "");
+  //
+  // const diffList: {
+  //   remoteName: string;
+  // }[] = (await readAllLinesIfExists(join(gameDir, "hdifffiles.txt")))
+  //   .filter(x => x.trim() != "")
+  //   .map(x => JSON.parse(x));
+  //
+  // const patchCount = deleteList.length + diffList.length;
+  // let doneCount = 0;
+  //
+  // for (const file of deleteList) {
+  //   await removeFile(join(gameDir, file));
+  //   doneCount++;
+  //   yield ["setProgress", (doneCount / patchCount) * 100];
+  // }
+  // await removeFileIfExists(join(gameDir, "deletefiles.txt"));
+  // // diff files
+  //
+  // for (const { remoteName: file } of diffList) {
+  //   await hpatchz(
+  //     join(gameDir, file),
+  //     join(gameDir, file + ".hdiff"),
+  //     join(gameDir, file + ".patched")
+  //   );
+  //   await forceMove(join(gameDir, file + ".patched"), join(gameDir, file));
+  //   await removeFile(join(gameDir, file + ".hdiff"));
+  //   doneCount++;
+  //   yield ["setProgress", (doneCount / patchCount) * 100];
+  // }
+  // await removeFileIfExists(join(gameDir, "hdifffiles.txt"));
+  // yield ["setUndeterminedProgress"];
 }
 
 export async function* updateGameProgram({
-  aria2,
-  updateFileZip,
+  sophon,
   gameDir,
-  currentGameVersion,
-  updatedGameVersion,
   server,
-  updateVoicePackZips,
+  updatedGameVersion,
 }: {
-  updateFileZip: string;
+  sophon: Sophon;
   gameDir: string;
-  currentGameVersion: string;
-  updatedGameVersion: string;
-  aria2: Aria2;
   server: Server;
-  updateVoicePackZips: string[];
+  updatedGameVersion: string;
 }): CommonUpdateProgram {
   yield ["setStateText", "UPDATING"];
   // 3.6.0
@@ -180,21 +217,9 @@ export async function* updateGameProgram({
     }
   }
 
-  yield* downloadAndPatch(updateFileZip, gameDir, aria2);
-
-  for (const updateVoicePackZip of updateVoicePackZips) {
-    yield* downloadAndPatch(updateVoicePackZip, gameDir, aria2);
-  }
-
+  yield* downloadAndPatch(sophon, gameDir);
   await setKey(`predownloaded_all`, null);
-  await writeFile(
-    join(gameDir, "config.ini"),
-    `[General]
-game_version=${updatedGameVersion}
-channel=${server.channel_id}
-sub_channel=${server.subchannel_id}
-cps=${server.cps}`
-  );
+  // Writing config.ini is done in python script
 }
 
 async function* predownload(

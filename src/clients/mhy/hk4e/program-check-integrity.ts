@@ -11,7 +11,7 @@ export async function* checkIntegrityProgram({
   gameDir: string;
   sophon: Sophon;
 }): CommonUpdateProgram {
-  const task_id = await sophon.startRepair({
+  const taskId = await sophon.startRepair({
     gamedir: gameDir,
     repair_mode: "reliable",
   })
@@ -23,7 +23,7 @@ export async function* checkIntegrityProgram({
     "0",
   ];
 
-  for await (const progress of sophon.streamOperationProgress(task_id)) {
+  for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
       case "check_file":
         yield [
@@ -41,7 +41,7 @@ export async function* checkIntegrityProgram({
           "setStateText",
           "DOWNLOADING_FILE_PROGRESS",
           basename(progress.filename),
-          humanFileSize(progress.overall_progress.download_speed), // Use chunk_size as speed approximation
+          humanFileSize(progress.overall_progress.download_speed),
           humanFileSize(progress.overall_progress.downloaded_size),
           humanFileSize(progress.overall_progress.total_size),
         ];
