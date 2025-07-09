@@ -65,16 +65,26 @@ export async function createApp() {
     "--stop-with-process",
     pid,
   ]);
-  const { pid: spid } = await spawn([
-    "./sidecar/sophon_server/.venv/bin/fastapi",
-    "run",
-    "sidecar/sophon_server/server.py",
-    "--port",
-    `${sophon_port}`,
-    "--host",
-    `${sophon_host}`,
-  ],
-    {"TERMINATE_WITH_PID": pid},
+
+  // Syncing env takes about 10milliseconds.
+  log("Syncing python environment for sophon server...");
+  await exec([
+    "./sidecar/uv/uv",
+    "sync",
+    "--directory",
+    "./sidecar/sophon_server/",
+  ]);
+  const { pid: spid } = await spawn(
+    [
+      "./sidecar/sophon_server/.venv/bin/fastapi",
+      "run",
+      "sidecar/sophon_server/server.py",
+      "--port",
+      `${sophon_port}`,
+      "--host",
+      `${sophon_host}`,
+    ],
+    { TERMINATE_WITH_PID: pid }
   );
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)

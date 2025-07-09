@@ -5,10 +5,10 @@ import { Server } from "@constants";
 import { humanFileSize, log } from "@utils";
 
 export async function* downloadAndInstallGameProgram({
-                                                       sophonClient,
-                                                       gameDir,
-                                                       installReltype = "os",
-                                                     }: {
+  sophonClient,
+  gameDir,
+  installReltype = "os",
+}: {
   sophonClient: SophonClient;
   gameDir: string;
   installReltype?: string;
@@ -19,10 +19,10 @@ export async function* downloadAndInstallGameProgram({
   const taskId = await sophonClient.startInstallation({
     gamedir: gameDir,
     install_reltype: installReltype,
-  })
-  log (`Installation task started with ID: ${taskId}`);
+  });
+  log(`Installation task started with ID: ${taskId}`);
 
-    for await (const progress of sophonClient.streamOperationProgress(taskId)) {
+  for await (const progress of sophonClient.streamOperationProgress(taskId)) {
     switch (progress.type) {
       case "job_start":
         yield ["setUndeterminedProgress"];

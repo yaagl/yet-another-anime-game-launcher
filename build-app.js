@@ -253,6 +253,10 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
+  await fs.copy(
+    path.resolve(process.cwd(), "sophon_server"),
+    path.resolve(sidecarDst, "sophon_server")
+  );
 
   (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });

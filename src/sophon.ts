@@ -30,12 +30,14 @@ export class SophonClient {
 
   constructor(host: string, port = 6969) {
     this.baseUrl = `http://${host}:${port}`;
-    this.wsUrl = this.baseUrl.replace("http://", "ws://").replace("https://", "wss://");
+    this.wsUrl = this.baseUrl
+      .replace("http://", "ws://")
+      .replace("https://", "wss://");
   }
 
   async healthCheck(): Promise<boolean> {
     try {
-      log(this.baseUrl)
+      log(this.baseUrl);
       const response = await fetch(`${this.baseUrl}/health`);
       if (!response.ok) {
         log(`Health check failed with status: ${response.status}`);
@@ -53,9 +55,9 @@ export class SophonClient {
     log(`Starting installation with options: ${JSON.stringify(options)}`);
 
     const response = await fetch(`${this.baseUrl}/api/install`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(options),
     });
@@ -73,9 +75,9 @@ export class SophonClient {
     log(`Starting repair with options: ${JSON.stringify(options)}`);
 
     const response = await fetch(`${this.baseUrl}/api/repair`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(options),
     });
@@ -93,9 +95,9 @@ export class SophonClient {
     log(`Starting update with options: ${JSON.stringify(options)}`);
 
     const response = await fetch(`${this.baseUrl}/api/update`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(options),
     });
@@ -109,7 +111,9 @@ export class SophonClient {
     return result.task_id;
   }
 
-  async* streamOperationProgress(taskId: string): AsyncGenerator<SophonProgressEvent> {
+  async *streamOperationProgress(
+    taskId: string
+  ): AsyncGenerator<SophonProgressEvent> {
     const ws = new WebSocket(`${this.wsUrl}/ws/${taskId}`);
 
     const messageQueue: SophonProgressEvent[] = [];
@@ -121,20 +125,24 @@ export class SophonClient {
       isConnected = true;
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       const message = JSON.parse(event.data) as SophonProgressEvent;
       messageQueue.push(message);
 
-      if (message.type === 'job_end' || message.type === 'job_error' || message.type === 'error') {
+      if (
+        message.type === "job_end" ||
+        message.type === "job_error" ||
+        message.type === "error"
+      ) {
         isCompleted = true;
-        if (message.type === 'job_error' || message.type === 'error') {
-          error = message.error || 'Unknown error';
+        if (message.type === "job_error" || message.type === "error") {
+          error = message.error || "Unknown error";
         }
       }
     };
 
-    ws.onerror = (event) => {
-      error = 'WebSocket connection error';
+    ws.onerror = event => {
+      error = "WebSocket connection error";
       isCompleted = true;
     };
 
@@ -157,8 +165,8 @@ export class SophonClient {
         const message = messageQueue.shift()!;
         yield message;
 
-        if (message.type === 'error' || message.type === 'job_error') {
-          throw new Error(message.error || 'Operation failed');
+        if (message.type === "error" || message.type === "job_error") {
+          throw new Error(message.error || "Operation failed");
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -170,7 +178,7 @@ export class SophonClient {
 
   async cancelOperation(taskId: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/api/tasks/${taskId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
 
     if (!response.ok) {
@@ -179,7 +187,9 @@ export class SophonClient {
   }
 
   async getLatestOnlineGameInfo(reltype: string, game: string) {
-    const response = await fetch(`${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`);
+    const response = await fetch(
+      `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to get game info: ${response.statusText}`);
@@ -189,7 +199,10 @@ export class SophonClient {
   }
 }
 
-export async function createSophon(host: string, port: number): Promise<SophonClient> {
+export async function createSophon(
+  host: string,
+  port: number
+): Promise<SophonClient> {
   const client = new SophonClient(host, port);
 
   if (!(await client.healthCheck())) {
@@ -200,7 +213,10 @@ export async function createSophon(host: string, port: number): Promise<SophonCl
 
 export type Sophon = SophonClient;
 
-export async function createSophonRetry(host: string, port: number): Promise<Sophon> {
+export async function createSophonRetry(
+  host: string,
+  port: number
+): Promise<Sophon> {
   for (let i = 0; i < 10; i++) {
     try {
       return await createSophon(host, port);

@@ -5,7 +5,7 @@ import { Wine } from "@wine";
 
 export interface CreateClientOptions {
   aria2: Aria2;
-  sophon: Sophon
+  sophon: Sophon;
   wine: Wine;
   locale: Locale;
 }

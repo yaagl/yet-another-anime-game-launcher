@@ -27,21 +27,24 @@ import { gte } from "semver";
 
 async function* downloadAndPatch(
   sophon: Sophon,
-  gameDir: string,
+  gameDir: string
 ): CommonUpdateProgram {
   const downloadTmp = join(gameDir, ".tmp");
   const taskId = await sophon.startUpdate({
     gamedir: gameDir,
     tempdir: downloadTmp,
     predownload: false,
-  })
+  });
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "ALLOCATING_FILE"];
   for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
       case "delete_file":
-        yield ["setStateText", "PATCHING"]
-        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        yield ["setStateText", "PATCHING"];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
 
       case "ldiff_download_complete":
@@ -53,7 +56,10 @@ async function* downloadAndPatch(
           humanFileSize(progress.overall_progress.downloaded_size),
           humanFileSize(progress.overall_progress.total_size),
         ];
-        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
 
       case "chunk_progress":
@@ -65,16 +71,22 @@ async function* downloadAndPatch(
           humanFileSize(progress.overall_progress.downloaded_size),
           humanFileSize(progress.overall_progress.total_size),
         ];
-        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
 
       case "delete_ldiff_file":
-        yield ["setStateText", "PATCHING"]
-        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        yield ["setStateText", "PATCHING"];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
     }
   }
-  yield ["setUndeterminedProgress"]
+  yield ["setUndeterminedProgress"];
 
   // try {
   //   await getKey(

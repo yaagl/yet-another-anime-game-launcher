@@ -75,7 +75,7 @@ export async function createHK4EChannelClient({
     pre_download,
   } = await getLatestVersionInfo(server);
 
-  const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hk4e")
+  const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hk4e");
   log(`Game info: ${JSON.stringify(gameInfo)}`);
   const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
@@ -236,7 +236,7 @@ export async function createHK4EChannelClient({
       });
     },
     async *update() {
-      const updatable = UPDATABLE_VERSIONS.includes(gameCurrentVersion())
+      const updatable = UPDATABLE_VERSIONS.includes(gameCurrentVersion());
       if (!updatable) {
         await locale.prompt(
           "UNSUPPORTED_VERSION",

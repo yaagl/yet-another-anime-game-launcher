@@ -13,14 +13,9 @@ export async function* checkIntegrityProgram({
   const taskId = await sophon.startRepair({
     gamedir: gameDir,
     repair_mode: "reliable",
-  })
+  });
 
-  yield [
-    "setStateText",
-    "SCANNING_FILES",
-    "0",
-    "0",
-  ];
+  yield ["setStateText", "SCANNING_FILES", "0", "0"];
 
   for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
@@ -31,7 +26,10 @@ export async function* checkIntegrityProgram({
           String(progress.overall_progress.checked_files),
           String(progress.overall_progress.total_files),
         ];
-        yield ["setProgress", Number(progress.overall_progress.overall_percent)];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
 
       case "chunk_progress":
