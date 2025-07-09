@@ -76,6 +76,7 @@ export async function createHK4EChannelClient({
   } = await getLatestVersionInfo(server);
 
   const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hk4e")
+  log(`Game info: ${JSON.stringify(gameInfo)}`);
   const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
 

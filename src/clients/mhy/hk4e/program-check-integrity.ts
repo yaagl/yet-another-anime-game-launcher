@@ -1,6 +1,5 @@
 import { basename, join } from "path-browserify";
 import { Sophon } from "@sophon";
-import { createSophonRetry } from "@sophon";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { log, md5, stats, readAllLines, setKey, humanFileSize } from "@utils";
 

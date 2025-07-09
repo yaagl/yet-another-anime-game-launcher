@@ -28,9 +28,25 @@ export class SophonClient {
   private baseUrl: string;
   private wsUrl: string;
 
-  constructor(baseUrl = "http://localhost:8000") {
-    this.baseUrl = baseUrl;
-    this.wsUrl = baseUrl.replace("http://", "ws://").replace("https://", "wss://");
+  constructor(host: string, port = 6969) {
+    this.baseUrl = `http://${host}:${port}`;
+    this.wsUrl = this.baseUrl.replace("http://", "ws://").replace("https://", "wss://");
+  }
+
+  async healthCheck(): Promise<boolean> {
+    try {
+      log(this.baseUrl)
+      const response = await fetch(`${this.baseUrl}/health`);
+      if (!response.ok) {
+        log(`Health check failed with status: ${response.status}`);
+        return false;
+      }
+      const data = await response.json();
+      return true;
+    } catch (error) {
+      log(`Health check error: ${error}`);
+      return false;
+    }
   }
 
   async startInstallation(options: SophonInstallOptions): Promise<string> {
@@ -173,39 +189,24 @@ export class SophonClient {
   }
 }
 
-export async function createSophon({
-                                     baseUrl = "http://localhost:8000"
-                                   }: {
-  baseUrl?: string;
-} = {}): Promise<SophonClient> {
-  const client = new SophonClient(baseUrl);
+export async function createSophon(host: string, port: number): Promise<SophonClient> {
+  const client = new SophonClient(host, port);
 
-  // Test connection
-  try {
-    const response = await fetch(`${baseUrl}/health`);
-    if (!response.ok) {
-      throw new Error('Health check failed');
-    }
-  } catch (error) {
-    throw new Error(`Failed to connect to Sophon server: ${error}`);
+  if (!(await client.healthCheck())) {
+    throw new Error(`Failed to connect to Sophon server at ${host}:${port}`);
   }
-
   return client;
 }
 
 export type Sophon = SophonClient;
 
-export async function createSophonRetry({
-                                          baseUrl = "http://localhost:8000"
-                                        }: {
-  baseUrl?: string;
-} = {}): Promise<Sophon> {
+export async function createSophonRetry(host: string, port: number): Promise<Sophon> {
   for (let i = 0; i < 10; i++) {
     try {
-      return await createSophon({ baseUrl });
+      return await createSophon(host, port);
     } catch (error) {
       log("Failed to create sophon client, retrying..." + error);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
   throw new Error("Failed to create sophon client after retries");

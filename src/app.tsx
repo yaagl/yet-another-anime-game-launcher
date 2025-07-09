@@ -33,6 +33,8 @@ export async function createApp() {
   await setKey("singleton", null);
 
   const aria2_port = 6868;
+  const sophon_port = 6969;
+  const sophon_host = "127.0.0.1";
 
   await Neutralino.events.on("windowClose", async () => {
     if (await GLOBAL_onClose(false)) {
@@ -63,11 +65,28 @@ export async function createApp() {
     "--stop-with-process",
     pid,
   ]);
+  const { pid: spid } = await spawn([
+    "./sidecar/sophon_server/.venv/bin/fastapi",
+    "run",
+    "sidecar/sophon_server/server.py",
+    "--port",
+    `${sophon_port}`,
+    "--host",
+    `${sophon_host}`,
+  ],
+    {"TERMINATE_WITH_PID": pid},
+  );
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
     try {
       await exec(["kill", apid + ""]);
+    } catch {
+      await log("killing process failed?");
+    }
+    await log("killing process " + spid);
+    try {
+      await exec(["kill", "-9", spid + ""]);
     } catch {
       await log("killing process failed?");
     }
@@ -80,7 +99,7 @@ export async function createApp() {
   await log(`Launched aria2 version ${aria2.version.version}`);
 
   const sophon = await Promise.race([
-    createSophonRetry({ baseUrl: "http://localhost:8000"}),
+    createSophonRetry(sophon_host, sophon_port),
     timeout(10000),
   ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
 
