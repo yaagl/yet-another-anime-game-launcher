@@ -124,18 +124,18 @@ export class SophonClient {
     ws.close();
   }
 
-  async cancelInstallation(taskId: string): Promise<void> {
+  async cancelOperation(taskId: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/api/tasks/${taskId}`, {
       method: 'DELETE',
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to cancel installation: ${response.statusText}`);
+      throw new Error(`Failed to cancel operation: ${response.statusText}`);
     }
   }
 
-  async getGameInfo(gamedir: string) {
-    const response = await fetch(`${this.baseUrl}/api/game/info?gamedir=${encodeURIComponent(gamedir)}`);
+  async getLatestOnlineGameInfo(reltype: string, game: string) {
+    const response = await fetch(`${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`);
 
     if (!response.ok) {
       throw new Error(`Failed to get game info: ${response.statusText}`);

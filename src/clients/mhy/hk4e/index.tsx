@@ -75,6 +75,10 @@ export async function createHK4EChannelClient({
     pre_download,
   } = await getLatestVersionInfo(server);
 
+  const gameInfo = await sophon.getLatestOnlineGameInfo("os", "hkrpg")
+  const LATEST_GAME_VERSION: string = gameInfo.version;
+  const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
+
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -99,7 +103,7 @@ export async function createHK4EChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
+  const updateRequired = () => lt(gameCurrentVersion(), LATEST_GAME_VERSION);
   return {
     installState: installed,
     showPredownloadPrompt,
@@ -142,7 +146,7 @@ export async function createHK4EChannelClient({
         batch(() => {
           setInstalled("INSTALLED");
           setGameInstallDir(selection);
-          setGameVersion(GAME_LATEST_VERSION);
+          setGameVersion(LATEST_GAME_VERSION);
         });
         await setKey("game_install_dir", selection);
         return;
@@ -158,9 +162,9 @@ export async function createHK4EChannelClient({
       //   );
       //   return;
       // } else
-      if (lt(gameVersion, GAME_LATEST_VERSION)) {
-        const updateTarget = patches.find(x => x.version == gameVersion);
-        if (!updateTarget) {
+      if (lt(gameVersion, LATEST_GAME_VERSION)) {
+        const updatable = UPDATABLE_VERSIONS.includes(gameVersion);
+        if (!updatable) {
           await locale.prompt(
             "UNSUPPORTED_VERSION",
             "GAME_VERSION_TOO_OLD_DESC",
@@ -277,13 +281,13 @@ export async function createHK4EChannelClient({
         aria2,
         server,
         currentGameVersion: gameCurrentVersion(),
-        updatedGameVersion: GAME_LATEST_VERSION,
+        updatedGameVersion: LATEST_GAME_VERSION,
         updateFileZip: updateTarget.game_pkgs[0].url,
         gameDir: _gameInstallDir(),
         updateVoicePackZips: voicePacks.map(x => x.url),
       });
       batch(() => {
-        setGameVersion(GAME_LATEST_VERSION);
+        setGameVersion(LATEST_GAME_VERSION);
       });
     },
     async *launch(config: Config) {
