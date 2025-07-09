@@ -1,0 +1,61 @@
+/*
+	File taken from GitHub user Lightczx (DGP-Studio/Snap.Hutao/issues/2446)
+	That repository is licensed under MIT, thus assuming the same for this comment.
+*/
+
+syntax = "proto3";
+
+message DiffManifest {
+	repeated DiffFileInfo files = 1;
+	repeated DeleteFile files_delete = 2;
+}
+
+message DiffFileInfo {
+	string filename = 1; // Path to the file relative to the game directory
+	int32 size = 2;      // Size of the entire file
+	string hash = 3;     // md5 file hash AFTER patching
+	repeated Patch patches = 4;
+}
+
+message Patch {
+	string key = 1;	 // Game version, e.g. "5.5.0" or "5.4.0" (when updating to "5.6.0")
+	PatchInfo info = 2;
+}
+
+// A patch file usually contains multiple concatenated hpatchz files, thus
+// this structure describes which section of the file patches which game file.
+message PatchInfo {
+	// File hash on disk "[8 bytes -> hex]_[16 bytes -> hex]" and
+	// the "suffix" for the URL found in getPatchBuild -> '.data.manifests.[N].diff_download.url_prefix'
+	// The official launcher uses the same naming scheme.
+	string patch_id = 1;     // unique identifier (hash)
+	string tag = 2;	         // same as `Patch.key`
+	string build_id = 3;     // same as in the getBuild API (unused in this script)
+
+	int64  patch_size = 4;   // in bytes
+	string patch_name  = 5;  // = "[8 bytes -> hex]" from 'id' above
+	int64  patch_offset = 6; // in bytes
+	int64  patch_length = 7; // in bytes
+
+	string original_name = 8;  // relative game file path to patch
+	int64  original_size = 9;  // in bytes
+	string original_hash = 10; // md5 file hash BEFORE patching
+}
+
+message DeleteFile
+{
+	string key = 1;       // same as `Patch.key`
+	DeleteFiles info = 2;
+}
+
+message DeleteFiles
+{
+	repeated DeleteFileInfo list = 1;
+}
+
+message DeleteFileInfo
+{
+	string filename = 1; // relative game file path
+	int64  size = 2;     // file size
+	string hash = 3;     // md5
+}
