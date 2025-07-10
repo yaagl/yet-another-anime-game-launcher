@@ -1,21 +1,28 @@
 import { log } from "@utils";
 
-export interface SophonInstallOptions {
+interface GameOperationOptions {
   gamedir: string;
+  tempdir?: string; // sophon manifest and intermediate files
+}
+
+export interface SophonInstallOptions extends GameOperationOptions {
   install_reltype: string; // "os", "cn", or "bb"
-  tempdir?: string;
 }
 
-export interface SophonRepairOptions {
-  gamedir: string;
+export interface SophonRepairOptions extends GameOperationOptions {
+  // "quick" or "reliable"
+  // "quick" does file size check, "reliable" does hash check
   repair_mode: string;
-  tempdir?: string;
 }
 
-export interface SophonUpdateOptions {
-  gamedir: string;
+export interface SophonUpdateOptions extends GameOperationOptions {
   predownload: boolean;
-  tempdir?: string;
+}
+
+interface SophonOperationResponse {
+  task_id: string;
+  status: string;
+  message: string;
 }
 
 export interface SophonProgressEvent {
@@ -37,13 +44,12 @@ export class SophonClient {
 
   async healthCheck(): Promise<boolean> {
     try {
-      log(this.baseUrl);
       const response = await fetch(`${this.baseUrl}/health`);
       if (!response.ok) {
         log(`Health check failed with status: ${response.status}`);
         return false;
       }
-      const data = await response.json();
+      await response.json();
       return true;
     } catch (error) {
       log(`Health check error: ${error}`);
@@ -51,64 +57,38 @@ export class SophonClient {
     }
   }
 
-  async startInstallation(options: SophonInstallOptions): Promise<string> {
-    log(`Starting installation with options: ${JSON.stringify(options)}`);
+  async startGameOperation(
+    type: "install" | "repair" | "update",
+    options: SophonInstallOptions | SophonRepairOptions | SophonUpdateOptions
+  ): Promise<string> {
+    log(`Starting ${type} operation with options: ${JSON.stringify(options)}`);
 
-    const response = await fetch(`${this.baseUrl}/api/install`, {
+    const response = await fetch(`${this.baseUrl}/api/${type}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(options),
     });
-    log(`Installation response status: ${response.status}`);
 
     if (!response.ok) {
-      throw new Error(`Installation request failed: ${response.statusText}`);
+      throw new Error(`${type} request failed: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result: SophonOperationResponse = await response.json();
     return result.task_id;
+  }
+
+  async startInstallation(options: SophonInstallOptions): Promise<string> {
+    return this.startGameOperation("install", options);
   }
 
   async startRepair(options: SophonRepairOptions): Promise<string> {
-    log(`Starting repair with options: ${JSON.stringify(options)}`);
-
-    const response = await fetch(`${this.baseUrl}/api/repair`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(options),
-    });
-    log(`Repair response status: ${response.status}`);
-
-    if (!response.ok) {
-      throw new Error(`Repair request failed: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.task_id;
+    return this.startGameOperation("repair", options);
   }
 
   async startUpdate(options: SophonUpdateOptions): Promise<string> {
-    log(`Starting update with options: ${JSON.stringify(options)}`);
-
-    const response = await fetch(`${this.baseUrl}/api/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(options),
-    });
-    log(`Update response status: ${response.status}`);
-
-    if (!response.ok) {
-      throw new Error(`Update request failed: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.task_id;
+    return this.startGameOperation("update", options);
   }
 
   async *streamOperationProgress(
@@ -120,6 +100,7 @@ export class SophonClient {
     let isConnected = false;
     let isCompleted = false;
     let error: string | null = null;
+    let messageResolver: ((value: unknown) => void) | null = null;
 
     ws.onopen = () => {
       isConnected = true;
@@ -128,6 +109,10 @@ export class SophonClient {
     ws.onmessage = event => {
       const message = JSON.parse(event.data) as SophonProgressEvent;
       messageQueue.push(message);
+
+      if (messageResolver) {
+        messageResolver(null);
+      }
 
       if (
         message.type === "job_end" ||
@@ -159,9 +144,10 @@ export class SophonClient {
       throw new Error(error);
     }
 
-    // Yield messages as they arrive
     while (!isCompleted || messageQueue.length > 0) {
       if (messageQueue.length > 0) {
+        // Array is not empty. message is not null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const message = messageQueue.shift()!;
         yield message;
 
@@ -169,7 +155,9 @@ export class SophonClient {
           throw new Error(message.error || "Operation failed");
         }
       } else {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => {
+          messageResolver = resolve;
+        });
       }
     }
 
@@ -177,6 +165,7 @@ export class SophonClient {
   }
 
   async cancelOperation(taskId: string): Promise<void> {
+    // Partial support at python server side
     const response = await fetch(`${this.baseUrl}/api/tasks/${taskId}`, {
       method: "DELETE",
     });
@@ -187,6 +176,7 @@ export class SophonClient {
   }
 
   async getLatestOnlineGameInfo(reltype: string, game: string) {
+    // Currently only supports "hk4e" for game, "os", "cn", or "bb" for reltype
     const response = await fetch(
       `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`
     );
