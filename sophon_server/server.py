@@ -61,21 +61,25 @@ def run_task(task_type: Literal["install", "repair", "update"], request: Union[I
 
 
 @app.post("/api/install")
-async def install_game(request: InstallRequest):
+async def install_game(request: InstallRequest) -> TaskResponse:
     return run_task("install", request)
 
 @app.post("/api/repair")
-async def repair_game(request: RepairRequest):
+async def repair_game(request: RepairRequest) -> TaskResponse:
     return run_task("repair", request)
 
 @app.post("/api/update")
-async def repair_game(request: UpdateRequest):
+async def repair_game(request: UpdateRequest) -> TaskResponse:
     return run_task("update", request)
 
 @app.get("/api/tasks/{task_id}/status")
-async def get_task_status(task_id: str):
+async def get_task_status(task_id: str) -> TaskStatus:
     if task_id not in tasks:
-        return {"error": "Task not found"}
+        return TaskStatus(
+            task_id = task_id,
+            status = "",
+            error = "Task not found"
+        )
     return tasks[task_id]
 
 
@@ -110,7 +114,7 @@ async def get_game_info(gamedir: str):
 
 
 @app.get("/api/game/online_info")
-async def get_online_game_info(reltype: str, game: str):
+async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
     try:
         if game.lower() == "hk4e":
             options = Options()
@@ -128,13 +132,42 @@ async def get_online_game_info(reltype: str, game: str):
                 "updatable_versions": cli.branches_json["diff_tags"],
                 "release_type": reltype,
             }
-            # remove all files in gamedir
+
+            del cli
+
             shutil.rmtree(options.gamedir, ignore_errors=True)
-            return online_info
+            options.predownload = True
+
+            cli = SophonClient()
+            cli.initialize(options)
+
+            try:
+                cli.retrieve_API_keys()
+                online_info['pre_download'] = True
+            except AssertionError:
+                online_info['pre_download'] = False
+
+            shutil.rmtree(options.gamedir, ignore_errors=True)
+            del cli
+            del options
+
+            return OnlineGameInfo(
+                version=online_info["version"],
+                updatable_versions=online_info["updatable_versions"],
+                release_type=online_info["release_type"],
+                pre_download=online_info["pre_download"],
+                error=None
+            )
         else:
             raise ValueError("Unsupported game type. Only 'hk4e' is supported.")
     except Exception as e:
-        return {"error": str(e)}
+        return OnlineGameInfo(
+            version="",
+            updatable_versions=[],
+            release_type=reltype,
+            pre_download=False,
+            error=str(e)
+        )
 
 @app.get("/health")
 async def health_check():
