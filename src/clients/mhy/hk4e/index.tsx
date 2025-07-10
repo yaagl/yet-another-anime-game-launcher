@@ -229,10 +229,8 @@ export async function createHK4EChannelClient({
         );
       }
       yield* predownloadGameProgram({
-        aria2,
-        updateFileZip: updateTarget.game_pkgs[0].url,
+        sophon,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.url),
       });
     },
     async *update() {
