@@ -250,6 +250,8 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     `Resources`,
     `sidecar`
   );
+  // Remove because .venv may be in there if a npm start something was run
+  await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
