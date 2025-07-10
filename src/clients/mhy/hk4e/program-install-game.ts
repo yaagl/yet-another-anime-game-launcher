@@ -7,11 +7,11 @@ import { humanFileSize, log } from "@utils";
 export async function* downloadAndInstallGameProgram({
   sophonClient,
   gameDir,
-  installReltype = "os",
+  installReltype,
 }: {
   sophonClient: SophonClient;
   gameDir: string;
-  installReltype?: string;
+  installReltype: string;
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   log("Starting game installation process...");

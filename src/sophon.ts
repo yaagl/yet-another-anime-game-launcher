@@ -175,7 +175,7 @@ export class SophonClient {
     }
   }
 
-  async getLatestOnlineGameInfo(reltype: string, game: string) {
+  async getLatestOnlineGameInfo(reltype: "os" | "cn" | "bb", game: string) {
     // Currently only supports "hk4e" for game, "os", "cn", or "bb" for reltype
     const response = await fetch(
       `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`
