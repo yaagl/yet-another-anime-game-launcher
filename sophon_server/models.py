@@ -33,4 +33,5 @@ class OnlineGameInfo(BaseModel):
     updatable_versions: List[str]
     release_type: str
     pre_download: bool
+    pre_download_version: Optional[str] = None
     error: Optional[str] = None

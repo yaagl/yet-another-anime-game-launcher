@@ -144,8 +144,10 @@ async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
             try:
                 cli.retrieve_API_keys()
                 online_info['pre_download'] = True
+                online_info['pre_download_version'] = cli.branches_json["tag"]
             except AssertionError:
                 online_info['pre_download'] = False
+                online_info["pre_download_version"] = "0.0.0"
 
             shutil.rmtree(options.gamedir, ignore_errors=True)
             del cli
@@ -156,6 +158,7 @@ async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
                 updatable_versions=online_info["updatable_versions"],
                 release_type=online_info["release_type"],
                 pre_download=online_info["pre_download"],
+                pre_download_version=online_info["pre_download_version"],
                 error=None
             )
         else:
