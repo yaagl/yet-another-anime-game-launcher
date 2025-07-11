@@ -64,5 +64,8 @@ rm neu.zip
 
 curl -sSL https://github.com/neutralinojs/neutralino.js/releases/download/v3.9.0/neutralino.js > neutralino.js
 
+curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v31.1/protoc-31.1-osx-universal_binary.zip > protobuf.zip
+unzip -o -j protobuf.zip bin/protoc -d bin
+
 pushd sophon_server
-protoc --python_out=. *.proto
+../bin/protoc --python_out=. *.proto
