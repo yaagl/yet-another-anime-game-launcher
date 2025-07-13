@@ -56,15 +56,6 @@ export async function createProxyHostConfig({
           <InputGroup>
             <Input value={value()} onChange={(e) => setValue(e.target.value)} />
           </InputGroup>
-          {/*<Box>*/}
-          {/*  <Checkbox*/}
-          {/*    checked={value()}*/}
-          {/*    size="md"*/}
-          {/*    onChange={() => setValue(x => !x)}*/}
-          {/*  >*/}
-          {/*    {locale.get("SETTING_ENABLED")}*/}
-          {/*  </Checkbox>*/}
-          {/*</Box>*/}
         </FormControl>
       );
     },
