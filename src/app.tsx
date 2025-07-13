@@ -68,11 +68,12 @@ export async function createApp() {
 
   // Syncing env takes about 10milliseconds.
   log("Syncing python environment for sophon server...");
-  await exec([  // Set python version to match target arch
+  // Set python version to match target arch
+  await exec([
     "bash",
     "-c",
-    `echo "cpython-3.13-macos-$(uname -m)-none" > ./sidecar/sophon_server/.python-version`
-  ])
+    `echo "cpython-3.13-macos-$(uname -m)-none" > ./sidecar/sophon_server/.python-version`,
+  ]);
   await exec([
     "./sidecar/uv/uv",
     "sync",
