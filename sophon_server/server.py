@@ -1,4 +1,4 @@
-import uuid, shutil, threading
+import uuid, shutil, threading, ssl
 from datetime import datetime
 from asyncio import AbstractEventLoop
 from typing import Literal, Union
@@ -9,6 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from utils import *
 from models import *
 from tasks import *
+
+# Disable SSL verification
+ssl._create_default_https_context = ssl._create_unverified_context
 
 app = FastAPI(title="Sophon Game Updater", version="1.0.0")
 
