@@ -1,6 +1,5 @@
 import {
   Box, Checkbox,
-  createIcon,
   FormControl,
   FormLabel,
 } from "@hope-ui/solid";
