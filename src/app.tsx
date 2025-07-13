@@ -33,7 +33,7 @@ export async function createApp() {
   await setKey("singleton", null);
 
   const aria2_port = 6868;
-  const sophon_port = 6969;
+  const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
   const sophon_host = "127.0.0.1";
 
   await Neutralino.events.on("windowClose", async () => {
