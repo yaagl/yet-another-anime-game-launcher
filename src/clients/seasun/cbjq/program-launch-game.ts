@@ -83,6 +83,10 @@ cd /d "${wine.toWinePath(gameDir)}"
           : {
               WINEESYNC: "1",
             }),
+        ...(config.proxyEnabled ? {
+          HTTP_PROXY: config.proxyHost,
+          HTTPS_PROXY: config.proxyHost,
+        } : {})
       },
       logfile
     );
