@@ -12,6 +12,7 @@ export async function* checkIntegrityProgram({
 }): CommonUpdateProgram {
   const taskId = await sophon.startRepair({
     gamedir: gameDir,
+    game_type: "hk4e",
     repair_mode: "reliable",
   });
 

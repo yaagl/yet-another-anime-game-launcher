@@ -2,6 +2,7 @@ import { log } from "@utils";
 
 interface GameOperationOptions {
   gamedir: string;
+  game_type: string // "hk4e" or "nap"
   tempdir?: string; // sophon manifest and intermediate files
 }
 

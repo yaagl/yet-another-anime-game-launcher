@@ -18,6 +18,7 @@ export async function* downloadAndInstallGameProgram({
 
   const taskId = await sophonClient.startInstallation({
     gamedir: gameDir,
+    game_type: "hk4e",
     install_reltype: installReltype,
   });
   log(`Installation task started with ID: ${taskId}`);

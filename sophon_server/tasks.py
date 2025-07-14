@@ -25,6 +25,7 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
     options.gamedir = pathlib.Path(request.gamedir)
     options.do_install = True
     options.install_reltype = request.install_reltype
+    options.game_type = request.game_type
     if request.tempdir:
         options.tempdir = pathlib.Path(request.tempdir)
     else:
@@ -84,6 +85,7 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
 
     options = Options()
     options.gamedir = pathlib.Path(request.gamedir)
+    options.game_type = request.game_type
     options.repair_mode = request.repair_mode
     if request.tempdir:
         options.tempdir = pathlib.Path(request.tempdir)
@@ -105,6 +107,7 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     options = Options()
     options.gamedir = pathlib.Path(request.gamedir)
     options.do_update = True
+    options.game_type = request.game_type
     options.predownload = request.predownload
     if request.tempdir:
         options.tempdir = pathlib.Path(request.tempdir)

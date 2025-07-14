@@ -1,9 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Literal
 
 
 class GameOperationRequest(BaseModel):
     gamedir: str
+    game_type: Literal["hk4e", "nap"]
     tempdir: Optional[str] = None
 
 class InstallRequest(GameOperationRequest):
@@ -29,6 +30,7 @@ class TaskStatus(BaseModel):
 
 
 class OnlineGameInfo(BaseModel):
+    game_type: Literal["hk4e", "nap", ""]
     version: str
     updatable_versions: List[str]
     release_type: str

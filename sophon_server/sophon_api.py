@@ -58,6 +58,7 @@ import subprocess # for hpatchz (ldiff)
 import sys # stdout
 import tempfile # patch extraction
 import time
+from typing import Literal
 import uuid
 import urllib.error # exception handling
 import urllib.request as request # downloads
@@ -99,6 +100,7 @@ class Options(argparse.Namespace):
 	force_use_cache: bool = False # True: disallow downloads, False: download if not cached
 	predownload: bool = False
 	install_reltype: str | None = None
+	game_type: Literal["hk4e", "nap"] | None # hk4e or nap
 	do_install: bool = False
 	do_update: bool = False         # True: ldiff, False: chunks
 	repair_mode: str | None = None  # "quick"|"reliable"|None
@@ -268,6 +270,7 @@ class DownloadInfo:
 class SophonClient:
 	installed_ver: None  # "major.minor.patch" or "new" for new installations
 	rel_type: str | None = None  # os / cn / bb
+	game_type: Literal["hk4e", "nap"] | None = None  # hk4e / nap
 	gamedatadir: str | None= None # "*_Data"
 	branch: str          # main / pre_download
 	branches_json = None # package_id, password, tag
@@ -291,6 +294,10 @@ class SophonClient:
 		if OPT.install_reltype:
 			OPT.do_install = True
 			self.rel_type = OPT.install_reltype
+
+		if OPT.game_type:
+			assert OPT.game_type in ["hk4e", "nap"], "Unknown game type. Must be 'hk4e' or 'nap'."
+			self.game_type = OPT.game_type
 
 		if OPT.do_install + OPT.do_update + isinstance(OPT.repair_mode, str) > 1:
 			abortlog("Do either install, update or repair!")
@@ -324,11 +331,18 @@ class SophonClient:
 			assert len(list(OPT.gamedir.glob("*"))) < 2, "The specified install path is not empty"
 
 		# Create "config.ini"
-		templates = {
-			"os": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n",
-			"cn": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=1\r\n",
-			"bb": "[General]\r\nchannel=14\r\ncps=bilibili\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n"
-		}
+		templates = {}
+		if OPT.game_type == "hk4e":
+			templates = {
+				"os": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n",
+				"cn": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=1\r\n",
+				"bb": "[General]\r\nchannel=14\r\ncps=bilibili\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n"
+			}
+		elif OPT.game_type == "nap":
+			templates = {
+				"os": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n",
+				"cn": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=1\r\n",
+			}
 		assert templates[self.rel_type], "Unknown reltype"
 		with gamedir("config.ini").open("w") as fh:
 			fh.write(templates[self.rel_type])
@@ -347,14 +361,21 @@ class SophonClient:
 		Find out what kind of installation we need to update
 		"""
 		self._get_gamedatadir()
-
-		if gamedir("GenshinImpact.exe").is_file():
-			self.rel_type = "os"
-		elif gamedir("YuanShen.exe").is_file():
-			if self.gamedatadir.joinpath("Plugins", "PCGameSDK.dll").is_file():
-				self.rel_type = "bb"
-			else:
-				self.rel_type = "cn"
+		if self.game_type == "hk4e":
+			if gamedir("GenshinImpact.exe").is_file():
+				self.rel_type = "os"
+			elif gamedir("YuanShen.exe").is_file():
+				if self.gamedatadir.joinpath("Plugins", "PCGameSDK.dll").is_file():
+					self.rel_type = "bb"
+				else:
+					self.rel_type = "cn"
+		elif self.game_type == "nap":
+			with open(gamedir("config.ini"), "r") as f:
+				contents = f.read()
+				if "sub_channel=0" in contents:
+					self.rel_type = "os"
+				elif "sub_channel=1" in contents:
+					self.rel_type = "cn"
 
 		if not isinstance(self.rel_type, str):
 			abortlog("Failed to detect release type. " \
@@ -561,16 +582,29 @@ class SophonClient:
 		game_ids: str = None
 		launcher_id: str = None
 
+		assert self.game_type in ["hk4e", "nap", "hkrpg"], "Unknown game type. Must be 'hk4e' or 'nap'."
+
 		if self.rel_type == "os":
 			# Up-to-date as of 2024-06-15 (4.7.0)
-			game_ids = "gopR6Cufr3"
+			if self.game_type == "nap":
+				game_ids = "U5hbdsT9W7"
+			elif self.game_type == "hk4e":
+				game_ids = "gopR6Cufr3"
+			elif self.game_type == "hkrpg":
+				game_ids = "4ziysqXOQ8"
 			launcher_id = "VYTpXlbWo8"
 		elif self.rel_type == "cn":
 			# From DGP-Studio/Snap.Hutao (GitHub), MIT
 			launcher_id = "jGHBHlcOq1"
-			game_ids = "1Z8W5NHUQb"
+			if self.game_type == "nap":
+				game_ids = "x6znKlJ0xK"
+			elif self.game_type == "hk4e":
+				game_ids = "1Z8W5NHUQb"
+			elif self.game_type == "hkrpg":
+				game_ids = "64kMb5iAWu"
 		elif self.rel_type == "bb":
 			# From DGP-Studio/Snap.Hutao (GitHub), MIT
+			assert self.game_type == "hk4e", "Bilibili is only available for 'hk4e' game type"
 			launcher_id = "umfgRO5gh5"
 			game_ids = "T2S0Gz4Dr2"
 		else:

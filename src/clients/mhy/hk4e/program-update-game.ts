@@ -19,6 +19,7 @@ async function* downloadAndPatch(
   const downloadTmp = join(gameDir, ".tmp");
   const taskId = await sophon.startUpdate({
     gamedir: gameDir,
+    game_type: "hk4e",
     tempdir: downloadTmp,
     predownload: false,
   });
@@ -146,6 +147,7 @@ async function* predownload(
   const downloadTmp = join(gameDir, ".tmp");
   const taskId = await sophon.startUpdate({
     gamedir: gameDir,
+    game_type: "hk4e",
     tempdir: downloadTmp,
     predownload: true,
   });

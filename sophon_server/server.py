@@ -117,10 +117,11 @@ async def get_game_info(gamedir: str):
 
 
 @app.get("/api/game/online_info")
-async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
+async def get_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
     try:
-        if game.lower() == "hk4e":
+        if game in ["hk4e", "nap"]:
             options = Options()
+            options.game_type = game
             options.install_reltype = reltype
             options.ignore_conditions = True
             options.gamedir = pathlib.Path("./sidecar/sophon_server/gametemp") # TODO: Change to proper dir
@@ -157,6 +158,7 @@ async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
             del options
 
             return OnlineGameInfo(
+                game_type=game,
                 version=online_info["version"],
                 updatable_versions=online_info["updatable_versions"],
                 release_type=online_info["release_type"],
@@ -165,9 +167,10 @@ async def get_online_game_info(reltype: str, game: str) -> OnlineGameInfo:
                 error=None
             )
         else:
-            raise ValueError("Unsupported game type. Only 'hk4e' is supported.")
+            raise ValueError("Unsupported game type. Only 'hk4e' and 'nap' is supported.")
     except Exception as e:
         return OnlineGameInfo(
+            game_type="",
             version="",
             updatable_versions=[],
             release_type=reltype,
