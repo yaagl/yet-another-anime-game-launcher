@@ -66,6 +66,7 @@ import urllib.error # exception handling
 import urllib.request as request # downloads
 from typing import TYPE_CHECKING
 
+import psutil
 import zstandard # archive unpacking
 from google.protobuf.json_format import MessageToJson
 
@@ -1445,7 +1446,7 @@ class SophonClient:
 		self.load_manifest(cat_name)
 
 		if self.installed_ver != self.di_chunks.getBuild_json["data"]["tag"]:
-			abortlog("The installed version is outdated. Run an update first.")
+			abortlog(f"The installed version is outdated. {self.installed_ver} / {self.di_chunks.getBuild_json['data']['tag']} Run an update first.")
 
 		self.new_files_to_download.clear()
 
@@ -1460,16 +1461,13 @@ class SophonClient:
 				repair_mode=OPT.repair_mode,
 				total_files=files_total
 			)
-
-		for v in self.di_chunks.manifest.files:
+		import threading
+		lock = threading.Lock()
+		def _verify_file(v):
 			if cancel_event and cancel_event.is_set():
 				if repair_progress_handler:
 					repair_progress_handler.job_error("cancelled")
 				raise Exception("Repair cancelled")
-			files_checked += 1
-
-			debuglog(f"\t Progress: {(files_checked * 100 / files_total):2.0f} % | "
-			         + f" {files_checked} / {files_total} files checked", end="\r")
 
 			reason = None
 			gamefile = gamedir(v.filename)
@@ -1489,11 +1487,19 @@ class SophonClient:
 				)
 
 			if not reason:
-				continue # file is OK
+				return # file is OK
 
 			print("")
 			infolog(f"Need to repair file '{v.filename}': " + reason)
-			self.new_files_to_download.add(v.filename)
+			with lock:
+				self.new_files_to_download.add(v.filename)
+
+		with concurrent.futures.ThreadPoolExecutor(max_workers=psutil.cpu_count(logical=False) - 4) as executor:
+			futures = [
+				executor.submit(_verify_file, v) for v in self.di_chunks.manifest.files
+			]
+			for future in concurrent.futures.as_completed(futures):
+				future.result()
 
 		print("") # Keep the last "100 %" line
 		self.diff_download_new_files(progress_handler=repair_progress_handler, cancel_event=cancel_event)
