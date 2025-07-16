@@ -41,7 +41,7 @@ import { getGameVersion as _getGameVersion } from "../unity";
 import { VoicePackNames } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.0.0";
+const CURRENT_SUPPORTED_VERSION = "2.1.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
