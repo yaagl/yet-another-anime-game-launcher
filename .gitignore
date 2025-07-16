@@ -36,3 +36,4 @@ server_secret.ts
 /napcn
 /sidecar/sophon_server
 /sophon_server/.python-version
+**/__pycache__
