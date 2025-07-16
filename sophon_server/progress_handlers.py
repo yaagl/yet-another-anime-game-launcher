@@ -143,18 +143,19 @@ class RepairProgressHandler(InstallProgressHandler):
     def check_file(self, filename: str, requires_repair: bool, reason: Optional[str] = None):
         """Send a message about a file that needs repair or is fine"""
         self.current_checked_file_cnt += 1
-        self.conn_manager.send_message_threadsafe({
-            "type": "check_file",
-            "task_id": self.task_id,
-            "filename": filename,
-            "requires_repair": requires_repair,
-            "reason": "" if reason is None else reason,
-            "overall_progress": {
-                "total_files": self.total_file_cnt,
-                "checked_files": self.current_checked_file_cnt,
-                "overall_percent": (self.current_checked_file_cnt / self.total_file_cnt) * 100 if self.total_file_cnt > 0 else 0
-            }
-        }, self.task_id)
+        if self.current_checked_file_cnt % 10 == 0:
+            self.conn_manager.send_message_threadsafe({
+                "type": "check_file",
+                "task_id": self.task_id,
+                "filename": filename,
+                "requires_repair": requires_repair,
+                "reason": "" if reason is None else reason,
+                "overall_progress": {
+                    "total_files": self.total_file_cnt,
+                    "checked_files": self.current_checked_file_cnt,
+                    "overall_percent": (self.current_checked_file_cnt / self.total_file_cnt) * 100 if self.total_file_cnt > 0 else 0
+                }
+            }, self.task_id)
 
 class UpdateProgressHandler(InstallProgressHandler):
     def __init__(self, task_id: str, conn_manager: ConnectionManager, tasks: Dict[str, TaskStatus]):
