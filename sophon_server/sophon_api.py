@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib # md5
+import os
 import io # TextIOWrapper
 import json
 import pathlib
@@ -58,8 +59,9 @@ import subprocess # for hpatchz (ldiff)
 import sys # stdout
 import tempfile # patch extraction
 import time
-from typing import Literal
+from typing import Literal, Optional
 import uuid
+import struct
 import urllib.error # exception handling
 import urllib.request as request # downloads
 from typing import TYPE_CHECKING
@@ -82,7 +84,7 @@ SCRIPTDIR = pathlib.Path(__file__).resolve().parent
 # Needed for ldiff
 HPATCHZ_APP = SCRIPTDIR / "HDiffPatch/hpatchz"
 if not HPATCHZ_APP.is_file():
-    HPATCHZ_APP = SCRIPTDIR / ".." / "hpatchz" / "hpatchz"
+	HPATCHZ_APP = SCRIPTDIR / ".." / "hpatchz" / "hpatchz"
 assert HPATCHZ_APP.is_file(), f"{HPATCHZ_APP.resolve()} not found."
 
 
@@ -239,8 +241,8 @@ def hpatchz_patch_file(oldfile: pathlib.Path, dstfile: pathlib.Path, patchfile: 
 	if retcode != 0 or perr != "":
 		dstfile.unlink(True) # hpatchz may create 0 byte files on failure. Remove it.
 		abortlog(f"Failed to patch file '{oldfile.name}' using '{patchfile.name}':"
-		   + f"\n\t Exit code: {retcode}"
-		   +  "\n\t Message:   " + perr)
+		         + f"\n\t Exit code: {retcode}"
+		         +  "\n\t Message:   " + perr)
 
 	#debuglog("\n", pout)
 	"""
@@ -255,6 +257,29 @@ def hpatchz_patch_file(oldfile: pathlib.Path, dstfile: pathlib.Path, patchfile: 
 		Patch file has an unexpected length
 	"""
 	return True
+
+
+def get_game_version(game_data_dir: pathlib.Path, offset: int = 0x88) -> Optional[str]:
+	ggm_path = game_data_dir / "globalgamemanagers"
+	with open(ggm_path, "rb") as f:
+		view = f.read()
+
+	pattern = bytes([0x69, 0x63, 0x2e, 0x61, 0x70, 0x70, 0x2d, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x2e])
+	plen = len(pattern)
+	index = -1
+	for i in range(len(view) - plen + 1):
+		if view[i:i+plen] == pattern:
+			index = i
+			break
+
+	if index == -1:
+		raise ValueError("pattern not found")
+	else:
+		len_index = index + offset
+		strlen = struct.unpack_from('<I', view, len_index)[0]
+		str_bytes = view[len_index + 4: len_index + 4 + strlen]
+		str_val = str_bytes.decode('ascii')
+		return str_val.split('_')[0]
 
 
 # -------------------
@@ -369,6 +394,9 @@ class SophonClient:
 					self.rel_type = "bb"
 				else:
 					self.rel_type = "cn"
+			if not isinstance(self.rel_type, str):
+				abortlog("Failed to detect release type. " \
+				         + f"Game executable in '{OPT.gamedir}' could not be found.")
 		elif self.game_type == "nap":
 			with open(gamedir("config.ini"), "r") as f:
 				contents = f.read()
@@ -376,24 +404,28 @@ class SophonClient:
 					self.rel_type = "os"
 				elif "sub_channel=1" in contents:
 					self.rel_type = "cn"
-
-		if not isinstance(self.rel_type, str):
-			abortlog("Failed to detect release type. " \
-				+ f"Game executable in '{OPT.gamedir}' could not be found.")
+			if not isinstance(self.rel_type, str):
+				abortlog("Failed to detect release type. " \
+				         + f"config.ini in '{OPT.gamedir}' has wrong information.")
 
 		infolog(f"Release type: {self.rel_type}")
 
 		# Retrieve the installed game version
 		if not OPT.ignore_conditions:
-			fullname = gamedir(self.gamedatadir, "globalgamemanagers")
-			assert fullname.is_file(), "Game install is incomplete!"
+			if self.game_type == "hk4e":
+				fullname = gamedir(self.gamedatadir, "globalgamemanagers")
+				assert fullname.is_file(), "Game install is incomplete!"
 
-			contents = fullname.read_bytes()
-			ver = re.findall(br"\0(\d+\.\d+\.\d+)_\d+_\d+\0", contents)
-			assert len(ver) == 1, "Broken script or corrupted game installation"
+				contents = fullname.read_bytes()
+				ver = re.findall(br"\0(\d+\.\d+\.\d+)_\d+_\d+\0", contents)
+				assert len(ver) == 1, "Broken script or corrupted game installation"
 
-			self.installed_ver = ver[0].decode("utf-8")
-			infolog(f"Installed game version: {self.installed_ver} (anchor 1: globalgamemanagers)")
+				self.installed_ver = ver[0].decode("utf-8")
+				infolog(f"Installed game version: {self.installed_ver} (anchor 1: globalgamemanagers)")
+			elif self.game_type == "nap":
+				ver = get_game_version(gamedir(self.gamedatadir), 0xc4)
+				assert ver, "Failed to retrieve game version from globalgamemanagers"
+				self.installed_ver = ver
 		else:
 			# Change this if needed
 			self.installed_ver = "5.5.0"
@@ -633,7 +665,7 @@ class SophonClient:
 			channel = 1
 			sub_channel = 0
 			self.load_cached_api_file("getGameChannelSDKs.json",
-					f"{base_url}/getGameChannelSDKs?channel={channel}&{tail}&sub_channel={sub_channel}")
+			                          f"{base_url}/getGameChannelSDKs?channel={channel}&{tail}&sub_channel={sub_channel}")
 
 
 	def make_getBuild_url(self, api_file):
@@ -661,10 +693,10 @@ class SophonClient:
 		assert not (url is None), f"Unhandled release type {self.rel_type}"
 
 		url = (
-			"https://" + url + "/downloader/sophon_chunk/api/" + api_file
-			+ "?branch=" + self.branches_json["branch"]
-			+ "&package_id=" + self.branches_json["package_id"]
-			+ "&password=" + self.branches_json["password"]
+				"https://" + url + "/downloader/sophon_chunk/api/" + api_file
+				+ "?branch=" + self.branches_json["branch"]
+				+ "&package_id=" + self.branches_json["package_id"]
+				+ "&password=" + self.branches_json["password"]
 		)
 
 		infolog("Created " + api_file + " JSON URL")
@@ -680,9 +712,9 @@ class SophonClient:
 		"""
 		api = "getBuild" if is_new_file else "getPatchBuild"
 		path = self.load_cached_api_file(f"{api}.json", lambda : self.make_getBuild_url(api),
-			# POST is required for patch
-			None if is_new_file else []
-		)
+		                                 # POST is required for patch
+		                                 None if is_new_file else []
+		                                 )
 		contents = None
 		with path.open("rb") as fh:
 			contents = json.load(fh)
@@ -935,7 +967,7 @@ class SophonClient:
 					bytes_written += len(data)
 
 				debuglog(f"\t Progress: {(bytes_written * 100 / file_info.size):2.0f} % | "
-					+ f" {bytes_to_MiB(bytes_written)} / {size_mib} MiB", end="\r")
+				         + f" {bytes_to_MiB(bytes_written)} / {size_mib} MiB", end="\r")
 				if install_progress_handler:
 					install_progress_handler.chunk_download_progress(
 						filename.name, len(file_info.chunks), chunk.chunk_id, bytes_written * 100 / file_info.size, bytes_written, file_info.size, chunk.compressed_size)
@@ -1120,8 +1152,8 @@ class SophonClient:
 
 		size_mib = bytes_to_MiB(pinfo.patch_size)
 		infolog(f"Downloading diff for '{v.filename}', {size_mib} MiB\n"
-			f"\t -> {pinfo.patch_id}"
-		)
+		        f"\t -> {pinfo.patch_id}"
+		        )
 
 		if OPT.disallow_download:
 			warnlog(f"NOT downloading diff for {ldiffname.name}")
@@ -1271,7 +1303,7 @@ class SophonClient:
 				print("")
 		infolog("\nFiles downloaded" + what_txt + ".") # keep the last "100 %" line
 
-		# Note: the downloaded ldiff files are removed by `self.remove_ldiff_files`
+	# Note: the downloaded ldiff files are removed by `self.remove_ldiff_files`
 
 
 	def process_deletefiles(self, progress_handler = None):
@@ -1437,7 +1469,7 @@ class SophonClient:
 			files_checked += 1
 
 			debuglog(f"\t Progress: {(files_checked * 100 / files_total):2.0f} % | "
-					+ f" {files_checked} / {files_total} files checked", end="\r")
+			         + f" {files_checked} / {files_total} files checked", end="\r")
 
 			reason = None
 			gamefile = gamedir(v.filename)
