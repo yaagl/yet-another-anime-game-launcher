@@ -34,6 +34,8 @@ server_secret.ts
 /cbjq
 /cbjqcn
 /napcn
+/napos
+
 /sidecar/sophon_server
 /sophon_server/.python-version
 **/__pycache__
