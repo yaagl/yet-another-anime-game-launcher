@@ -1,8 +1,8 @@
-import threading, os, pathlib, concurrent.futures, re
-from typing import Dict, Optional
+import threading, os, pathlib, concurrent.futures, re, shutil
+from typing import Dict, Optional, Literal
 
 from progress_handlers import InstallProgressHandler, RepairProgressHandler, UpdateProgressHandler
-from models import InstallRequest, RepairRequest, UpdateRequest, TaskStatus
+from models import InstallRequest, RepairRequest, UpdateRequest, TaskStatus, OnlineGameInfo
 from utils import ConnectionManager
 from sophon_api import Options, SophonClient
 
@@ -62,7 +62,7 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
                 err_cnt += 1
                 err_logs.append(str(e))
         if err_cnt == 5:
-            raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")["pkg_version", ""]
+            raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         futures = [
@@ -77,6 +77,9 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
 
     cli.load_manifest("game")
     cli.update_config_ini_version()
+
+    del cli
+    del options
     progress.job_end()
 
 def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], task_id: str, request: RepairRequest, cancel_event: Optional[threading.Event] = None):
@@ -98,6 +101,8 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
 
     cli.repair_by_category("game", repair_progress_handler=progress, cancel_event=cancel_event)
 
+    del cli
+    del options
     progress.job_end()
 
 def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], task_id: str, request: UpdateRequest, cancel_event: Optional[threading.Event] = None):
@@ -130,4 +135,70 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
         cli.update_config_ini_version()
         cli.remove_ldiff_files(progress_handler=progress)
 
+    del cli
+    del options
     progress.job_end()
+
+def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
+    try:
+        if game in ["hk4e", "nap"]:
+            options = Options()
+            options.game_type = game
+            options.install_reltype = reltype
+            options.ignore_conditions = True
+            options.gamedir = pathlib.Path("./sidecar/sophon_server/gametemp")  # TODO: Change to proper dir
+            options.tempdir = options.gamedir
+
+            if not options.gamedir.exists():
+                options.gamedir.mkdir(parents=True, exist_ok=True)
+
+            cli = SophonClient()
+            cli.initialize(options)
+            cli.retrieve_API_keys()
+
+            online_info = {
+                "version": cli.branches_json["tag"],
+                "updatable_versions": cli.branches_json["diff_tags"],
+                "release_type": reltype,
+            }
+
+            del cli
+
+            shutil.rmtree(options.gamedir, ignore_errors=True)
+            options.predownload = True
+
+            cli = SophonClient()
+            cli.initialize(options)
+
+            try:
+                cli.retrieve_API_keys()
+                online_info['pre_download'] = True
+                online_info['pre_download_version'] = cli.branches_json["tag"]
+            except AssertionError:
+                online_info['pre_download'] = False
+                online_info["pre_download_version"] = "0.0.0"
+
+            shutil.rmtree(options.gamedir, ignore_errors=True)
+            del cli
+            del options
+
+            return OnlineGameInfo(
+                game_type=game,
+                version=online_info["version"],
+                updatable_versions=online_info["updatable_versions"],
+                release_type=online_info["release_type"],
+                pre_download=online_info["pre_download"],
+                pre_download_version=online_info["pre_download_version"],
+                error=None
+            )
+        else:
+            raise ValueError("Unsupported game type. Only 'hk4e' and 'nap' is supported.")
+    except Exception as e:
+        return OnlineGameInfo(
+            game_type="",
+            version="",
+            updatable_versions=[],
+            release_type=reltype,
+            pre_download=False,
+            error=str(e)
+        )

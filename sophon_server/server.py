@@ -31,10 +31,12 @@ task_cancel_events: Dict[str, threading.Event] = {}
 
 def terminate_with_process(pid: int):
     print(f"Monitoring process {pid} for termination...")
-    def _worker(pid: str):
+    def _worker(target_pid: int):
         import os, time, psutil, signal
         while True:
-            if not psutil.pid_exists(pid):
+            if not psutil.pid_exists(target_pid):
+                # daemon threads somehow doesn't die with SIGTERM
+                # TODO: Terminate gracefully: event based termination
                 os.kill(os.getpid(), signal.SIGKILL)
             time.sleep(1)
     threading.Thread(target=_worker, args=(pid,), daemon=True).start()
@@ -59,7 +61,7 @@ def run_task(task_type: Literal["install", "repair", "update"], request: Union[I
     return TaskResponse(
         task_id=task_id,
         status="pending",
-        message="Installation started"
+        message="Task started"
     )
 
 
@@ -92,91 +94,9 @@ async def cancel_task(task_id: str):
         task_cancel_events[task_id].set()
     return {"message": f"Task {task_id} cancelled"}
 
-
-@app.get("/api/game/installed_info")
-async def get_game_info(gamedir: str):
-    try:
-        options = Options()
-        options.gamedir = pathlib.Path(gamedir)
-
-        if not options.gamedir.exists():
-            return {"installed": False}
-
-        cli = SophonClient()
-        cli.initialize(options)
-
-        info = {
-            "installed": True,
-            "gamedir": str(options.gamedir),
-            "version": getattr(cli, 'installed_ver', None),
-            "release_type": getattr(cli, 'rel_type', None),
-        }
-        return info
-    except Exception as e:
-        return {"error": str(e), "installed": False}
-
-
 @app.get("/api/game/online_info")
 async def get_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
-    try:
-        if game in ["hk4e", "nap"]:
-            options = Options()
-            options.game_type = game
-            options.install_reltype = reltype
-            options.ignore_conditions = True
-            options.gamedir = pathlib.Path("./sidecar/sophon_server/gametemp") # TODO: Change to proper dir
-            options.tempdir = options.gamedir
-
-            cli = SophonClient()
-            cli.initialize(options)
-            cli.retrieve_API_keys()
-
-            online_info = {
-                "version": cli.branches_json["tag"],
-                "updatable_versions": cli.branches_json["diff_tags"],
-                "release_type": reltype,
-            }
-
-            del cli
-
-            shutil.rmtree(options.gamedir, ignore_errors=True)
-            options.predownload = True
-
-            cli = SophonClient()
-            cli.initialize(options)
-
-            try:
-                cli.retrieve_API_keys()
-                online_info['pre_download'] = True
-                online_info['pre_download_version'] = cli.branches_json["tag"]
-            except AssertionError:
-                online_info['pre_download'] = False
-                online_info["pre_download_version"] = "0.0.0"
-
-            shutil.rmtree(options.gamedir, ignore_errors=True)
-            del cli
-            del options
-
-            return OnlineGameInfo(
-                game_type=game,
-                version=online_info["version"],
-                updatable_versions=online_info["updatable_versions"],
-                release_type=online_info["release_type"],
-                pre_download=online_info["pre_download"],
-                pre_download_version=online_info["pre_download_version"],
-                error=None
-            )
-        else:
-            raise ValueError("Unsupported game type. Only 'hk4e' and 'nap' is supported.")
-    except Exception as e:
-        return OnlineGameInfo(
-            game_type="",
-            version="",
-            updatable_versions=[],
-            release_type=reltype,
-            pre_download=False,
-            error=str(e)
-        )
+    return fetch_online_game_info(reltype, game)
 
 @app.get("/health")
 async def health_check():

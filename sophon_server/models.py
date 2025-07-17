@@ -30,7 +30,7 @@ class TaskStatus(BaseModel):
 
 
 class OnlineGameInfo(BaseModel):
-    game_type: Literal["hk4e", "nap", ""]
+    game_type: Literal["hk4e", "nap", ""]   # "" is for handling error cases
     version: str
     updatable_versions: List[str]
     release_type: str

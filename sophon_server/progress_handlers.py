@@ -15,11 +15,9 @@ class InstallProgressHandler:
         self.interval_cnt = 0
 
     def _speed_calculator_worker(self):
-        # Wait for task to start running
         while self.task_id not in self.tasks or self.tasks[self.task_id].status != "running":
             time.sleep(1)
 
-        # Calculate speed while running
         while self.task_id in self.tasks and self.tasks[self.task_id].status == "running":
             print("Calculating download speed...")
             prev_dl_size = self.downloaded_size
@@ -141,7 +139,6 @@ class RepairProgressHandler(InstallProgressHandler):
         }, self.task_id)
 
     def check_file(self, filename: str, requires_repair: bool, reason: Optional[str] = None):
-        """Send a message about a file that needs repair or is fine"""
         self.current_checked_file_cnt += 1
         if self.current_checked_file_cnt % 10 == 0:
             self.conn_manager.send_message_threadsafe({
