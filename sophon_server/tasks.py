@@ -64,12 +64,28 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
         if err_cnt == 5:
             raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+    positive_substr = ['globalgamemanagers', 'pkg_version']
+    negative_substr = ['/']
+    def key_func(x):
+        priority = 0
+
+        for string in positive_substr:
+            if string in x.filename:
+                priority -= 1
+
+        for string in negative_substr:
+            if string in x.filename:
+                priority += 1
+
+        return priority
+
+    worker_cnt = 16
+    with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
         futures = [
-            executor.submit(download_file, v) for v in 
+            executor.submit(download_file, v) for v in
             sorted(
-                cli.di_chunks.manifest.files,    # we need these files first
-                key = lambda x: 0 if "pkg_version" in x.filename or "globalgamemanagers" in x.filename or "/" not in x.filename else 1
+                cli.di_chunks.manifest.files,
+                key = key_func
             )
         ]
         for future in concurrent.futures.as_completed(futures):

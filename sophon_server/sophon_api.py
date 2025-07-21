@@ -1386,7 +1386,8 @@ class SophonClient:
 			if err_cnt == 5:
 				raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")["pkg_version", ""]
 
-		with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+		worker_cnt = 16
+		with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
 			repair_files = [v for v in self.di_chunks.manifest.files if v.filename in self.new_files_to_download]
 			futures = [executor.submit(download_file, v) for v in repair_files]
 			for future in concurrent.futures.as_completed(futures):
@@ -1494,7 +1495,8 @@ class SophonClient:
 			with lock:
 				self.new_files_to_download.add(v.filename)
 
-		with concurrent.futures.ThreadPoolExecutor(max_workers=psutil.cpu_count(logical=False) - 4) as executor:
+		worker_cnt = 16
+		with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
 			futures = [
 				executor.submit(_verify_file, v) for v in self.di_chunks.manifest.files
 			]
