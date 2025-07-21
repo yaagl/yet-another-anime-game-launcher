@@ -32,6 +32,17 @@ export interface SophonProgressEvent {
   [key: string]: any;
 }
 
+export interface SophonOnlineGameInfo {
+  game_type: "hk4e" | "nap" | "";
+  version: string;
+  install_size: number;
+  updatable_versions: string[];
+  release_type: "os" | "cn" | "bb";
+  pre_download: boolean;
+  pre_download_version?: string;
+  error?: string;
+}
+
 export class SophonClient {
   private baseUrl: string;
   private wsUrl: string;
@@ -176,7 +187,7 @@ export class SophonClient {
     }
   }
 
-  async getLatestOnlineGameInfo(reltype: "os" | "cn" | "bb", game: string) {
+  async getLatestOnlineGameInfo(reltype: "os" | "cn" | "bb", game: string): Promise<SophonOnlineGameInfo> {
     // Currently only supports "hk4e" for game, "os", "cn", or "bb" for reltype
     const response = await fetch(
       `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`

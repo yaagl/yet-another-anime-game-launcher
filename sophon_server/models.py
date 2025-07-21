@@ -32,6 +32,7 @@ class TaskStatus(BaseModel):
 class OnlineGameInfo(BaseModel):
     game_type: Literal["hk4e", "nap", ""]   # "" is for handling error cases
     version: str
+    install_size: int
     updatable_versions: List[str]
     release_type: str
     pre_download: bool

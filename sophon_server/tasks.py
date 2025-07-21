@@ -171,9 +171,11 @@ def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> Online
             cli = SophonClient()
             cli.initialize(options)
             cli.retrieve_API_keys()
+            cli.load_manifest("game")
 
             online_info = {
                 "version": cli.branches_json["tag"],
+                "install_size": int(cli.get_chunk_download_size(False)),
                 "updatable_versions": cli.branches_json["diff_tags"],
                 "release_type": reltype,
             }
@@ -201,6 +203,7 @@ def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> Online
             return OnlineGameInfo(
                 game_type=game,
                 version=online_info["version"],
+                install_size=online_info["install_size"],
                 updatable_versions=online_info["updatable_versions"],
                 release_type=online_info["release_type"],
                 pre_download=online_info["pre_download"],
@@ -213,6 +216,7 @@ def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> Online
         return OnlineGameInfo(
             game_type="",
             version="",
+            install_size=0,
             updatable_versions=[],
             release_type=reltype,
             pre_download=False,

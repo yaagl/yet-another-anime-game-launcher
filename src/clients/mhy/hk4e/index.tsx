@@ -70,8 +70,9 @@ export async function createHK4EChannelClient({
   log(`Game info: ${JSON.stringify(gameInfo)}`);
   const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
-  const PRE_DOWNLOAD_VERSION: string = gameInfo.pre_download_version;
+  const PRE_DOWNLOAD_VERSION: string = gameInfo.pre_download_version || "0.0.0";
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
+  const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
   await waitImageReady(background);
 
@@ -117,21 +118,16 @@ export async function createHK4EChannelClient({
       try {
         await stats(join(selection, "pkg_version"));
       } catch {
-        // TODO: Calculate required space for game installation
-        // const freeSpaceGB = await getFreeSpace(selection, "g");
-        // const totalSize = game_pkgs
-        //   .map(x => x.size)
-        //   .map(parseInt)
-        //   .reduce((a, b) => a + b, 0);
-        // const requiredSpaceGB = Math.ceil(totalSize / Math.pow(1024, 3)) * 1.2;
-        // if (freeSpaceGB < requiredSpaceGB) {
-        //   await locale.alert(
-        //     "NO_ENOUGH_DISKSPACE",
-        //     "NO_ENOUGH_DISKSPACE_DESC",
-        //     [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
-        //   );
-        //   return;
-        // }
+        const freeSpaceGB = await getFreeSpace(selection, "g");
+        const requiredSpaceGB = Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
+        if (freeSpaceGB < requiredSpaceGB) {
+          await locale.alert(
+            "NO_ENOUGH_DISKSPACE",
+            "NO_ENOUGH_DISKSPACE_DESC",
+            [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
+          );
+          return;
+        }
 
         yield* downloadAndInstallGameProgram({
           sophonClient: sophon,
