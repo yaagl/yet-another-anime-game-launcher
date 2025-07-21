@@ -57,25 +57,21 @@ def run_task(task_type: Literal["install", "repair", "update"], request: Union[I
         run_task_in_thread(manager, tasks, task_id, perform_repair, manager, tasks, task_id, request, task_cancel_events[task_id])
     elif task_type == "update":
         run_task_in_thread(manager, tasks, task_id, perform_update, manager, tasks, task_id, request, task_cancel_events[task_id])
-
+    else:
+        return TaskResponse(
+            task_id=task_id,
+            status="failed",
+            message="Invalid task type"
+        )
     return TaskResponse(
         task_id=task_id,
         status="pending",
         message="Task started"
     )
 
-
-@app.post("/api/install")
-async def install_game(request: InstallRequest) -> TaskResponse:
-    return run_task("install", request)
-
-@app.post("/api/repair")
-async def repair_game(request: RepairRequest) -> TaskResponse:
-    return run_task("repair", request)
-
-@app.post("/api/update")
-async def repair_game(request: UpdateRequest) -> TaskResponse:
-    return run_task("update", request)
+@app.post("/api/{task_type}")
+async def handle_game_operation(task_type: Literal["install", "repair", "update"], request: Union[InstallRequest, RepairRequest, UpdateRequest]) -> TaskResponse:
+    return run_task(task_type, request)
 
 @app.get("/api/tasks/{task_id}/status")
 async def get_task_status(task_id: str) -> TaskStatus:
