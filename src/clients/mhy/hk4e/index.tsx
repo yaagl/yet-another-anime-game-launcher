@@ -119,7 +119,8 @@ export async function createHK4EChannelClient({
         await stats(join(selection, "pkg_version"));
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
-        const requiredSpaceGB = Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
+        const requiredSpaceGB =
+          Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
         if (freeSpaceGB < requiredSpaceGB) {
           await locale.alert(
             "NO_ENOUGH_DISKSPACE",
