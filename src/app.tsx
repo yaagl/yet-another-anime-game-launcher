@@ -27,11 +27,14 @@ import { createLocale } from "./locale";
 import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
 import { getWhiskyBinary } from "./wine/whisky";
+import { createSophonRetry } from "./sophon";
 
 export async function createApp() {
   await setKey("singleton", null);
 
   const aria2_port = 6868;
+  const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
+  const sophon_host = "127.0.0.1";
 
   await Neutralino.events.on("windowClose", async () => {
     if (await GLOBAL_onClose(false)) {
@@ -62,11 +65,48 @@ export async function createApp() {
     "--stop-with-process",
     pid,
   ]);
+
+  // Syncing env takes about 10milliseconds.
+  log("Syncing python environment for sophon server...");
+  // Set python version to match target arch
+  await exec([
+    "bash",
+    "-c",
+    `echo "cpython-3.13-macos-$(uname -m)-none" > ./sidecar/sophon_server/.python-version`,
+  ]);
+  await exec([
+    "./sidecar/uv/uv",
+    "sync",
+    "--directory",
+    "./sidecar/sophon_server/",
+  ]);
+  const { pid: spid } = await spawn(
+    [
+      "./sidecar/uv/uv",
+      "run",
+      "--directory",
+      "./sidecar/sophon_server/",
+      "fastapi",
+      "run",
+      "server.py",
+      "--port",
+      `${sophon_port}`,
+      "--host",
+      `${sophon_host}`,
+    ],
+    { TERMINATE_WITH_PID: pid }
+  );
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
     try {
       await exec(["kill", apid + ""]);
+    } catch {
+      await log("killing process failed?");
+    }
+    await log("killing process " + spid);
+    try {
+      await exec(["kill", "-9", spid + ""]);
     } catch {
       await log("killing process failed?");
     }
@@ -77,6 +117,11 @@ export async function createApp() {
     timeout(10000),
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
+
+  const sophon = await Promise.race([
+    createSophonRetry(sophon_host, sophon_port),
+    timeout(10000),
+  ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
 
   const { latest, downloadUrl, description, version } = await createUpdater({
     github,
@@ -111,6 +156,7 @@ export async function createApp() {
       channelClient: await createClient({
         wine,
         aria2,
+        sophon,
         locale,
       }),
     });

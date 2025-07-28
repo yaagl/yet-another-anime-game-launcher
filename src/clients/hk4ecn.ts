@@ -68,6 +68,7 @@ const SERVER_DEFINITION: Server = {
 export function createClient(options: CreateClientOptions) {
   return createHK4EChannelClient({
     server: SERVER_DEFINITION,
+    releaseType: "cn",
     ...options,
   });
 }
