@@ -790,8 +790,8 @@ class SophonClient:
 		cat_name: "game", "en-us", "zh-cn", "ja-jp", "ko-kr"
 		"""
 
-		if not self.di_chunks.getBuild_json:
-			self.di_chunks.getBuild_json = self.get_getBuild_json(True)
+		# Always load manifest again
+		self.di_chunks.getBuild_json = self.get_getBuild_json(True)
 
 		if OPT.do_update:
 			# Error early.
@@ -804,8 +804,7 @@ class SophonClient:
 
 		if OPT.do_update:
 			# Do almost the same thing again
-			if not self.di_diffs.getBuild_json:
-				self.di_diffs.getBuild_json = self.get_getBuild_json(False)
+			self.di_diffs.getBuild_json = self.get_getBuild_json(False)
 
 			self._select_category(self.di_diffs, cat_name)
 

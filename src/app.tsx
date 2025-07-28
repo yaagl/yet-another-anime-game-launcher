@@ -82,9 +82,13 @@ export async function createApp() {
   ]);
   const { pid: spid } = await spawn(
     [
-      "./sidecar/sophon_server/.venv/bin/fastapi",
+      "./sidecar/uv/uv",
       "run",
-      "sidecar/sophon_server/server.py",
+      "--directory",
+      "./sidecar/sophon_server/",
+      "fastapi",
+      "run",
+      "server.py",
       "--port",
       `${sophon_port}`,
       "--host",

@@ -17,6 +17,16 @@ def update_config_ini_version(gamedir: pathlib.Path, version: str):
     contents = contents.replace(ver[0], version)
     confname.write_text(contents)
 
+def remove_cached_files(tempdir: pathlib.Path):
+    if tempdir.exists():
+        for item in tempdir.iterdir():
+            if item.is_file() or item.is_symlink():
+                if item.suffix in ['.json', '.zstd']:
+                    print(f"Removing cached file: {item}")
+                    item.unlink()
+    else:
+        print(f"Temporary directory {tempdir} does not exist, skipping removal.")
+
 def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], task_id: str, request: InstallRequest, cancel_event: Optional[threading.Event] = None):
     progress = InstallProgressHandler(task_id, manager, tasks)
     progress.job_start()
@@ -111,6 +121,8 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     else:
         options.tempdir = pathlib.Path(request.gamedir) / ".tmp"
 
+    remove_cached_files(options.tempdir)
+
     cli = SophonClient()
     cli.initialize(options)
     cli.retrieve_API_keys()
@@ -134,6 +146,8 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
         options.tempdir = pathlib.Path(request.tempdir)
     else:
         options.tempdir = pathlib.Path(request.gamedir) / ".tmp"
+
+    remove_cached_files(options.tempdir)
 
     cli = SophonClient()
     cli.initialize(options)
