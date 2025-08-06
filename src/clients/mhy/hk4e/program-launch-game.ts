@@ -37,27 +37,6 @@ export async function* launchGameProgram({
 
   await wine.setProps(config);
 
-  const cmd = `@echo off
-cd "%~dp0"
-copy "${wine.toWinePath(
-    join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
-  )}" "%WINDIR%\\system32\\"
-cd /d "${wine.toWinePath(gameDir)}"
-${await (async () => {
-  if (config.fpsUnlock !== "default") {
-    return `"${wine.toWinePath(
-      resolve("./fpsunlock/genshin-force-fps.exe")
-    )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
-      join(gameDir, gameExecutable)
-    )}"`;
-  } else {
-    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"${
-      /* workaround 10351-4001 */
-      " -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1"
-    }`;
-  }
-})()}`;
-  await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
@@ -99,8 +78,10 @@ ${await (async () => {
     }
 
     await wine.exec2(
-      "cmd",
-      ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
+      "C:\\windows\\system32\\steam.exe",
+      [wine.toWinePath(join(gameDir, gameExecutable))],
+      // "cmd",
+      // ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         ...(wine.attributes.renderBackend == "gptk"

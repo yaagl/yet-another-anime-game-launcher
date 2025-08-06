@@ -1,4 +1,5 @@
 import { zh_CN } from "./zh_CN";
+import { en } from "@locale/en";
 
 export const fr_FR: typeof zh_CN = {
   CONTENT_LANG_ID: "fr-fr",
@@ -116,4 +117,5 @@ export const fr_FR: typeof zh_CN = {
     "La sélection actuelle est la version communautaire, cette version n’est pas officiellement prise en charge, veuillez ne pas signaler de problèmes",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: en.SETTING_LICENSES,
 };
