@@ -78,6 +78,7 @@ export async function* patchProgram(
     );
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
+  const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
   if (wine.attributes.renderBackend == "dxvk") {
     for (const f of DXVK_FILES) {
       await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
@@ -112,6 +113,12 @@ export async function* patchProgram(
       join(gameDir, "d3dcompiler_47.dll")
     );
   }
+
+  await cp(resolve("./sidecar/protonextras/steam32.exe"), join(system32Dir, "steam.exe"))
+  await cp(resolve("./sidecar/protonextras/steam64.exe"), join(syswow64Dir, "steam.exe"))
+  await cp(resolve("./sidecar/protonextras/lsteamclient32.dll"), join(system32Dir, "lsteamclient.dll"))
+  await cp(resolve("./sidecar/protonextras/lsteamclient64.dll"), join(syswow64Dir, "lsteamclient.dll"))
+
   setKey("patched", "1");
 }
 
