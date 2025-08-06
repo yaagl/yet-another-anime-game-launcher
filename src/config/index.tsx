@@ -236,7 +236,7 @@ export async function createConfiguration({
               </Show>
               <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="100%" alignItems="start">
-                  <Heading>Copyright Notice: steam.exe and libsteamclient.dll (in the sidecar folder)</Heading>
+                  <Heading>Copyright Notice: steam.exe and lsteamclient.dll (in the sidecar folder)</Heading>
                   <Text>Copyright (c) 2015, 2019, 2020, 2021, 2022 Valve Corporation</Text>
                   <Text>All rights reserved.</Text>
                   <Text>

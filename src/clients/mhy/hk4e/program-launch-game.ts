@@ -128,7 +128,7 @@ export async function* launchGameProgram({
   }
 
   // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(resolve("config.bat"));
+  // await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
 }
