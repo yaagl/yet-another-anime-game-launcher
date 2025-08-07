@@ -3,7 +3,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-  InputGroup
+  InputGroup,
 } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "../locale";
@@ -54,7 +54,7 @@ export async function createProxyHostConfig({
         <FormControl id="proxyHost">
           <FormLabel>{locale.get("SETTING_PROXY_HOST")}</FormLabel>
           <InputGroup>
-            <Input value={value()} onChange={(e) => setValue(e.target.value)} />
+            <Input value={value()} onChange={e => setValue(e.target.value)} />
           </InputGroup>
         </FormControl>
       );
