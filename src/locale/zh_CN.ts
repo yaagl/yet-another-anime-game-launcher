@@ -108,4 +108,5 @@ export const zh_CN = {
     "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: "Licenses",
 };
