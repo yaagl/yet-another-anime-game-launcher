@@ -69,6 +69,7 @@ export const de_DE: typeof zh_CN = {
   SETTING_RETINA: "Retina-Modus",
   SETTING_LEFT_CMD: "Linke CMD zu CTRL zuordnen",
   SETTING_TURN_OFF_AC_PATCH: "AC-Patch deaktivieren",
+  SETTING_CUSTOM_RESOLUTION: "Benutzerdefinierte Auflösung",
   SETTING_SAVE: "Speichern",
   SETTING_CANCEL: "Abbrechen",
 

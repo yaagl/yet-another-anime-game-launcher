@@ -25,13 +25,19 @@ export async function* launchGameProgram({
 
   await wine.setProps(config);
 
+  const args = [];
+  if (config.resolutionCustom) {
+    args.push("-screen-width", config.resolutionWidth);
+    args.push("-screen-height", config.resolutionHeight);
+    args.push("-screen-fullscreen", "0");
+  }
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 cd /d "${wine.toWinePath(gameDir)}"
-"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+"${wine.toWinePath(join(gameDir, gameExecutable))}" ${args.join(" ")}`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
