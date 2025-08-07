@@ -67,6 +67,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_RETINA: "โหมด Retina",
   SETTING_LEFT_CMD: "แมปปุ่ม CMD ซ้ายเป็น CTRL",
   SETTING_TURN_OFF_AC_PATCH: "ปิดการใช้งานแพตช์ AC",
+  SETTING_CUSTOM_RESOLUTION: "Custom resolution",
   SETTING_SAVE: "บันทึก",
   SETTING_CANCEL: "ยกเลิก",
 
