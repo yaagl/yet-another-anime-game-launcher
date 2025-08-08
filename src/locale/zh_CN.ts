@@ -65,6 +65,7 @@ export const zh_CN = {
   SETTING_RETINA: "Retina 模式",
   SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
   SETTING_TURN_OFF_AC_PATCH: "关闭AC补丁",
+  SETTING_CUSTOM_RESOLUTION: "自定义分辨率",
   SETTING_SAVE: "保存",
   SETTING_CANCEL: "取消",
 

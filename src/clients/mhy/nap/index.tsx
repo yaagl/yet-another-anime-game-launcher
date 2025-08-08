@@ -36,11 +36,12 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import createPatchOff from "./config/patch-off";
+import createResolution from "./config/resolution";
 import { getGameVersion as _getGameVersion } from "../unity";
 import { VoicePackNames } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.0.0";
+const CURRENT_SUPPORTED_VERSION = "2.1.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
@@ -348,9 +349,10 @@ export async function createNAPChannelClient({
     },
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [PO] = await createPatchOff({ locale, config });
+      const [RES] = await createResolution({ locale, config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <PO />];
+        return ["Game Version: ", gameCurrentVersion(), <PO />, <RES />];
       };
     },
   };
