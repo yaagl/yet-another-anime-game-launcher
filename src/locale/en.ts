@@ -113,4 +113,9 @@ export const en: typeof zh_CN = {
     "The current selection is the Community version, this version is not officially supported, please do not report any issues",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+
+  SETTING_PROXY_ENABLED: "Enable HTTP Proxy",
+  SETTING_PROXY_HOST: "HTTP Proxy Host",
+  SETTING_PROXY_DESC:
+    "The proxy only applies to the game, not to the whole launcher.",
 };

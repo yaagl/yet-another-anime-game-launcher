@@ -1,4 +1,5 @@
 import { zh_CN } from "./zh_CN";
+import { en } from "@locale/en";
 
 export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
@@ -113,4 +114,8 @@ export const ko_KR: typeof zh_CN = {
     "현재 커뮤니티 버전이 선택되었습니다.이 버전은 공식적으로 지원되지 않습니다. 보고하지 마십시오",
 
   SETTING_BLOCK_NET: "게임실행 문제해결(hosts 수정)",
+
+  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
+  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
+  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 };
