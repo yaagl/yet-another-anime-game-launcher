@@ -115,4 +115,6 @@ export const de_DE: typeof zh_CN = {
     "Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+
+  SETTING_DPI: "DPI",
 };
