@@ -3,6 +3,7 @@ import { createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
 import { Config, NOOP } from "./config-def";
+import { externalResetDPI } from "./dpi";
 
 declare module "./config-def" {
   interface Config {
@@ -51,7 +52,10 @@ export async function createRetinaConfig({
             <Checkbox
               checked={value()}
               size="md"
-              onChange={() => setValue(x => !x)}
+              onChange={() => {
+                setValue(x => !x);
+                externalResetDPI();
+              }}
             >
               {locale.get("SETTING_ENABLED")}
             </Checkbox>
