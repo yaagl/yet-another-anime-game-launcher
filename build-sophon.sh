@@ -12,6 +12,5 @@ NUITKA_CACHE_DIR=./.cache uv run nuitka \
 --output-dir=./build \
 --assume-yes-for-downloads \
 server.py
-chmod +x ./build/sophon-server
 rm ./hpatchz
 popd
