@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.116.0",
+    "nuitka>=2.7.16",
     "protobuf>=6.31.1",
     "psutil>=7.0.0",
     "pycurl>=7.45.6",
