@@ -70,4 +70,3 @@ rm protobuf.zip
 
 pushd sophon_server
 ../bin/protoc --python_out=. *.proto
-echo "cpython-3.13-macos-$(uname -m)-none" > .python-version

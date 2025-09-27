@@ -250,6 +250,9 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     `Resources`,
     `sidecar`
   );
+  // copy sophon binary to sidecar
+  await fs.copy(path.resolve(process.cwd(), `sophon_server`, `build`, `server.dist`),
+    path.resolve(sidecarDst, `sophon_server`));
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
