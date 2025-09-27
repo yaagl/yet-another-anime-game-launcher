@@ -134,4 +134,4 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("SOPHON_PORT", 8000))
     host = os.environ.get("SOPHON_HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=port)
+    uvicorn.run(app, host=host, port=port, workers=1)
