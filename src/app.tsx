@@ -66,35 +66,15 @@ export async function createApp() {
     pid,
   ]);
 
-  // Syncing env takes about 10milliseconds.
-  log("Syncing python environment for sophon server...");
-  // Set python version to match target arch
-  await exec([
-    "bash",
-    "-c",
-    `echo "cpython-3.13-macos-$(uname -m)-none" > ./sidecar/sophon_server/.python-version`,
-  ]);
-  await exec([
-    "./sidecar/uv/uv",
-    "sync",
-    "--directory",
-    "./sidecar/sophon_server/",
-  ]);
   const { pid: spid } = await spawn(
     [
-      "./sidecar/uv/uv",
-      "run",
-      "--directory",
-      "./sidecar/sophon_server/",
-      "fastapi",
-      "run",
-      "server.py",
-      "--port",
-      `${sophon_port}`,
-      "--host",
-      `${sophon_host}`,
+      "./sidecar/sophon_server/sophon-server",
     ],
-    { TERMINATE_WITH_PID: pid }
+    {
+      TERMINATE_WITH_PID: pid,
+      SOPHON_PORT: sophon_port.toString(),
+      SOPHON_HOST: sophon_host,
+    }
   );
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
@@ -120,7 +100,7 @@ export async function createApp() {
 
   const sophon = await Promise.race([
     createSophonRetry(sophon_host, sophon_port),
-    timeout(10000),
+    timeout(30000),
   ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
 
   const { latest, downloadUrl, description, version } = await createUpdater({

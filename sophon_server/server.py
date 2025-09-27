@@ -129,3 +129,9 @@ def startup_event():
     if os.environ.get("TERMINATE_WITH_PID"):
         pid = int(os.environ["TERMINATE_WITH_PID"])
         terminate_with_process(pid)
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("SOPHON_PORT", 8000))
+    host = os.environ.get("SOPHON_HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)
