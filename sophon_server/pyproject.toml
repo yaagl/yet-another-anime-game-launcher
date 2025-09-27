@@ -1,0 +1,16 @@
+[project]
+name = "sophon-server"
+version = "0.1.0"
+description = "Game file download server"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.117.1",
+    "nuitka>=2.7.16",
+    "protobuf>=6.31.1",
+    "psutil>=7.0.0",
+    "pycurl>=7.45.6",
+    "uvicorn>=0.37.0",
+    "websockets>=15.0.1",
+    "zstandard>=0.23.0",
+]

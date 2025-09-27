@@ -1,4 +1,5 @@
 import { Aria2 } from "@aria2";
+import { Sophon } from "@sophon";
 import { Locale } from "@locale";
 import { Wine } from "@wine";
 
