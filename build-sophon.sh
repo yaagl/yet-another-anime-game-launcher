@@ -1,6 +1,7 @@
 #!/bin/bash
 cp ./sidecar/hpatchz/hpatchz ./sophon_server/hpatchz
 pushd sophon_server
+uv sync
 NUITKA_CACHE_DIR=./.cache uv run nuitka \
 --warn-implicit-exceptions \
 --warn-unusual-code \
