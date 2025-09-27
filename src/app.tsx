@@ -66,16 +66,11 @@ export async function createApp() {
     pid,
   ]);
 
-  const { pid: spid } = await spawn(
-    [
-      "./sidecar/sophon_server/sophon-server",
-    ],
-    {
-      TERMINATE_WITH_PID: pid,
-      SOPHON_PORT: sophon_port.toString(),
-      SOPHON_HOST: sophon_host,
-    }
-  );
+  const { pid: spid } = await spawn(["./sidecar/sophon_server/sophon-server"], {
+    TERMINATE_WITH_PID: pid,
+    SOPHON_PORT: sophon_port.toString(),
+    SOPHON_HOST: sophon_host,
+  });
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
