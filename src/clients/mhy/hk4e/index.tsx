@@ -13,8 +13,11 @@ import {
   getKey,
   getKeyOrDefault,
   log,
+  rawString,
   setKey,
+  spawn,
   stats,
+  timeout,
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
@@ -29,7 +32,7 @@ import { downloadAndInstallGameProgram } from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
 import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
-import { Sophon } from "@sophon";
+import { Sophon, createSophonRetry } from "@sophon";
 import { Wine } from "@wine";
 import {
   checkAndDownloadDXMT,
@@ -50,14 +53,12 @@ export async function createHK4EChannelClient({
   server,
   locale,
   aria2,
-  sophon,
   wine,
   releaseType,
 }: {
   server: Server;
   locale: Locale;
   aria2: Aria2;
-  sophon: Sophon;
   wine: Wine;
   releaseType: "os" | "cn" | "bb";
 }): Promise<ChannelClient> {
@@ -65,6 +66,20 @@ export async function createHK4EChannelClient({
     background: { url: background },
     icon: { url: icon, link: icon_link },
   } = await getLatestAdvInfo(locale, server);
+
+  const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
+  const sophon_host = "127.0.0.1";
+
+  const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
+  const { pid: spid } = await spawn(["./sidecar/sophon_server/sophon-server"], {
+    TERMINATE_WITH_PID: pid,
+    SOPHON_PORT: sophon_port.toString(),
+    SOPHON_HOST: sophon_host,
+  });
+  const sophon = await Promise.race([
+    createSophonRetry(sophon_host, sophon_port),
+    timeout(30000),
+  ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
 
   const gameInfo = await sophon.getLatestOnlineGameInfo(releaseType, "hk4e");
   log(`Game info: ${JSON.stringify(gameInfo)}`);
