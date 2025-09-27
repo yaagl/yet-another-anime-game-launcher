@@ -86,6 +86,8 @@ SCRIPTDIR = pathlib.Path(__file__).resolve().parent
 HPATCHZ_APP = SCRIPTDIR / "HDiffPatch/hpatchz"
 if not HPATCHZ_APP.is_file():
 	HPATCHZ_APP = SCRIPTDIR / ".." / "hpatchz" / "hpatchz"
+if not HPATCHZ_APP.is_file():
+	HPATCHZ_APP = SCRIPTDIR / "hpatchz"
 assert HPATCHZ_APP.is_file(), f"{HPATCHZ_APP.resolve()} not found."
 
 
