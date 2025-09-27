@@ -37,5 +37,4 @@ server_secret.ts
 /napos
 
 /sidecar/sophon_server
-/sophon_server/.python-version
 **/__pycache__
