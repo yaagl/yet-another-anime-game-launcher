@@ -48,6 +48,8 @@
 from __future__ import annotations
 
 import argparse
+import gc
+import ctypes
 import hashlib # md5
 import os
 import io # TextIOWrapper
@@ -90,6 +92,17 @@ if not HPATCHZ_APP.is_file():
 	HPATCHZ_APP = SCRIPTDIR / "hpatchz"
 assert HPATCHZ_APP.is_file(), f"{HPATCHZ_APP.resolve()} not found."
 
+libc = ctypes.CDLL("libc.dylib")
+c_malloc_zone_pressure_relief = libc.malloc_zone_pressure_relief
+c_malloc_zone_pressure_relief.argtypes = [ctypes.c_void_p, ctypes.c_int]
+c_malloc_zone_pressure_relief.restype = ctypes.c_int
+
+def force_memory_release():
+	gc.collect()
+	_ = c_malloc_zone_pressure_relief(None, 1)
+
+# Run only in compiled binary
+RUN_MEMORY_HACK = True
 
 # Not needed. Only helpful for development purposes.
 EXPORT_JSON_FILES = True
@@ -973,6 +986,10 @@ class SophonClient:
 				if install_progress_handler:
 					install_progress_handler.chunk_download_progress(
 						filename.name, len(file_info.chunks), chunk.chunk_id, bytes_written * 100 / file_info.size, bytes_written, file_info.size, chunk.compressed_size)
+				del data, reader, zfh, cfname
+
+				if RUN_MEMORY_HACK:
+					force_memory_release()
 			print("") # Keep the last "100 %" line
 
 		# Verify file integrity
@@ -982,6 +999,9 @@ class SophonClient:
 		else:
 			dstfile.unlink() # delete
 			abortlog(f"\t File is corrupt after download: {filename.name}. Please retry.")
+
+		if RUN_MEMORY_HACK:
+			force_memory_release()
 
 		# Remove chunks after downloading
 		for chunk in file_info.chunks:
@@ -1281,6 +1301,8 @@ class SophonClient:
 			# Motivation: less space consumption by temporary files
 
 			downloaded = self._download_ldiff_file(ldiff_dir, v, progress_handler=progress_handler)
+			if RUN_MEMORY_HACK:
+				force_memory_release()
 			if downloaded:
 				self.ldiff_files_to_remove.add(downloaded)
 				if not OPT.predownload:
@@ -1290,6 +1312,8 @@ class SophonClient:
 					self._apply_ldiff_file(ldiff_dir, v, progress_handler=progress_handler)
 					if progress_handler:
 						progress_handler.ldiff_patch_complete(v.filename)
+					if RUN_MEMORY_HACK:
+						force_memory_release()
 				elif OPT.TESTING_FILE and (OPT.TESTING_FILE in v.filename):
 					# Allow patching individual files beforehand
 					warnlog(f"ENTER TO APPLY PATCH (will create backup file): ", OPT.TESTING_FILE)
@@ -1480,6 +1504,11 @@ class SophonClient:
 				md5 = hashlib.md5(gamefile.read_bytes()).hexdigest()
 				if md5 != v.md5:
 					reason = f"md5 mismatch. is={md5}, should={v.md5}"
+				del md5
+			del gamefilesize, gamefile
+
+			if RUN_MEMORY_HACK:
+				force_memory_release()
 
 			if repair_progress_handler:
 				repair_progress_handler.check_file(

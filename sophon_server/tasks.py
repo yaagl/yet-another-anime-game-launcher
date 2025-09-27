@@ -4,7 +4,7 @@ from typing import Dict, Optional, Literal
 from progress_handlers import InstallProgressHandler, RepairProgressHandler, UpdateProgressHandler
 from models import InstallRequest, RepairRequest, UpdateRequest, TaskStatus, OnlineGameInfo
 from utils import ConnectionManager
-from sophon_api import Options, SophonClient
+from sophon_api import Options, SophonClient, force_memory_release, RUN_MEMORY_HACK
 
 
 def update_config_ini_version(gamedir: pathlib.Path, version: str):
@@ -108,6 +108,9 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
     del options
     progress.job_end()
 
+    if RUN_MEMORY_HACK:
+        force_memory_release()
+
 def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], task_id: str, request: RepairRequest, cancel_event: Optional[threading.Event] = None):
     progress = RepairProgressHandler(task_id, manager, tasks)
     progress.job_start()
@@ -132,6 +135,9 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     del cli
     del options
     progress.job_end()
+
+    if RUN_MEMORY_HACK:
+        force_memory_release()
 
 def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], task_id: str, request: UpdateRequest, cancel_event: Optional[threading.Event] = None):
     progress = UpdateProgressHandler(task_id, manager, tasks)
@@ -168,6 +174,9 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     del cli
     del options
     progress.job_end()
+
+    if RUN_MEMORY_HACK:
+        force_memory_release()
 
 def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
     try:
@@ -213,6 +222,9 @@ def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> Online
             shutil.rmtree(options.gamedir, ignore_errors=True)
             del cli
             del options
+
+            if RUN_MEMORY_HACK:
+                force_memory_release()
 
             return OnlineGameInfo(
                 game_type=game,
