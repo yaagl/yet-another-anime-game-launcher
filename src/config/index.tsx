@@ -36,6 +36,8 @@ import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
 import { createSignal, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
+import { createProxyEnabledConfig } from "@config/proxy-enabled";
+import { createProxyHostConfig } from "@config/proxy-host";
 
 export async function createConfiguration({
   wine,
@@ -70,6 +72,9 @@ export async function createConfiguration({
   const [UL] = await createLocaleConfig({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
+
+  const [PRE] = await createProxyEnabledConfig({ locale, config });
+  const [PRH] = await createProxyHostConfig({ locale, config });
 
   const ChannelClientConfig = await configForChannelClient(locale, config);
 
@@ -139,6 +144,12 @@ export async function createConfiguration({
                       <MH />
                       <R />
                       <LC />
+                      <Divider />
+                      <PRE />
+                      <PRH />
+                      <Text userSelect={"none"} size="xs">
+                        {locale.get("SETTING_PROXY_DESC")}
+                      </Text>
                       <Divider />
                       <UL />
                       <FormControl>

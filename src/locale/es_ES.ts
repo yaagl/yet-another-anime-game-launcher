@@ -71,6 +71,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_RETINA: "Modo Retina",
   SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Apagar el AC parche",
+  SETTING_CUSTOM_RESOLUTION: "Resolución personalizada",
   SETTING_SAVE: "Guardar",
   SETTING_CANCEL: "Cancelar",
 
@@ -110,4 +111,9 @@ export const es_ES: typeof zh_CN = {
   COMMUNITY_WINE_ALERT: en.COMMUNITY_WINE_ALERT,
 
   SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
+
+  SETTING_PROXY_ENABLED: "Activar Proxy HTTP",
+  SETTING_PROXY_HOST: "Host del Proxy HTTP",
+  SETTING_PROXY_DESC:
+    "El proxy solo se aplica al juego, y no al launcher entero", // TODO: Translate
 };

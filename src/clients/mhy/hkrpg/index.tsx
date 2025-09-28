@@ -38,9 +38,10 @@ import {
 import { getGameVersion2019 } from "../unity";
 import { VoicePackNames } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
+import createBlockNet from "./config/block-net";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "3.4.0";
+const CURRENT_SUPPORTED_VERSION = "3.6.0";
 
 export async function createHKRPGChannelClient({
   server,
@@ -338,9 +339,10 @@ export async function createHKRPGChannelClient({
     },
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [PO] = await createPatchOff({ locale, config });
+      const [BN] = await createBlockNet({ locale, config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <PO />];
+        return ["Game Version: ", gameCurrentVersion(), <PO />, <BN />];
       };
     },
   };
