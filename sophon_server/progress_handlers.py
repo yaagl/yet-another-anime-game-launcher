@@ -3,6 +3,8 @@ from utils import ConnectionManager
 from models import TaskStatus
 from typing import Dict, List, Optional
 
+BROADCAST_INTERVAL = 1  # seconds
+
 class InstallProgressHandler:
     def __init__(self, task_id: str, conn_manager: ConnectionManager, tasks: Dict[str, TaskStatus]):
         self.tasks = tasks
@@ -12,7 +14,7 @@ class InstallProgressHandler:
         self.downloaded_size = 0
         self.download_speed = 0
         self._speed_thread = None
-        self.interval_cnt = 0
+        self.last_broadcasted = time.time()
 
     def _speed_calculator_worker(self):
         while self.task_id not in self.tasks or self.tasks[self.task_id].status != "running":
@@ -53,7 +55,6 @@ class InstallProgressHandler:
 
     def download_summary(self, game_version: str, download_size: int, download_file_count: int, download_categories: List[str]):
         self.download_speed = 0
-        self.interval_cnt = 0
         self.downloaded_size = 0
         self.conn_manager.send_message_threadsafe({
             "type": "download_summary",
@@ -68,8 +69,8 @@ class InstallProgressHandler:
 
     def chunk_download_progress(self, filename:str, total_chunks: int, current_chunk: int, progress_percent: float, current_byte: int, total_bytes: int, chunk_size: int):
         self.downloaded_size += chunk_size
-        self.interval_cnt += 1
-        if self.interval_cnt % 20 == 0:
+        if time.time() - self.last_broadcasted > BROADCAST_INTERVAL:
+            self.last_broadcasted = time.time()
             self.conn_manager.send_message_threadsafe({
                 "type": "chunk_progress",
                 "task_id": self.task_id,
@@ -196,7 +197,6 @@ class UpdateProgressHandler(InstallProgressHandler):
         self.downloaded_size = 0
         self.download_size = total_size
         self.download_speed = 0
-        self.interval_cnt = 0
         self.conn_manager.send_message_threadsafe({
             "type": "ldiff_download_summary",
             "task_id": self.task_id,
@@ -222,7 +222,6 @@ class UpdateProgressHandler(InstallProgressHandler):
 
     def ldiff_download_complete(self, filename: str, file_size: int):
         self.downloaded_size += file_size
-        self.interval_cnt += 1
         self.conn_manager.send_message_threadsafe({
             "type": "ldiff_download_complete",
             "task_id": self.task_id,
