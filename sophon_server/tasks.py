@@ -4,7 +4,7 @@ from typing import Dict, Optional, Literal
 from progress_handlers import InstallProgressHandler, RepairProgressHandler, UpdateProgressHandler
 from models import InstallRequest, RepairRequest, UpdateRequest, TaskStatus, OnlineGameInfo
 from utils import ConnectionManager
-from sophon_api import Options, SophonClient, force_memory_release, RUN_MEMORY_HACK
+from sophon_api import Options, SophonClient, force_memory_release, RUN_MEMORY_HACK, WORKER_CNT
 
 
 def update_config_ini_version(gamedir: pathlib.Path, version: str):
@@ -74,6 +74,7 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
         if err_cnt == 5:
             raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")
 
+    # Prioritize downloading essintial files for version & game recognition
     positive_substr = ['globalgamemanagers', 'pkg_version']
     negative_substr = ['/']
     def key_func(x):
@@ -89,8 +90,7 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
 
         return priority
 
-    worker_cnt = 16
-    with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=WORKER_CNT) as executor:
         futures = [
             executor.submit(download_file, v) for v in
             sorted(

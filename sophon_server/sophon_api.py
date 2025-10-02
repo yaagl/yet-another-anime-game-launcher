@@ -104,6 +104,12 @@ def force_memory_release():
 # Run only in compiled binary
 RUN_MEMORY_HACK = True
 
+# Worker count for multithreaded downloads
+WORKER_CNT = 8
+# Worker count for verifying files
+# Do not use all cpu cores because it causes system slowdown
+WORKER_CNT_VERIFY = max(2, psutil.cpu_count(logical=False) - 4)
+
 # Not needed. Only helpful for development purposes.
 EXPORT_JSON_FILES = True
 
@@ -1411,8 +1417,7 @@ class SophonClient:
 			if err_cnt == 5:
 				raise Exception(f"Download file {v.name} failed after 3 attempts: {err_logs}")["pkg_version", ""]
 
-		worker_cnt = 16
-		with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
+		with concurrent.futures.ThreadPoolExecutor(max_workers=WORKER_CNT) as executor:
 			repair_files = [v for v in self.di_chunks.manifest.files if v.filename in self.new_files_to_download]
 			futures = [executor.submit(download_file, v) for v in repair_files]
 			for future in concurrent.futures.as_completed(futures):
@@ -1525,8 +1530,7 @@ class SophonClient:
 			with lock:
 				self.new_files_to_download.add(v.filename)
 
-		worker_cnt = 16
-		with concurrent.futures.ThreadPoolExecutor(max_workers=worker_cnt) as executor:
+		with concurrent.futures.ThreadPoolExecutor(max_workers=WORKER_CNT_VERIFY) as executor:
 			futures = [
 				executor.submit(_verify_file, v) for v in self.di_chunks.manifest.files
 			]
