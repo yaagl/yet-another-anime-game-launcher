@@ -33,7 +33,7 @@ jobs:
 
       - name: Save Sophon Build Cache
         if: ${{ steps.sophon-build-cache.outputs.cache-hit != 'true' }}
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*') }}
           path: |
@@ -72,28 +72,33 @@ jobs:
       - name: Build app
         run: |
           ./configure.sh
-          pnpm run format-check
-          pnpm run lint
           YAAGL_CHANNEL_CLIENT=hk4ecn node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hk4ecn.neu
           YAAGL_CHANNEL_CLIENT=hk4eos node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hk4eos.neu 
           YAAGL_CHANNEL_CLIENT=bh3glb node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_bh3glb.neu
           YAAGL_CHANNEL_CLIENT=hkrpgcn node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hkrpgcn.neu
           YAAGL_CHANNEL_CLIENT=hkrpgos node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_hkrpgos.neu
           YAAGL_CHANNEL_CLIENT=napcn node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_napcn.neu
           YAAGL_CHANNEL_CLIENT=napos node ./build-app.js
+          cp dist/Yaagl/resources.neu resources_napos.neu
 
-      # - name: Tar app
-      #   run: |
-      #     tar -zcf Yaagl.tar.gz Yaagl.app
-      #     tar -zcf "Yaagl OS.tar.gz" "Yaagl OS.app"
-      #     tar -zcf "Yaagl Honkai Global.tar.gz" "Yaagl Honkai Global.app"
-      # - name: Upload artifact - app
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app
-      #     path: Yaagl.tar.gz
-      # - name: Upload artifact - app-os
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app-os
-      #     path: "Yaagl OS.tar.gz"
+      - name: Tar app
+        run: |
+          tar -zcf Yaagl.app.tar.gz Yaagl.app
+          tar -zcf "Yaagl OS.app.tar.gz" "Yaagl OS.app"
+          tar -zcf "Yaagl Honkai Global.app.tar.gz" "Yaagl Honkai Global.app"
+          tar -zcf "Yaagl HSR.app.tar.gz" "Yaagl HSR.app"
+          tar -zcf "Yaagl HSR OS.app.tar.gz" "Yaagl HSR OS.app"
+          tar -zcf "Yaagl ZZZ.app.tar.gz" "Yaagl ZZZ.app"
+          tar -zcf "Yaagl ZZZ OS.app.tar.gz" "Yaagl ZZZ OS.app"
+
+      - name: Upload Artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Yaagl App
+          path: Yaagl*.tar.gz

@@ -38,7 +38,7 @@ jobs:
 
       - name: Save Sophon Build Cache
         if: ${{ steps.sophon-build-cache.outputs.cache-hit != 'true' }}
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*') }}
           path: |
