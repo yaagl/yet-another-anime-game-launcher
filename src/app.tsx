@@ -77,7 +77,6 @@ export async function createApp() {
     timeout(10000),
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
-
   const { latest, downloadUrl, description, version } = await createUpdater({
     github,
     aria2,

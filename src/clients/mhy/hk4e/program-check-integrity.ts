@@ -1,33 +1,36 @@
-import { join, basename } from "path-browserify";
-import { SophonClient } from "@sophon";
+import { basename, join } from "path-browserify";
+import { Sophon } from "@sophon";
 import { CommonUpdateProgram } from "@common-update-ui";
-import { Server } from "@constants";
-import { humanFileSize, log } from "@utils";
+import { log, md5, stats, readAllLines, setKey, humanFileSize } from "@utils";
 
-export async function* downloadAndInstallGameProgram({
-  sophonClient,
+export async function* checkIntegrityProgram({
+  sophon,
   gameDir,
-  installReltype,
 }: {
-  sophonClient: SophonClient;
   gameDir: string;
-  installReltype: string;
+  sophon: Sophon;
 }): CommonUpdateProgram {
-  yield ["setUndeterminedProgress"];
-  log("Starting game installation process...");
-
-  const taskId = await sophonClient.startInstallation({
+  const taskId = await sophon.startRepair({
     gamedir: gameDir,
     game_type: "hk4e",
-    install_reltype: installReltype,
+    repair_mode: "reliable",
   });
-  log(`Installation task started with ID: ${taskId}`);
 
-  for await (const progress of sophonClient.streamOperationProgress(taskId)) {
+  yield ["setStateText", "SCANNING_FILES", "0", "0"];
+
+  for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
-      case "job_start":
-        yield ["setUndeterminedProgress"];
-        yield ["setStateText", "ALLOCATING_FILE"];
+      case "check_file":
+        yield [
+          "setStateText",
+          "SCANNING_FILES",
+          String(progress.overall_progress.checked_files),
+          String(progress.overall_progress.total_files),
+        ];
+        yield [
+          "setProgress",
+          Number(progress.overall_progress.overall_percent),
+        ];
         break;
 
       case "chunk_progress":
