@@ -24,9 +24,7 @@ jobs:
         id: sophon-build-cache
         uses: actions/cache@v4
         with:
-          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*') }}
-          restore-keys: |
-            cache-key-${{ hashFiles('configure.sh') }}
+          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*.py', 'sophon_server/uv.lock', 'sophon_server/.python-version', 'sophon_server/pyproject.toml') }}
           path: |
             ./sophon_server/build/
             ./sophon_server/.cache/
@@ -40,7 +38,7 @@ jobs:
         if: ${{ steps.sophon-build-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
-          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*') }}
+          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*.py', 'sophon_server/uv.lock', 'sophon_server/.python-version', 'sophon_server/pyproject.toml') }}
           path: |
             ./sophon_server/build/
             ./sophon_server/.cache/
