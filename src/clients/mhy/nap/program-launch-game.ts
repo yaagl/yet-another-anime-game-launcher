@@ -6,6 +6,7 @@ import {
   removeFile,
   writeBinary,
   writeFile,
+  readBinary,
   resolve,
   utf16le,
   log,
@@ -123,8 +124,13 @@ async function fixWebview(wine: Wine) {
   ];
 
   try {
-    const result = await wine.exec("reg", ["query", key], {}, "/dev/null");
-    for (let line of result.stdOut.split("\n")) {
+    await wine.exec("reg", ["query", key], {}, resolve("fix_webview.log"));
+
+    // the output contains malformed CJK characters
+    const decoder = new TextDecoder("utf-8", { fatal: false });
+    const output = decoder.decode(await readBinary(resolve("fix_webview.log")));
+
+    for (let line of output.split("\n")) {
       line = line.trim();
       if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
         const abtest = line.split(" ", 2)[0];
@@ -132,6 +138,7 @@ async function fixWebview(wine: Wine) {
       }
     }
   } catch (e: unknown) {
+    log(String(e));
     return;
   }
 
