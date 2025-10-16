@@ -122,16 +122,17 @@ async function fixWebview(wine: Wine) {
     `"MIHOYOSDK_WEBVIEW_RENDER_METHOD_h1573598267"=-`,
   ];
 
-  let abtest = "";
-  const result = await wine.exec("reg", ["query", key], {});
-  for (let line of result.stdOut.split("\n")) {
-    line = line.trim();
-    if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
-      abtest = line.split(" ", 2)[0];
+  try {
+    const result = await wine.exec("reg", ["query", key], {});
+    for (let line of result.stdOut.split("\n")) {
+      line = line.trim();
+      if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
+        const abtest = line.split(" ", 2)[0];
+        reg.push(`"${abtest}"=-`);
+      }
     }
-  }
-  if (abtest) {
-    reg.push(`"${abtest}"=-`);
+  } catch (e: unknown) {
+    return;
   }
 
   await writeBinary(resolve("fix_webview.reg"), utf16le(reg.join("\r\n")));
