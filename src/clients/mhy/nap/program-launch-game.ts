@@ -1,7 +1,15 @@
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "../../../common-update-ui";
 import { Server } from "../../../constants";
-import { mkdirp, removeFile, writeFile, resolve, log } from "../../../utils";
+import {
+  mkdirp,
+  removeFile,
+  writeBinary,
+  writeFile,
+  resolve,
+  utf16le,
+  log,
+} from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
@@ -23,6 +31,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
+  await fixWebview(wine);
   await wine.setProps(config);
 
   const args = [];
@@ -101,4 +110,34 @@ cd /d "${wine.toWinePath(gameDir)}"
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
+}
+
+async function fixWebview(wine: Wine) {
+  const key = `HKEY_CURRENT_USER\\Software\\miHoYo\\绝区零`;
+
+  const reg = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"MIHOYOSDK_WEBVIEW_RENDER_METHOD_h1573598267"=-`,
+  ];
+
+  let abtest = "";
+  const result = await wine.exec("reg", ["query", key], {});
+  for (let line of result.stdOut.split("\n")) {
+    line = line.trim();
+    if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
+      abtest = line.split(" ", 2)[0];
+    }
+  }
+  if (abtest) {
+    reg.push(`"${abtest}"=-`);
+  }
+
+  await writeBinary(resolve("fix_webview.reg"), utf16le(reg.join("\r\n")));
+  await wine.exec(
+    "reg",
+    ["import", `${wine.toWinePath(resolve("./fix_webview.reg"))}`],
+    {}
+  );
 }
