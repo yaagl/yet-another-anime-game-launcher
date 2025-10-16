@@ -117,11 +117,11 @@ export function generateRandomString(n: number) {
 
 export function utf16le(text: string) {
   const buffer = new ArrayBuffer(text.length * 2 + 2);
-  const view = new Uint16Array(buffer);
+  const view = new DataView(buffer);
 
-  view[0] = 0xfeff;
-  for (let i = 0; i < text.length; i++) {
-    view[i + 1] = text.charCodeAt(i);
+  view.setUint16(0, 0xfeff, true);
+  for (let i = 1; i <= text.length; i++) {
+    view.setUint16(i * 2, text.charCodeAt(i - 1), true);
   }
 
   return buffer;
