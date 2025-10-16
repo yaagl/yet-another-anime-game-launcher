@@ -155,7 +155,7 @@ async function fixWebview(wine: Wine) {
   ];
 
   try {
-    const result = await wine.exec("reg", ["query", key], {});
+    const result = await wine.exec("reg", ["query", key], {}, "/dev/null");
     for (let line of result.stdOut.split("\n")) {
       line = line.trim();
       if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
@@ -171,6 +171,7 @@ async function fixWebview(wine: Wine) {
   await wine.exec(
     "reg",
     ["import", `${wine.toWinePath(resolve("./fix_webview.reg"))}`],
-    {}
+    {},
+    "/dev/null"
   );
 }
