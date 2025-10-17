@@ -32,7 +32,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await fixWebview(wine);
+  await fixWebview(wine, server);
   await wine.setProps(config);
 
   const args = [];
@@ -113,8 +113,15 @@ cd /d "${wine.toWinePath(gameDir)}"
   yield* patchRevertProgram(gameDir, wine, server, config);
 }
 
-async function fixWebview(wine: Wine) {
-  const key = `HKEY_CURRENT_USER\\Software\\miHoYo\\绝区零`;
+async function fixWebview(wine: Wine, server: Server) {
+  let key: string;
+  if (server.id === "nap_cn") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\绝区零`;
+  } else if (server.id === "nap_global") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\ZenlessZoneZero`;
+  } else {
+    return;
+  }
 
   const reg = [
     `Windows Registry Editor Version 5.00`,
@@ -138,7 +145,6 @@ async function fixWebview(wine: Wine) {
       }
     }
   } catch (e: unknown) {
-    log(String(e));
     return;
   }
 

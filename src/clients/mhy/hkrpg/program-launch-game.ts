@@ -34,7 +34,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
-  await fixWebview(wine);
+  await fixWebview(wine, server);
   await wine.setProps(config);
   if (wine.attributes.renderBackend == "dxmt") await wine.setNVExtension();
 
@@ -145,8 +145,15 @@ cd /d "${wine.toWinePath(gameDir)}"
   yield* patchRevertProgram(gameDir, wine, server, config);
 }
 
-async function fixWebview(wine: Wine) {
-  const key = `HKEY_CURRENT_USER\\Software\\miHoYo\\崩坏：星穹铁道`;
+async function fixWebview(wine: Wine, server: Server) {
+  let key: string;
+  if (server.id === "nap_cn") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\崩坏：星穹铁道`;
+  } else if (server.id === "nap_global") {
+    key = `HKEY_CURRENT_USER\\Software\\Cognosphere\\Star Rail`;
+  } else {
+    return;
+  }
 
   const reg = [
     `Windows Registry Editor Version 5.00`,
