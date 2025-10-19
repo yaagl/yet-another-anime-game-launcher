@@ -114,3 +114,15 @@ export function generateRandomString(n: number) {
   }
   return result;
 }
+
+export function utf16le(text: string) {
+  const buffer = new ArrayBuffer(text.length * 2 + 2);
+  const view = new DataView(buffer);
+
+  view.setUint16(0, 0xfeff, true);
+  for (let i = 1; i <= text.length; i++) {
+    view.setUint16(i * 2, text.charCodeAt(i - 1), true);
+  }
+
+  return buffer;
+}

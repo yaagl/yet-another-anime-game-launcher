@@ -1,7 +1,17 @@
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { Server } from "@constants";
-import { mkdirp, removeFile, writeFile, resolve, log, exec } from "@utils";
+import {
+  mkdirp,
+  removeFile,
+  writeBinary,
+  writeFile,
+  readBinary,
+  resolve,
+  utf16le,
+  log,
+  exec,
+} from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
@@ -24,6 +34,7 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
+  await fixWebview(wine, server);
   await wine.setProps(config);
   if (wine.attributes.renderBackend == "dxmt") await wine.setNVExtension();
 
@@ -133,4 +144,48 @@ cd /d "${wine.toWinePath(gameDir)}"
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
+}
+
+async function fixWebview(wine: Wine, server: Server) {
+  let key: string;
+  if (server.id === "nap_cn") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\崩坏：星穹铁道`;
+  } else if (server.id === "nap_global") {
+    key = `HKEY_CURRENT_USER\\Software\\Cognosphere\\Star Rail`;
+  } else {
+    return;
+  }
+
+  const reg = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"MIHOYOSDK_WEBVIEW_RENDER_METHOD_h1573598267"=-`,
+  ];
+
+  try {
+    await wine.exec("reg", ["query", key], {}, resolve("fix_webview.log"));
+
+    // the output contains malformed CJK characters
+    const decoder = new TextDecoder("utf-8", { fatal: false });
+    const output = decoder.decode(await readBinary(resolve("fix_webview.log")));
+
+    for (let line of output.split("\n")) {
+      line = line.trim();
+      if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
+        const abtest = line.split(" ", 2)[0];
+        reg.push(`"${abtest}"=-`);
+      }
+    }
+  } catch (e: unknown) {
+    return;
+  }
+
+  await writeBinary(resolve("fix_webview.reg"), utf16le(reg.join("\r\n")));
+  await wine.exec(
+    "reg",
+    ["import", `${wine.toWinePath(resolve("./fix_webview.reg"))}`],
+    {},
+    "/dev/null"
+  );
 }
