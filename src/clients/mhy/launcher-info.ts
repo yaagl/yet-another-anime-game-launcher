@@ -119,6 +119,11 @@ export interface HoyoConnectGameDisplay {
   display_status: string;
 }
 
+export enum HoyoConnectGameBackgroundType {
+  BACKGROUND_TYPE_UNSPECIFIED = "BACKGROUND_TYPE_UNSPECIFIED",
+  BACKGROUND_TYPE_VIDEO = "BACKGROUND_TYPE_VIDEO",
+}
+
 export interface HoyoConnectGameBackground {
   id: string;
   background: {
@@ -130,6 +135,15 @@ export interface HoyoConnectGameBackground {
     hover_url: string;
     link: string;
   };
+  video: {
+    url: string;
+    size: number;
+  };
+  theme: {
+    url: string;
+    link: string;
+  };
+  type: HoyoConnectGameBackgroundType;
 }
 
 export interface HoyoConnectGetGamesResponse {

@@ -15,6 +15,28 @@ body {
   background-size: cover;
 }
 
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.background-theme {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-position: center;
+  background-size: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .game-logo {
   display: block;
   position: absolute;

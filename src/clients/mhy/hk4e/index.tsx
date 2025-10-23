@@ -19,6 +19,7 @@ import {
   stats,
   timeout,
   waitImageReady,
+  waitVideoReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
@@ -43,7 +44,10 @@ import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
 import { getGameVersion } from "../unity";
-import { VoicePackNames } from "../launcher-info";
+import {
+  VoicePackNames,
+  HoyoConnectGameBackgroundType,
+} from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
 // no need to check supported version
@@ -65,7 +69,12 @@ export async function createHK4EChannelClient({
   const {
     background: { url: background },
     icon: { url: icon, link: icon_link },
+    video: { url: video_url },
+    theme: { url: theme_url },
+    type: bg_type,
   } = await getLatestAdvInfo(locale, server);
+  const IS_VIDEO_BG =
+    bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
 
   const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
   const sophon_host = "127.0.0.1";
@@ -89,7 +98,13 @@ export async function createHK4EChannelClient({
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
   const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
-  await waitImageReady(background);
+  if (IS_VIDEO_BG) {
+    // Theme is overlayed on video
+    await waitVideoReady(video_url);
+    await waitImageReady(theme_url);
+  } else {
+    await waitImageReady(background);
+  }
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
@@ -120,8 +135,9 @@ export async function createHK4EChannelClient({
     installDir: _gameInstallDir,
     updateRequired,
     uiContent: {
-      background,
-      iconImage: icon,
+      background: IS_VIDEO_BG ? undefined : background,
+      background_video: IS_VIDEO_BG ? video_url : undefined,
+      background_theme: IS_VIDEO_BG ? theme_url : undefined,
       url: icon_link,
     },
     predownloadVersion: () =>

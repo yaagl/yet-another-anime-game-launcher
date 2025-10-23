@@ -55,7 +55,15 @@ export async function createLauncher({
     update,
     checkIntegrity,
     init,
-    uiContent: { background, url, iconImage, launchButtonLocation, logo },
+    uiContent: {
+      background,
+      background_video,
+      background_theme,
+      url,
+      iconImage,
+      launchButtonLocation,
+      logo,
+    },
     dismissPredownload,
     predownloadVersion,
     createConfig,
@@ -118,9 +126,27 @@ export async function createLauncher({
       <div
         class="background"
         style={{
-          "background-image": `url(${background})`,
+          "background-image": background ? `url(${background})` : undefined,
         }}
       >
+        <Show when={background_video}>
+          <video
+            class="background-video"
+            src={background_video}
+            autoplay
+            loop
+            muted
+            playsinline
+          />
+        </Show>
+        <Show when={background_theme}>
+          <div
+            class="background-theme"
+            style={{
+              "background-image": `url(${background_theme})`,
+            }}
+          />
+        </Show>
         {logo ? (
           <div
             class="game-logo"
