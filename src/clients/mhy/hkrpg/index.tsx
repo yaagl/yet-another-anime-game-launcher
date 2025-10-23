@@ -15,6 +15,7 @@ import {
   setKey,
   stats,
   waitImageReady,
+  waitVideoReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -36,7 +37,10 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
-import { VoicePackNames } from "../launcher-info";
+import {
+  HoyoConnectGameBackgroundType,
+  VoicePackNames,
+} from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
@@ -57,7 +61,12 @@ export async function createHKRPGChannelClient({
   const {
     background: { url: background },
     icon: { url: icon, link: icon_link },
+    video: { url: video_url },
+    theme: { url: theme_url },
+    type: bg_type,
   } = await getLatestAdvInfo(locale, server);
+  const IS_VIDEO_BG =
+    bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
   const {
     main: {
       major: {
@@ -69,7 +78,13 @@ export async function createHKRPGChannelClient({
     },
     pre_download,
   } = await getLatestVersionInfo(server);
-  await waitImageReady(background);
+  if (IS_VIDEO_BG) {
+    // Theme is overlayed on video
+    await waitVideoReady(video_url);
+    await waitImageReady(theme_url);
+  } else {
+    await waitImageReady(background);
+  }
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
@@ -100,8 +115,9 @@ export async function createHKRPGChannelClient({
     installDir: _gameInstallDir,
     updateRequired,
     uiContent: {
-      background,
-      iconImage: icon,
+      background: IS_VIDEO_BG ? undefined : background,
+      background_video: IS_VIDEO_BG ? video_url : undefined,
+      background_theme: IS_VIDEO_BG ? theme_url : undefined,
       url: icon_link,
     },
     predownloadVersion: () => pre_download?.major?.version ?? "",
