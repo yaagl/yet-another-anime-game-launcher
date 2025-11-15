@@ -151,8 +151,8 @@ export async function createLauncher({
             class="background-theme"
             style={{
               "background-image": `url(${background_theme})`,
-              opacity: videoLoaded() ? 1 : 0,
-              transition: "opacity 0.5s ease-in",
+              // HACK: always load video overlay image.
+              // Image seems to align with overlay. Fix for ZZZ not having text in image.
             }}
           />
         </Show>
