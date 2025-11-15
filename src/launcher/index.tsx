@@ -18,7 +18,7 @@ import {
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { Show } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { createConfiguration } from "@config";
 import { Github } from "../github";
@@ -55,7 +55,15 @@ export async function createLauncher({
     update,
     checkIntegrity,
     init,
-    uiContent: { background, url, iconImage, launchButtonLocation, logo },
+    uiContent: {
+      background,
+      background_video,
+      background_theme,
+      url,
+      iconImage,
+      launchButtonLocation,
+      logo,
+    },
     dismissPredownload,
     predownloadVersion,
     createConfig,
@@ -99,6 +107,8 @@ export async function createLauncher({
 
     const { isOpen, onOpen, onClose } = createDisclosure();
 
+    const [videoLoaded, setVideoLoaded] = createSignal(false);
+
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (installState() == "INSTALLED") {
@@ -118,9 +128,34 @@ export async function createLauncher({
       <div
         class="background"
         style={{
-          "background-image": `url(${background})`,
+          "background-image": background ? `url(${background})` : undefined,
         }}
       >
+        <Show when={background_video}>
+          <video
+            class="background-video"
+            src={background_video}
+            autoplay
+            loop
+            muted
+            playsinline
+            onLoadedData={() => setVideoLoaded(true)}
+            style={{
+              opacity: videoLoaded() ? 1 : 0,
+              transition: "opacity 0.5s ease-in",
+            }}
+          />
+        </Show>
+        <Show when={background_theme}>
+          <div
+            class="background-theme"
+            style={{
+              "background-image": `url(${background_theme})`,
+              // HACK: always load video overlay image.
+              // Image seems to align with overlay. Fix for ZZZ not having text in image.
+            }}
+          />
+        </Show>
         {logo ? (
           <div
             class="game-logo"
