@@ -80,11 +80,11 @@ export async function createHKRPGChannelClient({
   } = await getLatestVersionInfo(server);
   if (IS_VIDEO_BG) {
     // Theme is overlayed on video
-    await waitVideoReady(video_url);
+    waitVideoReady(video_url);
     await waitImageReady(theme_url);
-  } else {
-    await waitImageReady(background);
   }
+  // Always load image (Shown before video loads)
+  await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
@@ -115,7 +115,7 @@ export async function createHKRPGChannelClient({
     installDir: _gameInstallDir,
     updateRequired,
     uiContent: {
-      background: IS_VIDEO_BG ? undefined : background,
+      background: background, // Always show image
       background_video: IS_VIDEO_BG ? video_url : undefined,
       background_theme: IS_VIDEO_BG ? theme_url : undefined,
       url: icon_link,

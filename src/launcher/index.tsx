@@ -18,7 +18,7 @@ import {
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { Show } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { createConfiguration } from "@config";
 import { Github } from "../github";
@@ -107,6 +107,8 @@ export async function createLauncher({
 
     const { isOpen, onOpen, onClose } = createDisclosure();
 
+    const [videoLoaded, setVideoLoaded] = createSignal(false);
+
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (installState() == "INSTALLED") {
@@ -137,6 +139,11 @@ export async function createLauncher({
             loop
             muted
             playsinline
+            onLoadedData={() => setVideoLoaded(true)}
+            style={{
+              opacity: videoLoaded() ? 1 : 0,
+              transition: "opacity 0.5s ease-in",
+            }}
           />
         </Show>
         <Show when={background_theme}>
@@ -144,6 +151,8 @@ export async function createLauncher({
             class="background-theme"
             style={{
               "background-image": `url(${background_theme})`,
+              opacity: videoLoaded() ? 1 : 0,
+              transition: "opacity 0.5s ease-in",
             }}
           />
         </Show>
