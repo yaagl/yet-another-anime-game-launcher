@@ -118,5 +118,6 @@ export const vi_VN: typeof zh_CN = {
 
   SETTING_PROXY_ENABLED: "Bật Proxy HTTP",
   SETTING_PROXY_HOST: "Máy chủ Proxy HTTP",
-  SETTING_PROXY_DESC: "Proxy này chỉ áp dụng cho game, không phải cho toàn bộ trình khởi động.",
+  SETTING_PROXY_DESC: 
+    "Proxy này chỉ áp dụng cho game, không phải cho toàn bộ trình khởi động.",
 };
