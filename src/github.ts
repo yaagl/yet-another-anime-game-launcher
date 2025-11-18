@@ -49,6 +49,7 @@ export async function createGithubEndpoint() {
   return {
     api,
     acceleratedPath,
+    mirrorURL: fastest,
   };
 }
 
