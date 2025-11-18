@@ -1,17 +1,32 @@
 import { log, timeout } from "./utils";
 
-const END_POINTS = ["", "https://ghp.3shain.uk/"];
+const END_POINTS = [
+  "https://gh-proxy.com/",
+  "https://ghfast.top/",
+  "https://gh.llkk.cc/",
+  "https://ghfile.geekertao.top/",
+  "https://ghps.cc/",
+  "",
+];
+const PROBE_URL =
+  "https://github.com/yaagl/yet-another-anime-game-launcher/releases/latest/download/resources_hk4eos.neu";
+const DELAY_MS = 5000;
+let fastest: string | null = null;
 
 export async function createGithubEndpoint() {
   await log(`Checking github endpoints`);
-  const fastest = await Promise.race([
+  fastest ||= await Promise.race([
     ...END_POINTS.map(prefix =>
-      fetch(`${prefix}https://api.github.com/octocat`)
-        .then(x => x.text())
-        .then(x => prefix)
-        .catch(() => timeout(5000))
+      fetch(`${prefix}${PROBE_URL}`.trim(), {
+        mode: "no-cors",
+        cache: "no-cache",
+        redirect: "follow",
+        signal: AbortSignal.timeout(DELAY_MS),
+      })
+        .then(x => ([0, 200].includes(x.status) ? prefix : Promise.reject()))
+        .catch(() => timeout(DELAY_MS))
     ),
-    timeout(5000),
+    timeout(DELAY_MS),
   ]);
 
   fastest == "" || (await log(`Using github proxy ${fastest}`));
