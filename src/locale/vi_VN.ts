@@ -105,7 +105,8 @@ export const vi_VN: typeof zh_CN = {
   NO_ENOUGH_DISKSPACE_DESC: "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống.",
 
   UPDATE: "Cập nhật game",
-  GAME_VERSION_TOO_OLD_DESC: "Phiên bản game của bạn ({0}) quá cũ để cập nhật bằng cách này. Hãy cài lại game.",
+  GAME_VERSION_TOO_OLD_DESC: 
+    "Phiên bản game của bạn ({0}) quá cũ để cập nhật bằng cách này. Hãy cài lại game.",
 
   PREDOWNLOAD_READY: "Cài trước phiên bản {0}",
 
