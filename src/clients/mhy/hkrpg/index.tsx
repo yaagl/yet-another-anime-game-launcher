@@ -15,7 +15,6 @@ import {
   setKey,
   stats,
   waitImageReady,
-  waitVideoReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -78,12 +77,6 @@ export async function createHKRPGChannelClient({
     },
     pre_download,
   } = await getLatestVersionInfo(server);
-  if (IS_VIDEO_BG) {
-    // Theme is overlayed on video
-    waitVideoReady(video_url);
-    await waitImageReady(theme_url);
-  }
-  // Always load image (Shown before video loads)
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(

@@ -19,7 +19,6 @@ import {
   stats,
   timeout,
   waitImageReady,
-  waitVideoReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
@@ -98,12 +97,6 @@ export async function createHK4EChannelClient({
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
   const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
-  if (IS_VIDEO_BG) {
-    // Theme is overlayed on video
-    waitVideoReady(video_url);
-    await waitImageReady(theme_url);
-  }
-  // Always load image (Shown before video loads)
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(

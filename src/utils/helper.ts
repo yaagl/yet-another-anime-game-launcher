@@ -7,15 +7,6 @@ export async function waitImageReady(url: string) {
   });
 }
 
-export async function waitVideoReady(url: string) {
-  return new Promise((res, rej) => {
-    const video = document.createElement("video");
-    video.src = url;
-    video.onloadeddata = res;
-    video.onerror = rej;
-  });
-}
-
 export function timeout(ms: number): Promise<never> {
   return new Promise((_, rej) => {
     setTimeout(() => {
