@@ -14,7 +14,9 @@ export interface ChannelClient {
   predownloadVersion: () => string;
 
   uiContent: {
-    background: string;
+    background?: string;
+    background_video?: string;
+    background_theme?: string;
     url: string;
     iconImage?: string;
     launchButtonLocation?: "left" | "right";

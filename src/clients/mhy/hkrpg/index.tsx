@@ -36,7 +36,10 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
-import { VoicePackNames } from "../launcher-info";
+import {
+  HoyoConnectGameBackgroundType,
+  VoicePackNames,
+} from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
@@ -57,7 +60,12 @@ export async function createHKRPGChannelClient({
   const {
     background: { url: background },
     icon: { url: icon, link: icon_link },
+    video: { url: video_url },
+    theme: { url: theme_url },
+    type: bg_type,
   } = await getLatestAdvInfo(locale, server);
+  const IS_VIDEO_BG =
+    bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
   const {
     main: {
       major: {
@@ -100,8 +108,9 @@ export async function createHKRPGChannelClient({
     installDir: _gameInstallDir,
     updateRequired,
     uiContent: {
-      background,
-      iconImage: icon,
+      background: background, // Always show image
+      background_video: IS_VIDEO_BG ? video_url : undefined,
+      background_theme: IS_VIDEO_BG ? theme_url : undefined,
       url: icon_link,
     },
     predownloadVersion: () => pre_download?.major?.version ?? "",

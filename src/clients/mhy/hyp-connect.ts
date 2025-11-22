@@ -2,11 +2,13 @@ import { Locale } from "@locale";
 import { Server } from "@constants";
 import {
   HoyoConnectGameBackground,
+  HoyoConnectGameBackgroundType,
   HoyoConnectGamePackageMainfest,
   HoyoConnectGetAllGameBasicInfoResponse,
   HoyoConnectGetGamePackagesResponse,
 } from "./launcher-info";
 import { exec } from "@utils";
+import { sort } from "semver";
 
 async function fetch(url: string) {
   const { stdOut } = await exec(["curl", url]);
@@ -32,7 +34,18 @@ export async function getLatestAdvInfo(
   const game = ret.data.game_info_list.find(x => x.game.biz == server.id);
   if (!game || game.backgrounds.length < 1)
     throw new Error(`failed to fetch game information: ${server.id}`);
-  return game.backgrounds[0];
+
+  const sortedBackgrounds = game.backgrounds.sort((a, b) => {
+    const isAVideo =
+      a.type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
+    const isBVideo =
+      b.type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
+
+    if (isAVideo && !isBVideo) return -1;
+    if (!isAVideo && isBVideo) return 1;
+    return 0;
+  });
+  return sortedBackgrounds[0];
 }
 
 export async function getLatestVersionInfo(
