@@ -42,6 +42,7 @@ import {
 import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
+import { createEnableHDRConfig } from "./config/enable-hdr";
 import { getGameVersion } from "../unity";
 import {
   VoicePackNames,
@@ -298,9 +299,17 @@ export async function createHK4EChannelClient({
       const [W3] = await createWorkaround3Config({ locale, config });
       const [PO] = await createPatchOff({ locale, config });
       const [BN] = await createBlockNet({ locale, config });
+      const [HDR] = await createEnableHDRConfig({ locale, config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <W3 />, <PO />, <BN />];
+        return [
+          "Game Version: ",
+          gameCurrentVersion(),
+          <HDR />,
+          <W3 />,
+          <PO />,
+          <BN />,
+        ];
       };
     },
   };
