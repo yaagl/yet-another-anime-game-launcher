@@ -116,6 +116,7 @@ export const de_DE: typeof zh_CN = {
     "Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_ENABLE_HDR: "HDR aktivieren",
 
   SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
