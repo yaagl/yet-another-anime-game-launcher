@@ -74,7 +74,7 @@ cd /d "${wine.toWinePath(gameDir)}"
         `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
         `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
         `fi`,
-        `sleep 15`,
+        `sleep 20`,
         `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
 
         `rm ${tmpScriptPath}`,
