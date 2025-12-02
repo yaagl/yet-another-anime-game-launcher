@@ -65,6 +65,7 @@ export const zh_CN = {
   SETTING_RETINA: "Retina 模式",
   SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
   SETTING_TURN_OFF_AC_PATCH: "关闭AC补丁",
+  SETTING_CUSTOM_RESOLUTION: "自定义分辨率",
   SETTING_SAVE: "保存",
   SETTING_CANCEL: "取消",
 
@@ -107,5 +108,11 @@ export const zh_CN = {
     "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: "Licenses",
+  SETTING_LICENSES: "Licenses", // TODO: Translate
+  SETTING_ENABLE_HDR: "启用 HDR",
+
+  SETTING_PROXY_ENABLED: "Enable HTTP Proxy", // TODO: Translate
+  SETTING_PROXY_HOST: "HTTP Proxy Host", // TODO: Translate
+  SETTING_PROXY_DESC:
+    "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
 };

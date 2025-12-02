@@ -36,11 +36,16 @@ import {
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import createPatchOff from "./config/patch-off";
+import createResolution from "./config/resolution";
+import createBlockNet from "./config/block-net";
 import { getGameVersion as _getGameVersion } from "../unity";
-import { VoicePackNames } from "../launcher-info";
+import {
+  HoyoConnectGameBackgroundType,
+  VoicePackNames,
+} from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.0.0";
+const CURRENT_SUPPORTED_VERSION = "2.4.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
@@ -65,7 +70,12 @@ export async function createNAPChannelClient({
   const {
     background: { url: background },
     icon: { url: icon, link: icon_link },
+    video: { url: video_url },
+    theme: { url: theme_url },
+    type: bg_type,
   } = await getLatestAdvInfo(locale, server);
+  const IS_VIDEO_BG =
+    bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
   const {
     main: {
       major: {
@@ -109,7 +119,9 @@ export async function createNAPChannelClient({
     installDir: _gameInstallDir,
     updateRequired,
     uiContent: {
-      background,
+      background: background, // Always show image
+      background_video: IS_VIDEO_BG ? video_url : undefined,
+      background_theme: IS_VIDEO_BG ? theme_url : undefined,
       iconImage: icon,
       url: icon_link,
     },
@@ -348,9 +360,17 @@ export async function createNAPChannelClient({
     },
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [PO] = await createPatchOff({ locale, config });
+      const [RES] = await createResolution({ locale, config });
+      const [BN] = await createBlockNet({ locale, config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <PO />];
+        return [
+          "Game Version: ",
+          gameCurrentVersion(),
+          <PO />,
+          <RES />,
+          <BN />,
+        ];
       };
     },
   };

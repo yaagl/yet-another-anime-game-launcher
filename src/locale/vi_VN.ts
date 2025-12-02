@@ -70,6 +70,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_RETINA: "Chế độ Retina",
   SETTING_LEFT_CMD: "Ánh xạ CMD trái sang CTRL",
   SETTING_TURN_OFF_AC_PATCH: "tắt bản vá AC",
+  SETTING_CUSTOM_RESOLUTION: "Độ phân giải tùy chỉnh",
   SETTING_SAVE: "Lưu",
   SETTING_CANCEL: "Huỷ",
 
@@ -113,5 +114,10 @@ export const vi_VN: typeof zh_CN = {
     "Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES,
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_ENABLE_HDR: "Bật HDR",
+
+  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
+  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
+  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 };

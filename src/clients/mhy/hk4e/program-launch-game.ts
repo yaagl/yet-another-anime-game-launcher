@@ -18,6 +18,34 @@ import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 import { CN_BLOCK_URL, OS_BLOCK_URL } from "../../secret";
+import hk4eHDRGlobalReg from "../../../constants/hk4e_hdr_os.reg?raw";
+import hk4eHDRCnReg from "../../../constants/hk4e_hdr_cn.reg?raw";
+
+const HDR_REGISTRY_FILES = {
+  hk4e_global: hk4eHDRGlobalReg,
+  hk4e_cn: hk4eHDRCnReg,
+} as const;
+
+async function applyHDRRegistry({
+  wine,
+  server,
+}: {
+  wine: Wine;
+  server: Server;
+}) {
+  const regContent =
+    HDR_REGISTRY_FILES[server.id as keyof typeof HDR_REGISTRY_FILES];
+  if (!regContent) return;
+
+  const regPath = resolve("./hk4e_enable_hdr.reg");
+  await writeFile(regPath, regContent);
+  try {
+    await wine.exec("regedit", [wine.toWinePath(regPath)], {}, "/dev/null");
+    await wine.waitUntilServerOff();
+  } finally {
+    await removeFile(regPath);
+  }
+}
 
 export async function* launchGameProgram({
   gameDir,
@@ -36,6 +64,9 @@ export async function* launchGameProgram({
   yield ["setStateText", "PATCHING"];
 
   await wine.setProps(config);
+  if (config.hk4eEnableHDR) {
+    await applyHDRRegistry({ wine, server });
+  }
 
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
@@ -118,6 +149,12 @@ export async function* launchGameProgram({
           : {
               WINEESYNC: "1",
             }),
+        ...(config.proxyEnabled
+          ? {
+              HTTP_PROXY: config.proxyHost,
+              HTTPS_PROXY: config.proxyHost,
+            }
+          : {}),
       },
       logfile
     );

@@ -71,6 +71,7 @@ export const fr_FR: typeof zh_CN = {
   SETTING_RETINA: "Mode Retina",
   SETTING_LEFT_CMD: "Mapper CMD gauche à CTRL",
   SETTING_TURN_OFF_AC_PATCH: "Désactiver le patch AC",
+  SETTING_CUSTOM_RESOLUTION: "Résolution personnalisée",
   SETTING_SAVE: "Sauvegarder",
   SETTING_CANCEL: "Annuler",
 
@@ -117,5 +118,10 @@ export const fr_FR: typeof zh_CN = {
     "La sélection actuelle est la version communautaire, cette version n’est pas officiellement prise en charge, veuillez ne pas signaler de problèmes",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES,
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_ENABLE_HDR: "Activer le HDR",
+
+  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
+  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
+  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 };

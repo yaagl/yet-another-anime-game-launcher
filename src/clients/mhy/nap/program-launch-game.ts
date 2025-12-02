@@ -1,11 +1,22 @@
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "../../../common-update-ui";
 import { Server } from "../../../constants";
-import { mkdirp, removeFile, writeFile, resolve, log } from "../../../utils";
+import {
+  mkdirp,
+  removeFile,
+  writeBinary,
+  writeFile,
+  readBinary,
+  resolve,
+  utf16le,
+  log,
+  exec,
+} from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { CROSSOVER_RESOURCE } from "src/wine/crossover";
+import { NAP_CN_BLOCK_URL, NAP_OS_BLOCK_URL } from "../../secret";
 
 export async function* launchGameProgram({
   gameDir,
@@ -23,15 +34,22 @@ export async function* launchGameProgram({
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "PATCHING"];
 
+  await fixWebview(wine, server);
   await wine.setProps(config);
 
+  const args = [];
+  if (config.resolutionCustom) {
+    args.push("-screen-width", config.resolutionWidth);
+    args.push("-screen-height", config.resolutionHeight);
+    args.push("-screen-fullscreen", "0");
+  }
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 cd /d "${wine.toWinePath(gameDir)}"
-"${wine.toWinePath(join(gameDir, gameExecutable))}"`;
+"${wine.toWinePath(join(gameDir, gameExecutable))}" ${args.join(" ")}`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
@@ -39,6 +57,41 @@ cd /d "${wine.toWinePath(gameDir)}"
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
+
+    if (config.blockNet) {
+      const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
+      const blockUrl =
+        server.id == "nap_global" ? NAP_OS_BLOCK_URL : NAP_CN_BLOCK_URL;
+
+      const commands = [
+        `#!/bin/sh`,
+
+        `HOSTS_FILE="/etc/hosts"`,
+        `ENTRY="0.0.0.0 ${blockUrl}"`,
+        `PAD_START="# Temporarily Added by Yaagl"`,
+        `PAD_END="# End of section"`,
+
+        `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
+        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
+        `fi`,
+        `sleep 20`,
+        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
+
+        `rm ${tmpScriptPath}`,
+      ];
+
+      await writeFile(tmpScriptPath, commands.join("\n"));
+      await exec(
+        [
+          "osascript",
+          "-e",
+          `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
+        ],
+        {},
+        false
+      );
+    }
+
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
@@ -76,6 +129,12 @@ cd /d "${wine.toWinePath(gameDir)}"
           : {
               WINEESYNC: "1",
             }),
+        ...(config.proxyEnabled
+          ? {
+              HTTP_PROXY: config.proxyHost,
+              HTTPS_PROXY: config.proxyHost,
+            }
+          : {}),
       },
       logfile
     );
@@ -89,4 +148,48 @@ cd /d "${wine.toWinePath(gameDir)}"
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
+}
+
+async function fixWebview(wine: Wine, server: Server) {
+  let key: string;
+  if (server.id === "nap_cn") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\绝区零`;
+  } else if (server.id === "nap_global") {
+    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\ZenlessZoneZero`;
+  } else {
+    return;
+  }
+
+  const reg = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"MIHOYOSDK_WEBVIEW_RENDER_METHOD_h1573598267"=-`,
+  ];
+
+  try {
+    await wine.exec("reg", ["query", key], {}, resolve("fix_webview.log"));
+
+    // the output contains malformed CJK characters
+    const decoder = new TextDecoder("utf-8", { fatal: false });
+    const output = decoder.decode(await readBinary(resolve("fix_webview.log")));
+
+    for (let line of output.split("\n")) {
+      line = line.trim();
+      if (line.startsWith("HOYO_WEBVIEW_RENDER_METHOD_ABTEST_")) {
+        const abtest = line.split(" ", 2)[0];
+        reg.push(`"${abtest}"=-`);
+      }
+    }
+  } catch (e: unknown) {
+    return;
+  }
+
+  await writeBinary(resolve("fix_webview.reg"), utf16le(reg.join("\r\n")));
+  await wine.exec(
+    "reg",
+    ["import", `${wine.toWinePath(resolve("./fix_webview.reg"))}`],
+    {},
+    "/dev/null"
+  );
 }
