@@ -10,11 +10,13 @@ import {
   resolve,
   utf16le,
   log,
+  exec,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { CROSSOVER_RESOURCE } from "src/wine/crossover";
+import { NAP_CN_BLOCK_URL, NAP_OS_BLOCK_URL } from "../../secret";
 
 export async function* launchGameProgram({
   gameDir,
@@ -55,6 +57,41 @@ cd /d "${wine.toWinePath(gameDir)}"
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
+
+    if (config.blockNet) {
+      const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
+      const blockUrl =
+        server.id == "nap_global" ? NAP_OS_BLOCK_URL : NAP_CN_BLOCK_URL;
+
+      const commands = [
+        `#!/bin/sh`,
+
+        `HOSTS_FILE="/etc/hosts"`,
+        `ENTRY="0.0.0.0 ${blockUrl}"`,
+        `PAD_START="# Temporarily Added by Yaagl"`,
+        `PAD_END="# End of section"`,
+
+        `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
+        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
+        `fi`,
+        `sleep 20`,
+        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
+
+        `rm ${tmpScriptPath}`,
+      ];
+
+      await writeFile(tmpScriptPath, commands.join("\n"));
+      await exec(
+        [
+          "osascript",
+          "-e",
+          `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
+        ],
+        {},
+        false
+      );
+    }
+
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
