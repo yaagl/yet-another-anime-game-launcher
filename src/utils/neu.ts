@@ -105,6 +105,24 @@ export function tar_extract(src: string, dst: string) {
   return exec(["tar", "-zxvf", src, "-C", dst]);
 }
 
+export function tar_extract_directory(
+  src: string,
+  dst: string,
+  dir: string,
+  isXZ: boolean
+) {
+  const stripCount = dir.split("/").length;
+  return exec([
+    "tar",
+    `--strip-components=${stripCount}`,
+    "-C",
+    dst,
+    isXZ ? "-Jxvf" : "-zxvf",
+    src,
+    dir,
+  ]);
+}
+
 export async function spawn(
   segments: CommandSegments,
   env?: { [key: string]: string }

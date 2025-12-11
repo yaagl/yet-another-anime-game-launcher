@@ -11,6 +11,7 @@ import {
   exec,
   generateRandomString,
   resolve,
+  tar_extract_directory,
 } from "@utils";
 import { ENSURE_HOSTS } from "../clients/secret";
 import { CROSSOVER_DATA } from "./crossover";
@@ -36,7 +37,8 @@ export async function createWineInstallProgram({
     await rmrf_dangerously(wineAbsPrefix);
     if (!wineDistro.attributes.crossover && !wineDistro.attributes.whisky) {
       yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-      const wineTarPath = resolve("./wine.tar.gz");
+      const isXZ = wineDistro.remoteUrl.endsWith(".xz");
+      const wineTarPath = resolve("./wine.tar." + (isXZ ? "xz" : "gz"));
       for await (const progress of aria2.doStreamingDownload({
         uri: wineDistro.remoteUrl,
         absDst: wineTarPath,
@@ -57,7 +59,19 @@ export async function createWineInstallProgram({
       yield ["setUndeterminedProgress"];
       await rmrf_dangerously(wineBinaryDir);
       await exec(["mkdir", "-p", wineBinaryDir]);
-      await tar_extract(resolve("./wine.tar.gz"), wineBinaryDir);
+      if (wineDistro.attributes.winePath) {
+        await tar_extract_directory(
+          resolve("./wine.tar." + (isXZ ? "xz" : "gz")),
+          wineBinaryDir,
+          wineDistro.attributes.winePath,
+          isXZ
+        );
+      } else {
+        await tar_extract(
+          resolve("./wine.tar." + (isXZ ? "xz" : "gz")),
+          wineBinaryDir
+        );
+      }
       await removeFile(wineTarPath);
 
       yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
