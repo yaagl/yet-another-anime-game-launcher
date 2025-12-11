@@ -9,6 +9,7 @@ export interface WineDistributionAttributes {
   crossover: boolean;
   whisky: boolean;
   community: boolean;
+  winePath: string; // Path to the wine directory inside the archive
 }
 
 export interface WineDistribution {
@@ -19,6 +20,16 @@ export interface WineDistribution {
 }
 
 const YAAGL_BUILTIN_WINE: WineDistribution[] = [
+  {
+    id: "10.18-dxmt",
+    displayName: "Wine 10.18 DXMT Experimental",
+    remoteUrl:
+      "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/wine-devel-10.18-osx64.tar.xz",
+    attributes: {
+      renderBackend: "dxmt",
+      winePath: "Wine Devel.app/Contents/Resources/wine",
+    },
+  },
   {
     id: "9.9-dxmt",
     displayName: "Wine 9.9 DXMT",
