@@ -119,4 +119,6 @@ export const es_ES: typeof zh_CN = {
   SETTING_PROXY_HOST: "Host del Proxy HTTP",
   SETTING_PROXY_DESC:
     "El proxy solo se aplica al juego, y no al launcher entero",
+
+  SETTING_TURN_ON_STEAM_PATCH: "Activar Parche de Steam"
 };

@@ -120,4 +120,6 @@ export const en: typeof zh_CN = {
   SETTING_PROXY_HOST: "HTTP Proxy Host",
   SETTING_PROXY_DESC:
     "The proxy only applies to the game, not to the whole launcher.",
+
+  SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch",
 };
