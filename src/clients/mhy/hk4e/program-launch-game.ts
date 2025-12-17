@@ -74,7 +74,7 @@ copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 cd /d "${wine.toWinePath(gameDir)}"
-${await(async () => {
+${await (async () => {
   if (config.fpsUnlock !== "default") {
     return `"${wine.toWinePath(
       resolve("./fpsunlock/genshin-force-fps.exe")
