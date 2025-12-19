@@ -1,5 +1,4 @@
 import { checkCrossover } from "./crossover";
-import { checkWhisky } from "./whisky";
 import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
@@ -71,29 +70,6 @@ export async function getWineDistributions(): Promise<WineDistribution[]> {
         attributes: {
           renderBackend: "gptk",
           crossover: true,
-        },
-      }
-    );
-  }
-
-  if (await checkWhisky()) {
-    ret.push(
-      {
-        id: "whisky-dxvk",
-        displayName: "Whisky DXVK",
-        remoteUrl: "n/a",
-        attributes: {
-          renderBackend: "dxvk",
-          whisky: true,
-        },
-      },
-      {
-        id: "whisky",
-        displayName: "Whisky D3DMetal",
-        remoteUrl: "n/a",
-        attributes: {
-          renderBackend: "gptk",
-          whisky: true,
         },
       }
     );

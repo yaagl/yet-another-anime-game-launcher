@@ -15,7 +15,6 @@ import {
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
 import { getCrossoverBinary } from "./crossover";
-import { getWhiskyBinary } from "./whisky";
 
 export async function createWine(options: {
   prefix: string;
@@ -23,8 +22,6 @@ export async function createWine(options: {
 }) {
   const loaderBin = options.distro.attributes.crossover
     ? await getCrossoverBinary()
-    : options.distro.attributes.whisky
-    ? await getWhiskyBinary()
     : await getCorrectWineBinary();
 
   async function cmd(command: string, args: string[]) {
