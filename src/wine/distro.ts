@@ -48,43 +48,6 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
       renderBackend: "dxvk",
     },
   },
-  {
-    id: "v8.16-3shain",
-    displayName: "Wine 8.17 DXVK",
-    remoteUrl:
-      "https://github.com/3Shain/wine/releases/download/v8.16-3shain/wine.tar.gz",
-    attributes: {
-      renderBackend: "dxvk",
-    },
-  },
-  {
-    id: "v9.2-mingw",
-    displayName: "Wine 9.2 DXVK",
-    remoteUrl:
-      "https://github.com/3Shain/wine/releases/download/v9.2-mingw/wine.tar.gz",
-    attributes: {
-      renderBackend: "dxvk",
-    },
-  },
-  {
-    id: "unstable-bh-gptk-1.0",
-    displayName: "GPTK",
-    remoteUrl:
-      "https://github.com/3Shain/wine/releases/download/unstable-bh-gptk-1.0/wine.tar.gz",
-    attributes: {
-      renderBackend: "gptk",
-    },
-  },
-  {
-    id: "community-hsr-gptk",
-    displayName: "GPTK (Community Ver.)",
-    remoteUrl:
-      "https://github.com/1146839821/wine/releases/download/0.0.1/wine.tar.gz",
-    attributes: {
-      renderBackend: "gptk",
-      community: true,
-    },
-  },
 ];
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
