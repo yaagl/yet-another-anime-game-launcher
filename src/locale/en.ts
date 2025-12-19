@@ -87,9 +87,6 @@ export const en: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Open YAAGL Data Directory",
   SETTING_YAAGL_VERSION: "YAAGL Version",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "To use Crossover, there is an additional manual step. Click here to learn more.",
-
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
 
