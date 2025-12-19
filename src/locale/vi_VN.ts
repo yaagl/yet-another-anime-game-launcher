@@ -90,9 +90,6 @@ export const vi_VN: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Mở thư mục dữ liệu của YAAGL",
   SETTING_YAAGL_VERSION: "Phiên bản YAAGL",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Để sử dụng CrossOver, một vài bước cần phải được tuỳ chỉnh thủ công. Nhấn vào đây để biết thêm chi tiết",
-
   SETTING_FPS_UNLOCK: "Mở khoá giới hạn FPSUnlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Tắt",
 

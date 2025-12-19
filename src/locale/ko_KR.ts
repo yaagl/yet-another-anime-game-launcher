@@ -88,9 +88,6 @@ export const ko_KR: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: " YAAGL 데이터 경로 열기",
   SETTING_YAAGL_VERSION: "YAAGL 버전",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Crossover를 사용하려면, 수동으로 수행해야 하는 추가 작업이 있습니다. 자세한 내용을 보려면 이 버튼을 클릭하세요.",
-
   SETTING_FPS_UNLOCK: "FPS 제한 해제",
   SETTING_FPS_UNLOCK_DEFAULT: "비활성화",
 
