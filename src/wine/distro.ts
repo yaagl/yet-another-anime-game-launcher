@@ -38,15 +38,6 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
       renderBackend: "dxmt",
     },
   },
-  {
-    id: "9.9-dxvk",
-    displayName: "Wine 9.9 DXVK",
-    remoteUrl:
-      "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
-    attributes: {
-      renderBackend: "dxvk",
-    },
-  },
 ];
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
