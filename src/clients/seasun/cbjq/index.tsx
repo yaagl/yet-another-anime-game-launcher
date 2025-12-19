@@ -185,9 +185,6 @@ export async function createCBJQChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      if (wine.attributes.renderBackend == "dxvk") {
-        yield* checkAndDownloadDXVK(aria2);
-      }
       if (wine.attributes.renderBackend == "dxmt") {
         yield* checkAndDownloadDXMT(aria2);
       }

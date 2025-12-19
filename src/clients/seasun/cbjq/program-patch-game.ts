@@ -32,12 +32,6 @@ export async function* patchProgram(
     return;
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxvk/${f}`, join(system32Dir, f));
-    }
-  }
   if (wine.attributes.renderBackend == "dxmt") {
     for (const f of DXMT_FILES) {
       await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
@@ -65,11 +59,6 @@ export async function* patchRevertProgram(
     return;
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
-    }
-  }
   if (wine.attributes.renderBackend == "dxmt") {
     for (const f of DXMT_FILES) {
       await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));

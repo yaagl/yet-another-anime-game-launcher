@@ -1,12 +1,9 @@
-import { checkCrossover } from "./crossover";
 import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
 
 export interface WineDistributionAttributes {
-  renderBackend: "dxmt" | "dxvk" | "gptk";
-  crossover: boolean;
-  whisky: boolean;
+  renderBackend: "dxmt";
   community: boolean;
   winePath: string; // Path to the wine directory inside the archive
 }
@@ -41,32 +38,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
 ];
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
-  const ret = [...YAAGL_BUILTIN_WINE];
-
-  if (await checkCrossover()) {
-    ret.push(
-      {
-        id: "crossover",
-        displayName: "CrossOver DXVK",
-        remoteUrl: "n/a",
-        attributes: {
-          renderBackend: "dxvk",
-          crossover: true,
-        },
-      },
-      {
-        id: "crossover-d3dm",
-        displayName: "CrossOver D3DMetal",
-        remoteUrl: "n/a",
-        attributes: {
-          renderBackend: "gptk",
-          crossover: true,
-        },
-      }
-    );
-  }
-
-  return ret;
+  return YAAGL_BUILTIN_WINE;
 }
 
 export type WineStatus =
