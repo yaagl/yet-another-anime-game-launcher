@@ -4,7 +4,6 @@ import { Github } from "../github";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt";
-  community: boolean;
   winePath: string; // Path to the wine directory inside the archive
 }
 
