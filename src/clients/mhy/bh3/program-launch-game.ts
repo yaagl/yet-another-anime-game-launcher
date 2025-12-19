@@ -55,19 +55,6 @@ cd /d "${wine.toWinePath(gameDir)}"
           MTL_HUD_ENABLED: config.metalHud ? "1" : "",
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-          ...(wine.attributes.renderBackend == "dxvk"
-            ? {
-                DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-                ...(config.dxvkHud == ""
-                  ? {}
-                  : {
-                      DXVK_HUD: config.dxvkHud,
-                    }),
-                DXVK_STATE_CACHE_PATH: yaaglDir,
-                DXVK_LOG_PATH: yaaglDir,
-                DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-              }
-            : {}),
           ...(wine.attributes.renderBackend == "dxmt"
             ? {
                 WINEMSYNC: "1",

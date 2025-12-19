@@ -14,15 +14,12 @@ import {
 } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
-import { getCrossoverBinary } from "./crossover";
 
 export async function createWine(options: {
   prefix: string;
   distro: WineDistribution;
 }) {
-  const loaderBin = options.distro.attributes.crossover
-    ? await getCrossoverBinary()
-    : await getCorrectWineBinary();
+  const loaderBin = await getCorrectWineBinary();
 
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
