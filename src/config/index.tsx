@@ -24,8 +24,6 @@ import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../constants";
 import { Locale } from "../locale";
 import { Wine } from "../wine";
 import { Config } from "./config-def";
-import { createDxvkAsyncConfig } from "./dxvk-async";
-import { createDxvkHUDConfig } from "./dxvk-hud";
 import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
@@ -58,8 +56,6 @@ export async function createConfiguration({
     locale,
     config,
   });
-  const [DA] = await createDxvkAsyncConfig({ locale, config });
-  const [DH] = await createDxvkHUDConfig({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -139,8 +135,6 @@ export async function createConfiguration({
                     <VStack spacing={"$4"}>
                       <GID />
                       <Divider />
-                      <DA />
-                      <DH />
                       <MH />
                       <R />
                       <LC />
