@@ -113,14 +113,10 @@ export async function checkWine(github: Github): Promise<WineStatus> {
     if (wineDistribution) {
       return { wineReady: true, wineDistribution } as const;
     } else {
+      // Force re-install for unknown wine version
       return {
-        wineReady: true,
-        wineDistribution: {
-          id: currrent_wine_tag,
-          displayName: currrent_wine_tag,
-          remoteUrl: "",
-          attributes: {}, // FIXME: old version compatibility (or force update)
-        },
+        wineReady: false,
+        wineDistribution: defaultDistro,
       };
     }
   } catch (e) {
