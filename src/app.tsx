@@ -26,7 +26,6 @@ import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { getCrossoverBinary } from "./wine/crossover";
 import { createClient } from "./clients";
-import { getWhiskyBinary } from "./wine/whisky";
 
 export async function createApp() {
   await setKey("singleton", null);
