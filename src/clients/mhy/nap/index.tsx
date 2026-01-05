@@ -45,7 +45,7 @@ import {
 } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.4.0";
+const CURRENT_SUPPORTED_VERSION = "2.5.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
@@ -320,9 +320,6 @@ export async function createNAPChannelClient({
       }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
-      }
-      if (wine.attributes.renderBackend == "dxvk") {
-        yield* checkAndDownloadDXVK(aria2);
       }
       if (wine.attributes.renderBackend == "dxmt") {
         yield* checkAndDownloadDXMT(aria2);

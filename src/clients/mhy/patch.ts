@@ -61,22 +61,7 @@ export async function* patchProgram(
       await putLocal(file.url, join(gameDir, file.file));
     }
   }
-  // FIXME: dirty hack
-  if (
-    wine.attributes.renderBackend == "dxvk" &&
-    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
-  ) {
-    await forceMove(
-      join(gameDir, server.dataDir, "globalgamemanagers"),
-      join(gameDir, server.dataDir, "globalgamemanagers.bak")
-    );
-    writeBinary(
-      join(gameDir, server.dataDir, "globalgamemanagers"),
-      await disableUnityFeature(
-        join(gameDir, server.dataDir, "globalgamemanagers.bak")
-      )
-    );
-  }
+
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
   if (wine.attributes.renderBackend == "dxvk") {
@@ -165,22 +150,8 @@ export async function* patchRevertProgram(
       }
     }
   }
-  // FIXME: dirty hack
-  if (
-    wine.attributes.renderBackend == "dxvk" &&
-    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
-  ) {
-    await forceMove(
-      join(gameDir, server.dataDir, "globalgamemanagers.bak"),
-      join(gameDir, server.dataDir, "globalgamemanagers")
-    );
-  }
+
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
-    }
-  }
   if (wine.attributes.renderBackend == "dxmt") {
     for (const f of DXMT_FILES) {
       await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));

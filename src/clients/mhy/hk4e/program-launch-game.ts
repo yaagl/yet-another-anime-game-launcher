@@ -16,7 +16,6 @@ import {
 import { Wine } from "../../../wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
-import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 import { CN_BLOCK_URL, OS_BLOCK_URL } from "../../secret";
 import hk4eHDRGlobalReg from "../../../constants/hk4e_hdr_os.reg?raw";
 import hk4eHDRCnReg from "../../../constants/hk4e_hdr_cn.reg?raw";
@@ -136,29 +135,7 @@ ${await (async () => {
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        ...(wine.attributes.renderBackend == "gptk"
-          ? {
-              WINEDLLPATH_PREPEND: wine.attributes.crossover
-                ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
-                : "",
-            }
-          : {
-              WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-            }),
-        ...(wine.attributes.renderBackend == "dxvk"
-          ? {
-              DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-              ...(config.dxvkHud == ""
-                ? {}
-                : {
-                    DXVK_HUD: config.dxvkHud,
-                  }),
-              DXVK_STATE_CACHE_PATH: yaaglDir,
-              DXVK_LOG_PATH: yaaglDir,
-              DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-              MVK_ALLOW_METAL_FENCES: "1",
-            }
-          : {}),
+        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
