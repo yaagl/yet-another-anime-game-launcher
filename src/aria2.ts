@@ -1,5 +1,8 @@
 import { WebSocket as RPC } from "libaria2-ts";
 import { log, sha256_16, wait } from "./utils";
+import { createGithubEndpoint } from "./github";
+
+let ghMirrorURL: string | null = null;
 
 export async function createAria2({
   host,
@@ -8,6 +11,8 @@ export async function createAria2({
   host: string;
   port: number;
 }) {
+  await createGithubEndpoint().then(gh => (ghMirrorURL ??= gh.mirrorURL));
+
   await wait(500); // FIXME:
   const rpc = new RPC.Client({
     host,
@@ -37,6 +42,9 @@ export async function createAria2({
     uri: string;
     absDst: string;
   }) {
+    if (options.uri.startsWith("https://github.com") && ghMirrorURL != null)
+      options["uri"] = `${ghMirrorURL}${options.uri}`;
+
     const gid = await sha256_16(`${options.uri}:${options.absDst}`);
     try {
       const status = await rpc.tellStatus(gid);
