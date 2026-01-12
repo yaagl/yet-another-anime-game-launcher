@@ -1,5 +1,5 @@
 import { WebSocket as RPC } from "libaria2-ts";
-import { log, sha256_16, wait } from "./utils";
+import { log, sha256_16, wait, timeout } from "./utils";
 
 export async function createAria2({
   host,
@@ -8,12 +8,14 @@ export async function createAria2({
   host: string;
   port: number;
 }) {
-  await wait(500); // FIXME:
+  await wait(200);
+
   const rpc = new RPC.Client({
     host,
     port,
   });
-  const version = await rpc.getVersion();
+
+  const version = await Promise.race([rpc.getVersion(), timeout(3000)]);
 
   function shutdown() {
     return rpc.shutdown();
@@ -45,7 +47,7 @@ export async function createAria2({
       } else if (status.status == "complete") {
         return;
       } else {
-        throw new Error("FIXME: implmenet me (aria2.ts) " + status.status);
+        throw new Error("Invalid status: " + status.status);
       }
     } catch (e: unknown) {
       if (typeof e == "object" && e != null && "code" in e && e["code"] == 1) {
@@ -81,11 +83,11 @@ export async function createAria2Retry({
   host: string;
   port: number;
 }): Promise<Aria2> {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     try {
       return await createAria2({ host, port });
-    } catch {
-      await log("Fail to create aria2 rpc, retrying...");
+    } catch (e) {
+      await log("Fail to create aria2 rpc (" + e + "), retrying...");
     }
   }
   throw new Error("Fail to create aria2 rpc");

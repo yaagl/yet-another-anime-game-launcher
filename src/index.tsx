@@ -3,7 +3,7 @@ import { createApp } from "./app";
 import { HopeProvider, NotificationsProvider } from "@hope-ui/solid";
 import { amber } from "@radix-ui/colors";
 
-import { fatal } from "./utils";
+import { fatal, log } from "./utils";
 
 function createPlates(
   tag: string,
@@ -49,5 +49,8 @@ if (typeof Neutralino == "undefined") {
       );
       Neutralino.window.show();
     })
-    .catch(fatal);
+    .catch(e => {
+      log("FATAL ERROR CAUGHT: " + e);
+      fatal(e);
+    });
 }

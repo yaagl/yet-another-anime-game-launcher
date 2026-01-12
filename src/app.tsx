@@ -40,10 +40,17 @@ export async function createApp() {
   const locale = await createLocale();
   const github = await createGithubEndpoint();
   const aria2_session = resolve("./aria2.session");
-  await appendFile(aria2_session, "");
+
+  try {
+    await Neutralino.filesystem.getStats(aria2_session);
+  } catch {
+    await Neutralino.filesystem.writeFile(aria2_session, "");
+  }
+
   const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
+
   const { pid: apid } = await spawn([
-    "./sidecar/aria2/aria2c",
+    resolve("./sidecar/aria2/aria2c"),
     "-d",
     "/",
     "--no-conf",
@@ -70,9 +77,10 @@ export async function createApp() {
     }
     return true;
   });
+
   const aria2 = await Promise.race([
     createAria2Retry({ host: "127.0.0.1", port: aria2_port }),
-    timeout(10000),
+    timeout(15000),
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
   const { latest, downloadUrl, description, version } = await createUpdater({
