@@ -125,11 +125,11 @@ cd /d "${wine.toWinePath(gameDir)}"
 }
 
 async function fixWebview(wine: Wine, server: Server) {
-  let key: string;
+  let key = "HKEY_CURRENT_USER\\Software\\";
   if (server.id === "hkrpg_cn") {
-    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\崩坏：星穹铁道`;
+    key += "\x6d\x69\x48\x6f\x59\x6f\\\u5d29\u574f\uff1a\u661f\u7a79\u94c1\u9053";
   } else if (server.id === "hkrpg_global") {
-    key = `HKEY_CURRENT_USER\\Software\\Cognosphere\\Star Rail`;
+    key += "\x43\x6f\x67\x6e\x6f\x73\x70\x68\x65\x72\x65\\\x53\x74\x61\x72\x20\x52\x61\x69\x6c";
   } else {
     return;
   }

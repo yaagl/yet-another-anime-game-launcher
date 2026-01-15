@@ -129,11 +129,11 @@ cd /d "${wine.toWinePath(gameDir)}"
 }
 
 async function fixWebview(wine: Wine, server: Server) {
-  let key: string;
+  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
   if (server.id === "nap_cn") {
-    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\绝区零`;
+    key += "\u7edd\u533a\u96f6";
   } else if (server.id === "nap_global") {
-    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\ZenlessZoneZero`;
+    key += "\x5a\x65\x6e\x6c\x65\x73\x73\x5a\x6f\x6e\x65\x5a\x65\x72\x6f";
   } else {
     return;
   }
