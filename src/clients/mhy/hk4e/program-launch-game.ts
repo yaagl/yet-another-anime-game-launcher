@@ -43,7 +43,11 @@ async function applyHDRRegistry({
   }
 }
 
-async function applyResolutionRegistry(wine: Wine, server: Server, config: Config) {
+async function applyResolutionRegistry(
+  wine: Wine,
+  server: Server,
+  config: Config
+) {
   let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
   if (server.id === "hk4e_cn") {
     key += "\u539f\u795e";
@@ -64,8 +68,12 @@ async function applyResolutionRegistry(wine: Wine, server: Server, config: Confi
     ``,
     `[${key}]`,
     `"Screenmanager Is Fullscreen mode_h3981298716"=dword:00000000`,
-    `"Screenmanager Resolution Width_h182942802"=dword:${width.toString(16).padStart(8, "0")}`,
-    `"Screenmanager Resolution Height_h2627697771"=dword:${height.toString(16).padStart(8, "0")}`,
+    `"Screenmanager Resolution Width_h182942802"=dword:${width
+      .toString(16)
+      .padStart(8, "0")}`,
+    `"Screenmanager Resolution Height_h2627697771"=dword:${height
+      .toString(16)
+      .padStart(8, "0")}`,
   ];
 
   const path = resolve("./hk4e_resolution.reg");
