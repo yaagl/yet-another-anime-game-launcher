@@ -64,33 +64,30 @@ export async function* patchProgram(
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxvk/${f}`, join(system32Dir, f));
-    }
+
+  for (const f of DXMT_FILES) {
+    await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
+    await cp(`./dxmt/${f}`, join(system32Dir, f));
   }
-  if (wine.attributes.renderBackend == "dxmt") {
-    for (const f of DXMT_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxmt/${f}`, join(system32Dir, f));
-    }
+
+  await cp(
+    `./dxmt/winemetal.dll`,
+    resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+  );
+
+  await cp(
+    `./dxmt/winemetal.so`,
+    resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+  );
+
+  if (server.id.startsWith("hkrpg")) {
     await cp(
-      `./dxmt/winemetal.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+      `./dxmt/nvngx.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
     );
-    await cp(
-      `./dxmt/winemetal.so`,
-      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
-    );
-    if (server.id.startsWith("hkrpg")) {
-      await cp(
-        `./dxmt/nvngx.dll`,
-        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
-      );
-      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
-    }
+    await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
   }
+
   if (config.reshade) {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
