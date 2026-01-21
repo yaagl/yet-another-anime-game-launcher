@@ -159,7 +159,7 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for (const file of DXMT_FILES_WITH_UNIXLIB) {
     for await (const progress of aria2.doStreamingDownload({
-      uri: `https://github.com/3Shain/wine/releases/download/dxmt-72/${file}`,
+      uri: `https://github.com/dawn-winery/dawn-signed/releases/download/dxmt-0.72/${file}`,
       absDst: resolve(`./dxmt/${file}`),
     })) {
       yield [
