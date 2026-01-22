@@ -18,6 +18,7 @@ import { ensureHosts } from "../hosts";
 import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
 import { WineDistribution } from "./distro";
+import { addCertsToWine } from "./cert";
 
 export async function createWineInstallProgram({
   aria2,
@@ -72,6 +73,7 @@ export async function createWineInstallProgram({
 
     yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 
+    await addCertsToWine(wineBinaryDir);
     await xattrRemove("com.apple.quarantine", wineBinaryDir);
 
     yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
