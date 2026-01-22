@@ -268,7 +268,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     preserveTimestamps: true,
   });
 
-  (async function getFiles(dir) {
+  await (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });
     await Promise.all(
       dirents.map(dirent => {
