@@ -96,26 +96,23 @@ export async function* patchProgram(
     );
   }
 
-  if (
-    !server.id.startsWith("hkrpg") &&
-    !server.id.startsWith("nap")
-  ) {
-  await cp(
-    resolve("./sidecar/protonextras/steam64.exe"),
-    join(system32Dir, "steam.exe")
-  );
-  await cp(
-    resolve("./sidecar/protonextras/steam32.exe"),
-    join(syswow64Dir, "steam.exe")
-  );
-  await cp(
-    resolve("./sidecar/protonextras/lsteamclient64.dll"),
-    join(system32Dir, "lsteamclient.dll")
-  );
-  await cp(
-    resolve("./sidecar/protonextras/lsteamclient32.dll"),
-    join(syswow64Dir, "lsteamclient.dll")
-  );
+  if (!server.id.startsWith("hkrpg") && !server.id.startsWith("nap")) {
+    await cp(
+      resolve("./sidecar/protonextras/steam64.exe"),
+      join(system32Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/steam32.exe"),
+      join(syswow64Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient64.dll"),
+      join(system32Dir, "lsteamclient.dll")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient32.dll"),
+      join(syswow64Dir, "lsteamclient.dll")
+    );
   }
 
   setKey("patched", "1");

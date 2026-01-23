@@ -75,10 +75,11 @@ export async function createApp() {
     timeout(10000),
   ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
   await log(`Launched aria2 version ${aria2.version.version}`);
-  const { latest, downloadUrl, description, version } = await createUpdater({
-    github,
-    aria2,
-  });
+  const { latest, downloadUrl, sidecarDownloadUrl, description, version } =
+    await createUpdater({
+      github,
+      aria2,
+    });
   if (latest == false) {
     if (
       await locale.prompt(
@@ -88,7 +89,7 @@ export async function createApp() {
       )
     ) {
       return createCommonUpdateUI(locale, () =>
-        downloadProgram(aria2, downloadUrl)
+        downloadProgram(aria2, downloadUrl, sidecarDownloadUrl)
       );
     }
   }
