@@ -96,6 +96,10 @@ export async function* patchProgram(
     );
   }
 
+  if (
+    !server.id.startsWith("hkrpg") &&
+    !server.id.startsWith("nap")
+  ) {
   await cp(
     resolve("./sidecar/protonextras/steam64.exe"),
     join(system32Dir, "steam.exe")
@@ -112,6 +116,7 @@ export async function* patchProgram(
     resolve("./sidecar/protonextras/lsteamclient32.dll"),
     join(syswow64Dir, "lsteamclient.dll")
   );
+  }
 
   setKey("patched", "1");
 }
