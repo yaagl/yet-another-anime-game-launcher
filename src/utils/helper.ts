@@ -7,10 +7,16 @@ export async function waitImageReady(url: string) {
   });
 }
 
-export function timeout(ms: number): Promise<never> {
+export function timeout(ms: number, message?: string): Promise<never> {
   return new Promise((_, rej) => {
     setTimeout(() => {
-      rej("TIMEOUT");
+      // Import TimeoutError dynamically to avoid circular dependencies
+      const error = new Error(message || `Operation timed out after ${ms}ms`);
+      error.name = "TimeoutError";
+      (error as Error & { timeoutMs: number; type: string }).timeoutMs = ms;
+      (error as Error & { timeoutMs: number; type: string }).type =
+        "timeout-error";
+      rej(error);
     }, ms);
   });
 }
@@ -21,6 +27,39 @@ export function wait(ms: number): Promise<number> {
       res(ms);
     }, ms);
   });
+}
+
+/**
+ * Execute a promise with timeout and optional cancellation callback
+ * Following 2026 best practices for proper resource cleanup
+ */
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  onTimeout?: () => void
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      onTimeout?.();
+      const error = new Error(`Operation timed out after ${ms}ms`);
+      error.name = "TimeoutError";
+      (error as Error & { timeoutMs: number; type: string }).timeoutMs = ms;
+      (error as Error & { timeoutMs: number; type: string }).type =
+        "timeout-error";
+      reject(error);
+    }, ms);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    if (timeoutId) clearTimeout(timeoutId);
+    return result;
+  } catch (error) {
+    if (timeoutId) clearTimeout(timeoutId);
+    throw error;
+  }
 }
 
 export async function sha256_16(str: string) {
