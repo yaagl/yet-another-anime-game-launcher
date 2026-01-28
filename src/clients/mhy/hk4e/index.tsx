@@ -41,6 +41,7 @@ import {
 } from "../../../downloadable-resource";
 import { createWorkaround3Config } from "./config/workaround-3";
 import createPatchOff from "./config/patch-off";
+import createSteamPatch from "./config/steam-patch";
 import createBlockNet from "./config/block-net";
 import { createEnableHDRConfig } from "./config/enable-hdr";
 import { getGameVersion } from "../unity";
@@ -295,6 +296,7 @@ export async function createHK4EChannelClient({
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [W3] = await createWorkaround3Config({ locale, config });
       const [PO] = await createPatchOff({ locale, config });
+      const [SP] = await createSteamPatch({ locale, config });
       const [BN] = await createBlockNet({ locale, config });
       const [HDR] = await createEnableHDRConfig({ locale, config });
 
@@ -305,6 +307,7 @@ export async function createHK4EChannelClient({
           <HDR />,
           <W3 />,
           <PO />,
+          <SP />,
           <BN />,
         ];
       };

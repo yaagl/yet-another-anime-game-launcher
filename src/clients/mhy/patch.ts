@@ -63,27 +63,31 @@ export async function* patchProgram(
   }
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxmt") {
-    for (const f of DXMT_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxmt/${f}`, join(system32Dir, f));
-    }
-    await cp(
-      `./dxmt/winemetal.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
-    );
-    await cp(
-      `./dxmt/winemetal.so`,
-      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
-    );
-    if (server.id.startsWith("hkrpg")) {
-      await cp(
-        `./dxmt/nvngx.dll`,
-        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
-      );
-      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
-    }
+  const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
+
+  for (const f of DXMT_FILES) {
+    await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
+    await cp(`./dxmt/${f}`, join(system32Dir, f));
   }
+
+  await cp(
+    `./dxmt/winemetal.dll`,
+    resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+  );
+
+  await cp(
+    `./dxmt/winemetal.so`,
+    resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+  );
+
+  if (server.id.startsWith("hkrpg")) {
+    await cp(
+      `./dxmt/nvngx.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+    );
+    await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+  }
+
   if (config.reshade) {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
@@ -91,6 +95,26 @@ export async function* patchProgram(
       join(gameDir, "d3dcompiler_47.dll")
     );
   }
+
+  if (!server.id.startsWith("hkrpg") && !server.id.startsWith("nap")) {
+    await cp(
+      resolve("./sidecar/protonextras/steam64.exe"),
+      join(system32Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/steam32.exe"),
+      join(syswow64Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient64.dll"),
+      join(system32Dir, "lsteamclient.dll")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient32.dll"),
+      join(syswow64Dir, "lsteamclient.dll")
+    );
+  }
+
   setKey("patched", "1");
 }
 

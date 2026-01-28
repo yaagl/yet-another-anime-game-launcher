@@ -259,16 +259,20 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     await fs.copy(
       path.resolve(process.cwd(), `sophon_server`, `build`, `server.dist`),
       path.resolve(sidecarDst, `sophon_server`), {
-        preserveTimestamps: true,
-      });
+      preserveTimestamps: true,
+    });
   }
   // Remove potentially existing dev sophon_server from sidecar
   await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
+  // Remove protonextras for hkrpg and nap
+  if (["hkrpgcn", "hkrpgos", "napcn", "napos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
+    await fs.remove(path.resolve(sidecarDst, "protonextras"));
+  }
 
-  (async function getFiles(dir) {
+  await (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });
     await Promise.all(
       dirents.map(dirent => {
@@ -276,12 +280,12 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         return dirent.isDirectory()
           ? getFiles(res)
           : dirent.isFile()
-          ? dirent.name.split(".").length == 1
-            ? fs.chmod(res, 0o755).then(() => {
+            ? dirent.name.split(".").length == 1
+              ? fs.chmod(res, 0o755).then(() => {
                 console.log("chmod +x " + res);
               })
-            : Promise.resolve()
-          : Promise.resolve();
+              : Promise.resolve()
+            : Promise.resolve();
       })
     );
   })(sidecarDst);
