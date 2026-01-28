@@ -13,6 +13,7 @@ node_modules
 .tmp/
 
 *.app
+*.dmg
 
 .DS_Store
 
@@ -38,3 +39,7 @@ server_secret.ts
 
 /sidecar/sophon_server
 **/__pycache__
+
+# Log files
+*.log
+**/*.log

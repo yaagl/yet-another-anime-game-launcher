@@ -1,35 +1,94 @@
-import { log, timeout } from "./utils";
+import { log, wait, withTimeout, httpFetch } from "./utils";
+import { logError, logRetry, logInfo } from "./utils/structured-logging";
+import { getTimeout, getRetryCount, calculateBackoff } from "./config/timeouts";
+import { NetworkError } from "./errors";
 
 const END_POINTS = ["", "https://ghp.3shain.uk/"];
 
 export async function createGithubEndpoint() {
   await log(`Checking github endpoints`);
+
+  const maxRetries = getRetryCount("GITHUB_ENDPOINT");
+  const timeoutMs = getTimeout("GITHUB_ENDPOINT");
   let fastest = "";
-  for (let i = 0; i < 3; i++) {
+  let lastError: unknown;
+  let hasSuccessfulConnection = false;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      fastest = await Promise.race([
-        ...END_POINTS.map(prefix =>
-          fetch(`${prefix}https://api.github.com/octocat`)
-            .then(x => x.text())
-            .then(x => prefix)
-            .catch(() => timeout(15000))
+      if (attempt > 0) {
+        const delay = calculateBackoff(attempt - 1);
+        await logRetry(
+          "GitHub endpoint check",
+          attempt + 1,
+          maxRetries,
+          lastError,
+          delay
+        );
+        await wait(delay);
+      }
+
+      const results = await withTimeout(
+        Promise.allSettled(
+          END_POINTS.map(async prefix => {
+            const response = await httpFetch(`${prefix}https://api.github.com/octocat`, { timeout: timeoutMs });
+            const text = await response.text();
+            
+            if (!text.includes("MMM")) {
+              throw new Error("Invalid GitHub octocat response");
+            }
+            
+            return prefix;
+          })
         ),
-        timeout(15000),
-      ]);
-      break;
-    } catch {
-      await log(`GitHub endpoint check failed (attempt ${i + 1}/3)`);
+        timeoutMs
+      );
+
+      // Find first successful endpoint
+      for (const result of results) {
+        if (result.status === "fulfilled") {
+          fastest = result.value;
+          hasSuccessfulConnection = true;
+          break;
+        }
+      }
+
+      if (hasSuccessfulConnection) {
+        break;
+      }
+
+      // All endpoints failed, prepare for retry
+      const errors = results
+        .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+        .map(r => r.reason);
+      lastError = errors[0] || new Error("All endpoints failed");
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === maxRetries - 1) {
+        await logError(
+          "Failed to connect to GitHub after all retry attempts",
+          error,
+          { attempts: maxRetries, endpoints: END_POINTS }
+        );
+        throw new NetworkError(
+          `Failed to connect to GitHub after ${maxRetries} attempts`,
+          { cause: error }
+        );
+      }
     }
   }
 
-  if (fastest === "") {
-    throw new Error("Failed to connect to GitHub after 3 attempts");
+  if (!hasSuccessfulConnection) {
+    throw new NetworkError(
+      "Failed to connect to GitHub: no endpoint responded"
+    );
   }
 
-  fastest == "" || (await log(`Using github proxy ${fastest}`));
+  await logInfo(`Using GitHub endpoint`, { endpoint: fastest || "direct" });
 
   function api(path: `/${string}`): Promise<unknown> {
-    return fetch(`${fastest}https://api.github.com${path}`).then(x => {
+    return httpFetch(`${fastest}https://api.github.com${path}`).then(x => {
       if (x.status == 200 || x.status == 301 || x.status == 302) {
         return x.json();
       }

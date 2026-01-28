@@ -10,7 +10,10 @@ import {
   setKey,
   exit,
   rawString,
+  withTimeout,
 } from "./utils";
+import { logError, logInfo } from "./utils/structured-logging";
+import { getTimeout } from "./config/timeouts";
 import { createAria2Retry } from "./aria2";
 import {
   checkWine,
@@ -41,10 +44,20 @@ export async function createApp() {
   const github = await createGithubEndpoint();
   const aria2_session = resolve("./aria2.session");
 
+  // Improved file existence check - more atomic approach
+  // Try to create the file with append mode, which creates if not exists
   try {
-    await Neutralino.filesystem.getStats(aria2_session);
-  } catch {
-    await Neutralino.filesystem.writeFile(aria2_session, "");
+    await Neutralino.filesystem.appendFile(aria2_session, "");
+  } catch (error) {
+    // If append fails, try to create it
+    try {
+      await Neutralino.filesystem.writeFile(aria2_session, "");
+    } catch (writeError) {
+      await logError("Failed to create aria2 session file", writeError, {
+        path: aria2_session,
+      });
+      throw writeError;
+    }
   }
 
   const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
@@ -72,17 +85,27 @@ export async function createApp() {
     await log("killing process " + apid);
     try {
       await exec(["kill", apid + ""]);
-    } catch {
-      await log("killing process failed?");
+    } catch (error) {
+      await logError("Failed to kill aria2 process", error, { pid: apid });
     }
     return true;
   });
 
-  const aria2 = await Promise.race([
+  // Use withTimeout with proper error handling
+  const aria2 = await withTimeout(
     createAria2Retry({ host: "127.0.0.1", port: aria2_port }),
-    timeout(15000),
-  ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
-  await log(`Launched aria2 version ${aria2.version.version}`);
+    getTimeout("ARIA2_LAUNCH")
+  ).catch(error => {
+    throw new Error(
+      `Failed to launch aria2: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error }
+    );
+  });
+
+  await logInfo(`Launched aria2`, { version: aria2.version.version });
+
   const { latest, downloadUrl, sidecarDownloadUrl, description, version } =
     await createUpdater({
       github,

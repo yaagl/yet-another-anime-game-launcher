@@ -1,4 +1,7 @@
 import { log } from "@utils";
+import { logError, logInfo } from "./utils/structured-logging";
+import { httpFetch } from "@utils";
+import { NetworkError } from "./errors";
 
 interface GameOperationOptions {
   gamedir: string;
@@ -56,15 +59,25 @@ export class SophonClient {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/health`);
-      if (!response.ok) {
-        log(`Health check failed with status: ${response.status}`);
+      const response = await httpFetch(`${this.baseUrl}/health`, {
+        timeout: 5000,
+        method: "GET",
+      });
+      
+      if (response.status !== 200) {
+        await logError("Sophon health check failed", new Error(`HTTP ${response.status}`), {
+          baseUrl: this.baseUrl,
+          status: response.status,
+        });
         return false;
       }
+      
       await response.json();
       return true;
     } catch (error) {
-      log(`Health check error: ${error}`);
+      await logError("Sophon health check error", error, {
+        baseUrl: this.baseUrl,
+      });
       return false;
     }
   }
@@ -73,8 +86,7 @@ export class SophonClient {
     type: "install" | "repair" | "update",
     options: SophonInstallOptions | SophonRepairOptions | SophonUpdateOptions
   ): Promise<string> {
-    log(`Starting ${type} operation with options: ${JSON.stringify(options)}`);
-
+    // Note: httpFetch doesn't support POST body yet, using fetch for POST requests
     const response = await fetch(`${this.baseUrl}/api/${type}`, {
       method: "POST",
       headers: {
@@ -84,7 +96,10 @@ export class SophonClient {
     });
 
     if (!response.ok) {
-      throw new Error(`${type} request failed: ${response.statusText}`);
+      throw new NetworkError(
+        `${type} request failed: ${response.statusText}`,
+        { metadata: { type, status: response.status } }
+      );
     }
 
     const result: SophonOperationResponse = await response.json();
@@ -177,13 +192,16 @@ export class SophonClient {
   }
 
   async cancelOperation(taskId: string): Promise<void> {
-    // Partial support at python server side
+    // Note: DELETE operations use fetch as httpFetch focuses on GET/POST
     const response = await fetch(`${this.baseUrl}/api/tasks/${taskId}`, {
       method: "DELETE",
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to cancel operation: ${response.statusText}`);
+      throw new NetworkError(
+        `Failed to cancel operation: ${response.statusText}`,
+        { metadata: { taskId, status: response.status } }
+      );
     }
   }
 
@@ -191,13 +209,16 @@ export class SophonClient {
     reltype: "os" | "cn" | "bb",
     game: string
   ): Promise<SophonOnlineGameInfo> {
-    // Currently only supports "hk4e" for game, "os", "cn", or "bb" for reltype
-    const response = await fetch(
-      `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`
+    const response = await httpFetch(
+      `${this.baseUrl}/api/game/online_info?game=${game}&reltype=${reltype}`,
+      { timeout: 15000 }
     );
 
-    if (!response.ok) {
-      throw new Error(`Failed to get game info: ${response.statusText}`);
+    if (response.status !== 200) {
+      throw new NetworkError(
+        `Failed to get game info: ${response.statusText}`,
+        { metadata: { game, reltype, status: response.status } }
+      );
     }
 
     return response.json();
@@ -222,13 +243,44 @@ export async function createSophonRetry(
   host: string,
   port: number
 ): Promise<Sophon> {
-  for (let i = 0; i < 10; i++) {
+  const maxRetries = 10;
+  const baseDelay = 500; // 500ms base delay
+  const maxDelay = 5000; // 5s max delay
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await createSophon(host, port);
     } catch (error) {
-      log("Failed to create sophon client, retrying..." + error);
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      if (attempt === maxRetries - 1) {
+        logError("Failed to create Sophon client after all retries", {
+          host,
+          port,
+          maxRetries,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw new NetworkError(
+          "Failed to create Sophon client after retries",
+          { metadata: { host, port, maxRetries } }
+        );
+      }
+
+      // Exponential backoff with jitter
+      const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+      const jitter = Math.random() * 0.3 * exponentialDelay;
+      const delay = exponentialDelay + jitter;
+
+      logInfo("Retrying Sophon connection", {
+        attempt: attempt + 1,
+        maxRetries,
+        nextAttemptIn: Math.round(delay),
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  throw new Error("Failed to create sophon client after retries");
+
+  throw new NetworkError("Failed to create Sophon client", {
+    metadata: { host, port },
+  });
 }

@@ -4,6 +4,7 @@ import { HopeProvider, NotificationsProvider } from "@hope-ui/solid";
 import { amber } from "@radix-ui/colors";
 
 import { fatal, log } from "./utils";
+import { logError } from "./utils/structured-logging";
 
 function createPlates(
   tag: string,
@@ -49,8 +50,12 @@ if (typeof Neutralino == "undefined") {
       );
       Neutralino.window.show();
     })
-    .catch(e => {
-      log("FATAL ERROR CAUGHT: " + e);
-      fatal(e);
+    .catch(async error => {
+      // Use structured logging for fatal errors
+      await logError("Fatal application error during initialization", error, {
+        timestamp: new Date().toISOString(),
+        environment: import.meta.env.MODE,
+      });
+      await fatal(error);
     });
 }
