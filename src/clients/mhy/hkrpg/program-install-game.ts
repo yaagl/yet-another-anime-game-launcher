@@ -39,11 +39,14 @@ export async function* downloadAndInstallGameProgram({
     })) {
       yield [
         "setStateText",
-        "DOWNLOADING_FILE_PROGRESS",
+        progress.isDiskBottleneck
+          ? "DOWNLOADING_FILE_PROGRESS_BOTTLENECK"
+          : "DOWNLOADING_FILE_PROGRESS",
         basename(gameFile7z),
         humanFileSize(Number(progress.downloadSpeed)),
         humanFileSize(Number(progress.completedLength)),
         humanFileSize(Number(progress.totalLength)),
+        humanFileSize(Number(progress.diskWriteSpeed)),
       ];
       yield [
         "setProgress",

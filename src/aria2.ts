@@ -1,8 +1,25 @@
 import { WebSocket as RPC } from "libaria2-ts";
-import { log, sha256_16, wait, timeout, withTimeout } from "./utils";
+import { log, sha256_16, wait, timeout, withTimeout, stats } from "./utils";
 import { logError, logRetry } from "./utils/structured-logging";
 import { getTimeout, getRetryCount, calculateBackoff } from "./config/timeouts";
 import { ConnectionError } from "./errors";
+
+/**
+ * Extension del status de aria2 con métricas de escritura a disco
+ */
+export interface Aria2StreamStatus {
+  // Metrics from aria2 RPC
+  status: string;
+  totalLength: bigint;
+  completedLength: bigint;
+  downloadSpeed: bigint;
+  uploadSpeed?: bigint;
+  
+  // Calculated metrics for disk performance
+  diskWriteSpeed: bigint;  // bytes/second written to disk
+  lastDiskUpdate: number;  // timestamp of last disk check
+  isDiskBottleneck: boolean;  // true if disk speed < 90% of network speed
+}
 
 export async function createAria2({
   host,
@@ -37,16 +54,96 @@ export async function createAria2({
     return rpc.shutdown();
   }
 
-  async function* doStreaming(gid: string) {
+  // Track disk metrics per download
+  const diskMetrics = new Map<string, {
+    lastSize: bigint;
+    lastTime: number;
+    diskSpeed: bigint;
+    speedSamples: bigint[];
+  }>();
+
+  /**
+   * Calculate disk write speed by checking file size changes
+   */
+  async function calculateDiskSpeed(absDst: string, gid: string): Promise<{speed: bigint, isBotleneck: boolean}> {
+    try {
+      const stat = await stats(absDst);
+      const currentSize = BigInt(stat.size);
+      const now = Date.now();
+      
+      let metrics = diskMetrics.get(gid);
+      if (!metrics) {
+        metrics = { lastSize: currentSize, lastTime: now, diskSpeed: BigInt(0), speedSamples: [] };
+        diskMetrics.set(gid, metrics);
+        return { speed: BigInt(0), isBotleneck: false };
+      }
+      
+      const timeDeltaMs = now - metrics.lastTime;
+      if (timeDeltaMs < 500) {
+        // Too soon, return last known speed
+        return { 
+          speed: metrics.diskSpeed, 
+          isBotleneck: false 
+        };
+      }
+      
+      const bytesWritten = currentSize - metrics.lastSize;
+      const secondsDelta = timeDeltaMs / 1000;
+      const speed = secondsDelta > 0 ? bytesWritten / BigInt(Math.ceil(secondsDelta)) : BigInt(0);
+      
+      // Keep rolling average of last 3 samples for stability
+      metrics.speedSamples.push(speed);
+      if (metrics.speedSamples.length > 3) {
+        metrics.speedSamples.shift();
+      }
+      const avgSpeed = metrics.speedSamples.length > 0 
+        ? metrics.speedSamples.reduce((a, b) => a + b, BigInt(0)) / BigInt(metrics.speedSamples.length)
+        : speed;
+      
+      metrics.lastSize = currentSize;
+      metrics.lastTime = now;
+      metrics.diskSpeed = avgSpeed;
+      
+      return { speed: avgSpeed, isBotleneck: false };
+    } catch {
+      // File doesn't exist yet or stats failed
+      return { speed: BigInt(0), isBotleneck: false };
+    }
+  }
+
+  async function* doStreaming(gid: string, absDst?: string) {
     while (true) {
       const status = await rpc.tellStatus(gid);
       if (status.status == "complete") {
+        // Cleanup metrics
+        diskMetrics.delete(gid);
         break;
       }
       if (status.totalLength == BigInt(0)) {
         continue;
       }
-      yield status;
+      
+      // Calculate disk metrics if file path provided
+      let diskWriteSpeed = BigInt(0);
+      let isDiskBottleneck = false;
+      
+      if (absDst) {
+        const { speed, isBotleneck } = await calculateDiskSpeed(absDst, gid);
+        diskWriteSpeed = speed;
+        
+        // Check if disk is bottleneck (disk speed < 90% of network speed)
+        if (status.downloadSpeed > BigInt(0) && speed < (status.downloadSpeed * BigInt(90)) / BigInt(100)) {
+          isDiskBottleneck = true;
+        }
+      }
+      
+      yield {
+        ...status,
+        diskWriteSpeed,
+        lastDiskUpdate: Date.now(),
+        isDiskBottleneck,
+      } as Aria2StreamStatus;
+      
       await wait(100);
     }
   }
@@ -78,7 +175,7 @@ export async function createAria2({
         throw e;
       }
     }
-    return yield* doStreaming(gid);
+    return yield* doStreaming(gid, options.absDst);
   }
 
   return {
