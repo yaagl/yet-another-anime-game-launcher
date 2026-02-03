@@ -174,7 +174,6 @@ export class SophonClient {
     while (!isCompleted || messageQueue.length > 0) {
       if (messageQueue.length > 0) {
         // Array is not empty. message is not null.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const message = messageQueue.shift()!;
         yield message;
 
