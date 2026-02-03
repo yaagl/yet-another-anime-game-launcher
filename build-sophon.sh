@@ -7,16 +7,30 @@ rm protobuf.zip
 
 pushd sophon_server
 ../bin/protoc --python_out=. *.proto
-uv sync
-NUITKA_CACHE_DIR=./.cache uv run nuitka \
---warn-implicit-exceptions \
---warn-unusual-code \
---standalone \
---python-flag=isolated \
---include-data-files=./hpatchz=./hpatchz \
---output-filename=sophon-server \
---output-dir=./build \
---assume-yes-for-downloads \
-server.py
+
+echo "[+] Installing dependencies..."
+uv python install 3.13.11
+uv sync --python 3.13
+
+echo "[+] Building with PyInstaller..."
+uv run --python 3.13 pyinstaller \
+  --onefile \
+  --name sophon-server \
+  --add-data "./hpatchz:." \
+  --hidden-import uvicorn.logging \
+  --hidden-import uvicorn.loops.auto \
+  --hidden-import uvicorn.loops.asyncio \
+  --hidden-import uvicorn.protocols.http.auto \
+  --hidden-import uvicorn.protocols.http.h11_impl \
+  --hidden-import uvicorn.protocols.websockets.auto \
+  --hidden-import uvicorn.protocols.websockets.websockets_impl \
+  --hidden-import uvicorn.lifespan.on \
+  --distpath ./dist \
+  --workpath ./build_temp \
+  server.py
+
 rm ./hpatchz
 popd
+
+echo "[+] Build complete!"
+ls -lh ./sophon_server/dist/sophon-server

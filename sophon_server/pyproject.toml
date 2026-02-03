@@ -3,14 +3,15 @@ name = "sophon-server"
 version = "0.1.0"
 description = "Game file download server"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
-    "fastapi>=0.117.1",
-    "nuitka>=2.7.16",
-    "protobuf>=6.31.1",
-    "psutil>=7.0.0",
-    "pycurl>=7.45.6",
-    "uvicorn>=0.37.0",
-    "websockets>=15.0.1",
-    "zstandard>=0.23.0",
+    "fastapi>=0.128.0",
+    "msgspec>=0.19.0",
+    "protobuf>=6.33.5",
+    "psutil>=7.2.2",
+    "pycurl>=7.45.4",
+    "pyinstaller>=6.15.0",
+    "uvicorn>=0.40.0",
+    "websockets>=16.0",
+    "zstandard>=0.25.0",
 ]
