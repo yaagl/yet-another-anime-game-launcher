@@ -85,7 +85,7 @@ export function DriveStatus(props: DriveStatusProps) {
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                   <Dialog.Title class="text-xl font-bold text-red-600">
-                    {`⚠️  External Drive Disconnected`}
+                      {`External Drive Disconnected`}
                   </Dialog.Title>
                   <Dialog.Description class="text-sm text-gray-600 mt-1">
                     {`The drive "${volumeName()}" is no longer accessible. Please reconnect it or select a different location.`}
@@ -145,7 +145,7 @@ export function DriveStatus(props: DriveStatusProps) {
               <Show when={isAccessible()}>
                 <div class="mt-4 p-3 bg-green-50 border-l-4 border-green-500 rounded">
                   <p class="text-sm text-green-700 font-semibold">
-                    ✓ Drive reconnected successfully!
+                    Drive reconnected successfully!
                   </p>
                 </div>
               </Show>

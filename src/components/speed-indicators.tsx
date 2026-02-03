@@ -72,7 +72,7 @@ export const SpeedIndicator: Component<SpeedIndicatorProps> = (props) => {
         </div>
         <div class="flex flex-col">
           <span class="text-xs font-bold text-blue-100 uppercase tracking-widest opacity-80">
-            ↓ DL
+            DL
           </span>
           <span class="text-sm font-bold text-white">{props.networkSpeed}</span>
         </div>

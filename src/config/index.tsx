@@ -221,7 +221,6 @@ export async function createConfiguration({
                 <Tabs.Content value="advanced" class="flex-1 p-0 h-full">
                   <VStack spacing={"$4"} w="40%" alignItems="start">
                     <Alert class="p-3 rounded border-l-4 bg-yellow-100 text-yellow-800 border-yellow-500">
-                      <span class="mr-2">⚠️</span>
                       {locale.get("SETTING_ADVANCED_ALERT")}
                     </Alert>
                     <FO />
