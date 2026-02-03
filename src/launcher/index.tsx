@@ -116,7 +116,7 @@ export async function createLauncher({
     }
 
     return (
-      <DriveStatus gamePath={installDir} locale={locale}>
+      <DriveStatus gamePath={installDir()} locale={locale}>
         <div
           class="background"
           style={{
