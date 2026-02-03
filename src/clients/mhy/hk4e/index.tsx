@@ -21,6 +21,7 @@ import {
   timeout,
   waitImageReady,
 } from "@utils";
+import { isExternalDrive, isDriveAccessible } from "../../../utils/external-drive";
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
 import { Config } from "@config";
@@ -335,6 +336,18 @@ async function checkGameState(locale: Locale, server: Server) {
       gameInstalled: false,
     } as const;
   }
+
+  // Validate that external drive is accessible if game is on one
+  if (await isExternalDrive(gameDir)) {
+    const isAccessible = await isDriveAccessible(gameDir);
+    if (!isAccessible) {
+      await log(`Game directory on external drive but not accessible: ${gameDir}`);
+      return {
+        gameInstalled: false,
+      } as const;
+    }
+  }
+
   try {
     return {
       gameInstalled: true,

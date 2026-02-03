@@ -14,6 +14,7 @@ import { createConfiguration } from "@config";
 import { Github } from "../github";
 import { createGameInstallationDirectorySanitizer } from "../accidental-complexity";
 import { ChannelClient } from "../channel-client";
+import { DriveStatus } from "../components/drive-status";
 import { createTaskQueueState } from "./task-queue";
 import { Wine } from "@wine";
 
@@ -115,12 +116,13 @@ export async function createLauncher({
     }
 
     return (
-      <div
-        class="background"
-        style={{
-          "background-image": background ? `url(${background})` : undefined,
-        }}
-      >
+      <DriveStatus gamePath={installDir} locale={locale}>
+        <div
+          class="background"
+          style={{
+            "background-image": background ? `url(${background})` : undefined,
+          }}
+        >
         <Show when={background_video}>
           <video
             class="background-video"
@@ -291,6 +293,7 @@ export async function createLauncher({
           </div>
         </div>
       </div>
+      </DriveStatus>
     );
   };
 }
