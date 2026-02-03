@@ -43,19 +43,19 @@ export function createCommonUpdateUI(
               setSpeedMetrics(null);
               break;
             case "setStateText":
-              // Extract speed metrics if present (indices 3: networkSpeed, 4: diskSpeed)
-              if (text[1] === "DOWNLOADING_FILE_PROGRESS" && text.length >= 5) {
+              // Extract speed metrics if present (indices: 3=networkSpeed, 6=diskSpeed, 7=isDiskBottleneck)
+              if (text[1] === "DOWNLOADING_FILE_PROGRESS" && text.length >= 8) {
                 const networkSpeed = text[3] as string;
-                const diskSpeed = text[4] as string;
-                const isDiskBottleneck = text[5] === "true";
+                const diskSpeed = text[6] as string;
+                const isDiskBottleneck = text[7] === "true";
 
                 setSpeedMetrics({
                   networkSpeed,
                   diskSpeed,
                   isDiskBottleneck,
                 });
-                // Only format the base progress text (filename, progress)
-                setStatusText(locale.format(text[1], text.slice(2, 4)));
+                // Format with all 4 parameters: filename, netspeed, completed, total
+                setStatusText(locale.format(text[1], text.slice(2, 6)));
               } else {
                 setStatusText(locale.format(text[1], text.slice(2)));
                 setSpeedMetrics(null);

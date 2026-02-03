@@ -98,7 +98,7 @@ export const SpeedIndicator: Component<SpeedIndicatorProps> = (props) => {
         </div>
         <div class="flex flex-col">
           <span class="text-xs font-bold text-emerald-100 uppercase tracking-widest opacity-80">
-            💾 Disk
+            Disk
           </span>
           <span class="text-sm font-bold text-white">{props.diskSpeed}</span>
         </div>
@@ -118,7 +118,7 @@ export const SpeedIndicator: Component<SpeedIndicatorProps> = (props) => {
             </svg>
           </div>
           <span class="text-xs font-bold text-yellow-50 uppercase tracking-wider">
-            ⚠ Bottleneck
+            Bottleneck
           </span>
         </div>
       )}
