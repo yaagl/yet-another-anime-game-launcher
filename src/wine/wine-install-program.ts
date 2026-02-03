@@ -32,6 +32,7 @@ export async function createWineInstallProgram({
   wineDistro: WineDistribution;
 }) {
   async function* program(): CommonUpdateProgram {
+    // Use standard resolve() for wine directories (Neutralino 2026 standard)
     const wineBinaryDir = resolve("./wine");
 
     await rmrf_dangerously(wineAbsPrefix);

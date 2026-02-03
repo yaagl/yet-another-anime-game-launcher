@@ -173,7 +173,7 @@ export async function getCorrectWineBinary() {
   try {
     // use wine64 if it is presented
     // in newer version of wine (esp. WoW64 mode), only one binary `bin/wine` exists
-    await stats("./wine/bin/wine64");
+    await stats(resolve("./wine/bin/wine64"));
     return resolve("./wine/bin/wine64");
   } catch {
     return resolve("./wine/bin/wine");

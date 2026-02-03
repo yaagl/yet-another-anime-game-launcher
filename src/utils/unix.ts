@@ -45,7 +45,7 @@ export async function hpatchz(
 }
 
 export function mkdirp(dir: string) {
-  return exec(["mkdir", "-p", dir]);
+  return exec(["mkdir", "-p", resolve(dir)]);
 }
 
 // not so accurate progress

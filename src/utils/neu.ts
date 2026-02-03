@@ -1,19 +1,120 @@
 import { join } from "path-browserify";
 import { build, CommandSegments, rawString } from "./command-builder";
 
-export function resolve(path: string): string {
-  if (!path.startsWith("/")) {
-    path = join(
-      import.meta.env.PROD
-        ? window.NL_PATH
-        : join(window.NL_CWD, window.NL_PATH),
-      path
-    );
-    // await Neutralino.os.showMessageBox("1", command, "OK");
-    if (!path.startsWith("/") || path == "/")
-      throw new Error("Assertation failed " + path);
+// Neutralino 2026 standard with pragmatic fallback for dev mode
+// Initialized synchronously before any resolve() calls
+let _basePath: string = "/";
+
+// Initialize synchronously using environment or fallback (called at module load time)
+function initializeBasePathSync(): string {
+  // Prefer NL_CWD (Neutralino current working directory) over NL_PATH
+  // NL_CWD is the directory where `neu run` was executed (project root in dev)
+  // NL_PATH is the app directory (yaaglwdos in `neu run --path=./yaaglwdos`)
+  try {
+    const nlCwd = (globalThis as any).NL_CWD;
+    if (nlCwd && nlCwd.startsWith("/")) {
+      _basePath = nlCwd;
+      return _basePath;
+    }
+  } catch (e) {
+    // continue
   }
-  return path;
+
+  // Fallback to NL_PATH if NL_CWD is not available/absolute
+  try {
+    const nlPath = (globalThis as any).NL_PATH;
+    if (nlPath) {
+      // NL_PATH might be relative, make it absolute
+      let basePath = nlPath;
+      if (!basePath.startsWith("/")) {
+        // If we have NL_CWD, make path relative to it
+        const nlCwd = (globalThis as any).NL_CWD || "/";
+        basePath = join(nlCwd, basePath);
+      }
+      _basePath = basePath;
+      return _basePath;
+    }
+  } catch (e) {
+    // continue to fallback
+  }
+
+  return _basePath;
+}
+
+// Initialize base path at module load time (synchronously)
+initializeBasePathSync();
+
+export function resolve(path: string): string {
+  if (path.startsWith("/")) {
+    return path;
+  }
+
+  // Ensure _basePath is absolute before using it
+  let basePath = _basePath;
+  if (!basePath.startsWith("/")) {
+    // If basePath is relative, this likely means we're in dev mode
+    // For now throw error - should be fixed by async initializeBasePath()
+    // But we can give more useful context
+    throw new Error(
+      `resolve() called before basePath initialized. basePath="${basePath}". Call await initializeBasePath() early in app initialization.`
+    );
+  }
+
+  const resolved = join(basePath, path);
+  // Final validation
+  if (!resolved.startsWith("/") || resolved === "/") {
+    throw new Error("Assertation failed " + resolved);
+  }
+  return resolved;
+}
+
+// Async initialization to get the real pwd-based path if NL_PATH didn't work
+let _initPromise: Promise<void> | null = null;
+
+export async function initializeBasePath(): Promise<void> {
+  if (_initPromise) return _initPromise;
+
+  _initPromise = (async () => {
+    // If we already have a good path from NL_CWD or other means, we're done
+    if (_basePath && _basePath !== "/") {
+      return;
+    }
+
+    // Try to get pwd from multiple sources (fastest to slowest)
+    try {
+      // 1. Try environment variable (fastest, doesn't need process execution)
+      if (typeof process !== "undefined" && process.env?.PWD?.startsWith("/")) {
+        _basePath = process.env.PWD;
+        return;
+      }
+    } catch (e) {
+      // continue
+    }
+
+    // 2. Fall back to exec pwd
+    try {
+      const result = await exec(["pwd"]);
+      _basePath = result.stdOut.trim();
+      if (!_basePath.startsWith("/")) {
+        throw new Error(`pwd returned non-absolute path: "${_basePath}"`);
+      }
+      return;
+    } catch (e) {
+      console.error("Failed to initialize basePath with pwd:", e);
+    }
+
+    // 3. Last resort: try to extract from NL_CWD (in case it wasn't available sync)
+    try {
+      const nlCwd = (globalThis as any).NL_CWD;
+      if (nlCwd && nlCwd.startsWith("/")) {
+        _basePath = nlCwd;
+      }
+    } catch {
+      // Give up
+    }
+  })();
+
+  return _initPromise;
 }
 
 export async function exec(
@@ -204,7 +305,7 @@ export async function cp(source: string, destination: string) {
 }
 
 export async function rmrf_dangerously(target: string) {
-  return await exec(["rm", "-rf", target]);
+  return await exec(["rm", "-rf", resolve(target)]);
 }
 
 export async function prompt(title: string, message: string) {

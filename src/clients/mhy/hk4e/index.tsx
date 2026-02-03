@@ -14,6 +14,7 @@ import {
   getKeyOrDefault,
   log,
   rawString,
+  resolve,
   setKey,
   spawn,
   stats,
@@ -81,7 +82,7 @@ export async function createHK4EChannelClient({
   const sophon_host = "127.0.0.1";
 
   const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
-  const { pid: spid } = await spawn(["./sidecar/sophon_server/sophon-server"], {
+  const { pid: spid } = await spawn([resolve("./sidecar/sophon_server/sophon-server")], {
     TERMINATE_WITH_PID: pid,
     SOPHON_PORT: sophon_port.toString(),
     SOPHON_HOST: sophon_host,
