@@ -1,8 +1,49 @@
-const execa = require("execa");
-const fs = require("fs-extra");
-const path = require("path");
-const { rimraf } = require("rimraf");
-const { IconIcns } = require("@shockpkg/icon-encoder");
+import { execa } from 'execa';
+import fs from 'fs-extra';
+import path from 'path';
+import { rimraf } from 'rimraf';
+import { IconIcns } from '@shockpkg/icon-encoder';
+
+/**
+ * Ensures Sophon server is built and up-to-date
+ * Rebuilds if models.py is newer than the compiled binary
+ */
+async function ensureSophonBuild() {
+  const sophonDistPath = path.resolve(process.cwd(), 'sophon_server', 'dist', 'sophon-server');
+  const sophonModelsPath = path.resolve(process.cwd(), 'sophon_server', 'models.py');
+  const sophonBuildScript = path.resolve(process.cwd(), 'sophon_server', 'build-sophon.sh');
+
+  // Check if build script exists
+  if (!fs.existsSync(sophonBuildScript)) {
+    throw new Error('Sophon build script not found: ' + sophonBuildScript);
+  }
+
+  // Check if rebuild is needed
+  let needsRebuild = !fs.existsSync(sophonDistPath);
+  
+  if (!needsRebuild && fs.existsSync(sophonModelsPath)) {
+    const binaryStat = fs.statSync(sophonDistPath);
+    const modelsStat = fs.statSync(sophonModelsPath);
+    needsRebuild = modelsStat.mtime > binaryStat.mtime;
+  }
+
+  if (needsRebuild) {
+    console.log('\n📦 Building Sophon server...');
+    try {
+      await execa('bash', [sophonBuildScript], { cwd: path.resolve(process.cwd(), 'sophon_server'), stdio: 'inherit' });
+      console.log('✅ Sophon server built successfully\n');
+    } catch (error) {
+      throw new Error(`Failed to build Sophon server:\n${error.message}`);
+    }
+  }
+
+  // Verify binary exists after build
+  if (!fs.existsSync(sophonDistPath)) {
+    throw new Error('Sophon binary not found after build attempt: ' + sophonDistPath);
+  }
+
+  console.log('✅ Sophon server ready');
+}
 
 (async () => {
   const icns = new IconIcns();
@@ -78,11 +119,16 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   );
   try {
     await execa("pnpm", ["exec", "tsc"]); // do typecheck first
-    await execa("rm", ["-rf", "./.tmp"]);
+    await rimraf("./.tmp");
     await execa("pnpm", ["exec", "vite", "build"]);
     await execa("cp", ["./neutralino.js", "./dist/neutralino.js"]);
     // run neu build command
     await execa("pnpm", ["exec", "neu", "build"]);
+    
+    // Ensure Sophon is built if needed for this channel
+    if (includeSophon) {
+      await ensureSophonBuild();
+    }
   } finally {
     await execa("mv", [
       "-f",
@@ -256,11 +302,18 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   );
   // copy sophon binary to sidecar
   if (includeSophon) {
-    await fs.copy(
-      path.resolve(process.cwd(), `sophon_server`, `build`, `server.dist`),
-      path.resolve(sidecarDst, `sophon_server`), {
+    await fs.ensureDir(path.resolve(sidecarDst, `sophon_server`));
+    const sophonSrc = path.resolve(process.cwd(), `sophon_server`, `dist`, `sophon-server`);
+    const sophonDst = path.resolve(sidecarDst, `sophon_server`, `sophon-server`);
+    
+    if (!fs.existsSync(sophonSrc)) {
+      throw new Error(`Sophon binary not found at: ${sophonSrc}\nMake sure build-sophon.sh completed successfully`);
+    }
+    
+    await fs.copy(sophonSrc, sophonDst, {
       preserveTimestamps: true,
     });
+    console.log(`✅ Copied Sophon server to: ${sophonDst}`);
   }
   // Remove potentially existing dev sophon_server from sidecar
   await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
@@ -333,4 +386,11 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     </dict>
     </plist>`
   );
+  
+  // Build completed
+  console.log('\n' + '='.repeat(70));
+  console.log(`✅ Build Complete!`);
+  console.log(`📦 App: ${appDistributionName}.app`);
+  console.log(`📍 Size: ${((await fs.stat(path.resolve(process.cwd(), `${appDistributionName}.app`))).size / 1024 / 1024).toFixed(2)} MB`);
+  console.log('='.repeat(70) + '\n');
 })();

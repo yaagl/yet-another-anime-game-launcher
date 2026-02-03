@@ -5,6 +5,9 @@ cd "$(dirname "$0")"
 echo "[+] Installing dependencies..."
 uv sync --python 3.13
 
+echo "[+] Cleaning previous builds..."
+rm -rf build dist sophon-server sophon-server.spec
+
 echo "[+] Building with PyInstaller..."
 uv run --python 3.13 pyinstaller \
   --onefile \
@@ -18,9 +21,10 @@ uv run --python 3.13 pyinstaller \
   --hidden-import uvicorn.protocols.websockets.auto \
   --hidden-import uvicorn.protocols.websockets.websockets_impl \
   --hidden-import uvicorn.lifespan.on \
-  --distpath ./build \
+  -y \
   --clean \
   server.py
 
 echo "[+] Build complete!"
-ls -lh ./build/sophon-server
+ls -lh ./dist/sophon-server
+
