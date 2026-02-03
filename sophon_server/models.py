@@ -8,13 +8,13 @@ class GameOperationRequest(BaseModel):
     tempdir: Optional[str] = None
 
 class InstallRequest(GameOperationRequest):
-    install_reltype: str  # "os", "cn", or "bb"
+    install_reltype: str = None  # "os", "cn", or "bb"
 
 class UpdateRequest(GameOperationRequest):
     predownload: bool = False
 
 class RepairRequest(GameOperationRequest):
-    repair_mode: str  # "quick" or "reliable"
+    repair_mode: str = None  # "quick" or "reliable"
 
 
 class TaskResponse(BaseModel):

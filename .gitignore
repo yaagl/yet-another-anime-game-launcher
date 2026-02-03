@@ -43,3 +43,219 @@ server_secret.ts
 # Log files
 *.log
 **/*.log
+
+# Python build artifacts
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.dylib
+*.egg
+*.egg-info
+dist/
+build/
+*.manifest
+*.spec
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Nuitka compilation cache and builds
+sophon_server/.nuitka_cache/
+sophon_server/.ccache_dir/
+sophon_server/build/
+nuitka-crash-report.xml
+nuitka-crash-report-*.xml
+
+# Sophon server generated and temporary files
+sophon_server/hpatchz
+sophon_server/*_pb2.py
+sophon_server/*_pb2.pyi
+sophon_server/manifest_pb2.py
+sophon_server/manifest_ldiff_pb2.py
+
+# UV package manager
+.python-version
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+/tmp/
+*.tmp
+*.bak
+*~
+
+# ==================================================
+# Node.js / npm / pnpm additional
+# ==================================================
+.pnpm-debug.log*
+.npm
+.yarn/
+.eslintcache
+.cache/
+*.tsbuildinfo
+.next/
+.turbo/
+out/
+.nuxt/
+coverage/
+.nyc_output/
+lib-cov/
+*.lcov
+.grunt/
+bower_components/
+.lock-wscript
+.node_repl_history
+*.tgz
+.pnp.*
+.yarn-integrity
+
+# ==================================================
+# Python additional
+# ==================================================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+htmlcov/
+.coverage
+.coverage.*
+*.cover
+.hypothesis/
+.tox/
+pip-log.txt
+pip-delete-this-directory.txt
+.installed.cfg
+*.egg-info/
+.Python
+celerybeat-schedule
+celerybeat.pid
+*.sage.py
+pyrightconfig.json
+
+# ==================================================
+# PyInstaller specific
+# ==================================================
+build_temp/
+sophon_server/build_temp/
+sophon_server/dist/sophon-server
+*.spec.bak
+
+# ==================================================
+# macOS additional system files
+# ==================================================
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+# ==================================================
+# IDE / Editors additional
+# ==================================================
+.idea/
+*.sublime-*
+*.swp
+*.swo
+*.swn
+*.code-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.metadata/
+.history/
+*.iml
+
+# ==================================================
+# Environment variables & secrets
+# ==================================================
+.env
+.env.*
+.env.local
+.env.*.local
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ==================================================
+# Wine/Proton runtime
+# ==================================================
+/wine
+/wineprefix
+wine.tar.gz
+wine.tar.xz
+wine.tar.bz2
+
+# ==================================================
+# Neutralino specific
+# ==================================================
+.storage/
+WebView_*
+auth_info.json
+.tmp-*
+
+# ==================================================
+# OS generated files
+# ==================================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ==================================================
+# Backup & patch files
+# ==================================================
+*.orig
+*.rej
+*.patch
+*.diff
+*~.nib
+*.backup
+
+# ==================================================
+# Compiled binaries (keep source, ignore builds)
+# ==================================================
+*.o
+*.obj
+*.exe
+*.out
+*.class
+*.bin
+
+# ==================================================
+# Aria2 & Download utilities
+# ==================================================
+*.aria2
+*.magnet
+*.torrent
