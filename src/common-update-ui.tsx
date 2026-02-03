@@ -1,5 +1,12 @@
-import { Button, Progress, ProgressIndicator, Center } from "@hope-ui/solid";
-import { Box, VStack, Image } from "@hope-ui/solid";
+import {
+  Button,
+  Progress,
+  ProgressIndicator,
+  Center,
+  Box,
+  VStack,
+  Image,
+} from "./components/ui";
 import { createSignal, onMount, Show } from "solid-js";
 import { fatal, _safeRelaunch } from "./utils";
 import { Locale, LocaleTextKey } from "./locale";

@@ -11,6 +11,7 @@ import {
   exit,
   rawString,
   withTimeout,
+  initializeBasePath,
 } from "./utils";
 import { logError, logInfo } from "./utils/structured-logging";
 import { getTimeout } from "./config/timeouts";
@@ -30,6 +31,11 @@ import { createLocale } from "./locale";
 import { createClient } from "./clients";
 
 export async function createApp() {
+  // Initialize base path (standard Neutralino 2026 approach)
+  // In dev mode (neu run --path=./yaaglwdos), we need pwd-based resolution
+  // In prod mode (packaged .app), we use NL_PATH
+  await initializeBasePath();
+
   await setKey("singleton", null);
 
   const aria2_port = 6868;
@@ -42,44 +48,24 @@ export async function createApp() {
 
   const locale = await createLocale();
   const github = await createGithubEndpoint();
-  const aria2_session = resolve("./aria2.session");
-
-  // Improved file existence check - more atomic approach
-  // Try to create the file with append mode, which creates if not exists
-  try {
-    await Neutralino.filesystem.appendFile(aria2_session, "");
-  } catch (error) {
-    // If append fails, try to create it
-    try {
-      await Neutralino.filesystem.writeFile(aria2_session, "");
-    } catch (writeError) {
-      await logError("Failed to create aria2 session file", writeError, {
-        path: aria2_session,
-      });
-      throw writeError;
-    }
-  }
 
   const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
 
-  const { pid: apid } = await spawn([
+  // Build aria2c command arguments
+  const aria2cArgs = [
     resolve("./sidecar/aria2/aria2c"),
     "-d",
     "/",
     "--no-conf",
     "--enable-rpc",
     `--rpc-listen-port=${aria2_port}`,
-    `--rpc-listen-all=true`,
-    `--rpc-allow-origin-all`,
-    `--input-file`,
-    `${aria2_session}`,
-    `--save-session`,
-    `${aria2_session}`,
-    `--pause`,
-    `true`,
-    "--stop-with-process",
-    pid,
-  ]);
+    "--rpc-listen-all=true",
+    "--rpc-allow-origin-all",
+    "--pause=true",
+    `--stop-with-process=${pid}`,
+  ];
+
+  const { pid: apid } = await spawn(aria2cArgs);
   addTerminationHook(async () => {
     // double insurance (esp. for self restart)
     await log("killing process " + apid);
@@ -126,7 +112,9 @@ export async function createApp() {
   }
 
   const wineStatus = await checkWine(github);
-  const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
+  
+  // Use standard resolve() for wineprefix path
+  const prefixPath = resolve("./wineprefix");
 
   if (wineStatus.wineReady) {
     const wine = await createWine({

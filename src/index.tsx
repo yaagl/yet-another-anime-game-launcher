@@ -1,25 +1,10 @@
 import { render } from "solid-js/web";
 import { createApp } from "./app";
-import { HopeProvider, NotificationsProvider } from "@hope-ui/solid";
-import { amber } from "@radix-ui/colors";
+import "./app.css";
+import { Toast } from "./components/ui";
 
-import { fatal, log } from "./utils";
+import { fatal, log, initializeBasePath } from "./utils";
 import { logError } from "./utils/structured-logging";
-
-function createPlates(
-  tag: string,
-  color: Record<string, string>,
-  colortag: string
-) {
-  return Object.fromEntries(
-    new Array(12)
-      .fill(1)
-      .map(
-        (_, i) =>
-          [`${tag}${i + 1}`, color[`${colortag}${i + 1}`] as string] as const
-      )
-  );
-}
 
 if (typeof Neutralino == "undefined") {
   console.log(`This app doesn't work on browser.`);
@@ -28,34 +13,32 @@ if (typeof Neutralino == "undefined") {
   if (import.meta.env.PROD) {
     document.addEventListener("contextmenu", event => event.preventDefault());
   }
-  createApp()
-    .then(UI => {
-      render(
-        () => (
-          <HopeProvider
-            config={{
-              lightTheme: {
-                colors: {
-                  ...createPlates("primary", amber, "amber"), // 兔兔伯爵，出击
-                },
-              },
-            }}
-          >
-            <NotificationsProvider>
-              <UI />
-            </NotificationsProvider>
-          </HopeProvider>
-        ),
-        document.getElementById("root") as HTMLElement
-      );
-      Neutralino.window.show();
+  
+  // Wait for path initialization BEFORE creating app
+  initializeBasePath()
+    .catch(err => {
+      console.warn("Path init warning, continuing with fallback:", err);
     })
-    .catch(async error => {
-      // Use structured logging for fatal errors
-      await logError("Fatal application error during initialization", error, {
-        timestamp: new Date().toISOString(),
-        environment: import.meta.env.MODE,
-      });
-      await fatal(error);
+    .then(() => {
+      createApp()
+        .then(UI => {
+          render(() => (
+            <>
+              <UI />
+              <Toast.Region>
+                <Toast.List class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-96" />
+              </Toast.Region>
+            </>
+          ), document.getElementById("root") as HTMLElement);
+          Neutralino.window.show();
+        })
+        .catch(async error => {
+          // Use structured logging for fatal errors
+          await logError("Fatal application error during initialization", error, {
+            timestamp: new Date().toISOString(),
+            environment: import.meta.env.MODE,
+          });
+          await fatal(error);
+        });
     });
 }

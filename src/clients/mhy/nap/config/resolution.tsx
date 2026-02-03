@@ -4,12 +4,9 @@ import {
   Box,
   Checkbox,
   Input,
-  InputGroup,
-  InputAddon,
-  InputLeftAddon,
   HStack,
   VStack,
-} from "@hope-ui/solid";
+} from "../../../../components/ui";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
@@ -43,11 +40,11 @@ export default async function ({
       return (
         <FormControl>
           <FormLabel>{locale.get("SETTING_CUSTOM_RESOLUTION")}</FormLabel>
-          <VStack spacing={4} alignItems="stretch">
+          <VStack spacing="$4" alignItems="stretch">
             <Box>
               <Custom />
             </Box>
-            <HStack spacing={8}>
+            <HStack spacing="$8">
               <Width />
               <Height />
             </HStack>

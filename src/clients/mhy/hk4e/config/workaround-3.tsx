@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Box, Checkbox } from "@hope-ui/solid";
+import { FormControl, FormLabel, Box, Checkbox } from "../../../../components/ui";
 import { createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { assertValueDefined, getCPUInfo, getKey, setKey } from "@utils";

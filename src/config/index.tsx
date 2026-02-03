@@ -1,6 +1,5 @@
 import {
   Alert,
-  AlertIcon,
   Box,
   Button,
   Divider,
@@ -8,18 +7,11 @@ import {
   FormLabel,
   Heading,
   HStack,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  Tab,
-  TabList,
-  TabPanel,
   Tabs,
   Text,
   VStack,
   notificationService,
-} from "@hope-ui/solid";
+} from "../components/ui";
 import { CURRENT_YAAGL_VERSION, YAAGL_ADVANCED_ENABLE } from "../constants";
 import { Locale } from "../locale";
 import { Wine } from "../wine";
@@ -111,28 +103,32 @@ export async function createConfiguration({
       onClose: (action: "check-integrity" | "close") => void;
     }) {
       return (
-        <ModalContent height={570} width={1000} maxWidth={1000}>
-          <ModalCloseButton />
-          <ModalHeader>{locale.get("SETTING")}</ModalHeader>
-          <ModalBody pb={20}>
-            <Tabs orientation="vertical" h="100%">
-              <TabList minW={120}>
-                <Tab>{locale.get("SETTING_GENERAL")}</Tab>
-                <Tab>{locale.get("SETTING_GAME")}</Tab>
-                <Tab>Wine</Tab>
+        <div class="bg-white rounded-lg shadow-xl" style={{ height: "570px", width: "1000px", "max-width": "1000px" }}>
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <Heading size="lg">{locale.get("SETTING")}</Heading>
+              <button 
+                onClick={() => props.onClose("close")}
+                class="text-gray-400 hover:text-gray-600"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <Tabs orientation="vertical" class="h-full">
+              <Tabs.List class="flex flex-col min-w-[120px] border-r border-gray-200">
+                <Tabs.Trigger value="general" class="px-4 py-2 text-left hover:bg-gray-100 ui-selected:bg-primary-100 ui-selected:border-l-4 ui-selected:border-primary-600">{locale.get("SETTING_GENERAL")}</Tabs.Trigger>
+                <Tabs.Trigger value="game" class="px-4 py-2 text-left hover:bg-gray-100 ui-selected:bg-primary-100 ui-selected:border-l-4 ui-selected:border-primary-600">{locale.get("SETTING_GAME")}</Tabs.Trigger>
+                <Tabs.Trigger value="wine" class="px-4 py-2 text-left hover:bg-gray-100 ui-selected:bg-primary-100 ui-selected:border-l-4 ui-selected:border-primary-600">Wine</Tabs.Trigger>
                 <Show when={advanceSetting()}>
-                  <Tab>{locale.get("SETTING_ADVANCED")}</Tab>
+                  <Tabs.Trigger value="advanced" class="px-4 py-2 text-left hover:bg-gray-100 ui-selected:bg-primary-100 ui-selected:border-l-4 ui-selected:border-primary-600">{locale.get("SETTING_ADVANCED")}</Tabs.Trigger>
                 </Show>
-                <Tab>{locale.get("SETTING_LICENSES")}</Tab>
-              </TabList>
-              <TabPanel flex={1} pt={0} pb={0}>
-                <HStack spacing={"$4"} h="100%">
-                  <Box
-                    width="40%"
-                    alignSelf="stretch"
-                    overflowY="scroll"
-                    pr={16}
-                  >
+                <Tabs.Trigger value="licenses" class="px-4 py-2 text-left hover:bg-gray-100 ui-selected:bg-primary-100 ui-selected:border-l-4 ui-selected:border-primary-600">{locale.get("SETTING_LICENSES")}</Tabs.Trigger>
+              </Tabs.List>
+              <Tabs.Content value="general" class="flex-1 p-0">
+                <div class="flex gap-4 h-full">
+                  <div class="w-[40%] overflow-y-scroll pr-4" style="align-self: stretch">
                     <VStack spacing={"$4"}>
                       <GID />
                       <Divider />
@@ -141,34 +137,28 @@ export async function createConfiguration({
                       <LC />
                       <Divider />
                       <PRE />
-                      <PRH />
-                      <Text userSelect={"none"} size="xs">
+                      <PRH />                      <p class="text-xs select-none">
                         {locale.get("SETTING_PROXY_DESC")}
-                      </Text>
+                      </p>
                       <Divider />
                       <UL />
                       <FormControl>
                         <FormLabel>
                           {locale.get("SETTING_YAAGL_VERSION")}
                         </FormLabel>
-                        <Text userSelect={"none"} onClick={onClickVersion}>
+                        <p class="select-none cursor-pointer" onClick={onClickVersion}>
                           {CURRENT_YAAGL_VERSION}
-                        </Text>
+                        </p>
                       </FormControl>
                     </VStack>
-                  </Box>
-                  <Box flex={1} />
-                  <VStack
-                    spacing={"$1"}
-                    width="30%"
-                    alignItems="start"
-                    alignSelf="start"
-                  >
+                  </div>
+                  <div class="flex-1" />
+                  <div class="flex flex-col gap-1 w-[30%]" style="align-items: start; align-self: start">
                     <Heading level="1" ml={12} mb={"$4"}>
                       {locale.get("SETTING_QUICK_ACTIONS")}
                     </Heading>
                     <Button
-                      variant="ghost"
+                      variant="text"
                       size="sm"
                       onClick={() => props.onClose("check-integrity")}
                     >
@@ -176,7 +166,7 @@ export async function createConfiguration({
                     </Button>
                     <Divider />
                     <Button
-                      variant="ghost"
+                      variant="text"
                       size="sm"
                       onClick={() =>
                         wine.openCmdWindow({
@@ -187,7 +177,7 @@ export async function createConfiguration({
                       {locale.get("SETTING_OPEN_CMD")}
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="text"
                       size="sm"
                       onClick={() =>
                         exec2(
@@ -201,7 +191,7 @@ export async function createConfiguration({
                       {locale.get("SETTING_OPEN_GAME_INSTALL_DIR")}
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="text"
                       size="sm"
                       onClick={async () =>
                         await exec2(
@@ -214,32 +204,32 @@ export async function createConfiguration({
                     >
                       {locale.get("SETTING_OPEN_YAAGL_DIR")}
                     </Button>
-                  </VStack>
-                </HStack>
-              </TabPanel>
-              <TabPanel flex={1} pt={0} pb={0} h="100%">
+                  </div>
+                </div>
+              </Tabs.Content>
+              <Tabs.Content value="game" class="flex-1 p-0 h-full">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <ChannelClientConfig />
                 </VStack>
-              </TabPanel>
-              <TabPanel flex={1} pt={0} pb={0} h="100%">
+              </Tabs.Content>
+              <Tabs.Content value="wine" class="flex-1 p-0 h-full">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <WD />
                 </VStack>
-              </TabPanel>
+              </Tabs.Content>
               <Show when={advanceSetting()}>
-                <TabPanel flex={1} pt={0} pb={0} h="100%">
+                <Tabs.Content value="advanced" class="flex-1 p-0 h-full">
                   <VStack spacing={"$4"} w="40%" alignItems="start">
-                    <Alert status="warning" variant="left-accent">
-                      <AlertIcon mr="$2_5" />
+                    <Alert class="p-3 rounded border-l-4 bg-yellow-100 text-yellow-800 border-yellow-500">
+                      <span class="mr-2">⚠️</span>
                       {locale.get("SETTING_ADVANCED_ALERT")}
                     </Alert>
                     <FO />
                     <RS />
                   </VStack>
-                </TabPanel>
+                </Tabs.Content>
               </Show>
-              <TabPanel flex={1} pt={0} pb={0} h="100%">
+              <Tabs.Content value="licenses" class="flex-1 p-0 h-full">
                 <VStack spacing={"$4"} w="100%" alignItems="start">
                   <Heading>
                     Copyright Notice: steam.exe and lsteamclient.dll (in the
@@ -291,10 +281,10 @@ export async function createConfiguration({
                     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   </Text>
                 </VStack>
-              </TabPanel>
+              </Tabs.Content>
             </Tabs>
-          </ModalBody>
-        </ModalContent>
+          </div>
+        </div>
       );
     },
     config: config as Config, // FIXME: better method than type assertation?
