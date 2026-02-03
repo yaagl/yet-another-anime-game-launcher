@@ -387,10 +387,30 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     </plist>`
   );
   
+  // Calculate total app size recursively
+  async function getDirectorySize(dirPath) {
+    let totalSize = 0;
+    const dirents = await fs.readdir(dirPath, { withFileTypes: true });
+    
+    for (const dirent of dirents) {
+      const fullPath = path.resolve(dirPath, dirent.name);
+      if (dirent.isDirectory()) {
+        totalSize += await getDirectorySize(fullPath);
+      } else if (dirent.isFile()) {
+        const stats = await fs.stat(fullPath);
+        totalSize += stats.size;
+      }
+    }
+    return totalSize;
+  }
+
+  const appSize = await getDirectorySize(path.resolve(process.cwd(), `${appDistributionName}.app`));
+  const appSizeMB = (appSize / 1024 / 1024).toFixed(2);
+
   // Build completed
   console.log('\n' + '='.repeat(70));
   console.log(`✅ Build Complete!`);
   console.log(`📦 App: ${appDistributionName}.app`);
-  console.log(`📍 Size: ${((await fs.stat(path.resolve(process.cwd(), `${appDistributionName}.app`))).size / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`📍 Size: ${appSizeMB} MB`);
   console.log('='.repeat(70) + '\n');
 })();
