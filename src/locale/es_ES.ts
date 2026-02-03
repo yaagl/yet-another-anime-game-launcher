@@ -48,8 +48,7 @@ export const es_ES: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Descomprimiendo archivos",
   ALLOCATING_FILE: "Asignando archivos en disco",
-  DOWNLOADING_FILE_PROGRESS: "Descargando archivos: {0} ({2}/{3}) 🌐{1}/s | 💾{4}/s",
-  DOWNLOADING_FILE_PROGRESS_BOTTLENECK: "Descargando archivos: {0} ({2}/{3}) 🌐{1}/s | 💾{4}/s ⚠️ Cuello de botella en disco",
+  DOWNLOADING_FILE_PROGRESS: "Descargando archivos: {0} ({2}/{3})",
 
   BACKUP_USER_DATA: "Respaldando datos de usuario",
   RECOVER_BACKUP_USER_DATA: "Recuperando respaldo",

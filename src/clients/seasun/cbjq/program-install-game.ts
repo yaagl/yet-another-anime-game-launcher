@@ -63,14 +63,13 @@ async function* downloadOrRecover(
       gameFileStart = true;
       yield [
         "setStateText",
-        progress.isDiskBottleneck
-          ? "DOWNLOADING_FILE_PROGRESS_BOTTLENECK"
-          : "DOWNLOADING_FILE_PROGRESS",
+        "DOWNLOADING_FILE_PROGRESS",
         basename(remoteUrl) + `(${fileIndex}/${totalFileCount})`,
         humanFileSize(Number(progress.downloadSpeed)),
         humanFileSize(Number(progress.completedLength)),
         humanFileSize(Number(progress.totalLength)),
         humanFileSize(Number(progress.diskWriteSpeed)),
+        progress.isDiskBottleneck ? "true" : "false",
       ];
       yield [
         "setProgress",

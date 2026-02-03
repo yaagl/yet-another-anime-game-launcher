@@ -7,6 +7,7 @@ import {
   VStack,
   Image,
 } from "./components/ui";
+import { SpeedIndicator } from "./components/speed-indicators";
 import { createSignal, onMount, Show } from "solid-js";
 import { fatal, _safeRelaunch } from "./utils";
 import { Locale, LocaleTextKey } from "./locale";
@@ -23,6 +24,11 @@ export function createCommonUpdateUI(
   return function CommonUpdateUI() {
     const [progress, setProgress] = createSignal(0);
     const [statusText, setStatusText] = createSignal("");
+    const [speedMetrics, setSpeedMetrics] = createSignal<{
+      networkSpeed: string;
+      diskSpeed: string;
+      isDiskBottleneck: boolean;
+    } | null>(null);
     const [done, setDone] = createSignal(false);
 
     onMount(() => {
@@ -34,9 +40,26 @@ export function createCommonUpdateUI(
               break;
             case "setUndeterminedProgress":
               setProgress(0);
+              setSpeedMetrics(null);
               break;
             case "setStateText":
-              setStatusText(locale.format(text[1], text.slice(2)));
+              // Extract speed metrics if present (indices 3: networkSpeed, 4: diskSpeed)
+              if (text[1] === "DOWNLOADING_FILE_PROGRESS" && text.length >= 5) {
+                const networkSpeed = text[3] as string;
+                const diskSpeed = text[4] as string;
+                const isDiskBottleneck = text[5] === "true";
+
+                setSpeedMetrics({
+                  networkSpeed,
+                  diskSpeed,
+                  isDiskBottleneck,
+                });
+                // Only format the base progress text (filename, progress)
+                setStatusText(locale.format(text[1], text.slice(2, 4)));
+              } else {
+                setStatusText(locale.format(text[1], text.slice(2)));
+                setSpeedMetrics(null);
+              }
               break;
           }
         }
@@ -54,7 +77,21 @@ export function createCommonUpdateUI(
           <Center>
             <Image boxSize={280} src={UPDATE_UI_IMAGE}></Image>
           </Center>
-          <h1 style="text-align: center">{statusText()}</h1>
+          <div style="text-align: center">
+            <h1>{statusText()}</h1>
+            <Show when={speedMetrics()}>
+              {(metrics) => (
+                <div style="margin-top: 1rem">
+                  <SpeedIndicator
+                    networkSpeed={metrics().networkSpeed}
+                    diskSpeed={metrics().diskSpeed}
+                    isDiskBottleneck={metrics().isDiskBottleneck}
+                    iconSize="md"
+                  />
+                </div>
+              )}
+            </Show>
+          </div>
           <Box height={100}>
             <Show
               when={!done()}
