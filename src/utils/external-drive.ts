@@ -24,14 +24,19 @@ export async function isExternalDrive(path: string): Promise<boolean> {
   }
 
   try {
-    const { stdOut } = await exec(["diskutil", "info", path]);
+    // Extract just the volume name from the path
+    // E.g., "/Volumes/HDD Lucas/Genshin Impact" → "/Volumes/HDD Lucas"
+    const parts = path.split("/");
+    const volumePath = parts.length >= 3 ? `/${parts[1]}/${parts[2]}` : path;
+
+    const { stdOut } = await exec(["diskutil", "info", volumePath]);
 
     // Look for indicators of external/removable drive
     const isRemovable = stdOut.includes("Removable Media:          Yes");
     const isExternal = stdOut.includes("External:                 Yes");
 
     await log(
-      `External drive detection: path=${path}, removable=${isRemovable}, external=${isExternal}`
+      `External drive detection: path=${path}, volumePath=${volumePath}, removable=${isRemovable}, external=${isExternal}`
     );
 
     return isRemovable || isExternal;
