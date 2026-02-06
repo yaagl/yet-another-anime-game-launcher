@@ -101,10 +101,10 @@ export async function createNAPChannelClient({
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
       pre_download?.major != null && //exist pre_download_game data in server response
-      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
-      "NOTFOUND" && // not downloaded yet
-      gameInstalled && // game installed
-      gt(pre_download.major.version, gameVersion) // predownload version is greater
+        (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
+          "NOTFOUND" && // not downloaded yet
+        gameInstalled && // game installed
+        gt(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
