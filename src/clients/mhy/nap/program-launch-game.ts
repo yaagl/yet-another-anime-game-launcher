@@ -41,8 +41,6 @@ export async function* launchGameProgram({
     args.push("-screen-width", config.resolutionWidth);
     args.push("-screen-height", config.resolutionHeight);
     args.push("-screen-fullscreen", "0");
-  } else {
-    await revertResolutionRegistry(wine, server);
   }
   const cmd = `@echo off
 cd "%~dp0"

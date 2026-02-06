@@ -110,8 +110,6 @@ export async function* launchGameProgram({
 
   if (config.resolutionCustom) {
     await applyResolutionRegistry(wine, server, config);
-  } else {
-    await revertResolutionRegistry(wine, server);
   }
   await wine.waitUntilServerOff();
 
