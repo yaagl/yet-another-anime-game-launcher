@@ -119,27 +119,16 @@ copy "${wine.toWinePath(
     join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="))
   )}" "%WINDIR%\\system32\\"
 cd /d "${wine.toWinePath(gameDir)}"
-${await (async () => {
-  if (config.fpsUnlock !== "default") {
-    return `"${wine.toWinePath(
-      resolve("./fpsunlock/genshin-force-fps.exe")
-    )}" -f ${config.fpsUnlock} -o "${wine.toWinePath(
-      join(gameDir, gameExecutable)
-    )}"`;
-  } else {
-    return `"${wine.toWinePath(join(gameDir, gameExecutable))}"${
-      /* workaround 10351-4001 */
-      " -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1"
-    }`;
-  }
-})()}`;
+"${wine.toWinePath(
+    join(gameDir, gameExecutable)
+  )}" -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
   const yaaglDir = resolve("./");
   try {
     yield ["setStateText", "GAME_RUNNING"];
-    const logfile = resolve(`./logs/game_${Date.now()}.log`);
+    const logfile = resolve(`./ logs / game_${Date.now()}.log`);
 
     if (config.blockNet) {
       const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
@@ -148,18 +137,18 @@ ${await (async () => {
       const commands = [
         `#!/bin/sh`,
 
-        `HOSTS_FILE="/etc/hosts"`,
-        `ENTRY="0.0.0.0 ${blockUrl}"`,
-        `PAD_START="# Temporarily Added by Yaagl"`,
-        `PAD_END="# End of section"`,
+        `HOSTS_FILE = "/etc/hosts"`,
+        `ENTRY = "0.0.0.0 ${blockUrl}"`,
+        `PAD_START = "# Temporarily Added by Yaagl"`,
+        `PAD_END = "# End of section"`,
 
-        `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
-        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
+        `if !grep - qF "$ENTRY" "$HOSTS_FILE"; then`,
+        `sudo bash - c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
         `fi`,
         `sleep 10`,
-        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
+        `sudo sed - i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
 
-        `rm ${tmpScriptPath}`,
+        `rm ${tmpScriptPath} `,
       ];
 
       await writeFile(tmpScriptPath, commands.join("\n"));
@@ -178,7 +167,7 @@ ${await (async () => {
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
         ? [wine.toWinePath(join(gameDir, gameExecutable))]
-        : ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
+        : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
@@ -234,39 +223,11 @@ async function revertHDRRegistry({
     `Windows Registry Editor Version 5.00`,
     ``,
     `[${key}]`,
-    `"WINDOWS_HDR_ON_h3132281285"=-`,
+    `"WINDOWS_HDR_ON_h3132281285" = -`,
   ];
 
   const path = resolve("./hk4e_revert_hdr.reg");
   await writeBinary(path, utf16le(reg.join("\r\n")));
-  try {
-    await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
-  } finally {
-    await removeFile(path);
-  }
-}
-
-async function revertResolutionRegistry(wine: Wine, server: Server) {
-  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
-  if (server.id === "hk4e_cn") {
-    key += "\u539f\u795e";
-  } else if (server.id === "hk4e_global") {
-    key += "\x47\x65\x6e\x73\x68\x69\x6e\x20\x49\x6d\x70\x61\x63\x74";
-  } else {
-    return;
-  }
-
-  const lines = [
-    `Windows Registry Editor Version 5.00`,
-    ``,
-    `[${key}]`,
-    `"Screenmanager Is Fullscreen mode_h3981298716"=-`,
-    `"Screenmanager Resolution Width_h182942802"=-`,
-    `"Screenmanager Resolution Height_h2627697771"=-`,
-  ];
-
-  const path = resolve("./hk4e_revert_resolution.reg");
-  await writeBinary(path, utf16le(lines.join("\r\n")));
   try {
     await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
   } finally {
