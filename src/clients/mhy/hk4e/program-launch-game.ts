@@ -104,9 +104,14 @@ export async function* launchGameProgram({
   await wine.setProps(config);
   if (config.hk4eEnableHDR) {
     await applyHDRRegistry({ wine, server });
+  } else {
+    await revertHDRRegistry({ wine, server });
   }
+
   if (config.resolutionCustom) {
     await applyResolutionRegistry(wine, server, config);
+  } else {
+    await revertResolutionRegistry(wine, server);
   }
   await wine.waitUntilServerOff();
 
@@ -209,4 +214,64 @@ ${await (async () => {
   await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
+}
+
+async function revertHDRRegistry({
+  wine,
+  server,
+}: {
+  wine: Wine;
+  server: Server;
+}) {
+  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
+  if (server.id === "hk4e_cn") {
+    key += "\u539f\u795e";
+  } else if (server.id === "hk4e_global") {
+    key += "\x47\x65\x6e\x73\x68\x69\x6e\x20\x49\x6d\x70\x61\x63\x74";
+  } else {
+    return;
+  }
+
+  const reg = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"WINDOWS_HDR_ON_h3132281285"=-`,
+  ];
+
+  const path = resolve("./hk4e_revert_hdr.reg");
+  await writeBinary(path, utf16le(reg.join("\r\n")));
+  try {
+    await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
+  } finally {
+    await removeFile(path);
+  }
+}
+
+async function revertResolutionRegistry(wine: Wine, server: Server) {
+  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
+  if (server.id === "hk4e_cn") {
+    key += "\u539f\u795e";
+  } else if (server.id === "hk4e_global") {
+    key += "\x47\x65\x6e\x73\x68\x69\x6e\x20\x49\x6d\x70\x61\x63\x74";
+  } else {
+    return;
+  }
+
+  const lines = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"Screenmanager Is Fullscreen mode_h3981298716"=-`,
+    `"Screenmanager Resolution Width_h182942802"=-`,
+    `"Screenmanager Resolution Height_h2627697771"=-`,
+  ];
+
+  const path = resolve("./hk4e_revert_resolution.reg");
+  await writeBinary(path, utf16le(lines.join("\r\n")));
+  try {
+    await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
+  } finally {
+    await removeFile(path);
+  }
 }
