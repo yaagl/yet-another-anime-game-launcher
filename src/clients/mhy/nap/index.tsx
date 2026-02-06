@@ -45,7 +45,7 @@ import {
 } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.5.0";
+const CURRENT_SUPPORTED_VERSION = "2.6.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
@@ -101,10 +101,10 @@ export async function createNAPChannelClient({
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
       pre_download?.major != null && //exist pre_download_game data in server response
-        (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
-          "NOTFOUND" && // not downloaded yet
-        gameInstalled && // game installed
-        gt(pre_download.major.version, gameVersion) // predownload version is greater
+      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
+      "NOTFOUND" && // not downloaded yet
+      gameInstalled && // game installed
+      gt(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
