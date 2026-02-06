@@ -72,8 +72,14 @@ export async function createApp() {
   });
   const aria2 = await Promise.race([
     createAria2Retry({ host: "127.0.0.1", port: aria2_port }),
-    timeout(10000),
-  ]).catch(() => Promise.reject(new Error("Fail to launch aria2.")));
+    timeout(15000),
+  ]).catch(() =>
+    Promise.reject(
+      new Error(
+        "Failed to start download service. Please restart the application."
+      )
+    )
+  );
   await log(`Launched aria2 version ${aria2.version.version}`);
   const { latest, downloadUrl, sidecarDownloadUrl, description, version } =
     await createUpdater({
