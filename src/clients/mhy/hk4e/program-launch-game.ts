@@ -7,11 +7,9 @@ import {
   writeFile,
   resolve,
   log,
-  readAllLines,
   exec,
-  rawString,
-  build,
-  runInSudo,
+  utf16le,
+  writeBinary,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
@@ -40,9 +38,50 @@ async function applyHDRRegistry({
   await writeFile(regPath, regContent);
   try {
     await wine.exec("regedit", [wine.toWinePath(regPath)], {}, "/dev/null");
-    await wine.waitUntilServerOff();
   } finally {
     await removeFile(regPath);
+  }
+}
+
+async function applyResolutionRegistry(
+  wine: Wine,
+  server: Server,
+  config: Config
+) {
+  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
+  if (server.id === "hk4e_cn") {
+    key += "\u539f\u795e";
+  } else if (server.id === "hk4e_global") {
+    key += "\x47\x65\x6e\x73\x68\x69\x6e\x20\x49\x6d\x70\x61\x63\x74";
+  } else {
+    return;
+  }
+
+  const width = Number(config.resolutionWidth);
+  const height = Number(config.resolutionHeight);
+  if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+    return;
+  }
+
+  const lines = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"Screenmanager Is Fullscreen mode_h3981298716"=dword:00000000`,
+    `"Screenmanager Resolution Width_h182942802"=dword:${width
+      .toString(16)
+      .padStart(8, "0")}`,
+    `"Screenmanager Resolution Height_h2627697771"=dword:${height
+      .toString(16)
+      .padStart(8, "0")}`,
+  ];
+
+  const path = resolve("./hk4e_resolution.reg");
+  await writeBinary(path, utf16le(lines.join("\r\n")));
+  try {
+    await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
+  } finally {
+    await removeFile(path);
   }
 }
 
@@ -66,6 +105,10 @@ export async function* launchGameProgram({
   if (config.hk4eEnableHDR) {
     await applyHDRRegistry({ wine, server });
   }
+  if (config.resolutionCustom) {
+    await applyResolutionRegistry(wine, server, config);
+  }
+  await wine.waitUntilServerOff();
 
   const cmd = `@echo off
 cd "%~dp0"
