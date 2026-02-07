@@ -1,6 +1,6 @@
 import { rawString } from "./command-builder";
 import { wait } from "./helper";
-import { exec, spawn, resolve, log } from "./neu";
+import { exec, exec2, spawn, resolve, log } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
   return await exec(
@@ -11,7 +11,7 @@ export async function xattrRemove(attr: string, path: string) {
 }
 
 export async function md5(path: string): Promise<string> {
-  const p = await exec(["md5", "-q", resolve(path)]);
+  const p = await exec2(["md5", "-q", resolve(path)]);
   return p.stdOut.split("\n")[0];
 }
 
