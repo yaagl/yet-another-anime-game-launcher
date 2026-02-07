@@ -44,7 +44,7 @@ export async function* checkIntegrityProgram({
         }
         const md5sum = await md5(localPath);
         if (md5sum.toLowerCase() !== entry.md5.toLowerCase()) {
-          await log(`${md5sum} ${entry.md5} not match`);
+          await log(`${entry.remoteName} ${md5sum} ${entry.md5} not match`);
           throw new Error("Md5 not match");
         }
       } catch {
