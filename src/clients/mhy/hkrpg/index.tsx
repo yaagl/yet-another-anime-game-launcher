@@ -44,7 +44,7 @@ import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "3.8.0";
+const CURRENT_SUPPORTED_VERSION = "4.0.0";
 
 export async function createHKRPGChannelClient({
   server,
@@ -90,10 +90,10 @@ export async function createHKRPGChannelClient({
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
       pre_download.major != null && //exist pre_download_game data in server response
-        (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
-          "NOTFOUND" && // not downloaded yet
-        gameInstalled && // game installed
-        gt(pre_download.major.version, gameVersion) // predownload version is greater
+      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
+      "NOTFOUND" && // not downloaded yet
+      gameInstalled && // game installed
+      gt(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
