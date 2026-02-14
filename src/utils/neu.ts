@@ -48,16 +48,27 @@ export async function exec2(
   );
   await log(cmd);
   const { id, pid } = await Neutralino.os.spawnProcess(cmd);
+
   return await new Promise((res, rej) => {
+    let stdErr = "";
+    let stdOut = "";
+
     const handler: Neutralino.events.Handler<
       Neutralino.os.SpawnProcessResult
     > = event => {
-      if (!event) return;
-      let stdErr = "",
-        stdOut = "";
-      if (event.detail.id == id) {
-        if (event.detail["action"] == "exit") {
-          const exit = Number(event.detail["data"]);
+      if (!event || event.detail.id !== id) return;
+
+      switch (event.detail.action) {
+        case "stdOut": {
+          stdOut += event.detail.data;
+          break;
+        }
+        case "stdErr": {
+          stdErr += event.detail.data;
+          break;
+        }
+        case "exit": {
+          const exit = Number(event.detail.data);
           if (exit == 0) {
             res({
               pid,
@@ -74,13 +85,10 @@ export async function exec2(
           }
 
           Neutralino.events.off("spawnedProcess", handler);
-        } else if (event.detail["action"] == "stdOut") {
-          stdOut += event.detail["data"];
-        } else if (event.detail["action"] == "stdErr") {
-          stdErr += event.detail["data"];
         }
       }
     };
+
     Neutralino.events.on("spawnedProcess", handler);
   });
 }
