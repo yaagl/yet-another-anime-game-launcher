@@ -14,6 +14,8 @@ import {
   writeBinary,
   writeFile,
   rmrf_dangerously,
+  exec,
+  removeFile,
 } from "@utils";
 import { Wine } from "@wine";
 import { join } from "path-browserify";
@@ -143,7 +145,7 @@ const DXMT_FILES_WITH_UNIXLIB = [
   "nvngx.dll",
 ];
 
-const CURRENT_DXMT_VERSION = "0.72.0";
+const CURRENT_DXMT_VERSION = "0.74.0";
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -155,24 +157,52 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
     return;
   }
 
+  await rmrf_dangerously(resolve(`./dxmt`));
   await mkdirp("./dxmt");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  for (const file of DXMT_FILES_WITH_UNIXLIB) {
-    for await (const progress of aria2.doStreamingDownload({
-      uri: `https://github.com/dawn-winery/dawn-signed/releases/download/dxmt-0.72/${file}`,
-      absDst: resolve(`./dxmt/${file}`),
-    })) {
-      yield [
-        "setProgress",
-        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
-      ];
-      yield [
-        "setStateText",
-        "DOWNLOADING_ENVIRONMENT_SPEED",
-        `${humanFileSize(Number(progress.downloadSpeed))}`,
-      ];
-    }
+  const archiveName = "dxmt-v0.74-builtin-signed.tar.xz";
+  for await (const progress of aria2.doStreamingDownload({
+    uri: `https://github.com/dawn-winery/dawn-signed/releases/download/dxmt-v0.74-builtin-signed/${archiveName}`,
+    absDst: resolve(`./dxmt/${archiveName}`),
+  })) {
+    yield [
+      "setProgress",
+      Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+    ];
+    yield [
+      "setStateText",
+      "DOWNLOADING_ENVIRONMENT_SPEED",
+      `${humanFileSize(Number(progress.downloadSpeed))}`,
+    ];
   }
+
+  yield ["setStateText", "EXTRACT_ENVIRONMENT"];
+  yield ["setUndeterminedProgress"];
+  await exec([
+    "tar",
+    "-xvf",
+    resolve(`./dxmt/${archiveName}`),
+    "-C",
+    resolve("./dxmt"),
+  ]);
+
+  await exec([
+    "sh",
+    "-c",
+    `mv "${resolve(
+      "./dxmt/dxmt-v0.74-builtin-signed/x86_64-windows/"
+    )}"* "${resolve("./dxmt/")}"`,
+  ]);
+  await exec([
+    "sh",
+    "-c",
+    `mv "${resolve(
+      "./dxmt/dxmt-v0.74-builtin-signed/x86_64-unix/"
+    )}"* "${resolve("./dxmt/")}"`,
+  ]);
+
+  await rmrf_dangerously(resolve(`./dxmt/dxmt-v0.74-builtin-signed`));
+  await removeFile(resolve(`./dxmt/${archiveName}`));
 
   setKey("installed_dxmt_version", CURRENT_DXMT_VERSION);
 }

@@ -1,3 +1,4 @@
+import { gt } from "semver";
 import { dirname, join } from "path-browserify";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { Server } from "@constants";
@@ -65,11 +66,26 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  for (const f of DXMT_FILES) {
-    await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-    await cp(`./dxmt/${f}`, join(system32Dir, f));
+  // Native DXMT if 0.74+
+  const isNativeDXMT = gt(
+    "0.74.0",
+    await getKeyOrDefault("installed_dxmt_version", "0.0.0")
+  );
+
+  if (isNativeDXMT) {
+    for (const f of DXMT_FILES) {
+      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
+      await cp(`./dxmt/${f}`, join(system32Dir, f));
+    }
+  } else {
+    for (const f of DXMT_FILES) {
+      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      await forceMove(wineLibPath, wineLibPath + ".bak");
+      await cp(`./dxmt/${f}`, wineLibPath);
+    }
   }
 
+  // winemetal files always go to Wine lib directories
   await cp(
     `./dxmt/winemetal.dll`,
     resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
@@ -79,6 +95,9 @@ export async function* patchProgram(
     `./dxmt/winemetal.so`,
     resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
   );
+
+  // winemetal.dll also to system32 for both native and builtin
+  await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
 
   if (server.id.startsWith("hkrpg")) {
     await cp(
@@ -152,8 +171,20 @@ export async function* patchRevertProgram(
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   if (wine.attributes.renderBackend == "dxmt") {
-    for (const f of DXMT_FILES) {
-      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
+    // Native DXMT if 0.74+
+    const isNativeDXMT = gt(
+      "0.74.0",
+      await getKeyOrDefault("installed_dxmt_version", "0.0.0")
+    );
+    if (isNativeDXMT) {
+      for (const f of DXMT_FILES) {
+        await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
+      }
+    } else {
+      for (const f of DXMT_FILES) {
+        const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+        await forceMove(wineLibPath + ".bak", wineLibPath);
+      }
     }
   }
   if (config.reshade) {

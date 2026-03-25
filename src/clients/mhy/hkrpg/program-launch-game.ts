@@ -11,11 +11,13 @@ import {
   utf16le,
   log,
   exec,
+  getKeyOrDefault,
 } from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { HKRPG_CN_BLOCK_URL, HKRPG_OS_BLOCK_URL } from "../../secret";
+import { gt } from "semver";
 
 export async function* launchGameProgram({
   gameDir,
@@ -85,12 +87,17 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const useNativeDlls = !(
+      wine.attributes.renderBackend == "dxmt" &&
+      gt("0.74.0", await getKeyOrDefault("installed_dxmt_version", "0.0.0"))
+    );
+
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
+        WINEDLLOVERRIDES: useNativeDlls ? "d3d11,dxgi=n,b" : "",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
