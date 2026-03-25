@@ -44,7 +44,7 @@ import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "4.0.0";
+const CURRENT_SUPPORTED_VERSION = "4.1.0";
 
 export async function createHKRPGChannelClient({
   server,
