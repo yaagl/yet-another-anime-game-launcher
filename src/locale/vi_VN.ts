@@ -99,11 +99,11 @@ export const vi_VN: typeof zh_CN = {
   SETTING_ADVANCED_VISIBLE: "Cài đặt nâng cao hiện có thể được tìm thấy.",
 
   NO_ENOUGH_DISKSPACE: "Không đủ dung lượng trống trên ổ đĩa",
-  NO_ENOUGH_DISKSPACE_DESC: 
+  NO_ENOUGH_DISKSPACE_DESC:
     "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống trên ổ đĩa.",
 
   UPDATE: "Cập nhật game",
-  GAME_VERSION_TOO_OLD_DESC: 
+  GAME_VERSION_TOO_OLD_DESC:
     "Phiên bản game của bạn ({0}) quá cũ để cập nhật bằng cách này. Hãy cài lại game.",
 
   PREDOWNLOAD_READY: "Cài trước phiên bản {0}",
@@ -118,8 +118,8 @@ export const vi_VN: typeof zh_CN = {
 
   SETTING_PROXY_ENABLED: "Bật Proxy HTTP",
   SETTING_PROXY_HOST: "Máy chủ Proxy HTTP",
-  SETTING_PROXY_DESC: 
+  SETTING_PROXY_DESC:
     "Proxy này chỉ áp dụng cho game, không phải cho toàn bộ trình khởi động.",
-  
+
   SETTING_TURN_ON_STEAM_PATCH: "Bật bản vá Steam",
 };
