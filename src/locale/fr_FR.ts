@@ -91,9 +91,6 @@ export const fr_FR: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Ouvrir le répertoire de données de YAAGL",
   SETTING_YAAGL_VERSION: "Version de YAAGL",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Pour utiliser Crossover, il y a une étape manuelle supplémentaire. Cliquez ici pour en savoir plus.",
-
   SETTING_FPS_UNLOCK: "Déverrouiller la limite de FPS",
   SETTING_FPS_UNLOCK_DEFAULT: "Désactivée",
 
@@ -118,8 +115,12 @@ export const fr_FR: typeof zh_CN = {
     "La sélection actuelle est la version communautaire, cette version n’est pas officiellement prise en charge, veuillez ne pas signaler de problèmes",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_ENABLE_HDR: "Activer le HDR",
 
   SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 };

@@ -87,9 +87,6 @@ export const en: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Open YAAGL Data Directory",
   SETTING_YAAGL_VERSION: "YAAGL Version",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "To use Crossover, there is an additional manual step. Click here to learn more.",
-
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
 
@@ -113,9 +110,13 @@ export const en: typeof zh_CN = {
     "The current selection is the Community version, this version is not officially supported, please do not report any issues",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: "Licenses",
+  SETTING_ENABLE_HDR: "Enable HDR",
 
   SETTING_PROXY_ENABLED: "Enable HTTP Proxy",
   SETTING_PROXY_HOST: "HTTP Proxy Host",
   SETTING_PROXY_DESC:
     "The proxy only applies to the game, not to the whole launcher.",
+
+  SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch",
 };

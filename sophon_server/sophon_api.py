@@ -412,7 +412,7 @@ class SophonClient:
 			if gamedir("GenshinImpact.exe").is_file():
 				self.rel_type = "os"
 			elif gamedir("YuanShen.exe").is_file():
-				if self.gamedatadir.joinpath("Plugins", "PCGameSDK.dll").is_file():
+				if gamedir(self.gamedatadir, "Plugins", "PCGameSDK.dll").is_file():
 					self.rel_type = "bb"
 				else:
 					self.rel_type = "cn"

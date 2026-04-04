@@ -88,9 +88,6 @@ export const ko_KR: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: " YAAGL 데이터 경로 열기",
   SETTING_YAAGL_VERSION: "YAAGL 버전",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Crossover를 사용하려면, 수동으로 수행해야 하는 추가 작업이 있습니다. 자세한 내용을 보려면 이 버튼을 클릭하세요.",
-
   SETTING_FPS_UNLOCK: "FPS 제한 해제",
   SETTING_FPS_UNLOCK_DEFAULT: "비활성화",
 
@@ -114,8 +111,12 @@ export const ko_KR: typeof zh_CN = {
     "현재 커뮤니티 버전이 선택되었습니다.이 버전은 공식적으로 지원되지 않습니다. 보고하지 마십시오",
 
   SETTING_BLOCK_NET: "게임실행 문제해결(hosts 수정)",
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_ENABLE_HDR: "HDR 활성화",
 
   SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 };

@@ -87,9 +87,6 @@ export const ru_RU: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Откройте каталог данных YAAGL",
   SETTING_YAAGL_VERSION: "Версия YAAGL",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Чтобы использовать CrossOver, существует дополнительный шаг, который необходимо выполнить вручную. Нажмите на это поле, чтобы ознакомиться с подробностями.",
-
   SETTING_FPS_UNLOCK: "Разблокируйте FPS лимит",
   SETTING_FPS_UNLOCK_DEFAULT: "Выключено",
 
@@ -113,8 +110,13 @@ export const ru_RU: typeof zh_CN = {
     "В настоящее время выбрана версия сообщества, эта версия официально не поддерживается, не сообщайте о каких - либо проблемах",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+
+  SETTING_ENABLE_HDR: "Включить HDR",
 
   SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 };

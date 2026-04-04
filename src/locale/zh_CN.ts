@@ -84,9 +84,6 @@ export const zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "打开YAAGL数据目录",
   SETTING_YAAGL_VERSION: "YAAGL版本",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "如果使用CrossOver，则有一个步骤必须由你手动完成。点击这个提示以获取详情。",
-
   SETTING_FPS_UNLOCK: "帧率限制解锁",
   SETTING_FPS_UNLOCK_DEFAULT: "不解锁",
 
@@ -108,9 +105,13 @@ export const zh_CN = {
     "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: "Licenses", // TODO: Translate
+  SETTING_ENABLE_HDR: "启用 HDR",
 
   SETTING_PROXY_ENABLED: "Enable HTTP Proxy", // TODO: Translate
   SETTING_PROXY_HOST: "HTTP Proxy Host", // TODO: Translate
   SETTING_PROXY_DESC:
     "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
+
+  SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
 };

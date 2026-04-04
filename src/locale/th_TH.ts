@@ -87,9 +87,6 @@ export const th_TH: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "เปิดไดเรกทอรีข้อมูล YAAGL",
   SETTING_YAAGL_VERSION: "เวอร์ชัน YAAGL",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "ในการใช้ Crossover มีขั้นตอนที่ต้องทำด้วยตนเองเพิ่มเติม คลิกที่นี่เพื่อเรียนรู้เพิ่มเติม",
-
   SETTING_FPS_UNLOCK: "ปลดล็อกจำกัด FPS",
   SETTING_FPS_UNLOCK_DEFAULT: "ปิดใช้งาน",
 
@@ -112,8 +109,12 @@ export const th_TH: typeof zh_CN = {
     "เวอร์ชันที่เลือกคือเวอร์ชันจากชุมชน ซึ่งไม่ได้รับการสนับสนุนอย่างเป็นทางการ กรุณาอย่ารายงานปัญหาใดๆ มา",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_ENABLE_HDR: "เปิดใช้ HDR",
 
   SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 };

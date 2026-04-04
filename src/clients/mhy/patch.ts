@@ -1,3 +1,4 @@
+import { gt } from "semver";
 import { dirname, join } from "path-browserify";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { Server } from "@constants";
@@ -61,50 +62,51 @@ export async function* patchProgram(
       await putLocal(file.url, join(gameDir, file.file));
     }
   }
-  // FIXME: dirty hack
-  if (
-    wine.attributes.renderBackend == "dxvk" &&
-    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
-  ) {
-    await forceMove(
-      join(gameDir, server.dataDir, "globalgamemanagers"),
-      join(gameDir, server.dataDir, "globalgamemanagers.bak")
-    );
-    writeBinary(
-      join(gameDir, server.dataDir, "globalgamemanagers"),
-      await disableUnityFeature(
-        join(gameDir, server.dataDir, "globalgamemanagers.bak")
-      )
-    );
-  }
+
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxvk/${f}`, join(system32Dir, f));
-    }
-  }
-  if (wine.attributes.renderBackend == "dxmt") {
+  const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
+
+  // Native DXMT if 0.74+
+  const isNativeDXMT = gt(
+    "0.74.0",
+    await getKeyOrDefault("installed_dxmt_version", "0.0.0")
+  );
+
+  if (isNativeDXMT) {
     for (const f of DXMT_FILES) {
       await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
       await cp(`./dxmt/${f}`, join(system32Dir, f));
     }
-    await cp(
-      `./dxmt/winemetal.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
-    );
-    await cp(
-      `./dxmt/winemetal.so`,
-      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
-    );
-    if (server.id.startsWith("hkrpg")) {
-      await cp(
-        `./dxmt/nvngx.dll`,
-        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
-      );
-      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+  } else {
+    for (const f of DXMT_FILES) {
+      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      await forceMove(wineLibPath, wineLibPath + ".bak");
+      await cp(`./dxmt/${f}`, wineLibPath);
     }
   }
+
+  // winemetal files always go to Wine lib directories
+  await cp(
+    `./dxmt/winemetal.dll`,
+    resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+  );
+
+  await cp(
+    `./dxmt/winemetal.so`,
+    resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+  );
+
+  // winemetal.dll also to system32 for both native and builtin
+  await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
+
+  if (server.id.startsWith("hkrpg")) {
+    await cp(
+      `./dxmt/nvngx.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+    );
+    await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+  }
+
   if (config.reshade) {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
@@ -112,6 +114,26 @@ export async function* patchProgram(
       join(gameDir, "d3dcompiler_47.dll")
     );
   }
+
+  if (!server.id.startsWith("hkrpg") && !server.id.startsWith("nap")) {
+    await cp(
+      resolve("./sidecar/protonextras/steam64.exe"),
+      join(system32Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/steam32.exe"),
+      join(syswow64Dir, "steam.exe")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient64.dll"),
+      join(system32Dir, "lsteamclient.dll")
+    );
+    await cp(
+      resolve("./sidecar/protonextras/lsteamclient32.dll"),
+      join(syswow64Dir, "lsteamclient.dll")
+    );
+  }
+
   setKey("patched", "1");
 }
 
@@ -146,25 +168,23 @@ export async function* patchRevertProgram(
       }
     }
   }
-  // FIXME: dirty hack
-  if (
-    wine.attributes.renderBackend == "dxvk" &&
-    ["hkrpg_cn", "hkrpg_global"].indexOf(server.id) === -1
-  ) {
-    await forceMove(
-      join(gameDir, server.dataDir, "globalgamemanagers.bak"),
-      join(gameDir, server.dataDir, "globalgamemanagers")
-    );
-  }
+
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxvk") {
-    for (const f of DXVK_FILES) {
-      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
-    }
-  }
   if (wine.attributes.renderBackend == "dxmt") {
-    for (const f of DXMT_FILES) {
-      await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
+    // Native DXMT if 0.74+
+    const isNativeDXMT = gt(
+      "0.74.0",
+      await getKeyOrDefault("installed_dxmt_version", "0.0.0")
+    );
+    if (isNativeDXMT) {
+      for (const f of DXMT_FILES) {
+        await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
+      }
+    } else {
+      for (const f of DXMT_FILES) {
+        const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+        await forceMove(wineLibPath + ".bak", wineLibPath);
+      }
     }
   }
   if (config.reshade) {

@@ -4,15 +4,26 @@ const END_POINTS = ["", "https://ghp.3shain.uk/"];
 
 export async function createGithubEndpoint() {
   await log(`Checking github endpoints`);
-  const fastest = await Promise.race([
-    ...END_POINTS.map(prefix =>
-      fetch(`${prefix}https://api.github.com/octocat`)
-        .then(x => x.text())
-        .then(x => prefix)
-        .catch(() => timeout(5000))
-    ),
-    timeout(5000),
-  ]);
+  let fastest: string | null = null;
+  for (let i = 0; i < 3; i++) {
+    try {
+      fastest = await Promise.race([
+        ...END_POINTS.map(prefix =>
+          fetch(`${prefix}https://api.github.com/octocat`)
+            .then(x => x.text())
+            .then(x => prefix)
+            .catch(() => timeout(5000))
+        ),
+        timeout(5000),
+      ]);
+      break;
+    } catch (e) {
+      await log(`Github endpoint check failed (attempt ${i + 1}/3): ${e}`);
+    }
+  }
+  if (fastest === null) {
+    throw new Error("Failed to connect to GitHub");
+  }
 
   fastest == "" || (await log(`Using github proxy ${fastest}`));
 

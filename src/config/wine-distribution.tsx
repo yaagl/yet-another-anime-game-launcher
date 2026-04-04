@@ -53,7 +53,6 @@ export async function createWineDistroConfig({
           tag: x.id,
           url: x.remoteUrl,
           displayName: x.displayName,
-          community: x.attributes.community,
         }));
       } else {
         return [
@@ -66,7 +65,6 @@ export async function createWineDistroConfig({
             tag: x.id,
             url: x.remoteUrl,
             displayName: x.displayName,
-            community: x.attributes.community,
           })),
         ];
       }

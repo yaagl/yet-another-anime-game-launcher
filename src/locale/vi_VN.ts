@@ -90,9 +90,6 @@ export const vi_VN: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: "Mở thư mục dữ liệu của YAAGL",
   SETTING_YAAGL_VERSION: "Phiên bản YAAGL",
 
-  SETTING_WINE_CROSSOVER_ALERT:
-    "Để sử dụng CrossOver, một vài bước cần phải được tuỳ chỉnh thủ công. Nhấn vào đây để biết thêm chi tiết",
-
   SETTING_FPS_UNLOCK: "Mở khoá giới hạn FPSUnlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Tắt",
 
@@ -102,7 +99,8 @@ export const vi_VN: typeof zh_CN = {
   SETTING_ADVANCED_VISIBLE: "Cài đặt nâng cao hiện có thể được tìm thấy.",
 
   NO_ENOUGH_DISKSPACE: "Không đủ dung lượng trống trên ổ đĩa",
-  NO_ENOUGH_DISKSPACE_DESC: "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống.",
+  NO_ENOUGH_DISKSPACE_DESC: 
+    "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống trên ổ đĩa.",
 
   UPDATE: "Cập nhật game",
   GAME_VERSION_TOO_OLD_DESC: 
@@ -115,9 +113,13 @@ export const vi_VN: typeof zh_CN = {
     "Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
 
   SETTING_BLOCK_NET: "Vá lỗi mở game (chặn máy chủ)",
+  SETTING_LICENSES: "Giấy phép",
+  SETTING_ENABLE_HDR: "Bật HDR",
 
   SETTING_PROXY_ENABLED: "Bật Proxy HTTP",
   SETTING_PROXY_HOST: "Máy chủ Proxy HTTP",
   SETTING_PROXY_DESC: 
     "Proxy này chỉ áp dụng cho game, không phải cho toàn bộ trình khởi động.",
+  
+  SETTING_TURN_ON_STEAM_PATCH: "Bật bản vá Steam",
 };

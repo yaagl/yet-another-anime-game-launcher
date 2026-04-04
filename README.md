@@ -2,10 +2,10 @@
 
 ## Current Supported Game Version:
 ### GI: 5.3.0+ OS/CN **
-### HSR: 3.7.0 OS/CN
-### ZZZ: 2.3.0 OS/CN
+### HSR: 4.1.0 OS/CN
+### ZZZ: 2.7.0 OS/CN
 
-#### **: For Apple Silicon users: At least Sonoma 14.4 is required. Sequoia is recommended. ~~Version 5.6 and up requires an external tool(Crossover, Whisky, Kegworks etc.,) to update the game for now.~~ Partially fixed on the latest build. (CN installation is bugged.)
+#### **: Starting from release 0.3.12 using DXMT 0.74, you need to update to Sequoia or later. Sonoma is getting old and is lacking technical features to improve the translation.
 
 ## For Linux users
 [Anime Games Launcher](https://github.com/an-anime-team/anime-games-launcher) is a universal linux launcher for anime games

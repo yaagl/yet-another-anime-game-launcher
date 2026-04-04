@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\SOFTWARE\miHoYo\原神]
+"WINDOWS_HDR_ON_h3132281285"=dword:00000001

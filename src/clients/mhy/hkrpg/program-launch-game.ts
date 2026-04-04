@@ -11,12 +11,13 @@ import {
   utf16le,
   log,
   exec,
+  getKeyOrDefault,
 } from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
-import { CROSSOVER_RESOURCE } from "src/wine/crossover";
 import { HKRPG_CN_BLOCK_URL, HKRPG_OS_BLOCK_URL } from "../../secret";
+import { gt } from "semver";
 
 export async function* launchGameProgram({
   gameDir,
@@ -86,33 +87,17 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const useNativeDlls = !(
+      wine.attributes.renderBackend == "dxmt" &&
+      gt("0.74.0", await getKeyOrDefault("installed_dxmt_version", "0.0.0"))
+    );
+
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        ...(wine.attributes.renderBackend == "gptk"
-          ? {
-              WINEDLLPATH_PREPEND: wine.attributes.crossover
-                ? join(CROSSOVER_RESOURCE, "lib64/apple_gptk/wine")
-                : "",
-            }
-          : {
-              WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
-            }),
-        ...(wine.attributes.renderBackend == "dxvk"
-          ? {
-              DXVK_ASYNC: config.dxvkAsync ? "1" : "",
-              ...(config.dxvkHud == ""
-                ? {}
-                : {
-                    DXVK_HUD: config.dxvkHud,
-                  }),
-              DXVK_STATE_CACHE_PATH: yaaglDir,
-              DXVK_LOG_PATH: yaaglDir,
-              DXVK_CONFIG_FILE: join(yaaglDir, "dxvk.conf"),
-            }
-          : {}),
+        WINEDLLOVERRIDES: useNativeDlls ? "d3d11,dxgi=n,b" : "",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
@@ -147,11 +132,13 @@ cd /d "${wine.toWinePath(gameDir)}"
 }
 
 async function fixWebview(wine: Wine, server: Server) {
-  let key: string;
-  if (server.id === "nap_cn") {
-    key = `HKEY_CURRENT_USER\\Software\\miHoYo\\崩坏：星穹铁道`;
-  } else if (server.id === "nap_global") {
-    key = `HKEY_CURRENT_USER\\Software\\Cognosphere\\Star Rail`;
+  let key = "HKEY_CURRENT_USER\\Software\\";
+  if (server.id === "hkrpg_cn") {
+    key +=
+      "\x6d\x69\x48\x6f\x59\x6f\\\u5d29\u574f\uff1a\u661f\u7a79\u94c1\u9053";
+  } else if (server.id === "hkrpg_global") {
+    key +=
+      "\x43\x6f\x67\x6e\x6f\x73\x70\x68\x65\x72\x65\\\x53\x74\x61\x72\x20\x52\x61\x69\x6c";
   } else {
     return;
   }

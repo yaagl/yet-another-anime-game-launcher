@@ -90,8 +90,6 @@ export const es_ES: typeof zh_CN = {
   SETTING_OPEN_YAAGL_DIR: en.SETTING_OPEN_YAAGL_DIR,
   SETTING_YAAGL_VERSION: en.SETTING_YAAGL_VERSION,
 
-  SETTING_WINE_CROSSOVER_ALERT: en.SETTING_WINE_CROSSOVER_ALERT,
-
   SETTING_FPS_UNLOCK: en.SETTING_FPS_UNLOCK,
   SETTING_FPS_UNLOCK_DEFAULT: en.SETTING_FPS_UNLOCK_DEFAULT,
 
@@ -111,9 +109,14 @@ export const es_ES: typeof zh_CN = {
   COMMUNITY_WINE_ALERT: en.COMMUNITY_WINE_ALERT,
 
   SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
+  SETTING_LICENSES: "Licencias",
+
+  SETTING_ENABLE_HDR: "Activar HDR",
 
   SETTING_PROXY_ENABLED: "Activar Proxy HTTP",
   SETTING_PROXY_HOST: "Host del Proxy HTTP",
   SETTING_PROXY_DESC:
-    "El proxy solo se aplica al juego, y no al launcher entero", // TODO: Translate
+    "El proxy solo se aplica al juego, y no al launcher entero",
+
+  SETTING_TURN_ON_STEAM_PATCH: "Activar Parche de Steam",
 };
