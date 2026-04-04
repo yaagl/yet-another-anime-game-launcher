@@ -10,6 +10,7 @@ import {
   setKey,
   exit,
   rawString,
+  getKeyOrDefault,
 } from "./utils";
 import { createAria2Retry } from "./aria2";
 import {
@@ -22,6 +23,7 @@ import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
 import "./app.css";
 import { createUpdater, downloadProgram } from "./updater";
+import { CONFIG_KEY as DISABLE_UPDATE_NOTICES_KEY } from "./config/disable-update-notices";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { createClient } from "./clients";
@@ -86,7 +88,14 @@ export async function createApp() {
       github,
       aria2,
     });
-  if (latest == false) {
+  const disableUpdateNotices =
+    (await getKeyOrDefault(DISABLE_UPDATE_NOTICES_KEY, "false")) == "true";
+  await log(
+    `Updater status: latest=${String(latest)}, disableUpdateNotices=${String(
+      disableUpdateNotices
+    )}`
+  );
+  if (latest == false && !disableUpdateNotices) {
     if (
       await locale.prompt(
         "NEW_VERSION_AVALIABLE",

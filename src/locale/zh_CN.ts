@@ -114,4 +114,6 @@ export const zh_CN = {
     "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
+
+  SETTING_DISABLE_UPDATE_NOTICES: "Disable launcher update notices", // TODO: Translate
 };
