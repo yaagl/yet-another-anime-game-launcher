@@ -11,6 +11,7 @@ import {
   exit,
   rawString,
   getKeyOrDefault,
+  osascriptDialog,
 } from "./utils";
 import { createAria2Retry } from "./aria2";
 import {
@@ -23,10 +24,45 @@ import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
 import "./app.css";
 import { createUpdater, downloadProgram } from "./updater";
-import { CONFIG_KEY as DISABLE_UPDATE_NOTICES_KEY } from "./config/disable-update-notices";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { createClient } from "./clients";
+import { Aria2 } from "./aria2";
+import { Github } from "./github";
+import { Locale } from "./locale";
+
+async function createLauncherUI(deps: {
+  aria2: Aria2;
+  locale: Locale;
+  github: Github;
+}) {
+  const wineStatus = await checkWine(deps.github);
+  const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
+
+  if (wineStatus.wineReady) {
+    const wine = await createWine({
+      prefix: prefixPath,
+      distro: wineStatus.wineDistribution,
+    });
+    return await createLauncher({
+      wine,
+      locale: deps.locale,
+      github: deps.github,
+      channelClient: await createClient({
+        wine,
+        aria2: deps.aria2,
+        locale: deps.locale,
+      }),
+    });
+  } else {
+    return await createWineInstallProgram({
+      aria2: deps.aria2,
+      wineAbsPrefix: prefixPath,
+      wineDistro: wineStatus.wineDistribution,
+      locale: deps.locale,
+    });
+  }
+}
 
 export async function createApp() {
   await setKey("singleton", null);
@@ -84,55 +120,34 @@ export async function createApp() {
   );
   await log(`Launched aria2 version ${aria2.version.version}`);
   const { latest, downloadUrl, sidecarDownloadUrl, description, version } =
-    await createUpdater({
-      github,
-      aria2,
-    });
-  const disableUpdateNotices =
-    (await getKeyOrDefault(DISABLE_UPDATE_NOTICES_KEY, "false")) == "true";
+    await createUpdater({ github, aria2 });
+  const SKIPPED_VERSION_KEY = "config_skippedVersion";
+  const skippedVersion = await getKeyOrDefault(SKIPPED_VERSION_KEY, "");
   await log(
-    `Updater status: latest=${String(latest)}, disableUpdateNotices=${String(
-      disableUpdateNotices
-    )}`
+    `Updater status: latest=${String(latest)}, skippedVersion=${skippedVersion}`
   );
-  if (latest == false && !disableUpdateNotices) {
-    if (
-      await locale.prompt(
-        "NEW_VERSION_AVALIABLE",
-        "NEW_VERSION_AVALIABLE_DESC",
-        [version, description]
-      )
-    ) {
+  if (latest == false && version !== skippedVersion) {
+    const btnUpdate = locale.get("LAUNCHER_UPDATE_NOW");
+    const btnSkip = locale.get("LAUNCHER_SKIP_VERSION");
+    const btnLater = locale.get("LAUNCHER_UPDATE_LATER");
+    const clicked = await osascriptDialog({
+      title: locale.get("NEW_VERSION_AVALIABLE"),
+      message: locale.format("NEW_VERSION_AVALIABLE_DESC", [
+        version,
+        description,
+      ]),
+      buttons: [btnLater, btnSkip, btnUpdate],
+      defaultButton: btnUpdate,
+    });
+    if (clicked === btnUpdate) {
       return createCommonUpdateUI(locale, () =>
         downloadProgram(aria2, downloadUrl, sidecarDownloadUrl)
       );
+    } else if (clicked === btnSkip) {
+      await setKey(SKIPPED_VERSION_KEY, version);
     }
+    // null (dismissed) or btnLater → fall through to launcher
   }
 
-  const wineStatus = await checkWine(github);
-  const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
-
-  if (wineStatus.wineReady) {
-    const wine = await createWine({
-      prefix: prefixPath,
-      distro: wineStatus.wineDistribution,
-    });
-    return await createLauncher({
-      wine,
-      locale,
-      github,
-      channelClient: await createClient({
-        wine,
-        aria2,
-        locale,
-      }),
-    });
-  } else {
-    return await createWineInstallProgram({
-      aria2,
-      wineAbsPrefix: prefixPath,
-      wineDistro: wineStatus.wineDistribution,
-      locale,
-    });
-  }
+  return createLauncherUI({ aria2, locale, github });
 }

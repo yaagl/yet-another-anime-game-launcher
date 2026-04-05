@@ -120,5 +120,7 @@ export const en: typeof zh_CN = {
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch",
 
-  SETTING_DISABLE_UPDATE_NOTICES: "Disable launcher update notices",
+  LAUNCHER_UPDATE_NOW: "Update",
+  LAUNCHER_SKIP_VERSION: "Skip this version",
+  LAUNCHER_UPDATE_LATER: "Not now",
 };

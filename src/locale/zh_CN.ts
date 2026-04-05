@@ -115,5 +115,7 @@ export const zh_CN = {
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
 
-  SETTING_DISABLE_UPDATE_NOTICES: "Disable launcher update notices", // TODO: Translate
+  LAUNCHER_UPDATE_NOW: "Update", // TODO: Translate
+  LAUNCHER_SKIP_VERSION: "Skip this version", // TODO: Translate
+  LAUNCHER_UPDATE_LATER: "Not now", // TODO: Translate
 };
