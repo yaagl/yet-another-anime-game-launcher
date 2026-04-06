@@ -123,4 +123,8 @@ export const fr_FR: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "Ignorer cette mise à jour",
+  SETTING_CHECK_UPDATE: "Vérifier les mises à jour",
+  ALREADY_LATEST_VERSION: "Vous utilisez déjà la dernière version.",
 };

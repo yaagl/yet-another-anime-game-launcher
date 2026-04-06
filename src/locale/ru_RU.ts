@@ -119,4 +119,8 @@ export const ru_RU: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "Пропустить это обновление",
+  SETTING_CHECK_UPDATE: "Проверить обновления",
+  ALREADY_LATEST_VERSION: "Вы уже используете последнюю версию.",
 };

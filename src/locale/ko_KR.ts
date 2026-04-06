@@ -119,4 +119,8 @@ export const ko_KR: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "이 업데이트 무시",
+  SETTING_CHECK_UPDATE: "업데이트 확인",
+  ALREADY_LATEST_VERSION: "이미 최신 버전을 사용 중입니다.",
 };

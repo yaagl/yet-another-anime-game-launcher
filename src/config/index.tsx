@@ -42,6 +42,7 @@ export async function createConfiguration({
   locale,
   gameInstallDir,
   configForChannelClient,
+  onCheckUpdate,
 }: {
   wine: Wine;
   locale: Locale;
@@ -50,6 +51,7 @@ export async function createConfiguration({
     locale: Locale,
     config: Partial<Config>
   ) => Promise<() => JSXElement>;
+  onCheckUpdate: () => void;
 }) {
   const config: Partial<Config> = {};
   const [WD] = await createWineDistroConfig({
@@ -213,6 +215,10 @@ export async function createConfiguration({
                       }
                     >
                       {locale.get("SETTING_OPEN_YAAGL_DIR")}
+                    </Button>
+                    <Divider />
+                    <Button variant="ghost" size="sm" onClick={onCheckUpdate}>
+                      {locale.get("SETTING_CHECK_UPDATE")}
                     </Button>
                   </VStack>
                 </HStack>

@@ -119,4 +119,8 @@ export const vi_VN: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "Bỏ qua bản cập nhật này",
+  SETTING_CHECK_UPDATE: "Kiểm tra cập nhật",
+  ALREADY_LATEST_VERSION: "Bạn đang sử dụng phiên bản mới nhất.",
 };

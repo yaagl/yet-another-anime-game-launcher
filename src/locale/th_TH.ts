@@ -117,4 +117,8 @@ export const th_TH: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "ข้ามการอัปเดตนี้",
+  SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต",
+  ALREADY_LATEST_VERSION: "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว",
 };

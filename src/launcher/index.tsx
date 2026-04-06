@@ -68,17 +68,20 @@ export async function createLauncher({
     predownloadVersion,
     createConfig,
   },
+  onCheckUpdate,
 }: {
   wine: Wine;
   locale: Locale;
   github: Github;
   channelClient: ChannelClient;
+  onCheckUpdate: () => void;
 }) {
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wine,
     locale,
     gameInstallDir: installDir,
     configForChannelClient: createConfig,
+    onCheckUpdate,
   });
 
   const { selectPath } = await createGameInstallationDirectorySanitizer({
