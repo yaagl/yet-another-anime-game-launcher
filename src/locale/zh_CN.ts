@@ -114,4 +114,10 @@ export const zh_CN = {
     "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
+
+  LAUNCHER_UPDATE_NOW: "更新",
+  LAUNCHER_SKIP_VERSION: "跳过此版本",
+  LAUNCHER_UPDATE_LATER: "暂不更新",
+
+  SETTING_CHECK_FOR_UPDATES: "检查更新",
 };

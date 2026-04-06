@@ -101,6 +101,52 @@ export function runInSudo(cmd: string) {
   ]);
 }
 
+// native macOS dialog via osascript; returns clicked button label or null if dismissed
+export async function osascriptDialog({
+  title,
+  message,
+  buttons,
+  defaultButton,
+}: {
+  title: string;
+  message: string;
+  buttons: readonly [string, string, string];
+  defaultButton: string;
+}): Promise<string | null> {
+  const esc = (s: string) => s.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+
+  const msgExpr = message
+    .split("\n")
+    .map(line => `"${esc(line)}"`)
+    .join(" & (ASCII character 10) & ");
+
+  const stmt1 = `set msg to ${msgExpr}`;
+  const stmt2 =
+    `display dialog msg ` +
+    `buttons {"${esc(buttons[0])}", "${esc(buttons[1])}", "${esc(
+      buttons[2]
+    )}"} ` +
+    `default button "${esc(defaultButton)}" ` +
+    `with title "${esc(
+      title
+    )}" with icon (POSIX file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns")`;
+
+  const sh = (s: string) => s.replaceAll("'", "'\\''");
+
+  await log(`osascript dialog: ${title}`);
+  const result = await Neutralino.os.execCommand(
+    `osascript -e '${sh(stmt1)}' -e '${sh(stmt2)}'`,
+    {}
+  );
+
+  if (result.exitCode === 0) {
+    const match = result.stdOut.trim().match(/^button returned:(.+)$/);
+    return match ? match[1] : null;
+  }
+  if (result.stdErr.includes("user cancelled")) return null;
+  throw new Error(`osascript dialog failed: ${result.stdErr}`);
+}
+
 export function tar_extract(src: string, dst: string) {
   return exec(["tar", "-zxvf", src, "-C", dst]);
 }
