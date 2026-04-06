@@ -123,4 +123,6 @@ export const en: typeof zh_CN = {
   LAUNCHER_UPDATE_NOW: "Update",
   LAUNCHER_SKIP_VERSION: "Skip this version",
   LAUNCHER_UPDATE_LATER: "Not now",
+
+  SETTING_CHECK_FOR_UPDATES: "Check for Updates",
 };

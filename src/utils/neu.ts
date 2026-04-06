@@ -113,8 +113,7 @@ export async function osascriptDialog({
   buttons: readonly [string, string, string];
   defaultButton: string;
 }): Promise<string | null> {
-  const esc = (s: string) =>
-    s.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+  const esc = (s: string) => s.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 
   const msgExpr = message
     .split("\n")
@@ -124,9 +123,13 @@ export async function osascriptDialog({
   const stmt1 = `set msg to ${msgExpr}`;
   const stmt2 =
     `display dialog msg ` +
-    `buttons {"${esc(buttons[0])}", "${esc(buttons[1])}", "${esc(buttons[2])}"} ` +
+    `buttons {"${esc(buttons[0])}", "${esc(buttons[1])}", "${esc(
+      buttons[2]
+    )}"} ` +
     `default button "${esc(defaultButton)}" ` +
-    `with title "${esc(title)}" with icon (POSIX file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns")`;
+    `with title "${esc(
+      title
+    )}" with icon (POSIX file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns")`;
 
   const sh = (s: string) => s.replaceAll("'", "'\\''");
 

@@ -31,7 +31,13 @@ import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
-import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
+import {
+  exec2,
+  getKeyOrDefault,
+  resolve,
+  setKey,
+  _safeRelaunch,
+} from "../utils";
 import { createSignal, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
@@ -213,6 +219,16 @@ export async function createConfiguration({
                       }
                     >
                       {locale.get("SETTING_OPEN_YAAGL_DIR")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        await setKey("config_skippedVersion", "");
+                        await _safeRelaunch();
+                      }}
+                    >
+                      {locale.get("SETTING_CHECK_FOR_UPDATES")}
                     </Button>
                   </VStack>
                 </HStack>

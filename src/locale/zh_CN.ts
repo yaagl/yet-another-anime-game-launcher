@@ -115,7 +115,9 @@ export const zh_CN = {
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
 
-  LAUNCHER_UPDATE_NOW: "Update", // TODO: Translate
-  LAUNCHER_SKIP_VERSION: "Skip this version", // TODO: Translate
-  LAUNCHER_UPDATE_LATER: "Not now", // TODO: Translate
+  LAUNCHER_UPDATE_NOW: "更新",
+  LAUNCHER_SKIP_VERSION: "跳过此版本",
+  LAUNCHER_UPDATE_LATER: "暂不更新",
+
+  SETTING_CHECK_FOR_UPDATES: "检查更新",
 };
