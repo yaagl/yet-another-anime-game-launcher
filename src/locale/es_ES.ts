@@ -119,4 +119,9 @@ export const es_ES: typeof zh_CN = {
     "El proxy solo se aplica al juego, y no al launcher entero",
 
   SETTING_TURN_ON_STEAM_PATCH: "Activar Parche de Steam",
+
+  UPDATE_PROMPT_IGNORE: "Ignorar actualización",
+  SETTING_CHECK_UPDATE: "Buscar actualizaciones de YAAGL",
+  ALREADY_LATEST_VERSION: "Ya estás utilizando la última versión.",
+  UPDATE_LAUNCHER: "Actualizar Launcher",
 };

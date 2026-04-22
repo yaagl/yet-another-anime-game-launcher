@@ -10,6 +10,7 @@ import { th_TH } from "./th_TH";
 import {
   alert as ualert,
   prompt as uprompt,
+  promptUpdate as upromptUpdate,
   formatString,
   getKey,
 } from "../utils";
@@ -65,6 +66,20 @@ export async function createLocale() {
     return uprompt(locale[title], formatString(locale[content], intrp));
   }
 
+  async function promptUpdate(
+    title: LocaleTextKey,
+    content: LocaleTextKey,
+    intrp: string[] = []
+  ) {
+    return upromptUpdate(
+      locale[title],
+      formatString(locale[content], intrp),
+      locale["SETTING_CANCEL"] as string,
+      locale["UPDATE_PROMPT_IGNORE"] as string,
+      locale["UPDATE_LAUNCHER"] as string
+    );
+  }
+
   function format(key: LocaleTextKey, intrp: string[]) {
     return formatString(locale[key], intrp);
   }
@@ -76,6 +91,7 @@ export async function createLocale() {
   return {
     alert,
     prompt,
+    promptUpdate,
     format,
     get,
     supportedLanguages: Object.entries(locales).map(

@@ -212,6 +212,38 @@ export async function prompt(title: string, message: string) {
   return out == "YES";
 }
 
+export async function promptUpdate(
+  title: string,
+  message: string,
+  cancelText: string,
+  ignoreText: string,
+  updateText: string
+) {
+  try {
+    const script = `button returned of (display dialog "${message.replaceAll(
+      '"',
+      '\\"'
+    )}" with title "${title.replaceAll(
+      '"',
+      '\\"'
+    )}" buttons {"${ignoreText}", "${cancelText}", "${updateText}"} default button "${updateText}")`;
+    const ret = await Neutralino.os.execCommand(`osascript -e '${script}'`, {});
+    const val = ret.stdOut.trim();
+    if (val === updateText) return "UPDATE";
+    if (val === ignoreText) return "IGNORE";
+    return "CANCEL";
+  } catch (e) {
+    const out = await Neutralino.os.showMessageBox(
+      title,
+      message,
+      "YES_NO_CANCEL"
+    );
+    if (out == "YES") return "UPDATE";
+    if (out == "NO") return "IGNORE";
+    return "CANCEL";
+  }
+}
+
 export async function alert(title: string, message: string) {
   return await Neutralino.os.showMessageBox(title, message, "OK");
 }

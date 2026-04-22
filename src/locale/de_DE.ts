@@ -121,4 +121,9 @@ export const de_DE: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+
+  UPDATE_PROMPT_IGNORE: "Update ignorieren",
+  SETTING_CHECK_UPDATE: "Nach YAAGL-Updates suchen",
+  ALREADY_LATEST_VERSION: "Sie verwenden bereits die neueste Version.",
+  UPDATE_LAUNCHER: "Launcher aktualisieren",
 };
