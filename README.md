@@ -3,7 +3,7 @@
 ## Current Supported Game Version:
 ### GI: 5.3.0+ OS/CN **
 ### HSR: 4.2.0 OS/CN
-### ZZZ: 2.7.0 OS/CN
+### ZZZ: 2.8.0 OS/CN
 
 #### **: Starting from release 0.3.12 using DXMT 0.74, you need to update to Sequoia or later. Sonoma is getting old and is lacking technical features to improve the translation.
 
