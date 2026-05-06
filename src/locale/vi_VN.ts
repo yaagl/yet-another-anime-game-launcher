@@ -37,8 +37,8 @@ export const vi_VN: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "Dường như như bạn đã chọn một thư mục khác với thư mục đã được chọn trước đó. Tiến trình không hợp lệ, nhưng bạn có thể chọn lại sau",
 
-  NEW_VERSION_AVALIABLE: "Phiên bản mới khả dụng",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "Phiên bản mới khả dụng",
+  NEW_VERSION_AVAILABLE_DESC:
     "Bạn có muốn cập nhật trình khởi động lên phiên bản {0} không?\n Những thứ được cập nhật:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Đang tải tệp cập nhật",

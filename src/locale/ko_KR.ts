@@ -35,8 +35,8 @@ export const ko_KR: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "이전에 선택한 것과 다른 경로를 선택한 것 같습니다. 이 작업은 유효하지 않지만, 나중에 다시 선택할 수 있습니다.",
 
-  NEW_VERSION_AVALIABLE: "새로운 업데이트 사용 가능",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "새로운 업데이트 사용 가능",
+  NEW_VERSION_AVAILABLE_DESC:
     "런처를 {0}버전으로 업데이트하시겠습니까? N 업데이트 내역:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "업데이트 파일 다운로드 중",

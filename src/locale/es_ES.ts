@@ -37,8 +37,8 @@ export const es_ES: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "Parece que ha seleccionado una ruta que difiere de la escogida anteriormente. Esta operación es inválida, pero puede seleccionar nuevamente",
 
-  NEW_VERSION_AVALIABLE: "Nueva versión disponible",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "Nueva versión disponible",
+  NEW_VERSION_AVAILABLE_DESC:
     "Desea actualizar la aplicación a la versión {0}?\n Nuevos cambios:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Descargando archivos de actualización",
@@ -98,7 +98,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_ADVANCED_VISIBLE: en.SETTING_ADVANCED_VISIBLE,
 
   NO_ENOUGH_DISKSPACE: en.NO_ENOUGH_DISKSPACE,
-  NO_ENOUGH_DISKSPACE_DESC: en.NEW_VERSION_AVALIABLE_DESC,
+  NO_ENOUGH_DISKSPACE_DESC: en.NEW_VERSION_AVAILABLE_DESC,
 
   UPDATE: en.UPDATE,
   GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,

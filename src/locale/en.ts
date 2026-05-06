@@ -35,8 +35,8 @@ export const en: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "You have changed your game path. This operation is unsupported, but you can adjust this later.",
 
-  NEW_VERSION_AVALIABLE: "A new update is avaliable",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "A new update is available",
+  NEW_VERSION_AVAILABLE_DESC:
     "Would you like to update launcher to version {0}?\n Changes:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Downloading update files",

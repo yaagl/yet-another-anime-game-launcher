@@ -34,8 +34,8 @@ export const zh_CN = {
   GAME_DIR_CHANGED: "路径不一致",
   GAME_DIR_CHANGED_DESC:
     "似乎跟你上次设置的游戏目录不一致。本操作无效，但之后你仍可以重新设置。",
-  NEW_VERSION_AVALIABLE: "启动器有新版本可用",
-  NEW_VERSION_AVALIABLE_DESC: "你希望更新到最新{0}版本吗?\n更新内容:\n{1}",
+  NEW_VERSION_AVAILABLE: "启动器有新版本可用",
+  NEW_VERSION_AVAILABLE_DESC: "你希望更新到最新{0}版本吗?\n更新内容:\n{1}",
   DOWNLOADING_UPDATE_FILE: "正在下载更新文件",
 
   // FIXME

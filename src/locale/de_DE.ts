@@ -37,8 +37,8 @@ export const de_DE: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "Sie haben Ihren Spielpfad geändert. Diese Operation wird nicht unterstützt, kann jedoch später angepasst werden.",
 
-  NEW_VERSION_AVALIABLE: "Ein neues Update ist verfügbar",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "Ein neues Update ist verfügbar",
+  NEW_VERSION_AVAILABLE_DESC:
     "Möchten Sie den Launcher auf Version {0} aktualisieren?\n Änderungen:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Update-Dateien herunterladen",

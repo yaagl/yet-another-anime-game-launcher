@@ -35,8 +35,8 @@ export const ru_RU: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "Похоже, вы выбрали другой путь, который отличается от ранее выбранного. Эта операция недопустима, но вы можете выбрать ее позже",
 
-  NEW_VERSION_AVALIABLE: "Доступна новая версия",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "Доступна новая версия",
+  NEW_VERSION_AVAILABLE_DESC:
     "Хотите ли вы обновить лаунчер до версии {0}?\n Что обновлено:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Загрузка файлов обновлений",

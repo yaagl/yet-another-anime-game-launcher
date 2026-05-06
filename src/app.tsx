@@ -166,10 +166,10 @@ export async function createApp() {
           <Modal opened={showPrompt()} onClose={() => setShowPrompt(false)}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>{locale.get("NEW_VERSION_AVALIABLE")}</ModalHeader>
+              <ModalHeader>{locale.get("NEW_VERSION_AVAILABLE")}</ModalHeader>
               <ModalBody>
                 <Text mb={"$4"} style={{ "white-space": "pre-wrap" }}>
-                  {locale.format("NEW_VERSION_AVALIABLE_DESC", [
+                  {locale.format("NEW_VERSION_AVAILABLE_DESC", [
                     pendingUpdateInfo().version!,
                     pendingUpdateInfo().description!,
                   ])}

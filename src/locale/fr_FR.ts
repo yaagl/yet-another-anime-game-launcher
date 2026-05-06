@@ -38,8 +38,8 @@ export const fr_FR: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "Vous avez modifié le chemin d’accès de votre jeu. Cette opération n’est pas prise en charge, mais vous pouvez modifier cela plus tard.",
 
-  NEW_VERSION_AVALIABLE: "Une nouvelle mise à jour est disponible",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "Une nouvelle mise à jour est disponible",
+  NEW_VERSION_AVAILABLE_DESC:
     "Voulez-vous mettre à jour le lanceur vers la version {0}?\n Changements:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "Téléchargement des fichiers de mise à jour",

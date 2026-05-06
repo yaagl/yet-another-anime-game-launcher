@@ -35,8 +35,8 @@ export const th_TH: typeof zh_CN = {
   GAME_DIR_CHANGED_DESC:
     "ตรวจพบการเปลี่ยนแปลงตำแหน่งของเกม โปรดระบุตำแหน่งใหม่ในการตั้งค่าเพื่อให้ทำงานได้อย่างถูกต้อง",
 
-  NEW_VERSION_AVALIABLE: "มีการอัปเดตเวอร์ชันใหม่",
-  NEW_VERSION_AVALIABLE_DESC:
+  NEW_VERSION_AVAILABLE: "มีการอัปเดตเวอร์ชันใหม่",
+  NEW_VERSION_AVAILABLE_DESC:
     "ต้องการอัปเดตเป็นเวอร์ชัน {0} หรือไม่?\n\nเปลี่ยนแปลง:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "กำลังดาวน์โหลดไฟล์อัปเดต",
