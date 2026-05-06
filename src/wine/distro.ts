@@ -35,16 +35,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
       winePath: "Wine Stable.app/Contents/Resources/wine",
     },
   },
-  {
-    id: "10.18-dxmt",
-    displayName: "Wine 10.18 DXMT Experimental",
-    remoteUrl:
-      "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/wine-devel-10.18-osx64.tar.xz",
-    attributes: {
-      renderBackend: "dxmt",
-      winePath: "Wine Devel.app/Contents/Resources/wine",
-    },
-  },
+
   {
     id: "9.9-dxmt",
     displayName: "Wine 9.9 DXMT",
