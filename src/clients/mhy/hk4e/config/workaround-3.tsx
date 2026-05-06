@@ -54,7 +54,7 @@ export async function createWorkaround3Config({
     function UI() {
       return (
         <FormControl id="workaround3">
-          <FormLabel>Workaround #3</FormLabel>
+          <FormLabel>Workaround #3(does nothing now)</FormLabel>
           <Box>
             <Checkbox
               checked={value()}
