@@ -37,7 +37,7 @@ export const ko_KR: typeof zh_CN = {
 
   NEW_VERSION_AVAILABLE: "새로운 업데이트 사용 가능",
   NEW_VERSION_AVAILABLE_DESC:
-    "런처를 {0}버전으로 업데이트하시겠습니까? N 업데이트 내역:\n{1}",
+    "런처를 {0}버전으로 업데이트하시겠습니까?\n업데이트 내역:\n{1}",
 
   DOWNLOADING_UPDATE_FILE: "업데이트 파일 다운로드 중",
 
