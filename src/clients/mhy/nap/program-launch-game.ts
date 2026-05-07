@@ -93,17 +93,12 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
-    const useNativeDlls = !(
-      wine.attributes.renderBackend == "dxmt" &&
-      gt("0.74.0", await getKeyOrDefault("installed_dxmt_version", "0.0.0"))
-    );
-
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        WINEDLLOVERRIDES: useNativeDlls ? "d3d11,dxgi=n,b" : "",
+        WINEDLLOVERRIDES: "",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",

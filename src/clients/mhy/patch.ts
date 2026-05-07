@@ -66,23 +66,10 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  // Native DXMT if 0.74+
-  const isNativeDXMT = gt(
-    "0.74.0",
-    await getKeyOrDefault("installed_dxmt_version", "0.0.0")
-  );
-
-  if (isNativeDXMT) {
-    for (const f of DXMT_FILES) {
-      await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxmt/${f}`, join(system32Dir, f));
-    }
-  } else {
-    for (const f of DXMT_FILES) {
-      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
-      await forceMove(wineLibPath, wineLibPath + ".bak");
-      await cp(`./dxmt/${f}`, wineLibPath);
-    }
+  for (const f of DXMT_FILES) {
+    const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+    await forceMove(wineLibPath, wineLibPath + ".bak");
+    await cp(`./dxmt/${f}`, wineLibPath);
   }
 
   // winemetal files always go to Wine lib directories
@@ -171,20 +158,9 @@ export async function* patchRevertProgram(
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   if (wine.attributes.renderBackend == "dxmt") {
-    // Native DXMT if 0.74+
-    const isNativeDXMT = gt(
-      "0.74.0",
-      await getKeyOrDefault("installed_dxmt_version", "0.0.0")
-    );
-    if (isNativeDXMT) {
-      for (const f of DXMT_FILES) {
-        await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
-      }
-    } else {
-      for (const f of DXMT_FILES) {
-        const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
-        await forceMove(wineLibPath + ".bak", wineLibPath);
-      }
+    for (const f of DXMT_FILES) {
+      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      await forceMove(wineLibPath + ".bak", wineLibPath);
     }
   }
   if (config.reshade) {
