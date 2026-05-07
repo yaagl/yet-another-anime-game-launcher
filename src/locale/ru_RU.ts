@@ -110,6 +110,7 @@ export const ru_RU: typeof zh_CN = {
     "В настоящее время выбрана версия сообщества, эта версия официально не поддерживается, не сообщайте о каких - либо проблемах",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
 
   SETTING_ENABLE_HDR: "Включить HDR",

@@ -109,6 +109,7 @@ export const es_ES: typeof zh_CN = {
   COMMUNITY_WINE_ALERT: en.COMMUNITY_WINE_ALERT,
 
   SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
+  SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_LICENSES: "Licencias",
 
   SETTING_ENABLE_HDR: "Activar HDR",
