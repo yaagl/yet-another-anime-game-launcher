@@ -94,8 +94,10 @@ cd /d "${wine.toWinePath(gameDir)}"
     }
 
     await wine.exec2(
-      "cmd",
-      ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
+      config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
+      config.steamPatch
+        ? [wine.toWinePath(join(gameDir, gameExecutable))]
+        : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         WINEDLLOVERRIDES: "",
