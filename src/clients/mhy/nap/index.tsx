@@ -17,7 +17,7 @@ import {
   stats,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt } from "semver";
+import { gt, lt, valid } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "../program-check-integrity";
 import {
@@ -87,13 +87,13 @@ export async function createNAPChannelClient({
     pre_download,
   } = await getLatestVersionInfo(server);
 
-  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
+  const { gameInstalled, hasPartialInstall, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : hasPartialInstall ? "PARTIAL_INSTALL" : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
@@ -127,8 +127,13 @@ export async function createNAPChannelClient({
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
+      let gameVersion: string | undefined;
       try {
         await stats(join(selection, "pkg_version"));
+        gameVersion = await getGameVersion(join(selection, server.dataDir), 0xc4);
+        if (!valid(gameVersion)) {
+          throw new Error("Invalid version parsed");
+        }
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
         const totalSize = game_pkgs
@@ -144,6 +149,14 @@ export async function createNAPChannelClient({
           );
           return;
         }
+
+        // Save the directory BEFORE starting the download so the launcher
+        // can resume if the user closes it mid-download.
+        await setKey("game_install_dir", selection);
+        batch(() => {
+          setInstalled("PARTIAL_INSTALL");
+          setGameInstallDir(selection);
+        });
 
         yield* downloadAndInstallGameProgram({
           aria2,
@@ -163,10 +176,6 @@ export async function createNAPChannelClient({
         await setKey("game_install_dir", selection);
         return;
       }
-      const gameVersion = await getGameVersion(
-        join(selection, server.dataDir),
-        0xc4
-      );
       if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
         await locale.alert(
           "UNSUPPORTED_VERSION",
@@ -187,7 +196,7 @@ export async function createNAPChannelClient({
         batch(() => {
           setInstalled("INSTALLED");
           setGameInstallDir(selection);
-          setGameVersion(gameVersion);
+          setGameVersion(gameVersion!);
         });
         await setKey("game_install_dir", selection);
         // FIXME: perform a integrity check?
@@ -201,7 +210,7 @@ export async function createNAPChannelClient({
         batch(() => {
           setInstalled("INSTALLED");
           setGameInstallDir(selection);
-          setGameVersion(gameVersion);
+          setGameVersion(gameVersion!);
         });
         await setKey("game_install_dir", selection);
       }
@@ -377,17 +386,29 @@ async function checkGameState(locale: Locale, server: Server) {
   } catch {
     return {
       gameInstalled: false,
+      hasPartialInstall: false,
     } as const;
   }
   try {
     return {
       gameInstalled: true,
+      hasPartialInstall: false,
       gameInstallDir: gameDir,
       gameVersion: await getGameVersion(join(gameDir, server.dataDir), 0xc4),
     } as const;
   } catch {
+    // Check for partial install: a .tmp directory means a download was started
+    let partial = false;
+    try {
+      const tmp = await stats(join(gameDir, ".tmp"));
+      partial = tmp.isDirectory;
+    } catch {
+      partial = false;
+    }
     return {
       gameInstalled: false,
+      hasPartialInstall: partial,
+      gameInstallDir: partial ? gameDir : undefined,
     } as const;
   }
 }

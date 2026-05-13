@@ -6,6 +6,10 @@ import {
   createDisclosure,
   Flex,
   IconButton,
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuTrigger,
   Modal,
   ModalOverlay,
   Popover,
@@ -154,6 +158,9 @@ export async function createLauncher({
         } else {
           taskQueue.next(() => launch(config));
         }
+      } else if (installState() == "PARTIAL_INSTALL") {
+        // Resume a previously started installation
+        taskQueue.next(() => install(installDir()));
       } else {
         const selection = await selectPath();
         if (!selection) return;
@@ -305,17 +312,52 @@ export async function createLauncher({
                       ? updateRequired()
                         ? locale.get("UPDATE")
                         : locale.get("LAUNCH")
+                      : installState() == "PARTIAL_INSTALL"
+                      ? locale.get("RESUME")
                       : locale.get("INSTALL")}
                   </Button>
                   <Show when={installState() != "INSTALLED"}>
-                    <IconButton
-                      onClick={() => onChooseInstalledGameClick().catch(fatal)}
-                      disabled={programBusy()}
-                      fontSize={30}
-                      aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
-                      title={locale.get("SELECT_INSTALLED_GAME_DIR")}
-                      icon={<IconFolder />}
-                    />
+                    <Menu>
+                      <MenuTrigger
+                        as={IconButton}
+                        disabled={programBusy()}
+                        fontSize={30}
+                        aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        title={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        icon={<IconFolder />}
+                      />
+                      <MenuContent>
+                        <MenuItem
+                          onSelect={() => onChooseInstalledGameClick().catch(fatal)}
+                        >
+                          {locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        </MenuItem>
+                      </MenuContent>
+                    </Menu>
+                  </Show>
+                  <Show when={installState() == "INSTALLED"}>
+                    <Menu>
+                      <MenuTrigger
+                        as={IconButton}
+                        disabled={programBusy()}
+                        fontSize={30}
+                        aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        title={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        icon={<IconFolder />}
+                      />
+                      <MenuContent>
+                        <MenuItem
+                          onSelect={() => onChooseInstalledGameClick().catch(fatal)}
+                        >
+                          {locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        </MenuItem>
+                        <MenuItem
+                          onSelect={() => { onClose(); taskQueue.next(checkIntegrity); }}
+                        >
+                          {locale.get("REPAIR_GAME")}
+                        </MenuItem>
+                      </MenuContent>
+                    </Menu>
                   </Show>
                 </ButtonGroup>
               </PopoverTrigger>

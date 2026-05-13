@@ -5,6 +5,8 @@ export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",
   INSTALL: "게임 다운로드",
+  RESUME: "계속",
+  REPAIR_GAME: "게임 복구",
   UPDATING: "업데이트 중",
   DOWNLOADING: "다운로드 중",
   FIXING_FILES: "게임 파일 복구 중 {0}/{1}",

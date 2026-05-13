@@ -5,6 +5,8 @@ export const ru_RU: typeof zh_CN = {
   CONTENT_LANG_ID: "ru-ru",
   LAUNCH: "Запустить игру",
   INSTALL: "Установить игру",
+  RESUME: "Продолжить",
+  REPAIR_GAME: "Починить игру",
   UPDATING: "Обновление",
   DOWNLOADING: "Загрузка",
   FIXING_FILES: "Исправляем игровые файлы {0}/{1}",

@@ -5,6 +5,8 @@ export const vi_VN: typeof zh_CN = {
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Khởi động trò chơi",
   INSTALL: "Cài đặt trò chơi",
+  RESUME: "Tiếp tục",
+  REPAIR_GAME: "Sửa trò chơi",
   UPDATING: "Đang cập nhật",
   DOWNLOADING: "Đang tải",
   FIXING_FILES: "Đang sửa tệp trò chơi {0}/{1}",

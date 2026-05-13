@@ -4,6 +4,8 @@ export const en: typeof zh_CN = {
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Launch Game",
   INSTALL: "Install Game",
+  RESUME: "Continue",
+  REPAIR_GAME: "Repair Game",
   UPDATING: "Updating",
   DOWNLOADING: "Downloading",
   FIXING_FILES: "Fixing game files {0}/{1}",

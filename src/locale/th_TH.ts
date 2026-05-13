@@ -5,6 +5,8 @@ export const th_TH: typeof zh_CN = {
   CONTENT_LANG_ID: "th-th",
   LAUNCH: "เริ่มเกม",
   INSTALL: "ติดตั้งเกม",
+  RESUME: "ดำเนินการต่อ",
+  REPAIR_GAME: "ซ่อมแซมเกม",
   UPDATING: "กำลังอัปเดต",
   DOWNLOADING: "กำลังดาวน์โหลด",
   FIXING_FILES: "กำลังซ่อมแซมไฟล์เกม {0}/{1}",

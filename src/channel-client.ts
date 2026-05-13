@@ -3,7 +3,7 @@ import { CommonUpdateProgram } from "./common-update-ui";
 import { Config } from "./config";
 import { Locale } from "./locale";
 
-export type ChannelClientInstallState = "INSTALLED" | "NOT_INSTALLED";
+export type ChannelClientInstallState = "INSTALLED" | "NOT_INSTALLED" | "PARTIAL_INSTALL";
 
 export interface ChannelClient {
   installState: () => ChannelClientInstallState;
