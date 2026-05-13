@@ -1,4 +1,8 @@
 manifest_ldiff_pb2.py
 manifest_pb2.py
+hpatchz
 .cache/
 build/
+.venv/
+__pycache__/
+*.py[cod]

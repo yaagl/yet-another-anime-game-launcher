@@ -9,14 +9,19 @@
 neutralino.js
 
 node_modules
+.pnpm-store/
+pnpm-workspace.yaml
 
 .tmp/
+.cache/
 
 *.app
 
 .DS_Store
 
 *.neu
+*.log
+*.zip
 
 /external
 
@@ -38,3 +43,5 @@ server_secret.ts
 
 /sidecar/sophon_server
 **/__pycache__
+*.py[cod]
+.venv/

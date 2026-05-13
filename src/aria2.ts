@@ -53,7 +53,7 @@ export async function createAria2({
           gid,
           "max-connection-per-server": 16,
           out: options.absDst,
-          continue: false,
+          continue: true,
           "allow-overwrite": true, // in case control file broken
         });
       } else {

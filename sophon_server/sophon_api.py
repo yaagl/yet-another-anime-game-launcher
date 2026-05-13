@@ -374,8 +374,24 @@ class SophonClient:
 
 		OPT.gamedir.mkdir(exist_ok=True)
 		if not OPT.ignore_conditions:
-			# must be empty (allow config.ini)
-			assert len(list(OPT.gamedir.glob("*"))) < 2, "The specified install path is not empty"
+			entries = list(OPT.gamedir.glob("*"))
+			config_ini = OPT.gamedir / "config.ini"
+			tempdir = OPT.tempdir.resolve() if OPT.tempdir else None
+			gamedir_root = OPT.gamedir.resolve()
+
+			def is_resume_entry(path: pathlib.Path):
+				resolved = path.resolve()
+				if resolved == config_ini.resolve():
+					return True
+				return tempdir is not None and tempdir.parent == gamedir_root and resolved == tempdir
+
+			blocking_entries = [path for path in entries if not is_resume_entry(path)]
+			# Fresh installs must start in an empty directory, but a previously
+			# interrupted install can leave config.ini, temp files, and completed files.
+			if blocking_entries:
+				assert config_ini.is_file(), "The specified install path is not empty"
+			else:
+				assert len(entries) < 2 or config_ini.is_file(), "The specified install path is not empty"
 
 		# Create "config.ini"
 		templates = {}

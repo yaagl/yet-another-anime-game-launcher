@@ -104,7 +104,8 @@ export async function createHK4EChannelClient({
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
-    server
+    server,
+    releaseType
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
@@ -142,9 +143,12 @@ export async function createHK4EChannelClient({
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
-      try {
-        await stats(join(selection, "pkg_version"));
-      } catch {
+      const existingGameDir = await findExistingGameInstallDir(
+        selection,
+        releaseType,
+        server
+      );
+      if (!existingGameDir) {
         const freeSpaceGB = await getFreeSpace(selection, "g");
         const requiredSpaceGB =
           Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
@@ -172,7 +176,7 @@ export async function createHK4EChannelClient({
         return;
       }
       const gameVersion = await getGameVersionGI(
-        join(selection, server.dataDir)
+        join(existingGameDir, server.dataDir)
       );
       // if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
       //   await locale.alert(
@@ -194,23 +198,23 @@ export async function createHK4EChannelClient({
         }
         batch(() => {
           setInstalled("INSTALLED");
-          setGameInstallDir(selection);
+          setGameInstallDir(existingGameDir);
           setGameVersion(gameVersion);
         });
-        await setKey("game_install_dir", selection);
+        await setKey("game_install_dir", existingGameDir);
         // FIXME: perform a integrity check?
       } else {
         yield* checkIntegrityProgram({
           sophon,
-          gameDir: selection,
+          gameDir: existingGameDir,
         });
         // setGameInstalled
         batch(() => {
           setInstalled("INSTALLED");
-          setGameInstallDir(selection);
+          setGameInstallDir(existingGameDir);
           setGameVersion(gameVersion);
         });
-        await setKey("game_install_dir", selection);
+        await setKey("game_install_dir", existingGameDir);
       }
     },
     async *predownload() {
@@ -328,7 +332,50 @@ async function getGameVersionGI(gameDataDir: string) {
   }
 }
 
-async function checkGameState(locale: Locale, server: Server) {
+async function hasExistingGameInstall(
+  gameDir: string,
+  releaseType: "os" | "cn" | "bb",
+  server: Server
+) {
+  try {
+    await stats(
+      join(gameDir, releaseType == "os" ? "GenshinImpact.exe" : "YuanShen.exe")
+    );
+    await stats(join(gameDir, server.dataDir, "globalgamemanagers"));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function findExistingGameInstallDir(
+  selection: string,
+  releaseType: "os" | "cn" | "bb",
+  server: Server
+) {
+  if (await hasExistingGameInstall(selection, releaseType, server)) {
+    return selection;
+  }
+
+  try {
+    const entries = await Neutralino.filesystem.readDirectory(selection);
+    for (const entry of entries) {
+      if (entry.type != "DIRECTORY") continue;
+      const candidate = join(selection, entry.entry);
+      if (await hasExistingGameInstall(candidate, releaseType, server)) {
+        return candidate;
+      }
+    }
+  } catch {
+    // Ignore unreadable folders. The normal install path will handle them.
+  }
+}
+
+async function checkGameState(
+  locale: Locale,
+  server: Server,
+  releaseType: "os" | "cn" | "bb"
+) {
   let gameDir = "";
   try {
     gameDir = await getKey("game_install_dir");
@@ -338,6 +385,9 @@ async function checkGameState(locale: Locale, server: Server) {
     } as const;
   }
   try {
+    if (!(await hasExistingGameInstall(gameDir, releaseType, server))) {
+      throw new Error("Incomplete game installation");
+    }
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
