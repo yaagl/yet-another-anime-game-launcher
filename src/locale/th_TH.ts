@@ -28,6 +28,10 @@ export const th_TH: typeof zh_CN = {
   UNSUPPORTED_VERSION: "เวอร์ชันไม่รองรับ",
   SELECT_INSTALLATION_DIR:
     "กรุณาเลือกไดเรกทอรีสำหรับติดตั้งเกม\nหากคุณติดตั้งเกมเรียบร้อยแล้ว, ให้เลือกตำแหน่งของไฟล์ที่ใช้สำหรับรันเกม",
+  SELECT_INSTALLED_GAME_DIR: "เลือกเกมที่ติดตั้งแล้ว",
+  LOADING_GAME: "กำลังโหลด {0}...",
+  GAME_REGION_GLOBAL: "โกลบอล",
+  GAME_REGION_CHINA: "จีน",
   CANT_OPEN_GAME_FILE: "ไม่สามารถเข้าถึงไฟล์เกมได้",
   CANT_OPEN_GAME_FILE_DESC:
     "ลันเชอร์ไม่สามารถเข้าถึงไฟล์เกมได้\nกรุณาปรับเปลี่ยนไดเรกทอรีติดตั้งเกมหลังจากนี้\n\nหากข้อความนี้ปรากฏขึ้นซ้ำๆ, โปรดตรวจสอบให้แน่ใจว่าลันเชอร์ได้รับสิทธิ์ในการเข้าถึงไดเรกทอรีของเกม",
@@ -81,6 +85,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_GAME: "เกม",
   LANGUAGE_LOCALE_NAME: "ไทย",
   SETTING_UI_LOCALE: "ภาษาของลันเชอร์",
+  SETTING_CHOOSE_OPTION: "เลือกตัวเลือก",
   SETTING_RESTART_TO_TAKE_EFFECT: "การตั้งค่านี้จะมีผลหลังจากรีสตาร์ท",
   SETTING_OPEN_CMD: "เปิด Wine Command Line Tool",
   SETTING_OPEN_GAME_INSTALL_DIR: "เปิดไดเรกทอรีติดตั้งเกม",
@@ -109,14 +114,14 @@ export const th_TH: typeof zh_CN = {
     "เวอร์ชันที่เลือกคือเวอร์ชันจากชุมชน ซึ่งไม่ได้รับการสนับสนุนอย่างเป็นทางการ กรุณาอย่ารายงานปัญหาใดๆ มา",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_LICENSES: "ใบอนุญาต",
   SETTING_ENABLE_HDR: "เปิดใช้ HDR",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "เปิดใช้งาน HTTP Proxy",
+  SETTING_PROXY_HOST: "HTTP Proxy Host",
+  SETTING_PROXY_DESC: "Proxy จะใช้กับเกมเท่านั้น ไม่ใช่กับตัวลันเชอร์ทั้งหมด",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "เปิดใช้งาน Steam Patch",
 
   UPDATE_PROMPT_IGNORE: "ละเว้นการอัปเดต",
   SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต YAAGL",

@@ -26,7 +26,7 @@ export async function getLatestAdvInfo(
   const ret: HoyoConnectGetAllGameBasicInfoResponse = await (
     await fetch(
       server.adv_url +
-        (server.id == "CN"
+        (server.id.endsWith("_cn")
           ? `&language=zh-cn` // CN server has no other language support
           : `&language=${locale.get("CONTENT_LANG_ID")}`)
     )

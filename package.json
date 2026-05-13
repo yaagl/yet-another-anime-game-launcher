@@ -15,6 +15,7 @@
     "dev": "vite",
     "build": "YAAGL_CHANNEL_CLIENT=hk4ecn vite build",
     "build-hk4eos": "YAAGL_CHANNEL_CLIENT=hk4eos vite build",
+    "build-universal": "YAAGL_CHANNEL_CLIENT=universal vite build",
     "build-bh3glb": "YAAGL_CHANNEL_CLIENT=bh3glb vite build",
     "build-dev": "vite build --mode=\"development\"",
     "lint": "eslint ./src --ext .ts --ext .tsx",

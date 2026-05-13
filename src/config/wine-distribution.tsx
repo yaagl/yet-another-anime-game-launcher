@@ -95,7 +95,9 @@ export async function createWineDistroConfig({
           <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
-              <SelectPlaceholder>Choose an option</SelectPlaceholder>
+              <SelectPlaceholder>
+                {locale.get("SETTING_CHOOSE_OPTION")}
+              </SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>

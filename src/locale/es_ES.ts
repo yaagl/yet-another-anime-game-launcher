@@ -21,7 +21,7 @@ export const es_ES: typeof zh_CN = {
   PATH_INVALID: "Ruta inválida",
   PLEASE_SELECT_A_DIR: "Por favor seleccione una ruta",
   PATH_INVALID_ASCII_ONLY:
-    "Por favor cericiórese de que la ruta solo contenga caracteres ASCII",
+    "Por favor cerciórese de que la ruta solo contenga caracteres ASCII",
   PATH_INVALID_FORBIDDEN_DIR:
     'Por favor seleccione una ruta que no esté dentro de "Escritorio", "Descargas" o "Documentos"',
   NOT_SUPPORTED_YET: "Función aún no soportada",
@@ -30,6 +30,10 @@ export const es_ES: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Versión no soportada",
   SELECT_INSTALLATION_DIR:
     "Por favor seleccione el directorio de instalación del juego.\nSi el juego ya está instalado, seleccione el directorio donde se ubica el ejecutable del juego",
+  SELECT_INSTALLED_GAME_DIR: "Seleccionar juego instalado",
+  LOADING_GAME: "Cargando {0}...",
+  GAME_REGION_GLOBAL: "Global",
+  GAME_REGION_CHINA: "China",
   CANT_OPEN_GAME_FILE: "No se pudo acceder a los archivos del juego",
   CANT_OPEN_GAME_FILE_DESC:
     "La aplicación no pudo acceder a los archivos del juego.\nNo se preocupe, aún puede seleccionar el directorio de instalación del juego después de cerrar el cuadro de diálogo.\n\nSi el mensaje aparece repetidamente, revise que la aplicación tenga los permisos adecuados para acceder al directorio de instalación del juego",
@@ -48,7 +52,7 @@ export const es_ES: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Descomprimiendo archivos",
   ALLOCATING_FILE: "Asignando archivos en disco",
-  DOWNLOADING_FILE_PROGRESS: "Descargando archivos: {0} ({2}/{3}) {1}/s",
+  DOWNLOADING_FILE_PROGRESS: "Descargando archivo: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Respaldando datos de usuario",
   RECOVER_BACKUP_USER_DATA: "Recuperando respaldo",
@@ -78,37 +82,38 @@ export const es_ES: typeof zh_CN = {
   SETTING_CHECK_INTEGRITY: "Revisar Integridad",
   SETTING_GAME_INSTALL_DIR: "Directorio de Instalación del Juego",
   // 0.0.27
-  SETTING_WINE_VERSION_CONFIRM: en.SETTING_WINE_VERSION_CONFIRM,
-  SETTING_QUICK_ACTIONS: en.SETTING_QUICK_ACTIONS,
-  SETTING_GENERAL: en.SETTING_GENERAL,
-  SETTING_GAME: en.SETTING_GAME,
+  SETTING_WINE_VERSION_CONFIRM: "Haz clic aquí para confirmar el cambio.",
+  SETTING_QUICK_ACTIONS: "Acciones rápidas",
+  SETTING_GENERAL: "General",
+  SETTING_GAME: "Juego",
   LANGUAGE_LOCALE_NAME: "Español",
-  SETTING_UI_LOCALE: en.SETTING_UI_LOCALE,
-  SETTING_RESTART_TO_TAKE_EFFECT: en.SETTING_RESTART_TO_TAKE_EFFECT,
-  SETTING_OPEN_CMD: en.SETTING_OPEN_CMD,
-  SETTING_OPEN_GAME_INSTALL_DIR: en.SETTING_OPEN_GAME_INSTALL_DIR,
-  SETTING_OPEN_YAAGL_DIR: en.SETTING_OPEN_YAAGL_DIR,
-  SETTING_YAAGL_VERSION: en.SETTING_YAAGL_VERSION,
+  SETTING_UI_LOCALE: "Idioma de la interfaz",
+  SETTING_CHOOSE_OPTION: "Elige una opción",
+  SETTING_RESTART_TO_TAKE_EFFECT: "Esto surtirá efecto después del reinicio.",
+  SETTING_OPEN_CMD: "Abrir herramienta de línea de comandos de Wine",
+  SETTING_OPEN_GAME_INSTALL_DIR: "Abrir directorio de instalación del juego",
+  SETTING_OPEN_YAAGL_DIR: "Abrir directorio de datos de YAAGL",
+  SETTING_YAAGL_VERSION: "Versión de YAAGL",
 
-  SETTING_FPS_UNLOCK: en.SETTING_FPS_UNLOCK,
-  SETTING_FPS_UNLOCK_DEFAULT: en.SETTING_FPS_UNLOCK_DEFAULT,
+  SETTING_FPS_UNLOCK: "Desbloquear límite de FPS",
+  SETTING_FPS_UNLOCK_DEFAULT: "Desactivado",
 
-  SETTING_ADVANCED: en.SETTING_ADVANCED,
-  SETTING_ADVANCED_ALERT: en.SETTING_ADVANCED_ALERT,
-  SETTING_ADVANCED_VISIBLE: en.SETTING_ADVANCED_VISIBLE,
+  SETTING_ADVANCED: "Avanzado",
+  SETTING_ADVANCED_ALERT: "NO CAMBIE NADA a menos que sepa lo que está haciendo.",
+  SETTING_ADVANCED_VISIBLE: "Los ajustes avanzados ya están disponibles.",
 
-  NO_ENOUGH_DISKSPACE: en.NO_ENOUGH_DISKSPACE,
-  NO_ENOUGH_DISKSPACE_DESC: en.NEW_VERSION_AVAILABLE_DESC,
+  NO_ENOUGH_DISKSPACE: "No hay suficiente espacio en disco.",
+  NO_ENOUGH_DISKSPACE_DESC: "Se requiere al menos {0}GiB ({1}GB) de espacio libre en su disco.",
 
-  UPDATE: en.UPDATE,
-  GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
+  UPDATE: "Actualizar juego",
+  GAME_VERSION_TOO_OLD_DESC: "Tu versión actual del juego ({0}) es demasiado antigua para actualizarse gradualmente. Por favor, reinstala el juego.",
 
-  PREDOWNLOAD_READY: en.PREDOWNLOAD_READY,
+  PREDOWNLOAD_READY: "Pre-descarga {0}",
 
-  COMMUNITY_WARNING: en.COMMUNITY_WARNING,
-  COMMUNITY_WINE_ALERT: en.COMMUNITY_WINE_ALERT,
+  COMMUNITY_WARNING: "Advertencia de la comunidad",
+  COMMUNITY_WINE_ALERT: "La selección actual es la versión de la comunidad, esta versión no es compatible oficialmente, por favor no informe de ningún problema",
 
-  SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
+  SETTING_BLOCK_NET: "Arreglo de inicio (bloquear hosts)",
   SETTING_LICENSES: "Licencias",
 
   SETTING_ENABLE_HDR: "Activar HDR",

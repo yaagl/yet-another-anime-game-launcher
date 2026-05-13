@@ -28,6 +28,10 @@ export const zh_CN = {
   UNSUPPORTED_VERSION: "不支持的版本",
   SELECT_INSTALLATION_DIR:
     "选择游戏的安装目录。\n如果你已安装游戏，请选择游戏.exe文件所在的位置",
+  SELECT_INSTALLED_GAME_DIR: "选择已安装的游戏",
+  LOADING_GAME: "正在加载 {0}...",
+  GAME_REGION_GLOBAL: "国际服",
+  GAME_REGION_CHINA: "中国服",
   CANT_OPEN_GAME_FILE: "无法读取游戏文件",
   CANT_OPEN_GAME_FILE_DESC:
     '启动器无法打开游戏文件。\n但不用着急，此对话框关闭后你可以再次手动选择游戏安装目录。\n\n如果此对话框反复出现，请检查启动器是否具有足够的权限访问游戏目录（macOS部分文件夹，如"下载"，需要特殊的权限设置）。',
@@ -78,6 +82,7 @@ export const zh_CN = {
   SETTING_GAME: "游戏",
   LANGUAGE_LOCALE_NAME: "简体中文",
   SETTING_UI_LOCALE: "启动器界面语言",
+  SETTING_CHOOSE_OPTION: "选择选项",
   SETTING_RESTART_TO_TAKE_EFFECT: "此设置将从下次启动生效",
   SETTING_OPEN_CMD: "打开Wine命令行工具",
   SETTING_OPEN_GAME_INSTALL_DIR: "打开游戏安装目录",
@@ -104,16 +109,15 @@ export const zh_CN = {
   COMMUNITY_WINE_ALERT:
     "当前选择为社区版本，此版本不受官方支持，请不要报告任何问题",
 
-  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: "Licenses", // TODO: Translate
+  SETTING_BLOCK_NET: "启动修复 (屏蔽 hosts)",
+  SETTING_LICENSES: "许可证",
   SETTING_ENABLE_HDR: "启用 HDR",
 
-  SETTING_PROXY_ENABLED: "Enable HTTP Proxy", // TODO: Translate
-  SETTING_PROXY_HOST: "HTTP Proxy Host", // TODO: Translate
-  SETTING_PROXY_DESC:
-    "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
+  SETTING_PROXY_ENABLED: "启用 HTTP 代理",
+  SETTING_PROXY_HOST: "HTTP 代理地址",
+  SETTING_PROXY_DESC: "代理仅适用于游戏，不适用于启动器本身。",
 
-  SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "启用 Steam 补丁",
 
   UPDATE_PROMPT_IGNORE: "忽略此更新",
   SETTING_CHECK_UPDATE: "检查 YAAGL 更新",

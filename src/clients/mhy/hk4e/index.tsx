@@ -18,7 +18,6 @@ import {
   spawn,
   stats,
   timeout,
-  waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
@@ -100,8 +99,6 @@ export async function createHK4EChannelClient({
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
   const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
-  await waitImageReady(background);
-
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server,
@@ -135,6 +132,7 @@ export async function createHK4EChannelClient({
       background: background, // Always show image
       background_video: IS_VIDEO_BG ? video_url : undefined,
       background_theme: IS_VIDEO_BG ? theme_url : undefined,
+      iconImage: icon,
       url: icon_link,
     },
     predownloadVersion: () =>

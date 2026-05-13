@@ -49,5 +49,8 @@ if (typeof Neutralino == "undefined") {
       );
       Neutralino.window.show();
     })
-    .catch(fatal);
+    .catch(e => {
+      console.error(e);
+      document.body.innerHTML = `<div style="color:red; padding: 20px; word-break: break-all;"><h1>Fatal Error during initialization</h1><pre>${e?.stack || e}</pre></div>`;
+    });
 }

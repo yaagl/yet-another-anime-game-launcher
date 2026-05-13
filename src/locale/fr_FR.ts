@@ -31,6 +31,10 @@ export const fr_FR: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Version non prise en charge",
   SELECT_INSTALLATION_DIR:
     "Veuillez sélectionner le répertoire d’installation du jeu.\nSi vous avez déjà installé le jeu, sélectionnez l’emplacement du fichier exécutable du jeu.",
+  SELECT_INSTALLED_GAME_DIR: "Sélectionner le jeu installé",
+  LOADING_GAME: "Chargement de {0}...",
+  GAME_REGION_GLOBAL: "Global",
+  GAME_REGION_CHINA: "Chine",
   CANT_OPEN_GAME_FILE: "Échec d’accès aux fichiers de jeu.",
   CANT_OPEN_GAME_FILE_DESC:
     "Le lanceur n’a pas pu accéder aux fichiers du jeu.\nVeuillez ajuster le répertoire d’installation du jeu après ce message.\n\nSi ce message apparaît plusieurs fois, veuillez vous assurer que le lanceur a l’autorisation d’accéder au répertoire du jeu.",
@@ -84,6 +88,7 @@ export const fr_FR: typeof zh_CN = {
   SETTING_GAME: "Jeu",
   LANGUAGE_LOCALE_NAME: "Français",
   SETTING_UI_LOCALE: "Langue de l’interface utilisateur du lanceur",
+  SETTING_CHOOSE_OPTION: "Choisissez une option",
   SETTING_RESTART_TO_TAKE_EFFECT:
     "Cette action prendra effet après le redémarrage.",
   SETTING_OPEN_CMD: "Lancer l’outil de ligne de commande Wine",
@@ -114,15 +119,16 @@ export const fr_FR: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "La sélection actuelle est la version communautaire, cette version n’est pas officiellement prise en charge, veuillez ne pas signaler de problèmes",
 
-  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_BLOCK_NET: "Correctif de lancement (bloquer les hôtes)",
+  SETTING_LICENSES: "Licences",
   SETTING_ENABLE_HDR: "Activer le HDR",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "Activer le proxy HTTP",
+  SETTING_PROXY_HOST: "Hôte du proxy HTTP",
+  SETTING_PROXY_DESC:
+    "Le proxy ne s'applique qu'au jeu, pas à l'ensemble du lanceur.",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "Activer le patch Steam",
 
   UPDATE_PROMPT_IGNORE: "Ignorer la mise à jour",
   SETTING_CHECK_UPDATE: "Rechercher des mises à jour YAAGL",
