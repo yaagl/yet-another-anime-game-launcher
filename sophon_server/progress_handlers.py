@@ -40,6 +40,13 @@ class InstallProgressHandler:
             "task_id": self.task_id
         }, self.task_id)
 
+    def job_stage(self, stage: str):
+        self.conn_manager.send_message_threadsafe({
+            "type": "job_stage",
+            "task_id": self.task_id,
+            "stage_key": stage
+        }, self.task_id)
+
     def job_end(self):
         self.conn_manager.send_message_threadsafe({
             "type": "job_end",

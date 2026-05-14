@@ -33,6 +33,10 @@ export async function* downloadAndInstallGameProgram({
         yield ["setStateText", "ALLOCATING_FILE"];
         break;
 
+      case "job_stage":
+        yield ["setStateText", progress.stage_key as any];
+        break;
+
       case "chunk_progress":
         log(`Chunk progress: ${progress.chunk_size} bytes downloaded`);
         yield [

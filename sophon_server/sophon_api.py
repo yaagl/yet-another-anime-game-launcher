@@ -878,11 +878,13 @@ class SophonClient:
 				download_size_total += c.compressed_size
 		return download_size_total
 
-	def get_missing_chunk_download_size(self, filter_by_new: bool) -> int:
+	def get_missing_chunk_download_size(self, filter_by_new: bool, progress_handler = None) -> int:
 		"""
 		Returns the compressed bytes that still need to be downloaded.
 		Existing game files and already cached chunks are not counted.
 		"""
+		if progress_handler:
+			progress_handler.job_stage("SCANNING_FILES_STATUS")
 		download_size_total: int = 0
 		for v in self.di_chunks.manifest.files:
 			if v.flags == 64:

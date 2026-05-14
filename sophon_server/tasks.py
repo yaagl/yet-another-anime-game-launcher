@@ -43,13 +43,15 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
 
     os.makedirs(options.gamedir, exist_ok=True)
 
+    progress.job_stage("PREPARING_INSTALLATION")
+
     cli = SophonClient()
     cli.initialize(options)
     cli.retrieve_API_keys()
 
     cli.load_manifest("game")
 
-    download_size_total = cli.get_missing_chunk_download_size(False)
+    download_size_total = cli.get_missing_chunk_download_size(False, progress)
     progress.download_summary(
         game_version=cli.installed_ver,
         download_size=download_size_total,
@@ -125,6 +127,8 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
 
     remove_cached_files(options.tempdir)
 
+    progress.job_stage("PREPARING_INSTALLATION")
+
     cli = SophonClient()
     cli.initialize(options)
     cli.retrieve_API_keys()
@@ -153,6 +157,8 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
         options.tempdir = pathlib.Path(request.gamedir) / ".tmp"
 
     remove_cached_files(options.tempdir)
+
+    progress.job_stage("PREPARING_INSTALLATION")
 
     cli = SophonClient()
     cli.initialize(options)

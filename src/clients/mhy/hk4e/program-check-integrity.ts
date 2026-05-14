@@ -20,6 +20,10 @@ export async function* checkIntegrityProgram({
 
   for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
+      case "job_stage":
+        yield ["setStateText", progress.stage_key as any];
+        break;
+
       case "check_file":
         yield [
           "setStateText",

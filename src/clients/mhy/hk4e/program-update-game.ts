@@ -27,6 +27,9 @@ async function* downloadAndPatch(
   yield ["setStateText", "ALLOCATING_FILE"];
   for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
+      case "job_stage":
+        yield ["setStateText", progress.stage_key as any];
+        break;
       case "delete_file":
         yield ["setStateText", "PATCHING"];
         yield [
@@ -155,6 +158,9 @@ async function* predownload(
   yield ["setStateText", "ALLOCATING_FILE"];
   for await (const progress of sophon.streamOperationProgress(taskId)) {
     switch (progress.type) {
+      case "job_stage":
+        yield ["setStateText", progress.stage_key as any];
+        break;
       case "ldiff_download_complete":
         yield [
           "setStateText",
