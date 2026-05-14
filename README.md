@@ -78,8 +78,8 @@ node ./build-app.js
 ## Related projects
 
 * Custom `neutralinojs` binary from [3Shain/neutralinojs](https://github.com/3Shain/neutralinojs)
-* [DXVK-macOS](https://github.com/Gcenx/DXVK-macOS)
-* [MoltenVK](https://github.com/KhronosGroup/MoltenVK)
+* [DXMT](https://github.com/3Shain/dxmt)
+* Custom Wine from [anime-game-wine](https://github.com/yaagl/anime-game-wine)
 
 ## Special thanks
 * An Anime Team
