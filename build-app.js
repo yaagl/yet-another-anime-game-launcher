@@ -267,8 +267,8 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
-  // Remove protonextras for hkrpg and nap
-  if (["hkrpgcn", "hkrpgos", "napcn", "napos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
+  // Remove protonextras for hkrpg
+  if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));
   }
 
