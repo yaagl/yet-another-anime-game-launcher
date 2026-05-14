@@ -32,12 +32,6 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       appDistributionName = config.cli.binaryName + " Uni";
       includeSophon = true;
       break;
-    case "universal":
-      bundleId = config.applicationId + ".universal";
-      appDistributionName = config.cli.binaryName + " Multi";
-      config.modes.window.icon = "/src/icons/appIcon.png";
-      includeSophon = true;
-      break;
     case "hkrpgcn":
       bundleId = config.applicationId + ".hkrpg.cn";
       appDistributionName = config.cli.binaryName + " HSR";

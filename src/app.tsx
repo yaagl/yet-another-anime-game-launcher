@@ -21,13 +21,12 @@ import {
 } from "./wine";
 import { createGithubEndpoint } from "./github";
 import { createLauncher } from "./launcher";
-import { createGameDashboard } from "./launcher/dashboard";
 import "./app.css";
 import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { createClient } from "./clients";
-import { createSignal, onMount, Show, JSXElement } from "solid-js";
+import { createSignal, Show, JSXElement } from "solid-js";
 import {
   Modal,
   ModalOverlay,
@@ -94,6 +93,11 @@ export async function createApp() {
     )
   );
   await log(`Launched aria2 version ${aria2.version.version}`);
+  const initialUpdateCheck = await createUpdater({
+    github,
+    aria2,
+  });
+
   const ignoredVersion = await getKeyOrDefault("ignore_launcher_update", "");
 
   const wineStatus = await checkWine(github);
@@ -121,29 +125,17 @@ export async function createApp() {
       prefix: prefixPath,
       distro: wineStatus.wineDistribution,
     });
-    const clientOptions = {
+    MainApp = await createLauncher({
       wine,
-      aria2,
       locale,
-    };
-    if (import.meta.env["YAAGL_CHANNEL_CLIENT"] == "universal") {
-      MainApp = await createGameDashboard({
+      github,
+      channelClient: await createClient({
         wine,
-        locale,
-        github,
         aria2,
-        onCheckUpdate,
-      });
-    } else {
-      MainApp = await createLauncher({
-        wine,
         locale,
-        github,
-        aria2,
-        channelClient: await createClient(clientOptions),
-        onCheckUpdate,
-      });
-    }
+      }),
+      onCheckUpdate,
+    });
   } else {
     MainApp = await createWineInstallProgram({
       aria2,
@@ -156,24 +148,15 @@ export async function createApp() {
   return function AppRoot() {
     const [updaterComponent, setUpdaterComponent] =
       createSignal<() => JSXElement>();
-    const [pendingUpdateInfo, setPendingUpdateInfo] = createSignal<
-      Awaited<ReturnType<typeof createUpdater>>
-    >({ latest: true });
-    const [showPrompt, setShowPrompt] = createSignal(false);
+    const [pendingUpdateInfo, setPendingUpdateInfo] =
+      createSignal(initialUpdateCheck);
+    const [showPrompt, setShowPrompt] = createSignal(
+      initialUpdateCheck.latest == false &&
+        ignoredVersion !== initialUpdateCheck.version
+    );
 
     showPromptSignal = setShowPrompt;
     setPendingUpdateInfoSignal = setPendingUpdateInfo;
-
-    onMount(() => {
-      createUpdater({ github, aria2 })
-        .then(result => {
-          setPendingUpdateInfo(result);
-          setShowPrompt(
-            result.latest == false && ignoredVersion !== result.version
-          );
-        })
-        .catch(error => log(`Launcher update check failed: ${error}`));
-    });
 
     return (
       <>

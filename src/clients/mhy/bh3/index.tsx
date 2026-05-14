@@ -14,6 +14,7 @@ import {
   getKeyOrDefault,
   setKey,
   stats,
+  waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -84,6 +85,8 @@ export async function createBH3ChannelClient({
       pre_download_game,
     },
   }: LauncherResourceData = await getLatestVersionInfo(server);
+  await waitImageReady(background);
+
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server

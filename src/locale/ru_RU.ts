@@ -16,7 +16,7 @@ export const ru_RU: typeof zh_CN = {
   DOWNLOADING_ENVIRONMENT_SPEED: "Загрузка файлов окружения ({0}/s)",
   EXTRACT_ENVIRONMENT: "Распаковка окружения",
   CONFIGURING_ENVIRONMENT: "Настройка окружения",
-  RESTART_TO_INSTALL: "Перезапустить программу",
+  RESTART_TO_INSTALL: "Перезарустить программу",
   PATH_INVALID: "Неверный путь",
   PLEASE_SELECT_A_DIR: "Пожалуйста, выберите путь",
   PATH_INVALID_ASCII_ONLY: "Убедитесь, что путь содержит только символы ASCII.",
@@ -28,10 +28,6 @@ export const ru_RU: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Не поддерживаемая версия",
   SELECT_INSTALLATION_DIR:
     "Пожалуйста, выберите каталог установки игры.\nЕсли вы уже установили игру, выберите, где находится исполняемый файл игры.",
-  SELECT_INSTALLED_GAME_DIR: "Выбрать установленную игру",
-  LOADING_GAME: "Загрузка {0}...",
-  GAME_REGION_GLOBAL: "Глобальная",
-  GAME_REGION_CHINA: "Китай",
   CANT_OPEN_GAME_FILE: "Не удалось получить доступ к файлу игры",
   CANT_OPEN_GAME_FILE_DESC:
     "Лаунчеру не удалось получить доступ к файлу игры.\nНо не волнуйтесь, вы можете снова выбрать каталог установки игры, когда это диалоговое окно закроется\n\nЕсли это диалоговое окно появляется повторно, пожалуйста, проверьте, имеет ли программа запуска правильные разрешения для доступа к каталогу установки игры",
@@ -71,7 +67,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Всё",
   SETTING_RETINA: "Режим Retina",
   SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
-  SETTING_TURN_OFF_AC_PATCH: "Выключить патч AC",
+  SETTING_TURN_OFF_AC_PATCH: "выключи патч AC",
   SETTING_CUSTOM_RESOLUTION: "Пользовательское разрешение",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",
@@ -85,7 +81,6 @@ export const ru_RU: typeof zh_CN = {
   SETTING_GAME: "Игра",
   LANGUAGE_LOCALE_NAME: "Русский",
   SETTING_UI_LOCALE: "Язык лаунчера",
-  SETTING_CHOOSE_OPTION: "Выберите вариант",
   SETTING_RESTART_TO_TAKE_EFFECT: "Это вступит в силу после перезагрузки.",
   SETTING_OPEN_CMD: "Открыть командную строку Wine",
   SETTING_OPEN_GAME_INSTALL_DIR: "Открыть каталог установки игры",
@@ -114,15 +109,16 @@ export const ru_RU: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "В настоящее время выбрана версия сообщества, эта версия официально не поддерживается, не сообщайте о каких - либо проблемах",
 
-  SETTING_BLOCK_NET: "Исправление запуска (блокировка хостов)",
-  SETTING_LICENSES: "Лицензии",
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
+  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+
   SETTING_ENABLE_HDR: "Включить HDR",
 
-  SETTING_PROXY_ENABLED: "Включить HTTP-прокси",
-  SETTING_PROXY_HOST: "Хост HTTP-прокси",
-  SETTING_PROXY_DESC: "Прокси применяется только к игре, а не ко всему лаунчеру.",
+  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
+  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
+  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
-  SETTING_TURN_ON_STEAM_PATCH: "Включить патч Steam",
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 
   UPDATE_PROMPT_IGNORE: "Пропустить обновление",
   SETTING_CHECK_UPDATE: "Проверить обновления YAAGL",

@@ -50,7 +50,7 @@ def perform_install(manager: ConnectionManager, tasks: Dict[str, TaskStatus], ta
     cli.load_manifest("game")
     update_config_ini_version(options.gamedir, cli.di_chunks.getBuild_json["data"]["tag"])
 
-    download_size_total = cli.get_missing_chunk_download_size(False)
+    download_size_total = cli.get_chunk_download_size(False)
     progress.download_summary(
         game_version=cli.installed_ver,
         download_size=download_size_total,

@@ -11,8 +11,9 @@ import {
   SelectPlaceholder,
   SelectTrigger,
   SelectValue,
+  Text,
 } from "@hope-ui/solid";
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, Show } from "solid-js";
 import { Locale } from "@locale";
 import { setKey } from "@utils";
 import { Config } from "./config-def";
@@ -27,7 +28,6 @@ export default async function ({
 
   async function onSave(apply: boolean) {
     await setKey("config_uiLocale", value());
-    if (apply) locale.setLanguage(value());
   }
 
   createEffect(() => {
@@ -42,9 +42,7 @@ export default async function ({
           <FormLabel>{locale.get("SETTING_UI_LOCALE")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
-              <SelectPlaceholder>
-                {locale.get("SETTING_CHOOSE_OPTION")}
-              </SelectPlaceholder>
+              <SelectPlaceholder>Choose an option</SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>
@@ -62,6 +60,11 @@ export default async function ({
             </SelectContent>
           </Select>
         </FormControl>,
+        <Show when={locale.currentLanguage != value()}>
+          <Text fontSize={11} color={"$blackAlpha8"}>
+            {locale.get("SETTING_RESTART_TO_TAKE_EFFECT")}
+          </Text>
+        </Show>,
       ];
     },
   ] as const;

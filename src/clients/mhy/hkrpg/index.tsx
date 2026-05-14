@@ -14,6 +14,7 @@ import {
   getKeyOrDefault,
   setKey,
   stats,
+  waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -76,6 +77,8 @@ export async function createHKRPGChannelClient({
     },
     pre_download,
   } = await getLatestVersionInfo(server);
+  await waitImageReady(background);
+
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
@@ -108,7 +111,6 @@ export async function createHKRPGChannelClient({
       background: background, // Always show image
       background_video: IS_VIDEO_BG ? video_url : undefined,
       background_theme: IS_VIDEO_BG ? theme_url : undefined,
-      iconImage: icon,
       url: icon_link,
     },
     predownloadVersion: () => pre_download?.major?.version ?? "",

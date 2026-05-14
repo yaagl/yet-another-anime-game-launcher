@@ -16,6 +16,7 @@ import {
   readFile,
   setKey,
   stats,
+  waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -67,6 +68,8 @@ export async function createCBJQChannelClient({
   const resourceData = await getLatestVersionInfo(server);
   const { projectVersion: GAME_LATEST_VERSION }: LauncherResourceData =
     resourceData;
+  await waitImageReady(server.background_url);
+
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
@@ -95,6 +98,7 @@ export async function createCBJQChannelClient({
       background: server.background_url,
       iconImage: "",
       url: "",
+      launchButtonLocation: "left",
     },
     predownloadVersion: () => "", // TODO
     dismissPredownload() {

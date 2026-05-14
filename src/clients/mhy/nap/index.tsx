@@ -15,6 +15,7 @@ import {
   md5,
   setKey,
   stats,
+  waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
@@ -86,6 +87,8 @@ export async function createNAPChannelClient({
     },
     pre_download,
   } = await getLatestVersionInfo(server);
+
+  await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,

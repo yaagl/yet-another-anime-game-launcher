@@ -144,38 +144,8 @@ export async function spawn(
   return { pid, id };
 }
 
-let storageNamespace = "";
-
-const NAMESPACED_STORAGE_KEYS = new Set(["game_install_dir"]);
-const NAMESPACED_STORAGE_PREFIXES = [
-  "predownloaded_",
-  "patched",
-  "config_block_net",
-  "config_patch_off",
-  "config_resolution_",
-  "config_hk4e_",
-  "config_workaround3",
-  "config_steam_patch",
-];
-
-function shouldNamespaceStorageKey(key: string) {
-  return (
-    NAMESPACED_STORAGE_KEYS.has(key) ||
-    NAMESPACED_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix))
-  );
-}
-
-function storageKey(key: string) {
-  if (!storageNamespace || !shouldNamespaceStorageKey(key)) return key;
-  return `${storageNamespace}.${key}`;
-}
-
-export function setStorageNamespace(namespace: string) {
-  storageNamespace = namespace;
-}
-
 export async function getKey(key: string): Promise<string> {
-  return await Neutralino.storage.getData(storageKey(key));
+  return await Neutralino.storage.getData(key);
 }
 
 export async function getKeyOrDefault(
@@ -190,7 +160,7 @@ export async function getKeyOrDefault(
 }
 
 export async function setKey(key: string, value: string | null) {
-  return await Neutralino.storage.setData(storageKey(key), value);
+  return await Neutralino.storage.setData(key, value);
 }
 
 export function log(message: string) {
@@ -326,10 +296,6 @@ export async function writeBinary(path: string, data: ArrayBuffer) {
 
 export async function writeFile(path: string, data: string) {
   return await Neutralino.filesystem.writeFile(resolve(path), data);
-}
-
-export async function createDirIfNeeded(path: string) {
-  return await Neutralino.filesystem.createDirectory(resolve(path));
 }
 
 export async function removeFile(path: string) {

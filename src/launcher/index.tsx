@@ -26,8 +26,6 @@ import { createGameInstallationDirectorySanitizer } from "../accidental-complexi
 import { ChannelClient } from "../channel-client";
 import { createTaskQueueState } from "./task-queue";
 import { Wine } from "@wine";
-import { getCachedMediaUrl } from "../media-cache";
-import type { Aria2 } from "@aria2";
 
 const IconSetting = createIcon({
   viewBox: "0 0 1024 1024",
@@ -42,27 +40,10 @@ const IconSetting = createIcon({
   },
 });
 
-const IconFolder = createIcon({
-  viewBox: "0 0 24 24",
-  path() {
-    return (
-      <path
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M3 6.5A2.5 2.5 0 0 1 5.5 4H9l2 2h7.5A2.5 2.5 0 0 1 21 8.5v8A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"
-      />
-    );
-  },
-});
-
 export async function createLauncher({
   wine,
   locale,
   github,
-  aria2,
   channelClient: {
     installDir,
     installState,
@@ -92,24 +73,9 @@ export async function createLauncher({
   wine: Wine;
   locale: Locale;
   github: Github;
-  aria2?: Aria2;
   channelClient: ChannelClient;
   onCheckUpdate: () => void;
 }) {
-  const [
-    cachedBackground,
-    cachedBackgroundVideo,
-    cachedBackgroundTheme,
-    cachedIconImage,
-    cachedLogo,
-  ] = await Promise.all([
-    getCachedMediaUrl(background, aria2),
-    getCachedMediaUrl(background_video, aria2),
-    getCachedMediaUrl(background_theme, aria2),
-    getCachedMediaUrl(iconImage, aria2),
-    getCachedMediaUrl(logo, aria2),
-  ]);
-
   const { UI: ConfigurationUI, config } = await createConfiguration({
     wine,
     locale,
@@ -161,26 +127,17 @@ export async function createLauncher({
       }
     }
 
-    async function onChooseInstalledGameClick() {
-      if (programBusy() || installState() == "INSTALLED") return;
-      const selection = await selectPath();
-      if (!selection) return;
-      taskQueue.next(() => install(selection));
-    }
-
     return (
       <div
         class="background"
         style={{
-          "background-image": cachedBackground
-            ? `url(${cachedBackground})`
-            : undefined,
+          "background-image": background ? `url(${background})` : undefined,
         }}
       >
-        <Show when={cachedBackgroundVideo}>
+        <Show when={background_video}>
           <video
             class="background-video"
-            src={cachedBackgroundVideo}
+            src={background_video}
             autoplay
             loop
             muted
@@ -192,11 +149,11 @@ export async function createLauncher({
             }}
           />
         </Show>
-        <Show when={cachedBackgroundTheme}>
+        <Show when={background_theme}>
           <div
             class="background-theme"
             style={{
-              "background-image": `url(${cachedBackgroundTheme})`,
+              "background-image": `url(${background_theme})`,
               // HACK: always load video overlay image.
               // Image seems to align with overlay. Fix for ZZZ not having text in image.
             }}
@@ -206,7 +163,7 @@ export async function createLauncher({
           <div
             class="game-logo"
             style={{
-              "background-image": `url(${cachedLogo})`,
+              "background-image": `url(${logo})`,
               height: `${234}px`,
               width: `${416}px`, //fixme: responsive size
             }}
@@ -218,22 +175,12 @@ export async function createLauncher({
             role="button"
             class="version-icon"
             style={{
-              "background-image": `url(${cachedIconImage})`,
+              "background-image": `url(${iconImage})`,
               height: `${bh}px`,
               width: `${bw}px`, //fixme: responsive size
             }}
           />
         ) : null}
-        <button
-          class="side-settings-button"
-          onClick={onOpen}
-          disabled={programBusy()}
-          aria-label={locale.get("SETTING")}
-          title={locale.get("SETTING")}
-          type="button"
-        >
-          <IconSetting />
-        </button>
         <Flex h="100vh" direction={"column-reverse"}>
           <Flex
             direction={launchButtonLocation == "left" ? "row-reverse" : "row"}
@@ -295,9 +242,11 @@ export async function createLauncher({
                 <ButtonGroup
                   class="launch-button"
                   size="xl"
+                  attached
                   minWidth={150}
                 >
                   <Button
+                    mr="-1px"
                     disabled={programBusy()}
                     onClick={() => onButtonClick().catch(fatal)}
                   >
@@ -307,14 +256,13 @@ export async function createLauncher({
                         : locale.get("LAUNCH")
                       : locale.get("INSTALL")}
                   </Button>
-                  <Show when={installState() != "INSTALLED"}>
+                  <Show when={installState() == "INSTALLED"}>
                     <IconButton
-                      onClick={() => onChooseInstalledGameClick().catch(fatal)}
+                      onClick={onOpen}
                       disabled={programBusy()}
                       fontSize={30}
-                      aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
-                      title={locale.get("SELECT_INSTALLED_GAME_DIR")}
-                      icon={<IconFolder />}
+                      aria-label="Settings"
+                      icon={<IconSetting />}
                     />
                   </Show>
                 </ButtonGroup>
