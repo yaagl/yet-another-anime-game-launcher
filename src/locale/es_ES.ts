@@ -5,8 +5,6 @@ export const es_ES: typeof zh_CN = {
   CONTENT_LANG_ID: "es-es",
   LAUNCH: "Iniciar el juego",
   INSTALL: "Instalar el juego",
-  RESUME: "Continuar",
-  REPAIR_GAME: "Reparar juego",
   UPDATING: "Actualizando",
   DOWNLOADING: "Descargando",
   FIXING_FILES: "Arreglando archivos del juego {0}/{1}",

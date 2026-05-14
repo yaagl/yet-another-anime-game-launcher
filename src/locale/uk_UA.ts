@@ -4,8 +4,6 @@ export const uk_UA: typeof zh_CN = {
   CONTENT_LANG_ID: "uk-ua",
   LAUNCH: "Запустити гру",
   INSTALL: "Встановити гру",
-  RESUME: "Продовжити",
-  REPAIR_GAME: "Полагодити гру",
   UPDATING: "Оновлення",
   DOWNLOADING: "Завантаження",
   FIXING_FILES: "Виправлення ігрових файлів {0}/{1}",

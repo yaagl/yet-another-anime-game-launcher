@@ -84,13 +84,13 @@ export async function createBH3ChannelClient({
       pre_download_game,
     },
   }: LauncherResourceData = await getLatestVersionInfo(server);
-  const { gameInstalled, hasPartialInstall, gameInstallDir, gameVersion } = await checkGameState(
+  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : hasPartialInstall ? "PARTIAL_INSTALL" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
@@ -136,14 +136,6 @@ export async function createBH3ChannelClient({
           );
           return;
         }
-
-        // Save the directory BEFORE starting the download so the launcher
-        // can resume if the user closes it mid-download.
-        await setKey("game_install_dir", selection);
-        batch(() => {
-          setInstalled("PARTIAL_INSTALL");
-          setGameInstallDir(selection);
-        });
 
         yield* downloadAndInstallGameProgram({
           aria2,
@@ -355,29 +347,17 @@ async function checkGameState(locale: Locale, server: Server) {
   } catch {
     return {
       gameInstalled: false,
-      hasPartialInstall: false,
     } as const;
   }
   try {
     return {
       gameInstalled: true,
-      hasPartialInstall: false,
       gameInstallDir: gameDir,
       gameVersion: await getGameVersion(join(gameDir, server.dataDir)),
     } as const;
   } catch {
-    // Check for partial install: a .tmp directory means a download was started
-    let partial = false;
-    try {
-      const tmp = await stats(join(gameDir, ".tmp"));
-      partial = tmp.isDirectory;
-    } catch {
-      partial = false;
-    }
     return {
       gameInstalled: false,
-      hasPartialInstall: partial,
-      gameInstallDir: partial ? gameDir : undefined,
     } as const;
   }
 }

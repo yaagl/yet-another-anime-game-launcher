@@ -20,7 +20,7 @@ import {
   timeout,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt, SemVer, valid } from "semver";
+import { gt, lt, SemVer } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import {
@@ -88,33 +88,33 @@ export async function createHK4EChannelClient({
   });
   const sophon = await Promise.race([
     createSophonRetry(sophon_host, sophon_port),
-    timeout(15000),
+    timeout(30000),
   ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
 
   const gameInfo = await sophon.getLatestOnlineGameInfo(releaseType, "hk4e");
   log(`Game info: ${JSON.stringify(gameInfo)}`);
-  const LATEST_GAME_VERSION: string = valid(gameInfo.version) ? gameInfo.version : "0.0.0";
+  const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
-  const PRE_DOWNLOAD_VERSION: string = valid(gameInfo.pre_download_version) ? gameInfo.pre_download_version! : "0.0.0";
+  const PRE_DOWNLOAD_VERSION: string = gameInfo.pre_download_version || "0.0.0";
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
   const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
-  const { gameInstalled, hasPartialInstall, gameInstallDir, gameVersion } = await checkGameState(
+  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server,
     releaseType
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : hasPartialInstall ? "PARTIAL_INSTALL" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
       PRE_DOWNLOAD_AVAILABLE &&
-      (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
-      "NOTFOUND" && // not downloaded yet
-      gameInstalled && // game installed
-      gt(PRE_DOWNLOAD_VERSION, gameVersion) // predownload version is greater
+        (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
+          "NOTFOUND" && // not downloaded yet
+        gameInstalled && // game installed
+        gt(PRE_DOWNLOAD_VERSION, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -147,27 +147,17 @@ export async function createHK4EChannelClient({
         server
       );
       if (!existingGameDir) {
-        if (!(await hasInstallResumeState(selection))) {
-          const freeSpaceGB = await getFreeSpace(selection, "g");
-          const requiredSpaceGB =
-            Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
-          if (freeSpaceGB < requiredSpaceGB) {
-            await locale.alert(
-              "NO_ENOUGH_DISKSPACE",
-              "NO_ENOUGH_DISKSPACE_DESC",
-              [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
-            );
-            return;
-          }
+        const freeSpaceGB = await getFreeSpace(selection, "g");
+        const requiredSpaceGB =
+          Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
+        if (freeSpaceGB < requiredSpaceGB) {
+          await locale.alert(
+            "NO_ENOUGH_DISKSPACE",
+            "NO_ENOUGH_DISKSPACE_DESC",
+            [requiredSpaceGB + "", (requiredSpaceGB * 1.074).toFixed(1)]
+          );
+          return;
         }
-
-        // Save the directory BEFORE starting the download so the launcher
-        // can resume if the user closes it mid-download.
-        await setKey("game_install_dir", selection);
-        batch(() => {
-          setInstalled("PARTIAL_INSTALL");
-          setGameInstallDir(selection);
-        });
 
         yield* downloadAndInstallGameProgram({
           sophonClient: sophon,
@@ -331,19 +321,13 @@ export async function createHK4EChannelClient({
 }
 
 async function getGameVersionGI(gameDataDir: string) {
-  for (const offset of [0xac, undefined] as const) {
-    try {
-      const ret =
-        offset == null
-          ? await getGameVersion(gameDataDir)
-          : await getGameVersion(gameDataDir, offset);
-      await log(String(new SemVer(ret)));
-      return ret;
-    } catch {
-      // Try the next known metadata layout.
-    }
+  try {
+    const ret = await getGameVersion(gameDataDir, 0xac);
+    await log(String(new SemVer(ret)));
+    return ret;
+  } catch {
+    return await getGameVersion(gameDataDir);
   }
-  throw new Error("Failed to parse game version");
 }
 
 async function hasExistingGameInstall(
@@ -356,7 +340,6 @@ async function hasExistingGameInstall(
       join(gameDir, releaseType == "os" ? "GenshinImpact.exe" : "YuanShen.exe")
     );
     await stats(join(gameDir, server.dataDir, "globalgamemanagers"));
-    await getGameVersionGI(join(gameDir, server.dataDir));
     return true;
   } catch {
     return false;
@@ -386,22 +369,6 @@ async function findExistingGameInstallDir(
   }
 }
 
-async function hasInstallResumeState(selection: string) {
-  try {
-    await stats(join(selection, "config.ini"));
-    return true;
-  } catch {
-    // Fresh install path.
-  }
-
-  try {
-    const tmp = await stats(join(selection, ".tmp"));
-    return tmp.isDirectory;
-  } catch {
-    return false;
-  }
-}
-
 async function checkGameState(
   locale: Locale,
   server: Server,
@@ -413,7 +380,6 @@ async function checkGameState(
   } catch {
     return {
       gameInstalled: false,
-      hasPartialInstall: false,
     } as const;
   }
   try {
@@ -422,17 +388,12 @@ async function checkGameState(
     }
     return {
       gameInstalled: true,
-      hasPartialInstall: false,
       gameInstallDir: gameDir,
       gameVersion: await getGameVersionGI(join(gameDir, server.dataDir)),
     } as const;
   } catch {
-    // Check if there's a partial install (resume state)
-    const partial = await hasInstallResumeState(gameDir);
     return {
       gameInstalled: false,
-      hasPartialInstall: partial,
-      gameInstallDir: partial ? gameDir : undefined,
     } as const;
   }
 }

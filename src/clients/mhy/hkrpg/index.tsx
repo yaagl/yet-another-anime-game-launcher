@@ -16,7 +16,7 @@ import {
   stats,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt, valid } from "semver";
+import { gt, lt } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "../program-check-integrity";
 import {
@@ -76,13 +76,13 @@ export async function createHKRPGChannelClient({
     },
     pre_download,
   } = await getLatestVersionInfo(server);
-  const { gameInstalled, hasPartialInstall, gameInstallDir, gameVersion } = await checkGameState(
+  const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : hasPartialInstall ? "PARTIAL_INSTALL" : "NOT_INSTALLED"
+    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
@@ -116,16 +116,9 @@ export async function createHKRPGChannelClient({
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
-      let gameVersion = "";
       try {
         // await stats(join(selection, "pkg_version"));
         await stats(join(selection, "GameAssembly.dll")); // FIXME: no pkg_version?
-        gameVersion = await getGameVersion2019(
-          join(selection, server.dataDir)
-        );
-        if (!valid(gameVersion)) {
-          throw new Error("Invalid version parsed");
-        }
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
         const totalSize = game_pkgs
@@ -141,14 +134,6 @@ export async function createHKRPGChannelClient({
           );
           return;
         }
-
-        // Save the directory BEFORE starting the download so the launcher
-        // can resume if the user closes it mid-download.
-        await setKey("game_install_dir", selection);
-        batch(() => {
-          setInstalled("PARTIAL_INSTALL");
-          setGameInstallDir(selection);
-        });
 
         yield* downloadAndInstallGameProgram({
           aria2,
@@ -166,6 +151,9 @@ export async function createHKRPGChannelClient({
         await setKey("game_install_dir", selection);
         return;
       }
+      const gameVersion = await getGameVersion2019(
+        join(selection, server.dataDir)
+      );
       if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
         await locale.alert(
           "UNSUPPORTED_VERSION",
@@ -371,29 +359,17 @@ async function checkGameState(locale: Locale, server: Server) {
   } catch {
     return {
       gameInstalled: false,
-      hasPartialInstall: false,
     } as const;
   }
   try {
     return {
       gameInstalled: true,
-      hasPartialInstall: false,
       gameInstallDir: gameDir,
       gameVersion: await getGameVersion2019(join(gameDir, server.dataDir)),
     } as const;
   } catch {
-    // Check for partial install: a .tmp directory means a download was started
-    let partial = false;
-    try {
-      const tmp = await stats(join(gameDir, ".tmp"));
-      partial = tmp.isDirectory;
-    } catch {
-      partial = false;
-    }
     return {
       gameInstalled: false,
-      hasPartialInstall: partial,
-      gameInstallDir: partial ? gameDir : undefined,
     } as const;
   }
 }
