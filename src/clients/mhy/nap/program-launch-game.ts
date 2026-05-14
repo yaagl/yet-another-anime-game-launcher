@@ -101,6 +101,7 @@ cd /d "${wine.toWinePath(gameDir)}"
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         WINEDLLOVERRIDES: "",
+        WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
