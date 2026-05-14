@@ -64,7 +64,9 @@ export default async function ({
           <FormLabel>{locale.get("SETTING_FPS_UNLOCK")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
-              <SelectPlaceholder>Choose an option</SelectPlaceholder>
+              <SelectPlaceholder>
+                {locale.get("SETTING_CHOOSE_OPTION")}
+              </SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>
