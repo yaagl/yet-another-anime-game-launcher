@@ -51,6 +51,8 @@ export const ko_KR: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "파일 압축 해제하는 중",
   ALLOCATING_FILE: "디스크에 파일 할당하는 중",
+  PREPARING_INSTALLATION: "설치 준비 중...",
+  SCANNING_FILES_STATUS: "게임 파일 스캔 중...",
   DOWNLOADING_FILE_PROGRESS: "파일 다운로드 중: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "사용자 데이터 백업",

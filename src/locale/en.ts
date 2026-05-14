@@ -53,6 +53,8 @@ export const en: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Decompressing files",
   ALLOCATING_FILE: "Allocating files on disk",
+  PREPARING_INSTALLATION: "Preparing installation...",
+  SCANNING_FILES_STATUS: "Scanning game files...",
   DOWNLOADING_FILE_PROGRESS: "Downloading file: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Backing up user data",

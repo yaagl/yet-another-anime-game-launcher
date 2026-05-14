@@ -53,6 +53,8 @@ export const de_DE: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Dateien entpacken",
   ALLOCATING_FILE: "Dateien auf der Festplatte zuweisen",
+  PREPARING_INSTALLATION: "Installation wird vorbereitet...",
+  SCANNING_FILES_STATUS: "Spieldateien werden gescannt...",
   DOWNLOADING_FILE_PROGRESS: "Datei herunterladen: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Benutzerdaten sichern",

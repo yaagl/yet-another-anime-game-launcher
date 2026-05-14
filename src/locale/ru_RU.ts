@@ -52,6 +52,8 @@ export const ru_RU: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Распаковка файлов",
   ALLOCATING_FILE: "Распределение файлов на диске",
+  PREPARING_INSTALLATION: "Подготовка к установке...",
+  SCANNING_FILES_STATUS: "Сканирование игровых файлов...",
   DOWNLOADING_FILE_PROGRESS: "Загрузка файла: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Резервное копирование пользовательских данных",

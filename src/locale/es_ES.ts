@@ -54,6 +54,8 @@ export const es_ES: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Descomprimiendo archivos",
   ALLOCATING_FILE: "Asignando archivos en disco",
+  PREPARING_INSTALLATION: "Preparando instalación...",
+  SCANNING_FILES_STATUS: "Escaneando archivos del juego...",
   DOWNLOADING_FILE_PROGRESS: "Descargando archivo: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Respaldando datos de usuario",

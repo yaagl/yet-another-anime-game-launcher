@@ -53,6 +53,8 @@ export const vi_VN: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "Đang giải nén tệp",
   ALLOCATING_FILE: "Đang phân bổ tệp trên ổ đĩa",
+  PREPARING_INSTALLATION: "Đang chuẩn bị cài đặt...",
+  SCANNING_FILES_STATUS: "Đang quét tệp trò chơi...",
   DOWNLOADING_FILE_PROGRESS: "Đang tải tệp: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Đang sao lưu dữ liệu người dùng",

@@ -51,6 +51,8 @@ export const th_TH: typeof zh_CN = {
 
   DECOMPRESS_FILE_PROGRESS: "กำลังแตกไฟล์",
   ALLOCATING_FILE: "กำลังจัดสรรพื้นที่ไฟล์บนดิสก์",
+  PREPARING_INSTALLATION: "กำลังเตรียมการติดตั้ง...",
+  SCANNING_FILES_STATUS: "กำลังสแกนไฟล์เกม...",
   DOWNLOADING_FILE_PROGRESS: "กำลังดาวน์โหลดไฟล์: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "กำลังสำรองข้อมูลผู้ใช้",
