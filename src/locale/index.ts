@@ -7,6 +7,7 @@ import { ru_RU } from "./ru_RU";
 import { ko_KR } from "./ko_KR";
 import { de_DE } from "./de_DE";
 import { th_TH } from "./th_TH";
+import { uk_UA } from "./uk_UA";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -14,6 +15,7 @@ import {
   formatString,
   getKey,
 } from "../utils";
+import { createSignal } from "solid-js";
 
 export type LocaleTextKey = keyof typeof zh_CN;
 
@@ -22,11 +24,12 @@ export const locales = {
   en,
   vi_vn: vi_VN,
   es_es: es_ES,
-  fr_FR: fr_FR,
+  fr_fr: fr_FR,
   ru_ru: ru_RU,
   ko_kr: ko_KR,
   de_de: de_DE,
   th_th: th_TH,
+  uk_ua: uk_UA,
 };
 
 export async function createLocale() {
@@ -47,14 +50,19 @@ export async function createLocale() {
   }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore THIS IS A BUG
-  const currentLanguage: keyof typeof locales = lang in locales ? lang : "en";
-  const locale = locales[currentLanguage];
+  const initialLanguage: keyof typeof locales = lang in locales ? lang : "en";
+  const [currentLanguage, setCurrentLanguage] = createSignal(initialLanguage);
+
+  function currentLocale() {
+    return locales[currentLanguage()];
+  }
 
   function alert(
     title: LocaleTextKey,
     content: LocaleTextKey,
     intrp: string[] = []
   ) {
+    const locale = currentLocale();
     return ualert(locale[title], formatString(locale[content], intrp));
   }
 
@@ -63,6 +71,7 @@ export async function createLocale() {
     content: LocaleTextKey,
     intrp: string[] = []
   ) {
+    const locale = currentLocale();
     return uprompt(locale[title], formatString(locale[content], intrp));
   }
 
@@ -71,6 +80,7 @@ export async function createLocale() {
     content: LocaleTextKey,
     intrp: string[] = []
   ) {
+    const locale = currentLocale();
     return upromptUpdate(
       locale[title],
       formatString(locale[content], intrp),
@@ -81,11 +91,16 @@ export async function createLocale() {
   }
 
   function format(key: LocaleTextKey, intrp: string[]) {
-    return formatString(locale[key], intrp);
+    return formatString(currentLocale()[key], intrp);
   }
 
   function get(key: LocaleTextKey) {
-    return locale[key];
+    return currentLocale()[key];
+  }
+
+  function setLanguage(lang: string) {
+    const nextLanguage = lang.toLowerCase() as keyof typeof locales;
+    setCurrentLanguage(nextLanguage in locales ? nextLanguage : "en");
   }
 
   return {
@@ -102,7 +117,10 @@ export async function createLocale() {
         };
       }
     ),
-    currentLanguage,
+    get currentLanguage() {
+      return currentLanguage();
+    },
+    setLanguage,
   };
 }
 

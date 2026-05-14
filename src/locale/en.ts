@@ -4,6 +4,10 @@ export const en: typeof zh_CN = {
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Launch Game",
   INSTALL: "Install Game",
+  RESUME: "Continue",
+  REPAIR_GAME: "Repair Game",
+  REPAIR_AFTER_DOWNLOAD_DESC:
+    "The game is not fully downloaded yet. Continue the download first; integrity check will be available after installation completes.",
   UPDATING: "Updating",
   DOWNLOADING: "Downloading",
   FIXING_FILES: "Fixing game files {0}/{1}",
@@ -28,6 +32,10 @@ export const en: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Unsupported version",
   SELECT_INSTALLATION_DIR:
     "Please select the game installation directory.\nIf you have already installed the game, select where the game executable file is located.",
+  SELECT_INSTALLED_GAME_DIR: "Select installed game",
+  LOADING_GAME: "Loading {0}...",
+  GAME_REGION_GLOBAL: "Global",
+  GAME_REGION_CHINA: "China",
   CANT_OPEN_GAME_FILE: "Failed to access game files.",
   CANT_OPEN_GAME_FILE_DESC:
     "The launcher failed to access the game files.\nPlease adjust the game installation directory after this dialog.\n\nIf this dialog appears repeatedly, please ensure that the launcher has the permission to access the game directory.",
@@ -81,6 +89,7 @@ export const en: typeof zh_CN = {
   SETTING_GAME: "Game",
   LANGUAGE_LOCALE_NAME: "English",
   SETTING_UI_LOCALE: "Launcher UI Language",
+  SETTING_CHOOSE_OPTION: "Choose an option",
   SETTING_RESTART_TO_TAKE_EFFECT: "This will take effect after restart.",
   SETTING_OPEN_CMD: "Launch Wine Command Line Tool",
   SETTING_OPEN_GAME_INSTALL_DIR: "Open Game Install Directory",

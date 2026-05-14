@@ -1,10 +1,12 @@
 import { zh_CN } from "./zh_CN";
-import { en } from "@locale/en";
 
 export const de_DE: typeof zh_CN = {
   CONTENT_LANG_ID: "de-de",
   LAUNCH: "Spiel starten",
   INSTALL: "Spiel installieren",
+  RESUME: "Fortsetzen",
+  REPAIR_GAME: "Spiel reparieren",
+  REPAIR_AFTER_DOWNLOAD_DESC: "The game is not fully downloaded yet. Continue the download first; integrity check will be available after installation completes.",
   UPDATING: "Aktualisieren",
   DOWNLOADING: "Herunterladen",
   FIXING_FILES: "Spieldateien reparieren {0}/{1}",
@@ -30,6 +32,10 @@ export const de_DE: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Nicht unterstützte Version",
   SELECT_INSTALLATION_DIR:
     "Bitte wählen Sie das Installationsverzeichnis des Spiels.\nWenn Sie das Spiel bereits installiert haben, wählen Sie das Verzeichnis, in dem sich die ausführbare Spieldatei befindet.",
+  SELECT_INSTALLED_GAME_DIR: "Installiertes Spiel auswählen",
+  LOADING_GAME: "{0} wird geladen...",
+  GAME_REGION_GLOBAL: "Global",
+  GAME_REGION_CHINA: "China",
   CANT_OPEN_GAME_FILE: "Zugriff auf Spieldateien fehlgeschlagen.",
   CANT_OPEN_GAME_FILE_DESC:
     "Der Launcher konnte nicht auf die Spieldateien zugreifen.\nBitte passen Sie das Installationsverzeichnis des Spiels nach diesem Dialog an.\n\nWenn dieser Dialog wiederholt angezeigt wird, stellen Sie bitte sicher, dass der Launcher die Berechtigung hat, auf das Spielverzeichnis zuzugreifen.",
@@ -83,6 +89,7 @@ export const de_DE: typeof zh_CN = {
   SETTING_GAME: "Spiel",
   LANGUAGE_LOCALE_NAME: "Deutsch",
   SETTING_UI_LOCALE: "Launcher UI-Sprache",
+  SETTING_CHOOSE_OPTION: "Wählen Sie eine Option",
   SETTING_RESTART_TO_TAKE_EFFECT: "Dies wird nach dem Neustart wirksam.",
   SETTING_OPEN_CMD: "Wine-Kommandozeilenwerkzeug starten",
   SETTING_OPEN_GAME_INSTALL_DIR: "Spiel-Installationsverzeichnis öffnen",
@@ -112,15 +119,16 @@ export const de_DE: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "Aktuelle version als gemeindeversion, die nicht offiziell unterstützt wird. Bitte berichten sie nicht über Fragen.",
 
-  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_BLOCK_NET: "Start-Fix (Hosts blockieren)",
+  SETTING_LICENSES: "Lizenzen",
   SETTING_ENABLE_HDR: "HDR aktivieren",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "HTTP-Proxy aktivieren",
+  SETTING_PROXY_HOST: "HTTP-Proxy-Host",
+  SETTING_PROXY_DESC:
+    "Der Proxy gilt nur für das Spiel, nicht für den gesamten Launcher.",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "Steam-Patch aktivieren",
 
   UPDATE_PROMPT_IGNORE: "Update ignorieren",
   SETTING_CHECK_UPDATE: "Nach YAAGL-Updates suchen",

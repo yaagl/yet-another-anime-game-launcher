@@ -1,10 +1,12 @@
-import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
 export const vi_VN: typeof zh_CN = {
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Khởi động trò chơi",
   INSTALL: "Cài đặt trò chơi",
+  RESUME: "Tiếp tục",
+  REPAIR_GAME: "Sửa trò chơi",
+  REPAIR_AFTER_DOWNLOAD_DESC: "The game is not fully downloaded yet. Continue the download first; integrity check will be available after installation completes.",
   UPDATING: "Đang cập nhật",
   DOWNLOADING: "Đang tải",
   FIXING_FILES: "Đang sửa tệp trò chơi {0}/{1}",
@@ -30,6 +32,10 @@ export const vi_VN: typeof zh_CN = {
   UNSUPPORTED_VERSION: "Phiên bản không được hỗ trợ",
   SELECT_INSTALLATION_DIR:
     "Vui lòng chọn thư mục cài đặt trò chơi.\nNếu như bạn đã có sẵn game thì hãy chọn thư mục có chứa tệp thực thi (.exe) của game",
+  SELECT_INSTALLED_GAME_DIR: "Chọn game đã cài đặt",
+  LOADING_GAME: "Đang tải {0}...",
+  GAME_REGION_GLOBAL: "Toàn cầu",
+  GAME_REGION_CHINA: "Trung Quốc",
   CANT_OPEN_GAME_FILE: "Không truy cập được tệp của trò chơi",
   CANT_OPEN_GAME_FILE_DESC:
     "Trình khởi động không truy cập được tệp trò chơi\nNhưng đừng lo, bạn có thể chọn lại thư mục cài đặt trò chơi khi bảng này được đóng\n\nNếu như bảng này vẫn lặp lại liên tục, hãy kiểm tra liệu trình khởi động có được cấp quyền để truy cập thư mục cài đặt trò chơi này không",
@@ -83,6 +89,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_GAME: "Trò chơi",
   LANGUAGE_LOCALE_NAME: "Tiếng Việt",
   SETTING_UI_LOCALE: "Ngôn ngữ trình khởi động",
+  SETTING_CHOOSE_OPTION: "Chọn một tùy chọn",
   SETTING_RESTART_TO_TAKE_EFFECT:
     "Cài đặt sẽ có hiệu lực sau khi khởi động lại",
   SETTING_OPEN_CMD: "Mở command line (cmd) của wine",
@@ -101,24 +108,26 @@ export const vi_VN: typeof zh_CN = {
   NO_ENOUGH_DISKSPACE: "Không đủ dung lượng trống trên ổ đĩa",
   NO_ENOUGH_DISKSPACE_DESC: "Cần có tối thiếu {0}GiB ({1}GB) dung lượng trống.",
 
-  UPDATE: en.UPDATE,
-  GAME_VERSION_TOO_OLD_DESC: en.GAME_VERSION_TOO_OLD_DESC,
+  UPDATE: "Cập nhật game",
+  GAME_VERSION_TOO_OLD_DESC:
+    "Phiên bản hiện tại ({0}) đã quá cũ để cập nhật từng phần. Vui lòng cài đặt lại game.",
 
-  PREDOWNLOAD_READY: en.PREDOWNLOAD_READY,
+  PREDOWNLOAD_READY: "Tải trước {0}",
 
   COMMUNITY_WARNING: "Cảnh báo phiên bản cộng đồng",
   COMMUNITY_WINE_ALERT:
     "Hiện tại được chọn là phiên bản cộng đồng, phiên bản này không được hỗ trợ chính thức, vui lòng không báo cáo bất kỳ vấn đề nào",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_LICENSES: "Giấy phép",
   SETTING_ENABLE_HDR: "Bật HDR",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "Bật Proxy HTTP",
+  SETTING_PROXY_HOST: "Host Proxy HTTP",
+  SETTING_PROXY_DESC:
+    "Proxy chỉ áp dụng cho game, không áp dụng cho toàn bộ launcher.",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "Bật Steam Patch",
 
   UPDATE_PROMPT_IGNORE: "Bỏ qua cập nhật",
   SETTING_CHECK_UPDATE: "Kiểm tra cập nhật YAAGL",

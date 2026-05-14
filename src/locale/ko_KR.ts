@@ -1,10 +1,12 @@
 import { zh_CN } from "./zh_CN";
-import { en } from "@locale/en";
 
 export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",
   INSTALL: "게임 다운로드",
+  RESUME: "계속",
+  REPAIR_GAME: "게임 복구",
+  REPAIR_AFTER_DOWNLOAD_DESC: "The game is not fully downloaded yet. Continue the download first; integrity check will be available after installation completes.",
   UPDATING: "업데이트 중",
   DOWNLOADING: "다운로드 중",
   FIXING_FILES: "게임 파일 복구 중 {0}/{1}",
@@ -28,6 +30,10 @@ export const ko_KR: typeof zh_CN = {
   UNSUPPORTED_VERSION: "지원되지 않는 버전입니다",
   SELECT_INSTALLATION_DIR:
     "게임 설치 경로를 선택하세요.\n이미 게임을 설치했다면, 게임 실행 파일의 위치를 선택하세요.",
+  SELECT_INSTALLED_GAME_DIR: "설치된 게임 선택",
+  LOADING_GAME: "{0} 로딩 중...",
+  GAME_REGION_GLOBAL: "글로벌",
+  GAME_REGION_CHINA: "중국",
   CANT_OPEN_GAME_FILE: "게임 파일에 접근할 수 없습니다",
   CANT_OPEN_GAME_FILE_DESC:
     "런처가 게임 파일에 접근할 수 없습니다.\n하지만 걱정하지 마세요. 이 대화상자가 닫힐 때 게임 설치 경로를 다시 지정할 수 있습니다.\n\n이 대화상자가 반복적으로 나타나면 런처가 게임 설치 경로에 접근할 수 있는 권한이 있는지 확인하십시오",
@@ -81,6 +87,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_GAME: "게임",
   LANGUAGE_LOCALE_NAME: "한국어",
   SETTING_UI_LOCALE: "런처 UI 언어",
+  SETTING_CHOOSE_OPTION: "옵션 선택",
   SETTING_RESTART_TO_TAKE_EFFECT:
     "이 설정은 런처를 재시작한 이후에 적용됩니다.",
   SETTING_OPEN_CMD: "Wine 명령줄 도구 실행",
@@ -111,14 +118,14 @@ export const ko_KR: typeof zh_CN = {
     "현재 커뮤니티 버전이 선택되었습니다.이 버전은 공식적으로 지원되지 않습니다. 보고하지 마십시오",
 
   SETTING_BLOCK_NET: "게임실행 문제해결(hosts 수정)",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_LICENSES: "라이선스",
   SETTING_ENABLE_HDR: "HDR 활성화",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "HTTP 프록시 활성화",
+  SETTING_PROXY_HOST: "HTTP 프록시 호스트",
+  SETTING_PROXY_DESC: "프록시는 게임에만 적용되며 런처 전체에는 적용되지 않습니다.",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "Steam 패치 활성화",
 
   UPDATE_PROMPT_IGNORE: "업데이트 무시",
   SETTING_CHECK_UPDATE: "YAAGL 업데이트 확인",
