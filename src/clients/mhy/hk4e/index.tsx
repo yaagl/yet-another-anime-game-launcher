@@ -21,14 +21,17 @@ import {
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt, SemVer } from "semver";
+import { coerce, gt, lt, SemVer, valid } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "./program-check-integrity";
 import {
   predownloadGameProgram,
   updateGameProgram,
 } from "./program-update-game";
-import { downloadAndInstallGameProgram } from "./program-install-game";
+import {
+  downloadAndInstallGameProgram,
+  INSTALL_STATE_MARKER,
+} from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
 import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
@@ -77,6 +80,7 @@ export async function createHK4EChannelClient({
   } = await getLatestAdvInfo(locale, server);
   const IS_VIDEO_BG =
     bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
+  await waitImageReady(background);
 
   const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
   const sophon_host = "127.0.0.1";
@@ -100,8 +104,6 @@ export async function createHK4EChannelClient({
   const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
   const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
 
-  await waitImageReady(background);
-
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server,
@@ -109,15 +111,19 @@ export async function createHK4EChannelClient({
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
+    gameInstalled
+      ? "INSTALLED"
+      : gameInstallDir
+      ? "PARTIAL_INSTALL"
+      : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      PRE_DOWNLOAD_AVAILABLE &&
+      gameInstalled &&
+        PRE_DOWNLOAD_AVAILABLE &&
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
-        gameInstalled && // game installed
-        gt(PRE_DOWNLOAD_VERSION, gameVersion) // predownload version is greater
+        isVersionGreater(PRE_DOWNLOAD_VERSION, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -125,7 +131,9 @@ export async function createHK4EChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () => lt(gameCurrentVersion(), LATEST_GAME_VERSION);
+  const updateRequired = () =>
+    installed() == "INSTALLED" &&
+    isVersionLower(gameCurrentVersion(), LATEST_GAME_VERSION);
   return {
     installState: installed,
     showPredownloadPrompt,
@@ -135,6 +143,7 @@ export async function createHK4EChannelClient({
       background: background, // Always show image
       background_video: IS_VIDEO_BG ? video_url : undefined,
       background_theme: IS_VIDEO_BG ? theme_url : undefined,
+      iconImage: icon,
       url: icon_link,
     },
     predownloadVersion: () =>
@@ -143,6 +152,7 @@ export async function createHK4EChannelClient({
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
+      await setKey("game_install_dir", selection);
       const existingGameDir = await findExistingGameInstallDir(
         selection,
         releaseType,
@@ -323,13 +333,38 @@ export async function createHK4EChannelClient({
 }
 
 async function getGameVersionGI(gameDataDir: string) {
-  try {
-    const ret = await getGameVersion(gameDataDir, 0xac);
-    await log(String(new SemVer(ret)));
-    return ret;
-  } catch {
-    return await getGameVersion(gameDataDir);
+  for (const offset of [0xac, undefined] as const) {
+    try {
+      const ret =
+        offset == null
+          ? await getGameVersion(gameDataDir)
+          : await getGameVersion(gameDataDir, offset);
+      const gameVersion = normalizeVersion(ret);
+      if (gameVersion == null) throw new Error("Failed to parse game version");
+      await log(String(new SemVer(gameVersion)));
+      return gameVersion;
+    } catch {
+      // Try the next known metadata layout.
+    }
   }
+  throw new Error("Failed to parse game version");
+}
+
+function normalizeVersion(version: unknown) {
+  if (typeof version != "string" || version.trim() == "") return;
+  return valid(version) ?? coerce(version)?.version;
+}
+
+function isVersionGreater(a: unknown, b: unknown) {
+  const av = normalizeVersion(a);
+  const bv = normalizeVersion(b);
+  return av != null && bv != null && gt(av, bv);
+}
+
+function isVersionLower(a: unknown, b: unknown) {
+  const av = normalizeVersion(a);
+  const bv = normalizeVersion(b);
+  return av != null && bv != null && lt(av, bv);
 }
 
 async function hasExistingGameInstall(
@@ -338,11 +373,34 @@ async function hasExistingGameInstall(
   server: Server
 ) {
   try {
+    await stats(join(gameDir, "config.ini"));
+    try {
+      await stats(join(gameDir, INSTALL_STATE_MARKER));
+      return false;
+    } catch {
+      // Missing install marker means the launcher did not leave an install in progress.
+    }
+    if (await hasLegacySophonResumeState(gameDir)) return false;
     await stats(
       join(gameDir, releaseType == "os" ? "GenshinImpact.exe" : "YuanShen.exe")
     );
     await stats(join(gameDir, server.dataDir, "globalgamemanagers"));
+    await getGameVersionGI(join(gameDir, server.dataDir));
     return true;
+  } catch {
+    return false;
+  }
+}
+
+async function hasLegacySophonResumeState(gameDir: string) {
+  try {
+    const entries = await Neutralino.filesystem.readDirectory(
+      join(gameDir, ".tmp")
+    );
+    return entries.some(entry => {
+      if (entry.type != "FILE") return false;
+      return !entry.entry.endsWith(".json") && !entry.entry.endsWith(".zstd");
+    });
   } catch {
     return false;
   }
@@ -371,6 +429,26 @@ async function findExistingGameInstallDir(
   }
 }
 
+async function hasInstallResumeState(gameDir: string) {
+  try {
+    await stats(join(gameDir, INSTALL_STATE_MARKER));
+    return true;
+  } catch {
+    // Fall back to legacy markers below.
+  }
+  try {
+    await stats(join(gameDir, "config.ini"));
+    return true;
+  } catch {
+    try {
+      await stats(join(gameDir, ".tmp"));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 async function checkGameState(
   locale: Locale,
   server: Server,
@@ -394,6 +472,12 @@ async function checkGameState(
       gameVersion: await getGameVersionGI(join(gameDir, server.dataDir)),
     } as const;
   } catch {
+    if (gameDir && (await hasInstallResumeState(gameDir))) {
+      return {
+        gameInstalled: false,
+        gameInstallDir: gameDir,
+      } as const;
+    }
     return {
       gameInstalled: false,
     } as const;

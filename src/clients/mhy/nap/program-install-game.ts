@@ -7,6 +7,7 @@ import {
   humanFileSize,
   doStreamUnzip,
   removeFile,
+  removeFileIfExists,
   writeFile,
   getKey,
   sha1sum,
@@ -15,6 +16,8 @@ import {
   exec,
   rawString,
 } from "@utils";
+
+export const INSTALL_STATE_MARKER = ".yaagl_installing";
 
 export async function* downloadAndInstallGameProgram({
   aria2,
@@ -32,6 +35,7 @@ export async function* downloadAndInstallGameProgram({
   const downloadTmp = join(gameDir, ".ariatmp");
 
   await mkdirp(downloadTmp);
+  await writeFile(join(gameDir, INSTALL_STATE_MARKER), "partial");
 
   const deferredCleanup: (() => Promise<void>)[] = [];
 
@@ -74,6 +78,7 @@ channel=${server.channel_id}
 sub_channel=${server.subchannel_id}
 cps=${server.cps}`
   );
+  await removeFileIfExists(join(gameDir, INSTALL_STATE_MARKER));
 }
 
 async function* downloadOrRecover(

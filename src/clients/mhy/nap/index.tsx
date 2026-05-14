@@ -18,14 +18,17 @@ import {
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt } from "semver";
+import { coerce, gt, lt, valid } from "semver";
 import { Config } from "@config";
 import { checkIntegrityProgram } from "../program-check-integrity";
 import {
   predownloadGameProgram,
   updateGameProgram,
 } from "./program-update-game";
-import { downloadAndInstallGameProgram } from "./program-install-game";
+import {
+  downloadAndInstallGameProgram,
+  INSTALL_STATE_MARKER,
+} from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
 import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
@@ -76,6 +79,7 @@ export async function createNAPChannelClient({
   } = await getLatestAdvInfo(locale, server);
   const IS_VIDEO_BG =
     bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
+  await waitImageReady(background);
   const {
     main: {
       major: {
@@ -88,23 +92,25 @@ export async function createNAPChannelClient({
     pre_download,
   } = await getLatestVersionInfo(server);
 
-  await waitImageReady(background);
-
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
     locale,
     server
   );
 
   const [installed, setInstalled] = createSignal<ChannelClientInstallState>(
-    gameInstalled ? "INSTALLED" : "NOT_INSTALLED"
+    gameInstalled
+      ? "INSTALLED"
+      : gameInstallDir
+      ? "PARTIAL_INSTALL"
+      : "NOT_INSTALLED"
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      pre_download?.major != null && //exist pre_download_game data in server response
+      gameInstalled &&
+        pre_download?.major != null && //exist pre_download_game data in server response
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
-        gameInstalled && // game installed
-        gt(pre_download.major.version, gameVersion) // predownload version is greater
+        isVersionGreater(pre_download.major.version, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -112,7 +118,9 @@ export async function createNAPChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
+  const updateRequired = () =>
+    installed() == "INSTALLED" &&
+    isVersionLower(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
     installState: installed,
     showPredownloadPrompt,
@@ -130,8 +138,11 @@ export async function createNAPChannelClient({
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
+      let gameVersion = "";
       try {
         await stats(join(selection, "pkg_version"));
+        await stats(join(selection, "config.ini"));
+        gameVersion = await getInstalledGameVersion(selection, server);
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
         const totalSize = game_pkgs
@@ -148,6 +159,11 @@ export async function createNAPChannelClient({
           return;
         }
 
+        batch(() => {
+          setInstalled("PARTIAL_INSTALL");
+          setGameInstallDir(selection);
+        });
+        await setKey("game_install_dir", selection);
         yield* downloadAndInstallGameProgram({
           aria2,
           gameDir: selection,
@@ -166,10 +182,6 @@ export async function createNAPChannelClient({
         await setKey("game_install_dir", selection);
         return;
       }
-      const gameVersion = await getGameVersion(
-        join(selection, server.dataDir),
-        0xc4
-      );
       if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
         await locale.alert(
           "UNSUPPORTED_VERSION",
@@ -308,7 +320,7 @@ export async function createNAPChannelClient({
     },
     async *launch(config: Config) {
       if (
-        gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
+        isVersionGreater(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
         !config.patchOff
       ) {
         await locale.alert(
@@ -373,6 +385,49 @@ export async function createNAPChannelClient({
   };
 }
 
+async function hasInstallResumeState(gameDir: string) {
+  try {
+    await stats(join(gameDir, "config.ini"));
+    return true;
+  } catch {
+    try {
+      await stats(join(gameDir, INSTALL_STATE_MARKER));
+      return true;
+    } catch {
+      try {
+        await stats(join(gameDir, ".ariatmp"));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  }
+}
+
+async function getInstalledGameVersion(gameDir: string, server: Server) {
+  const gameVersion = await getGameVersion(join(gameDir, server.dataDir), 0xc4);
+  const normalizedVersion = normalizeVersion(gameVersion);
+  if (normalizedVersion == null) throw new Error("Failed to parse game version");
+  return normalizedVersion;
+}
+
+function normalizeVersion(version: unknown) {
+  if (typeof version != "string" || version.trim() == "") return;
+  return valid(version) ?? coerce(version)?.version;
+}
+
+function isVersionGreater(a: unknown, b: unknown) {
+  const av = normalizeVersion(a);
+  const bv = normalizeVersion(b);
+  return av != null && bv != null && gt(av, bv);
+}
+
+function isVersionLower(a: unknown, b: unknown) {
+  const av = normalizeVersion(a);
+  const bv = normalizeVersion(b);
+  return av != null && bv != null && lt(av, bv);
+}
+
 async function checkGameState(locale: Locale, server: Server) {
   let gameDir = "";
   try {
@@ -383,12 +438,19 @@ async function checkGameState(locale: Locale, server: Server) {
     } as const;
   }
   try {
+    await stats(join(gameDir, "config.ini"));
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion(join(gameDir, server.dataDir), 0xc4),
+      gameVersion: await getInstalledGameVersion(gameDir, server),
     } as const;
   } catch {
+    if (gameDir && (await hasInstallResumeState(gameDir))) {
+      return {
+        gameInstalled: false,
+        gameInstallDir: gameDir,
+      } as const;
+    }
     return {
       gameInstalled: false,
     } as const;

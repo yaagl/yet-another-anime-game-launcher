@@ -7,8 +7,11 @@ import {
   humanFileSize,
   doStreamUn7z,
   removeFile,
+  removeFileIfExists,
   writeFile,
 } from "@utils";
+
+export const INSTALL_STATE_MARKER = ".yaagl_installing";
 
 export async function* downloadAndInstallGameProgram({
   aria2,
@@ -27,6 +30,7 @@ export async function* downloadAndInstallGameProgram({
   const downloadedFiles: string[] = [];
 
   await mkdirp(downloadTmp);
+  await writeFile(join(gameDir, INSTALL_STATE_MARKER), "partial");
   yield ["setUndeterminedProgress"];
   yield ["setStateText", "ALLOCATING_FILE"];
 
@@ -73,4 +77,5 @@ cps=${server.cps}`
   for (const file of downloadedFiles) {
     await removeFile(file);
   }
+  await removeFileIfExists(join(gameDir, INSTALL_STATE_MARKER));
 }

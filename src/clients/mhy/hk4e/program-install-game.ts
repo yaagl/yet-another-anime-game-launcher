@@ -2,7 +2,9 @@ import { join, basename } from "path-browserify";
 import { SophonClient } from "@sophon";
 import { CommonUpdateProgram } from "@common-update-ui";
 import { Server } from "@constants";
-import { humanFileSize, log } from "@utils";
+import { humanFileSize, log, removeFileIfExists, writeFile } from "@utils";
+
+export const INSTALL_STATE_MARKER = ".yaagl_installing";
 
 export async function* downloadAndInstallGameProgram({
   sophonClient,
@@ -15,6 +17,7 @@ export async function* downloadAndInstallGameProgram({
 }): CommonUpdateProgram {
   yield ["setUndeterminedProgress"];
   log("Starting game installation process...");
+  await writeFile(join(gameDir, INSTALL_STATE_MARKER), "partial");
 
   const taskId = await sophonClient.startInstallation({
     gamedir: gameDir,
@@ -51,4 +54,5 @@ export async function* downloadAndInstallGameProgram({
         break;
     }
   }
+  await removeFileIfExists(join(gameDir, INSTALL_STATE_MARKER));
 }

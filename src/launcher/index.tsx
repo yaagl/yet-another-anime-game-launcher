@@ -1,4 +1,4 @@
-import { openDir, fatal, open } from "@utils";
+import { openDir, fatal, open, stats } from "@utils";
 import {
   Box,
   Button,
@@ -16,6 +16,10 @@ import {
   PopoverTrigger,
   Progress,
   ProgressIndicator,
+  Menu,
+  MenuTrigger,
+  MenuContent,
+  MenuItem,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
 import { Show, createSignal } from "solid-js";
@@ -36,6 +40,22 @@ const IconSetting = createIcon({
         d="M396.72 320.592a141.184 141.184 0 0 1-99.824 15.92 277.648 277.648 0 0 0-45.344 74.576 141.216 141.216 0 0 1 37.52 95.952 141.248 141.248 0 0 1-41.728 100.32 274.4 274.4 0 0 0 49.952 86.224 141.264 141.264 0 0 1 107.168 14.176 141.216 141.216 0 0 1 63.984 79.296 274.72 274.72 0 0 0 86.816-1.92 141.248 141.248 0 0 1 66.016-86.304 141.216 141.216 0 0 1 101.856-15.488 277.648 277.648 0 0 0 41.92-76.544 141.184 141.184 0 0 1-36.128-94.4c0-34.912 12.768-67.68 34.816-92.96a274.736 274.736 0 0 0-38.192-70.032 141.264 141.264 0 0 1-105.792-14.56 141.312 141.312 0 0 1-67.168-90.912 274.4 274.4 0 0 0-92.784 0.016 141.152 141.152 0 0 1-63.088 76.64z m22.56-116.656c57.312-16 119.024-16.224 178.016 1.216a93.44 93.44 0 0 0 142.288 86.736 322.64 322.64 0 0 1 79.104 142.656 93.328 93.328 0 0 0-41.76 77.84 93.36 93.36 0 0 0 42.88 78.592 322.832 322.832 0 0 1-34.208 85.232 323.392 323.392 0 0 1-47.968 63.568 93.392 93.392 0 0 0-92.352 0.64 93.408 93.408 0 0 0-46.688 83.616 322.704 322.704 0 0 1-171.424 3.84 93.376 93.376 0 0 0-46.704-78.544 93.408 93.408 0 0 0-95.184 1.008A322.432 322.432 0 0 1 192 589.28a93.408 93.408 0 0 0 49.072-82.24c0-34.128-18.304-64-45.632-80.288a323.392 323.392 0 0 1 31.088-73.328 322.832 322.832 0 0 1 56.704-72.256 93.36 93.36 0 0 0 89.488-2.144 93.328 93.328 0 0 0 46.56-75.088z m92.208 385.28a68.864 68.864 0 1 0 0-137.76 68.864 68.864 0 0 0 0 137.76z m0 48a116.864 116.864 0 1 1 0-233.76 116.864 116.864 0 0 1 0 233.76z"
         p-id="2766"
       ></path>
+    );
+  },
+});
+
+const IconFolder = createIcon({
+  viewBox: "0 0 24 24",
+  path() {
+    return (
+      <path
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3 6.5A2.5 2.5 0 0 1 5.5 4H9l2 2h7.5A2.5 2.5 0 0 1 21 8.5v8A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"
+      />
     );
   },
 });
@@ -112,6 +132,44 @@ export async function createLauncher({
 
     const [videoLoaded, setVideoLoaded] = createSignal(false);
 
+    async function pathExists(path: string) {
+      if (!path) return false;
+      try {
+        await stats(path);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function selectInstallationPath() {
+      const selection = await selectPath();
+      return selection || undefined;
+    }
+
+    async function getResumePath() {
+      const savedPath = installDir();
+      if (await pathExists(savedPath)) return savedPath;
+      return await selectInstallationPath();
+    }
+
+    async function onRepairGameClick() {
+      if (programBusy()) return;
+      if (installState() == "PARTIAL_INSTALL") {
+        await locale.alert("REPAIR_GAME", "REPAIR_AFTER_DOWNLOAD_DESC");
+        return;
+      }
+
+      if (!(await pathExists(installDir()))) {
+        const selection = await selectInstallationPath();
+        if (!selection) return;
+        taskQueue.next(() => install(selection));
+        return;
+      }
+
+      taskQueue.next(checkIntegrity);
+    }
+
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (installState() == "INSTALLED") {
@@ -120,11 +178,22 @@ export async function createLauncher({
         } else {
           taskQueue.next(() => launch(config));
         }
+      } else if (installState() == "PARTIAL_INSTALL") {
+        const resumePath = await getResumePath();
+        if (!resumePath) return;
+        taskQueue.next(() => install(resumePath));
       } else {
-        const selection = await selectPath();
+        const selection = await selectInstallationPath();
         if (!selection) return;
         taskQueue.next(() => install(selection));
       }
+    }
+
+    async function onChooseInstalledGameClick() {
+      if (programBusy()) return;
+      const selection = await selectInstallationPath();
+      if (!selection) return;
+      taskQueue.next(() => install(selection));
     }
 
     return (
@@ -181,6 +250,16 @@ export async function createLauncher({
             }}
           />
         ) : null}
+        <button
+          class="side-settings-button"
+          onClick={onOpen}
+          disabled={programBusy()}
+          aria-label={locale.get("SETTING")}
+          title={locale.get("SETTING")}
+          type="button"
+        >
+          <IconSetting />
+        </button>
         <Flex h="100vh" direction={"column-reverse"}>
           <Flex
             direction={launchButtonLocation == "left" ? "row-reverse" : "row"}
@@ -242,11 +321,9 @@ export async function createLauncher({
                 <ButtonGroup
                   class="launch-button"
                   size="xl"
-                  attached
                   minWidth={150}
                 >
                   <Button
-                    mr="-1px"
                     disabled={programBusy()}
                     onClick={() => onButtonClick().catch(fatal)}
                   >
@@ -254,16 +331,61 @@ export async function createLauncher({
                       ? updateRequired()
                         ? locale.get("UPDATE")
                         : locale.get("LAUNCH")
+                      : installState() == "PARTIAL_INSTALL"
+                      ? locale.get("RESUME")
                       : locale.get("INSTALL")}
                   </Button>
+                  <Show when={installState() != "INSTALLED"}>
+                    <Menu>
+                      <MenuTrigger
+                        as={IconButton}
+                        disabled={programBusy()}
+                        fontSize={30}
+                        aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        title={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        icon={<IconFolder />}
+                      />
+                      <MenuContent>
+                        <MenuItem
+                          onSelect={() =>
+                            onChooseInstalledGameClick().catch(fatal)
+                          }
+                        >
+                          {locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        </MenuItem>
+                        <MenuItem
+                          onSelect={() => onRepairGameClick().catch(fatal)}
+                        >
+                          {locale.get("REPAIR_GAME")}
+                        </MenuItem>
+                      </MenuContent>
+                    </Menu>
+                  </Show>
                   <Show when={installState() == "INSTALLED"}>
-                    <IconButton
-                      onClick={onOpen}
-                      disabled={programBusy()}
-                      fontSize={30}
-                      aria-label="Settings"
-                      icon={<IconSetting />}
-                    />
+                    <Menu>
+                      <MenuTrigger
+                        as={IconButton}
+                        disabled={programBusy()}
+                        fontSize={30}
+                        aria-label={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        title={locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        icon={<IconFolder />}
+                      />
+                      <MenuContent>
+                        <MenuItem
+                          onSelect={() =>
+                            onChooseInstalledGameClick().catch(fatal)
+                          }
+                        >
+                          {locale.get("SELECT_INSTALLED_GAME_DIR")}
+                        </MenuItem>
+                        <MenuItem
+                          onSelect={() => onRepairGameClick().catch(fatal)}
+                        >
+                          {locale.get("REPAIR_GAME")}
+                        </MenuItem>
+                      </MenuContent>
+                    </Menu>
                   </Show>
                 </ButtonGroup>
               </PopoverTrigger>
