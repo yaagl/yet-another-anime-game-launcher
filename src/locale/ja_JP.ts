@@ -21,7 +21,7 @@ export const ja_JP: typeof zh_CN = {
   PATH_INVALID_ASCII_ONLY:
     "パスにはASCII文字のみが含まれていることを確認してください。",
   PATH_INVALID_FORBIDDEN_DIR:
-    '「デスクトップ」、「ダウンロード」又は「書類」以外パスを選択してください',
+    "「デスクトップ」、「ダウンロード」又は「書類」以外パスを選択してください",
   NOT_SUPPORTED_YET: "非対応機能です",
   PLEASE_WAIT_FOR_LAUNCHER_UPDATE:
     "ただ今、ランチャーはバージョン {0} に対応していません。今後の更新をお待ちください。",
@@ -66,7 +66,7 @@ export const ja_JP: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "全部",
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retinaモード",
-  SETTING_LEFT_CMD: "右CMDキーをCTRLキーに割り当て",
+  SETTING_LEFT_CMD: "左CMDキーをCTRLキーにマップ",
   SETTING_TURN_OFF_AC_PATCH: "ACパッチを無効にする",
   SETTING_CUSTOM_RESOLUTION: "カスタム解像度",
   SETTING_SAVE: "保存",
@@ -75,7 +75,8 @@ export const ja_JP: typeof zh_CN = {
   SETTING_CHECK_INTEGRITY: "整合性確認",
   SETTING_GAME_INSTALL_DIR: "ゲームインストールディレクトリ",
   // 0.0.27
-  SETTING_WINE_VERSION_CONFIRM: "変更を確認するには、ここをクリックしてください。",
+  SETTING_WINE_VERSION_CONFIRM:
+    "変更を確認するには、ここをクリックしてください。",
   SETTING_QUICK_ACTIONS: "クイックアクション",
   SETTING_GENERAL: "全般",
   SETTING_GAME: "ゲーム",
