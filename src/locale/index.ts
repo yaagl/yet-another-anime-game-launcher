@@ -4,6 +4,7 @@ import { vi_VN } from "./vi_VN";
 import { es_ES } from "./es_ES";
 import { fr_FR } from "./fr_FR";
 import { ru_RU } from "./ru_RU";
+import { ja_JP } from "./ja_JP";
 import { ko_KR } from "./ko_KR";
 import { de_DE } from "./de_DE";
 import { th_TH } from "./th_TH";
@@ -24,6 +25,7 @@ export const locales = {
   es_es: es_ES,
   fr_FR: fr_FR,
   ru_ru: ru_RU,
+  ja_jp: ja_JP,
   ko_kr: ko_KR,
   de_de: de_DE,
   th_th: th_TH,
