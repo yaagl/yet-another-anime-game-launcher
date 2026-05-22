@@ -16,6 +16,16 @@ export interface WineDistribution {
 
 const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   {
+    id: "11.0-1-crossover-experimental",
+    displayName: "Wine 11.0-1 Crossover (experimental)",
+    remoteUrl:
+      "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1/wine-crossover-11.0-1-osx64.tar.xz",
+    attributes: {
+      renderBackend: "dxmt",
+      winePath: "wine",
+    },
+  },
+  {
     id: "11.8-dxmt-signed-experimental",
     displayName: "Wine 11.8 DXMT (signed, experimental)",
     remoteUrl:
