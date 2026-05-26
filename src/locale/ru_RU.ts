@@ -16,7 +16,7 @@ export const ru_RU: typeof zh_CN = {
   DOWNLOADING_ENVIRONMENT_SPEED: "Загрузка файлов окружения ({0}/s)",
   EXTRACT_ENVIRONMENT: "Распаковка окружения",
   CONFIGURING_ENVIRONMENT: "Настройка окружения",
-  RESTART_TO_INSTALL: "Перезап  устить программу",
+  RESTART_TO_INSTALL: "Перезапустить программу",
   PATH_INVALID: "Неверный путь",
   PLEASE_SELECT_A_DIR: "Пожалуйста, выберите путь",
   PATH_INVALID_ASCII_ONLY: "Убедитесь, что путь содержит только символы ASCII.",
@@ -109,7 +109,7 @@ export const ru_RU: typeof zh_CN = {
   COMMUNITY_WINE_ALERT:
     "Выбрана версия сообщества. Она не поддерживается официально. Пожалуйста, не сообщайте о проблемах, связанных с этой версией.",
 
-  SETTING_BLOCK_NET: "Launch Fix (block hosts)",
+  SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix (Исправление тайм-аута)",
   SETTING_LICENSES: "Лицензии",
 
