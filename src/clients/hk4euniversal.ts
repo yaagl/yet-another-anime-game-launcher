@@ -6,7 +6,7 @@ import { ChannelClient } from "../channel-client";
 
 export const DEFAULT_WINE_DISTRO_URL =
   "https://github.com/3Shain/winecx/releases/download/gi-wine-1.2/wine.tar.gz";
-export const DEFAULT_WINE_DISTRO_TAG = "gi-wine-1.2";
+export const DEFAULT_WINE_DISTRO_TAG = "11.0-dxmt-signed-with-patches";
 
 export async function createClient(
   options: CreateClientOptions

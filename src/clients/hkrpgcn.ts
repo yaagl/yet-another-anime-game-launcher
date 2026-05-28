@@ -16,7 +16,7 @@ import {
 
 export const DEFAULT_WINE_DISTRO_URL =
   "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz";
-export const DEFAULT_WINE_DISTRO_TAG = "9.9-dxmt";
+export const DEFAULT_WINE_DISTRO_TAG = "11.0-1-crossover-signed-experimental";
 
 export const SERVER_DEFINITION: Server = {
   id: "hkrpg_cn",
