@@ -8,6 +8,7 @@ import {
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
+  SelectPlaceholder,
   SelectTrigger,
   SelectValue,
 } from "@hope-ui/solid";
@@ -63,6 +64,7 @@ export default async function ({
           <FormLabel>{locale.get("SETTING_FPS_UNLOCK")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
+              <SelectPlaceholder>Choose an option</SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>

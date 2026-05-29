@@ -261,7 +261,7 @@ export async function createLauncher({
                       onClick={onOpen}
                       disabled={programBusy()}
                       fontSize={30}
-                      aria-label={locale.get("SETTING")}
+                      aria-label="Settings"
                       icon={<IconSetting />}
                     />
                   </Show>
