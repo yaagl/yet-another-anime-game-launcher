@@ -9,7 +9,6 @@ import {
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
-  SelectPlaceholder,
   SelectTrigger,
   SelectValue,
 } from "@hope-ui/solid";
@@ -95,7 +94,6 @@ export async function createWineDistroConfig({
           <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
-              <SelectPlaceholder>Choose an option</SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>

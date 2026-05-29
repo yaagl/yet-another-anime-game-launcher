@@ -8,7 +8,6 @@ import {
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
-  SelectPlaceholder,
   SelectTrigger,
   SelectValue,
   Text,
@@ -42,7 +41,6 @@ export default async function ({
           <FormLabel>{locale.get("SETTING_UI_LOCALE")}</FormLabel>
           <Select value={value()} onChange={setValue}>
             <SelectTrigger>
-              <SelectPlaceholder>Choose an option</SelectPlaceholder>
               <SelectValue />
               <SelectIcon />
             </SelectTrigger>
