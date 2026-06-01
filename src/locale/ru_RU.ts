@@ -81,7 +81,8 @@ export const ru_RU: typeof zh_CN = {
   SETTING_GAME: "Игра",
   LANGUAGE_LOCALE_NAME: "Русский",
   SETTING_UI_LOCALE: "Язык лаунчера",
-  SETTING_RESTART_TO_TAKE_EFFECT: "Настройка вступит в силу после перезагрузки.",
+  SETTING_RESTART_TO_TAKE_EFFECT:
+    "Настройка вступит в силу после перезагрузки.",
   SETTING_OPEN_CMD: "Открыть командную строку Wine",
   SETTING_OPEN_GAME_INSTALL_DIR: "Открыть каталог игры",
   SETTING_OPEN_YAAGL_DIR: "Открыть каталог YAAGL",
