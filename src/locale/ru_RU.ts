@@ -7,8 +7,8 @@ export const ru_RU: typeof zh_CN = {
   INSTALL: "Установить игру",
   UPDATING: "Обновление",
   DOWNLOADING: "Загрузка",
-  FIXING_FILES: "Исправляем игровые файлы {0}/{1}",
-  PATCHING: "Патчим игровые файлы",
+  FIXING_FILES: "Исправление игровых файлов {0}/{1}",
+  PATCHING: "Патчинг игровых файлов",
   GAME_RUNNING: "Игра запущена (НЕ ЗАКРЫВАЙТЕ ЛАУНЧЕР)",
   REVERT_PATCHING: "Откат патчей",
   SCANNING_FILES: "Проверка целостности файлов игры. Завершенные файлы {0}/{1}",
@@ -16,7 +16,7 @@ export const ru_RU: typeof zh_CN = {
   DOWNLOADING_ENVIRONMENT_SPEED: "Загрузка файлов окружения ({0}/s)",
   EXTRACT_ENVIRONMENT: "Распаковка окружения",
   CONFIGURING_ENVIRONMENT: "Настройка окружения",
-  RESTART_TO_INSTALL: "Перезарустить программу",
+  RESTART_TO_INSTALL: "Перезапустить программу",
   PATH_INVALID: "Неверный путь",
   PLEASE_SELECT_A_DIR: "Пожалуйста, выберите путь",
   PATH_INVALID_ASCII_ONLY: "Убедитесь, что путь содержит только символы ASCII.",
@@ -41,10 +41,10 @@ export const ru_RU: typeof zh_CN = {
 
   DOWNLOADING_UPDATE_FILE: "Загрузка файлов обновлений",
 
-  UPGRADE_FUNCTION_TBD: "В настоящее время обновление не реализовано",
+  UPGRADE_FUNCTION_TBD: "В настоящее время функция обновления не реализована",
 
   DECOMPRESS_FILE_PROGRESS: "Распаковка файлов",
-  ALLOCATING_FILE: "Распределение файлов на диске",
+  ALLOCATING_FILE: "Выделение места на диске",
   DOWNLOADING_FILE_PROGRESS: "Загрузка файла: {0} ({2}/{3}) {1}/s",
 
   BACKUP_USER_DATA: "Резервное копирование пользовательских данных",
@@ -57,69 +57,69 @@ export const ru_RU: typeof zh_CN = {
     "Программа запуска перезагрузится, чтобы выполнить установку Wine.",
 
   SETTING: "Настройки",
-  SETTING_WINE_VERSION: "Дистрибутив Wine",
-  SETTING_ASYNC_DXVK: "Асинхронная компиляция шейдера DXVK",
+  SETTING_WINE_VERSION: "Версия Wine",
+  SETTING_ASYNC_DXVK: "Асинхронная компиляция шейдеров DXVK",
   SETTING_ENABLED: "Включено",
-  SETTING_DXVK_HUD: "Оверлэй DXVK",
+  SETTING_DXVK_HUD: "Оверлей DXVK",
   SETTING_DXVK_HUD_NONE: "Ничего",
   SETTING_DXVK_HUD_FPS: "Только FPS",
-  SETTING_MTL_HUD: "Оверлэй Metal",
+  SETTING_MTL_HUD: "Оверлей Metal",
   SETTING_DXVK_HUD_ALL: "Всё",
   SETTING_RETINA: "Режим Retina",
-  SETTING_LEFT_CMD: "Сопоставить левый CMD с CTRL",
-  SETTING_TURN_OFF_AC_PATCH: "выключи патч AC",
+  SETTING_LEFT_CMD: "Назначить левый CMD как CTRL",
+  SETTING_TURN_OFF_AC_PATCH: "Отключить патч АЧ",
   SETTING_CUSTOM_RESOLUTION: "Пользовательское разрешение",
   SETTING_SAVE: "Сохранить",
   SETTING_CANCEL: "Отменить",
 
-  SETTING_CHECK_INTEGRITY: "Проверить целостность",
+  SETTING_CHECK_INTEGRITY: "Проверить целостность файлов",
   SETTING_GAME_INSTALL_DIR: "Каталог установки игры",
   // 0.0.27
-  SETTING_WINE_VERSION_CONFIRM: "Нажми на меня, чтобы подтвердить изменение",
+  SETTING_WINE_VERSION_CONFIRM: "Нажмите для подтверждения изменений",
   SETTING_QUICK_ACTIONS: "Быстрые действия",
   SETTING_GENERAL: "Основные",
   SETTING_GAME: "Игра",
   LANGUAGE_LOCALE_NAME: "Русский",
   SETTING_UI_LOCALE: "Язык лаунчера",
-  SETTING_RESTART_TO_TAKE_EFFECT: "Это вступит в силу после перезагрузки.",
+  SETTING_RESTART_TO_TAKE_EFFECT: "Настройка вступит в силу после перезагрузки.",
   SETTING_OPEN_CMD: "Открыть командную строку Wine",
-  SETTING_OPEN_GAME_INSTALL_DIR: "Открыть каталог установки игры",
-  SETTING_OPEN_YAAGL_DIR: "Откройте каталог данных YAAGL",
+  SETTING_OPEN_GAME_INSTALL_DIR: "Открыть каталог игры",
+  SETTING_OPEN_YAAGL_DIR: "Открыть каталог YAAGL",
   SETTING_YAAGL_VERSION: "Версия YAAGL",
 
-  SETTING_FPS_UNLOCK: "Разблокируйте FPS лимит",
+  SETTING_FPS_UNLOCK: "Снять ограничение FPS",
   SETTING_FPS_UNLOCK_DEFAULT: "Выключено",
 
   SETTING_ADVANCED: "Дополнительные",
   SETTING_ADVANCED_ALERT:
     "НИЧЕГО НЕ МЕНЯЙТЕ, если только вы не знаете, что делаете.",
-  SETTING_ADVANCED_VISIBLE: "Теперь видны расширенные настройки.",
+  SETTING_ADVANCED_VISIBLE: "Расширенные настройки теперь доступны.",
 
   NO_ENOUGH_DISKSPACE: "Недостаточно свободного места на диске",
   NO_ENOUGH_DISKSPACE_DESC:
     "Требуется не менее {0}ГиБ ({1}Гб) свободного пространства.",
 
-  UPDATE: "Обновите игру",
+  UPDATE: "Обновить игру",
   GAME_VERSION_TOO_OLD_DESC:
     "Текущая версия игры ({0}) слишком устарела для постепенного обновления. Пожалуйста, переустановите игру.",
 
   PREDOWNLOAD_READY: "Предзагрузка {0}",
 
-  COMMUNITY_WARNING: "Предупреждение сообщества",
+  COMMUNITY_WARNING: "Предупреждение о неофициальной версии",
   COMMUNITY_WINE_ALERT:
-    "В настоящее время выбрана версия сообщества, эта версия официально не поддерживается, не сообщайте о каких - либо проблемах",
+    "Выбрана версия сообщества. Она не поддерживается официально. Пожалуйста, не сообщайте о проблемах, связанных с этой версией.",
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
-  SETTING_TIMEOUT_FIX: "Timeout Fix",
-  SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
+  SETTING_TIMEOUT_FIX: "Timeout Fix (Исправление тайм-аута)",
+  SETTING_LICENSES: "Лицензии",
 
   SETTING_ENABLE_HDR: "Включить HDR",
 
-  SETTING_PROXY_ENABLED: en.SETTING_PROXY_ENABLED, // TODO: Translate
-  SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
-  SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
+  SETTING_PROXY_ENABLED: "Использовать HTTP-прокси",
+  SETTING_PROXY_HOST: "Хост HTTP-прокси",
+  SETTING_PROXY_DESC: "Прокси действует только на игру, а не на весь лаунчер.",
 
-  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_TURN_ON_STEAM_PATCH: "Использовать патч Steam",
 
   UPDATE_PROMPT_IGNORE: "Пропустить обновление",
   SETTING_CHECK_UPDATE: "Проверить обновления YAAGL",
