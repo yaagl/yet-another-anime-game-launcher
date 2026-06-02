@@ -44,6 +44,9 @@ export async function getGameVersion2019(gameDataDir: string) {
     if (ggmMD5 == "3602065e153d9782a0f0cf4a73a98b44") {
       return "3.8.0";
     }
+    if (ggmMD5 == "01fbfd295247a36ef97109121bd3ec01") {
+      return "4.3.0";
+    }
     return "9.99.99";
   } else {
     for (let j = index; j < index + 0x80; j++) {
