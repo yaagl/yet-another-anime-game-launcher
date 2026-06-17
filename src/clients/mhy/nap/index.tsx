@@ -47,7 +47,8 @@ import {
 } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "3.0.0";
+// no need to check supported version
+// const CURRENT_SUPPORTED_VERSION = "3.0.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);
@@ -172,14 +173,15 @@ export async function createNAPChannelClient({
         join(selection, server.dataDir),
         0xc4
       );
-      if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
-        await locale.alert(
-          "UNSUPPORTED_VERSION",
-          "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameVersion]
-        );
-        return;
-      } else if (lt(gameVersion, GAME_LATEST_VERSION)) {
+      // if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
+      //   await locale.alert(
+      //     "UNSUPPORTED_VERSION",
+      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+      //     [gameVersion]
+      //   );
+      //   return;
+      // } else
+      if (lt(gameVersion, GAME_LATEST_VERSION)) {
         const updateTarget = patches.find(x => x.version == gameVersion);
         if (!updateTarget) {
           await locale.prompt(
@@ -309,17 +311,17 @@ export async function createNAPChannelClient({
       });
     },
     async *launch(config: Config) {
-      if (
-        gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
-        !config.patchOff
-      ) {
-        await locale.alert(
-          "UNSUPPORTED_VERSION",
-          "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-          [gameCurrentVersion()]
-        );
-        return;
-      }
+      // if (
+      //   gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
+      //   !config.patchOff
+      // ) {
+      //   await locale.alert(
+      //     "UNSUPPORTED_VERSION",
+      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
+      //     [gameCurrentVersion()]
+      //   );
+      //   return;
+      // }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
