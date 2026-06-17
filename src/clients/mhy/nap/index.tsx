@@ -47,7 +47,7 @@ import {
 } from "../launcher-info";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
-const CURRENT_SUPPORTED_VERSION = "2.8.0";
+const CURRENT_SUPPORTED_VERSION = "3.0.0";
 
 export async function getGameVersion(gameDataDir: string, offset: number) {
   const ret = await _getGameVersion(gameDataDir, offset);

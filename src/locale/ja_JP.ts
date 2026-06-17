@@ -8,7 +8,7 @@ export const ja_JP: typeof zh_CN = {
   DOWNLOADING: "ダウンロード中",
   FIXING_FILES: "ゲームファイルを修復中{0}/{1}",
   PATCHING: "ゲームファイルをパッチ中",
-  GAME_RUNNING: "ゲーム実行中 (ランチャーを閉じいないでください)",
+  GAME_RUNNING: "ゲーム実行中 (ランチャーを閉じないでください)",
   REVERT_PATCHING: "パッチを元に戻し中",
   SCANNING_FILES: "ゲームファイルの整合性を確認中. 完了ファイル{0}/{1}",
   DOWNLOADING_ENVIRONMENT: "環境ファイルダウンロード中",
