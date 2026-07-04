@@ -120,6 +120,8 @@ export const ja_JP: typeof zh_CN = {
   SETTING_PROXY_DESC:
     "このプロキシ設定はゲームのみに適用され、ランチャー全体には適用されません。",
 
+  SETTING_DEBUG_LAUNCH: "Debug Launch Logging",
+
   SETTING_TURN_ON_STEAM_PATCH: "Steamパッチ有効",
 
   UPDATE_PROMPT_IGNORE: "更新無視",

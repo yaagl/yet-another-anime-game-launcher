@@ -40,6 +40,7 @@ import createResolution from "./config/resolution";
 import createBlockNet from "./config/block-net";
 import createSteamPatch from "./config/steam-patch";
 import createTimeoutFix from "./config/timeout-fix";
+import createDebugLaunch from "./config/debug-launch";
 import { getGameVersion as _getGameVersion } from "../unity";
 import {
   HoyoConnectGameBackgroundType,
@@ -365,6 +366,7 @@ export async function createNAPChannelClient({
       const [BN] = await createBlockNet({ locale, config });
       const [SP] = await createSteamPatch({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
+      const [DL] = await createDebugLaunch({ locale, config });
 
       return function () {
         return [
@@ -375,6 +377,7 @@ export async function createNAPChannelClient({
           <BN />,
           <SP />,
           <TF />,
+          <DL />,
         ];
       };
     },
