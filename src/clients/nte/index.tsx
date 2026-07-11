@@ -12,9 +12,32 @@ import {
   checkAndDownloadReshade,
 } from "../../downloadable-resource";
 import { Server } from "./server";
-import { launchGameProgram } from "./program-launch-game";
+import { VERSION_INFO_URL, BACKUP_VERSION_INFO_URL, } from "./constants";
 
 const GAME_INSTALL_DIR_KEY = "nte_game_install_dir";
+
+async function getNTEVersionInfo() {
+  const urls = [
+    VERSION_INFO_URL,
+    BACKUP_VERSION_INFO_URL,
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        continue;
+      }
+
+      return await response.text();
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("Failed to fetch NTE Version.ini");
+}
 
 async function findGameExecutable(server: Server, gameDir: string) {
   for (const candidate of server.executableCandidates) {
@@ -102,6 +125,8 @@ export async function createNTEChannelClient({
       return;
     },
     async *install(selection: string): CommonUpdateProgram {
+      const versionInfo = await getNTEVersionInfo();
+      console.log("NTE Version.ini:", versionInfo);
       const executable = await findGameExecutable(server, selection);
       if (executable == null) {
         await showNteManifestMissingMessage(server);
