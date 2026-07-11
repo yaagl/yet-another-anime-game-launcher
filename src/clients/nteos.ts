@@ -15,6 +15,8 @@ const SERVER_DEFINITION: Server = {
   websiteUrl: "https://nte.perfectworld.com/",
   backgroundUrl: "https://nte.perfectworld.com/favicon.ico",
   executableCandidates: [
+    "NTEGlobalGame.exe",
+    "NTEGlobalLauncher.exe",
     "NTE.exe",
     "NevernessToEverness.exe",
     "Game/Binaries/Win64/Game.exe",
