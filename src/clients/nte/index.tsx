@@ -1,3 +1,11 @@
+import { launchGameProgram } from "./program-launch-game";
+import {
+  getVersionInfo,
+  downloadManifest,
+  parseManifest,
+  buildDownloadList,
+} from "./manifest";
+
 import { batch, createSignal } from "solid-js";
 import { join } from "path-browserify";
 import { Config } from "@config";
@@ -125,7 +133,20 @@ export async function createNTEChannelClient({
       return;
     },
     async *install(selection: string): CommonUpdateProgram {
+      console.log("NTE INSTALL START");
+      yield ["setUndeterminedProgress"];
+
       const versionInfo = await getNTEVersionInfo();
+
+      const version = await getVersionInfo();
+      console.log(version);
+      const xml = await downloadManifest(version);
+      console.log(xml.substring(0, 1500));
+      const manifest = parseManifest(xml);
+      console.log(manifest);
+      const files = buildDownloadList(manifest);
+      console.log(files.slice(0, 5));
+
       console.log("NTE Version.ini:", versionInfo);
       const executable = await findGameExecutable(server, selection);
       if (executable == null) {

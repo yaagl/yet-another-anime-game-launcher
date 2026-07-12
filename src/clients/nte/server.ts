@@ -4,4 +4,8 @@ export interface Server {
   websiteUrl: string;
   backgroundUrl: string;
   executableCandidates: string[];
+
+  updateUrl?: string;
+  dataDir?: string;
+  executable?: string;
 }

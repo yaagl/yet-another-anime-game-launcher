@@ -1,0 +1,4 @@
+INFO 2026-07-12 22:20:07,651 Auth info was exported to ./nteos/.tmp/auth_info.json api/debug/debug.cpp:17 shinebear@unknown-host
+ERROR 2026-07-12 22:20:08,817 NE_RS_UNBLDRE: Unable to load application resource file /dist/neutralino.js api/debug/debug.cpp:20 shinebear@unknown-host
+INFO 2026-07-12 22:21:14,923 Auth info was exported to ./nteos/.tmp/auth_info.json api/debug/debug.cpp:17 shinebear@unknown-host
+ERROR 2026-07-12 22:21:15,780 NE_RS_UNBLDRE: Unable to load application resource file /dist/neutralino.js api/debug/debug.cpp:20 shinebear@unknown-host
