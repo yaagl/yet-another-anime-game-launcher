@@ -383,8 +383,14 @@ export async function _safeRelaunch() {
     await Neutralino.os.execCommand(`open "${app}"`, {
       background: true,
     });
-    Neutralino.app.exit(0);
+    if (NL_OS === "Darwin") {
+      // Neutralino.app.exit() can throw NSException on macOS while the
+      // native window is being torn down. See neutralinojs#1469.
+      setTimeout(() => void Neutralino.app.killProcess(), 100);
+    } else {
+      Neutralino.app.exit(0);
+    }
   } else {
-    Neutralino.app.restartProcess();
+    await Neutralino.app.restartProcess();
   }
 }
