@@ -380,7 +380,7 @@ export async function _safeRelaunch() {
   // HACK
   if (import.meta.env.PROD) {
     const app = await Neutralino.os.getEnv("PATH_LAUNCH");
-    await Neutralino.os.execCommand(`open "${app}"`, {
+    await Neutralino.os.execCommand(`open -n "${app}"`, {
       background: true,
     });
     if (NL_OS === "Darwin") {
