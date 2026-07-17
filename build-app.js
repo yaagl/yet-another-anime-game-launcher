@@ -223,7 +223,7 @@ mkdir -p "$APST_DIR"
 CONTENTS_DIR="$(dirname "$SCRIPT_DIR")"
 rsync -rlptu "$CONTENTS_DIR/Resources/." "$APST_DIR"
 cd "$APST_DIR"
-PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
+PATH_LAUNCH="$CONTENTS_DIR/.." exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
   );
 
   await fs.chmod(
