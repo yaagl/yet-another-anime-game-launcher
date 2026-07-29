@@ -208,6 +208,18 @@ cd /d "${wine.toWinePath(gameDir)}"
       await revertResolutionRegistry(wine, server);
     }
   } catch (e: unknown) {
+    // A failed Wine launch can leave winedevice attached to the prefix.
+    // Stop both msync modes before collecting evidence and reverting patches.
+    await wine.prepareForLaunch(
+      diagnostics.debug
+        ? {
+            phase: "nap.launch.cleanup",
+            logFile: diagnostics.metaLog,
+            teeOutput: true,
+            debug: true,
+          }
+        : undefined
+    );
     const crashReports = await collectCrashReports(launchStartedAt);
     const driverErrorLog = join(gameDir, "driverError.log");
     const driverError = await readTextIfExists(driverErrorLog);
@@ -555,8 +567,11 @@ function buildDiagnosticHints({
       "hosts-block-detected: /etc/hosts blocks a known ZZZ launch domain"
     );
   }
-  if (
-    combined.includes("WDFLDR.SYS") ||
+  if (combined.includes("WDFLDR.SYS")) {
+    hints.push(
+      "wine-runtime-missing-wdfldr: the selected Wine runtime cannot load HoYoKProtect because WDFLDR.SYS is unavailable; this is distinct from a proxy, hosts, or DXMT initialization failure"
+    );
+  } else if (
     combined.includes("HoYoKProtect.sys") ||
     combined.includes("initDriver Failed")
   ) {
