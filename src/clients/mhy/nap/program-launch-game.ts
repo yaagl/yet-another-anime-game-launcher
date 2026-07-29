@@ -4,6 +4,7 @@ import { Server } from "../../../constants";
 import {
   alert,
   appendFile,
+  cp,
   env as getEnv,
   fileOrDirExists,
   mkdirp,
@@ -85,6 +86,22 @@ export async function* launchGameProgram({
       `proxyNote=proxy is recorded only; this diagnostic path does not treat proxy settings as a primary failure cause`,
       `debugLaunch=${config.debugLaunch}`,
     ].join("\n")
+  );
+
+  // Steam patch launches skip config.bat, so they must prepare the driver
+  // file explicitly instead of relying on a previous launch's prefix state.
+  const driverSource = join(gameDir, atob("SG9Zb0tQcm90ZWN0LnN5cw=="));
+  const driverDestination = join(
+    wine.prefix,
+    "drive_c",
+    "windows",
+    "system32",
+    "HoYoKProtect.sys"
+  );
+  await cp(driverSource, driverDestination);
+  await recordLaunchDiagnostic(
+    diagnostics.metaLog,
+    `driverPreparedFrom=${driverSource}\ndriverPreparedAt=${driverDestination}`
   );
 
   await wine.prepareForLaunch(
@@ -222,8 +239,11 @@ cd /d "${wine.toWinePath(gameDir)}"
     );
     const crashReports = await collectCrashReports(launchStartedAt);
     const driverErrorLog = join(gameDir, "driverError.log");
-    const driverError = await readTextIfExists(driverErrorLog);
     const gameLog = await readTextIfExists(diagnostics.gameLog);
+    const driverEvidence = hasDriverEvidence(gameLog);
+    const driverError = driverEvidence
+      ? await readTextIfExists(driverErrorLog)
+      : undefined;
     const blockedHosts = await collectBlockedHosts(server);
     const diagnosticHints = buildDiagnosticHints({
       config,
@@ -588,6 +608,18 @@ function buildDiagnosticHints({
     );
   }
   return hints;
+}
+
+function hasDriverEvidence(gameLog?: string) {
+  const combined = gameLog ?? "";
+  return [
+    "WDFLDR.SYS",
+    "WdfVersionBind",
+    "WdfVersionUnbind",
+    "ZwLoadDriver",
+    "HoYoKProtect.sys",
+    "initDriver Failed",
+  ].some(term => combined.includes(term));
 }
 
 function buildLaunchFailureAlert(
