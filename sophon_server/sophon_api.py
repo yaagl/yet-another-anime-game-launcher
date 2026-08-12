@@ -74,6 +74,7 @@ from google.protobuf.json_format import MessageToJson
 
 import manifest_pb2 # generated
 import manifest_ldiff_pb2 # generated
+from endpoints import get_sophon_api_host
 
 from io import BytesIO
 import pycurl
@@ -700,17 +701,7 @@ class SophonClient:
 			self.retrieve_API_keys()
 
 
-		url: str = None
-		if OPT.do_update:
-			if self.rel_type == "os":
-				url = "sg-downloader-api.ho" + "yoverse.com"
-			elif self.rel_type == "cn":
-				assert False, "TODO"
-		else:
-			if self.rel_type == "os":
-				url = "sg-public-api.ho" + "yoverse.com"
-			elif self.rel_type == "cn":
-				url = "api-takumi.mih" + "oyo.com"
+		url = get_sophon_api_host(OPT.do_update, self.rel_type)
 
 		assert not (url is None), f"Unhandled release type {self.rel_type}"
 
