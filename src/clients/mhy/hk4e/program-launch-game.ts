@@ -87,6 +87,32 @@ async function applyResolutionRegistry(
   }
 }
 
+async function applyBorderlessModeRegistry(wine: Wine, server: Server) {
+  let key = "HKEY_CURRENT_USER\\Software\\\x6d\x69\x48\x6f\x59\x6f\\";
+  if (server.id === "hk4e_cn") {
+    key += "\u539f\u795e";
+  } else if (server.id === "hk4e_global") {
+    key += "\x47\x65\x6e\x73\x68\x69\x6e\x20\x49\x6d\x70\x61\x63\x74";
+  } else {
+    return;
+  }
+
+  const lines = [
+    `Windows Registry Editor Version 5.00`,
+    ``,
+    `[${key}]`,
+    `"Screenmanager Is Fullscreen mode_h3981298716"=dword:00000000`,
+  ];
+
+  const path = resolve("./hk4e_borderless_mode.reg");
+  await writeBinary(path, utf16le(lines.join("\r\n")));
+  try {
+    await wine.exec("regedit", [wine.toWinePath(path)], {}, "/dev/null");
+  } finally {
+    await removeFile(path);
+  }
+}
+
 export async function* launchGameProgram({
   gameDir,
   gameExecutable,
@@ -108,11 +134,17 @@ export async function* launchGameProgram({
     await applyHDRRegistry({ wine, server });
   }
 
+  if (config.borderlessWindow !== false) {
+    await applyBorderlessModeRegistry(wine, server);
+  }
+
   if (config.resolutionCustom) {
     await applyResolutionRegistry(wine, server, config);
   }
   await wine.waitUntilServerOff();
 
+  const borderlessArgs =
+    config.borderlessWindow !== false ? " -screen-fullscreen 0 -popupwindow" : "";
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
@@ -121,7 +153,7 @@ copy "${wine.toWinePath(
 cd /d "${wine.toWinePath(gameDir)}"
 "${wine.toWinePath(
     join(gameDir, gameExecutable)
-  )}" -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1`;
+  )}" -platform_type CLOUD_THIRD_PARTY_PC -is_cloud 1${borderlessArgs}`;
   await writeFile(resolve("config.bat"), cmd);
   yield* patchProgram(gameDir, wine, server, config);
   await mkdirp(resolve("./logs"));
@@ -166,7 +198,12 @@ cd /d "${wine.toWinePath(gameDir)}"
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
-        ? [wine.toWinePath(join(gameDir, gameExecutable))]
+        ? [
+            wine.toWinePath(join(gameDir, gameExecutable)),
+            ...(config.borderlessWindow !== false
+              ? ["-screen-fullscreen", "0", "-popupwindow"]
+              : []),
+          ]
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
@@ -192,6 +229,11 @@ cd /d "${wine.toWinePath(gameDir)}"
       },
       logfile
     );
+  } catch (e: unknown) {
+    // it seems game crashed?
+    await log(String(e));
+  } finally {
+    await wine.killServer();
     await wine.waitUntilServerOff();
     if (config.hk4eEnableHDR) {
       await revertHDRRegistry({ wine, server });
@@ -199,13 +241,9 @@ cd /d "${wine.toWinePath(gameDir)}"
     if (config.resolutionCustom) {
       await revertResolutionRegistry(wine, server);
     }
-  } catch (e: unknown) {
-    // it seems game crashed?
-    await log(String(e));
+    await removeFile(resolve("config.bat"));
   }
 
-  // await removeFile(resolve("bWh5cHJvdDJfcnVubmluZy5yZWcK.reg"));
-  await removeFile(resolve("config.bat"));
   yield ["setStateText", "REVERT_PATCHING"];
   yield* patchRevertProgram(gameDir, wine, server, config);
 }

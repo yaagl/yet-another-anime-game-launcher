@@ -3,6 +3,7 @@ import { zh_CN } from "./zh_CN";
 export const ja_JP: typeof zh_CN = {
   CONTENT_LANG_ID: "ja-jp",
   LAUNCH: "ゲーム開始",
+  STOP_GAME: "停止",
   INSTALL: "ゲームをインストール",
   UPDATING: "更新中",
   DOWNLOADING: "ダウンロード中",
@@ -121,6 +122,7 @@ export const ja_JP: typeof zh_CN = {
     "このプロキシ設定はゲームのみに適用され、ランチャー全体には適用されません。",
 
   SETTING_TURN_ON_STEAM_PATCH: "Steamパッチ有効",
+  SETTING_BORDERLESS_WINDOW: "ボーダーレスウィンドウ（最小化防止）",
 
   UPDATE_PROMPT_IGNORE: "更新無視",
   SETTING_CHECK_UPDATE: "YAAGL更新を確認する",

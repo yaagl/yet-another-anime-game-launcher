@@ -4,6 +4,7 @@ import { en } from "@locale/en";
 export const th_TH: typeof zh_CN = {
   CONTENT_LANG_ID: "th-th",
   LAUNCH: "เริ่มเกม",
+  STOP_GAME: "หยุด",
   INSTALL: "ติดตั้งเกม",
   UPDATING: "กำลังอัปเดต",
   DOWNLOADING: "กำลังดาวน์โหลด",
@@ -118,6 +119,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "ละเว้นการอัปเดต",
   SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต YAAGL",

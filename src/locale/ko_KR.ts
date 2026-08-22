@@ -4,6 +4,7 @@ import { en } from "@locale/en";
 export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",
+  STOP_GAME: "중지",
   INSTALL: "게임 다운로드",
   UPDATING: "업데이트 중",
   DOWNLOADING: "다운로드 중",
@@ -120,6 +121,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "업데이트 무시",
   SETTING_CHECK_UPDATE: "YAAGL 업데이트 확인",
