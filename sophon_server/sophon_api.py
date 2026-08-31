@@ -304,6 +304,15 @@ def get_game_version(game_data_dir: pathlib.Path, offset: int = 0x88) -> Optiona
 		return str_val.split('_')[0]
 
 
+def temp_name_for(relative_filename: str) -> str:
+	"""
+	Collision-free temporary name for a game file. Base names are not unique
+	within a manifest, so mix in a digest of the full relative path.
+	"""
+	digest = hashlib.md5(relative_filename.encode("utf-8")).hexdigest()[:16]
+	return digest + "_" + pathlib.Path(relative_filename).name
+
+
 # -------------------
 
 class DownloadInfo:
@@ -956,7 +965,7 @@ class SophonClient:
 			return
 
 		# Download to the temporary directory. Move after we're done.
-		dstfile = tempdir(filename.name)
+		dstfile = tempdir(temp_name_for(file_info.filename))
 		bytes_written = 0
 
 		while True: # run once
@@ -1223,7 +1232,7 @@ class SophonClient:
 		gamefile = gamedir(v.filename)
 
 		# Patched file goes into the temporary directory (at first)
-		dstfile = tempdir(pathlib.Path(v.filename).name)
+		dstfile = tempdir(temp_name_for(v.filename))
 		dstfile.unlink(True)  # remove any existing duplicate temporary file
 
 		ldiffname = ldiff_dir.joinpath(pinfo.patch_id)
