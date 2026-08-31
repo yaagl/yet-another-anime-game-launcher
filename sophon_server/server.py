@@ -91,7 +91,7 @@ async def cancel_task(task_id: str):
     return {"message": f"Task {task_id} cancelled"}
 
 @app.get("/api/game/online_info")
-async def get_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
+async def get_online_game_info(reltype: str, game: Literal["nap", "hk4e", "hkrpg"]) -> OnlineGameInfo:
     return fetch_online_game_info(reltype, game)
 
 @app.get("/health")

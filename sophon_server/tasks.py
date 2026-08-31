@@ -130,7 +130,8 @@ def perform_repair(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     cli.initialize(options)
     cli.retrieve_API_keys()
 
-    cli.repair_by_category("game", repair_progress_handler=progress, cancel_event=cancel_event)
+    for category in ["game"] + cli.get_installed_voiceover_categories():
+        cli.repair_by_category(category, repair_progress_handler=progress, cancel_event=cancel_event)
 
     del cli
     del options
@@ -158,13 +159,17 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     cli = SophonClient()
     cli.initialize(options)
     cli.retrieve_API_keys()
-    cli.load_manifest("game")
 
-    if not options.predownload:
-        cli.process_deletefiles(progress_handler=progress)
+    # Voice packs are shipped as their own categories. Updating only "game"
+    # leaves them on the previous version, which the client will not load.
+    for category in ["game"] + cli.get_installed_voiceover_categories():
+        cli.load_manifest(category)
 
-    cli.apply_or_prepare_ldiff_files(progress_handler=progress)
-    cli.diff_download_new_files(progress_handler=progress)
+        if not options.predownload:
+            cli.process_deletefiles(progress_handler=progress)
+
+        cli.apply_or_prepare_ldiff_files(progress_handler=progress)
+        cli.diff_download_new_files(progress_handler=progress)
 
     if not options.predownload:
         cli.load_manifest("game")
@@ -178,9 +183,9 @@ def perform_update(manager: ConnectionManager, tasks: Dict[str, TaskStatus], tas
     if RUN_MEMORY_HACK:
         force_memory_release()
 
-def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> OnlineGameInfo:
+def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e", "hkrpg"]) -> OnlineGameInfo:
     try:
-        if game in ["hk4e", "nap"]:
+        if game in ["hk4e", "nap", "hkrpg"]:
             options = Options()
             options.game_type = game
             options.install_reltype = reltype
@@ -237,7 +242,7 @@ def fetch_online_game_info(reltype: str, game: Literal["nap", "hk4e"]) -> Online
                 error=None
             )
         else:
-            raise ValueError("Unsupported game type. Only 'hk4e' and 'nap' is supported.")
+            raise ValueError("Unsupported game type. Only 'hk4e', 'nap' and 'hkrpg' are supported.")
     except Exception as e:
         return OnlineGameInfo(
             game_type="",

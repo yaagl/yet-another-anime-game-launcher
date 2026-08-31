@@ -124,7 +124,7 @@ class Options(argparse.Namespace):
 	force_use_cache: bool = False # True: disallow downloads, False: download if not cached
 	predownload: bool = False
 	install_reltype: str | None = None
-	game_type: Literal["hk4e", "nap"] | None # hk4e or nap
+	game_type: Literal["hk4e", "nap", "hkrpg"] | None # hk4e, nap or hkrpg
 	do_install: bool = False
 	do_update: bool = False         # True: ldiff, False: chunks
 	repair_mode: str | None = None  # "quick"|"reliable"|None
@@ -143,6 +143,14 @@ OPT = Options()
 
 
 # ------------------- Translate between voiceover pack names
+# HSR keeps its voiceover packs in directories named after the language
+HKRPG_VOICEOVER_DIRS = {
+	"Chinese(PRC)": "zh-cn",
+	"English":      "en-us",
+	"Japanese":     "ja-jp",
+	"Korean":       "ko-kr",
+}
+
 VOICEOVERS_LUT = {
 	# "Friendly/short": {"short": "aa-bb", "friendly": "Longname"}
 	"English(US)": {"short": "en-us"},
@@ -306,11 +314,32 @@ def get_game_version(game_data_dir: pathlib.Path, offset: int = 0x88) -> Optiona
 
 def temp_name_for(relative_filename: str) -> str:
 	"""
-	Collision-free temporary name for a game file. Base names are not unique
-	within a manifest, so mix in a digest of the full relative path.
+	Collision-free temporary file name for a game file.
+	Base names are not unique within a manifest, so mix in a digest of the
+	full relative path while keeping the readable name for logs.
 	"""
 	digest = hashlib.md5(relative_filename.encode("utf-8")).hexdigest()[:16]
 	return digest + "_" + pathlib.Path(relative_filename).name
+
+
+def get_game_version_2019(game_data_dir: pathlib.Path) -> Optional[str]:
+	"""
+	Unity 2019 games (HSR) keep the version string in 'data.unity3d'
+	instead of 'globalgamemanagers'.
+	"""
+	unity3d_path = game_data_dir / "data.unity3d"
+	with open(unity3d_path, "rb") as f:
+		view = f.read()
+
+	index = view.find(b"category")
+	if index == -1:
+		raise ValueError("pattern not found")
+
+	for j in range(index, min(index + 0x80, len(view) - 3)):
+		if view[j] == 0x2e and view[j + 2] == 0x2e:
+			return "%c.%c.%c" % (view[j - 1], view[j + 1], view[j + 3])
+
+	raise ValueError("Failed to parse version")
 
 
 # -------------------
@@ -326,7 +355,7 @@ class DownloadInfo:
 class SophonClient:
 	installed_ver: None  # "major.minor.patch" or "new" for new installations
 	rel_type: str | None = None  # os / cn / bb
-	game_type: Literal["hk4e", "nap"] | None = None  # hk4e / nap
+	game_type: Literal["hk4e", "nap", "hkrpg"] | None = None  # hk4e / nap / hkrpg
 	gamedatadir: str | None= None # "*_Data"
 	branch: str          # main / pre_download
 	branches_json = None # package_id, password, tag
@@ -352,7 +381,7 @@ class SophonClient:
 			self.rel_type = OPT.install_reltype
 
 		if OPT.game_type:
-			assert OPT.game_type in ["hk4e", "nap"], "Unknown game type. Must be 'hk4e' or 'nap'."
+			assert OPT.game_type in ["hk4e", "nap", "hkrpg"], "Unknown game type. Must be 'hk4e', 'nap' or 'hkrpg'."
 			self.game_type = OPT.game_type
 
 		if OPT.do_install + OPT.do_update + isinstance(OPT.repair_mode, str) > 1:
@@ -399,6 +428,11 @@ class SophonClient:
 				"os": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=0\r\n",
 				"cn": "[General]\r\nchannel=1\r\ncps=mihoyo\r\ngame_version=0.0.0\r\nsdk_version=\r\nsub_channel=1\r\n",
 			}
+		elif OPT.game_type == "hkrpg":
+			templates = {
+				"os": "[General]\r\nchannel=1\r\ncps=hoyoverse_PC\r\ngame_version=0.0.0\r\nsub_channel=1\r\n",
+				"cn": "[General]\r\nchannel=1\r\ncps=gw_PC\r\ngame_version=0.0.0\r\nsub_channel=1\r\n",
+			}
 		assert templates[self.rel_type], "Unknown reltype"
 		with gamedir("config.ini").open("w") as fh:
 			fh.write(templates[self.rel_type])
@@ -438,6 +472,17 @@ class SophonClient:
 			if not isinstance(self.rel_type, str):
 				abortlog("Failed to detect release type. " \
 				         + f"config.ini in '{OPT.gamedir}' has wrong information.")
+		elif self.game_type == "hkrpg":
+			# OS and CN share the same executable and sub_channel, so use cps
+			with open(gamedir("config.ini"), "r") as f:
+				contents = f.read()
+				if "cps=hoyoverse_PC" in contents:
+					self.rel_type = "os"
+				elif "cps=gw_PC" in contents:
+					self.rel_type = "cn"
+			if not isinstance(self.rel_type, str):
+				abortlog("Failed to detect release type. " \
+				         + f"config.ini in '{OPT.gamedir}' has wrong information.")
 
 		infolog(f"Release type: {self.rel_type}")
 
@@ -457,6 +502,11 @@ class SophonClient:
 				ver = get_game_version(gamedir(self.gamedatadir), 0xc4)
 				assert ver, "Failed to retrieve game version from globalgamemanagers"
 				self.installed_ver = ver
+			elif self.game_type == "hkrpg":
+				ver = get_game_version_2019(gamedir(self.gamedatadir))
+				assert ver, "Failed to retrieve game version from data.unity3d"
+				self.installed_ver = ver
+				infolog(f"Installed game version: {self.installed_ver} (anchor: data.unity3d)")
 		else:
 			# Change this if needed
 			self.installed_ver = "5.5.0"
@@ -491,6 +541,34 @@ class SophonClient:
 		else:
 			# equal version or lower
 			self.installed_ver = ver[0]
+
+
+	def get_installed_voiceover_categories(self) -> list:
+		"""
+		Audio categories present in the install, e.g. ["en-us", "ja-jp"].
+		Only implemented for hkrpg; the other games keep their own handling.
+		"""
+		if self.game_type != "hkrpg":
+			return []
+
+		self._get_gamedatadir()
+		audio_root = gamedir(self.gamedatadir, "Persistent/Audio/AudioPackage/Windows")
+		if not audio_root.is_dir():
+			infolog("No voiceover packs installed.")
+			return []
+
+		found = []
+		for entry in sorted(audio_root.iterdir()):
+			if not entry.is_dir():
+				continue
+			category = HKRPG_VOICEOVER_DIRS.get(entry.name)
+			if not category:
+				warnlog(f"Unknown voiceover directory '{entry.name}'")
+				continue
+			found.append(category)
+
+		infolog("Installed voiceover packs: " + (", ".join(found) if found else "none"))
+		return found
 
 
 	def get_voiceover_packs(self):
@@ -645,7 +723,7 @@ class SophonClient:
 		game_ids: str = None
 		launcher_id: str = None
 
-		assert self.game_type in ["hk4e", "nap", "hkrpg"], "Unknown game type. Must be 'hk4e' or 'nap'."
+		assert self.game_type in ["hk4e", "nap", "hkrpg"], "Unknown game type. Must be 'hk4e', 'nap' or 'hkrpg'."
 
 		if self.rel_type == "os":
 			# Up-to-date as of 2024-06-15 (4.7.0)
@@ -946,10 +1024,11 @@ class SophonClient:
 		filename = pathlib.Path(file_info.filename) # "UnityGame_Data/Subdirectory/file.txt"
 
 		# Check whether the file already exists.
-		# A file queued in `new_files_to_download` is there because the caller
-		# already found it wrong (repair md5 mismatch, failed patch). Its size can
-		# still match, so a size-only check would skip the files we were asked to
-		# restore.
+		# A file queued in `new_files_to_download` was put there by a caller that
+		# already decided it is wrong (a repair md5 mismatch, a failed patch). Its
+		# size can still match, so a size-only check here would skip the very files
+		# it was asked to restore, and "reliable" repair could never fix corruption
+		# that preserves the file size.
 		if file_info.filename not in self.new_files_to_download:
 			if try_get_file_size(gamedir(filename)) == file_info.size:
 				if install_progress_handler:
@@ -970,6 +1049,10 @@ class SophonClient:
 			return
 
 		# Download to the temporary directory. Move after we're done.
+		# The temporary name must be derived from the full relative path: several
+		# files share a base name (HSR has 46 'VFS.bytes' and 19 'AudioGround.bytes'),
+		# and downloads run concurrently, so a name-only temp file lets one file's
+		# chunks land in another file's path.
 		dstfile = tempdir(temp_name_for(file_info.filename))
 		bytes_written = 0
 
