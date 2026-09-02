@@ -102,7 +102,7 @@ export const tr_TR: typeof zh_CN = {
   SETTING_PROXY_ENABLED: "HTTP Proxy'yi etkinleştir",
   SETTING_PROXY_HOST: "HTTP Proxy Host",
   SETTING_PROXY_DESC: "Bu proxy sadece oyuna etki eder, uygulamaya değil",
-  SETTING_TURN_ON_STEAM_PATCH: "Steam Patch'i aç",
+  SETTING_TURN_ON_STEAM_PATCH: "Steam Patch'i etkinleştir",
   UPDATE_PROMPT_IGNORE: "Güncellemeyi görmezden gel",
   SETTING_CHECK_UPDATE: "YAAGL güncellemesi için kontrol et",
   ALREADY_LATEST_VERSION: "Zaten en güncel sürümü kullanıyorsunuz.",
