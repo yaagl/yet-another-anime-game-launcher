@@ -8,6 +8,7 @@ import { ja_JP } from "./ja_JP";
 import { ko_KR } from "./ko_KR";
 import { de_DE } from "./de_DE";
 import { th_TH } from "./th_TH";
+import { tr_TR } from "./tr_TR";
 import {
   alert as ualert,
   prompt as uprompt,
@@ -29,6 +30,7 @@ export const locales = {
   ko_kr: ko_KR,
   de_de: de_DE,
   th_th: th_TH,
+  tr_tr: tr_TR,
 };
 
 export async function createLocale() {
