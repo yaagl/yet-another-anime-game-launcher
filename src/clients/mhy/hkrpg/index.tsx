@@ -7,19 +7,23 @@ import {
 import { Server } from "@constants";
 import { Locale } from "@locale";
 import {
-  assertValueDefined,
   exec,
   getFreeSpace,
   getKey,
   getKeyOrDefault,
+  log,
+  rawString,
+  readAllLinesIfExists,
   setKey,
+  spawn,
   stats,
+  timeout,
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt } from "semver";
 import { Config } from "@config";
-import { checkIntegrityProgram } from "../program-check-integrity";
+import { checkIntegrityProgram } from "./program-check-integrity";
 import {
   predownloadGameProgram,
   updateGameProgram,
@@ -28,56 +32,64 @@ import { downloadAndInstallGameProgram } from "./program-install-game";
 import { launchGameProgram } from "./program-launch-game";
 import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
+import { Sophon, createSophonRetry } from "@sophon";
 import { Wine } from "@wine";
 import {
   checkAndDownloadDXMT,
-  checkAndDownloadDXVK,
   checkAndDownloadJadeite,
   checkAndDownloadReshade,
 } from "../../../downloadable-resource";
 import { getGameVersion2019 } from "../unity";
-import {
-  HoyoConnectGameBackgroundType,
-  VoicePackNames,
-} from "../launcher-info";
+import { HoyoConnectGameBackgroundType } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
-import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
-
-// no need to check supported version
-// const CURRENT_SUPPORTED_VERSION = "4.3.0";
+import { getLatestAdvInfo } from "../hyp-connect";
 
 export async function createHKRPGChannelClient({
   server,
   locale,
   aria2,
   wine,
+  releaseType,
 }: {
   server: Server;
   locale: Locale;
   aria2: Aria2;
   wine: Wine;
+  releaseType: "os" | "cn";
 }): Promise<ChannelClient> {
   const {
     background: { url: background },
-    icon: { url: icon, link: icon_link },
+    icon: { link: icon_link },
     video: { url: video_url },
     theme: { url: theme_url },
     type: bg_type,
   } = await getLatestAdvInfo(locale, server);
   const IS_VIDEO_BG =
     bg_type === HoyoConnectGameBackgroundType.BACKGROUND_TYPE_VIDEO;
-  const {
-    main: {
-      major: {
-        version: GAME_LATEST_VERSION,
-        game_pkgs,
-        res_list_url: decompressed_path,
-      },
-      patches,
-    },
-    pre_download,
-  } = await getLatestVersionInfo(server);
+
+  const sophon_port = Math.floor(Math.random() * (65535 - 40000)) + 40000;
+  const sophon_host = "127.0.0.1";
+
+  const pid = (await exec(["echo", rawString("$PPID")])).stdOut.split("\n")[0];
+  await spawn(["./sidecar/sophon_server/sophon-server"], {
+    TERMINATE_WITH_PID: pid,
+    SOPHON_PORT: sophon_port.toString(),
+    SOPHON_HOST: sophon_host,
+  });
+  const sophon = await Promise.race([
+    createSophonRetry(sophon_host, sophon_port),
+    timeout(30000),
+  ]).catch(() => Promise.reject(new Error("Fail to launch sophon.")));
+
+  const gameInfo = await sophon.getLatestOnlineGameInfo(releaseType, "hkrpg");
+  log(`Game info: ${JSON.stringify(gameInfo)}`);
+  const LATEST_GAME_VERSION: string = gameInfo.version;
+  const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
+  const PRE_DOWNLOAD_VERSION: string = gameInfo.pre_download_version || "0.0.0";
+  const PRE_DOWNLOAD_AVAILABLE: boolean = gameInfo.pre_download;
+  const INSTALL_SIZE_BYTES: number = gameInfo.install_size;
+
   await waitImageReady(background);
 
   const { gameInstalled, gameInstallDir, gameVersion } = await checkGameState(
@@ -90,11 +102,11 @@ export async function createHKRPGChannelClient({
   );
   const [showPredownloadPrompt, setShowPredownloadPrompt] =
     createSignal<boolean>(
-      pre_download.major != null && //exist pre_download_game data in server response
+      PRE_DOWNLOAD_AVAILABLE &&
         (await getKeyOrDefault("predownloaded_all", "NOTFOUND")) ==
           "NOTFOUND" && // not downloaded yet
         gameInstalled && // game installed
-        gt(pre_download.major.version, gameVersion) // predownload version is greater
+        gt(PRE_DOWNLOAD_VERSION, gameVersion) // predownload version is greater
     );
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
@@ -102,7 +114,7 @@ export async function createHKRPGChannelClient({
   const [gameCurrentVersion, setGameVersion] = createSignal(
     gameVersion ?? "0.0.0"
   );
-  const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
+  const updateRequired = () => lt(gameCurrentVersion(), LATEST_GAME_VERSION);
   return {
     installState: installed,
     showPredownloadPrompt,
@@ -114,21 +126,18 @@ export async function createHKRPGChannelClient({
       background_theme: IS_VIDEO_BG ? theme_url : undefined,
       url: icon_link,
     },
-    predownloadVersion: () => pre_download?.major?.version ?? "",
+    predownloadVersion: () =>
+      PRE_DOWNLOAD_AVAILABLE ? PRE_DOWNLOAD_VERSION : "",
     dismissPredownload() {
       setShowPredownloadPrompt(false);
     },
     async *install(selection: string): CommonUpdateProgram {
       try {
-        // await stats(join(selection, "pkg_version"));
         await stats(join(selection, "GameAssembly.dll")); // FIXME: no pkg_version?
       } catch {
         const freeSpaceGB = await getFreeSpace(selection, "g");
-        const totalSize = game_pkgs
-          .map(x => x.size)
-          .map(parseInt)
-          .reduce((a, b) => a + b, 0);
-        const requiredSpaceGB = Math.ceil(totalSize / Math.pow(1024, 3)) * 1.2;
+        const requiredSpaceGB =
+          Math.ceil(INSTALL_SIZE_BYTES / Math.pow(1024, 3)) * 1.2;
         if (freeSpaceGB < requiredSpaceGB) {
           await locale.alert(
             "NO_ENOUGH_DISKSPACE",
@@ -139,35 +148,22 @@ export async function createHKRPGChannelClient({
         }
 
         yield* downloadAndInstallGameProgram({
-          aria2,
+          sophonClient: sophon,
           gameDir: selection,
-          gameSegmentZips: game_pkgs.map(x => x.url),
-          gameVersion: GAME_LATEST_VERSION,
-          server,
+          installReltype: releaseType,
         });
         // setGameInstalled
         batch(() => {
           setInstalled("INSTALLED");
           setGameInstallDir(selection);
-          setGameVersion(GAME_LATEST_VERSION);
+          setGameVersion(LATEST_GAME_VERSION);
         });
         await setKey("game_install_dir", selection);
         return;
       }
-      const gameVersion = await getGameVersion2019(
-        join(selection, server.dataDir)
-      );
-      // if (gt(gameVersion, CURRENT_SUPPORTED_VERSION)) {
-      //   await locale.alert(
-      //     "UNSUPPORTED_VERSION",
-      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-      //     [gameVersion]
-      //   );
-      //   return;
-      // } else
-      if (lt(gameVersion, GAME_LATEST_VERSION)) {
-        const updateTarget = patches.find(x => x.version == gameVersion);
-        if (!updateTarget) {
+      const gameVersion = await getInstalledVersion(selection, server);
+      if (lt(gameVersion, LATEST_GAME_VERSION)) {
+        if (!UPDATABLE_VERSIONS.includes(gameVersion)) {
           await locale.prompt(
             "UNSUPPORTED_VERSION",
             "GAME_VERSION_TOO_OLD_DESC",
@@ -184,9 +180,8 @@ export async function createHKRPGChannelClient({
         // FIXME: perform a integrity check?
       } else {
         yield* checkIntegrityProgram({
-          aria2,
+          sophon,
           gameDir: selection,
-          remoteDir: decompressed_path,
         });
         // setGameInstalled
         batch(() => {
@@ -199,48 +194,14 @@ export async function createHKRPGChannelClient({
     },
     async *predownload() {
       setShowPredownloadPrompt(false);
-      if (pre_download.major == null) return;
-      const updateTarget = pre_download.patches.find(
-        x => x.version == gameCurrentVersion()
-      );
-      if (updateTarget == null) return;
-      const voicePacks = (
-        await Promise.all(
-          updateTarget.audio_pkgs.map(async x => {
-            try {
-              await stats(
-                join(
-                  _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
-              );
-              return x;
-            } catch {
-              return null;
-            }
-          })
-        )
-      )
-        .filter(x => x != null)
-        .map(x => {
-          assertValueDefined(x);
-          return x;
-        });
-      if (updateTarget.game_pkgs.length != 1) {
-        throw new Error(
-          "assertation failed (game_pkgs.length!= 1)! please file an issue."
-        );
-      }
+      if (!PRE_DOWNLOAD_AVAILABLE) return;
       yield* predownloadGameProgram({
-        aria2,
-        updateFileZip: updateTarget.game_pkgs[0].url,
+        sophon,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.url),
       });
     },
     async *update() {
-      const updateTarget = patches.find(x => x.version == gameCurrentVersion());
-      if (!updateTarget) {
+      if (!UPDATABLE_VERSIONS.includes(gameCurrentVersion())) {
         await locale.prompt(
           "UNSUPPORTED_VERSION",
           "GAME_VERSION_TOO_OLD_DESC",
@@ -254,58 +215,15 @@ export async function createHKRPGChannelClient({
         await setKey("game_install_dir", null);
         return;
       }
-      const voicePacks = (
-        await Promise.all(
-          updateTarget.audio_pkgs.map(async x => {
-            try {
-              await stats(
-                join(
-                  _gameInstallDir(),
-                  `Audio_${VoicePackNames[x.language]}_pkg_version`
-                )
-              );
-              return x;
-            } catch {
-              return null;
-            }
-          })
-        )
-      )
-        .filter(x => x != null)
-        .map(x => {
-          assertValueDefined(x);
-          return x;
-        });
-      if (updateTarget.game_pkgs.length != 1) {
-        throw new Error(
-          "assertation failed (game_pkgs.length!= 1)! please file an issue."
-        );
-      }
       yield* updateGameProgram({
-        aria2,
-        server,
-        currentGameVersion: gameCurrentVersion(),
-        updatedGameVersion: GAME_LATEST_VERSION,
-        updateFileZip: updateTarget.game_pkgs[0].url,
+        sophon,
         gameDir: _gameInstallDir(),
-        updateVoicePackZips: voicePacks.map(x => x.url),
       });
       batch(() => {
-        setGameVersion(GAME_LATEST_VERSION);
+        setGameVersion(LATEST_GAME_VERSION);
       });
     },
     async *launch(config: Config) {
-      // if (
-      //   gt(gameCurrentVersion(), CURRENT_SUPPORTED_VERSION) &&
-      //   !config.patchOff
-      // ) {
-      //   await locale.alert(
-      //     "UNSUPPORTED_VERSION",
-      //     "PLEASE_WAIT_FOR_LAUNCHER_UPDATE",
-      //     [gameCurrentVersion()]
-      //   );
-      //   return;
-      // }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
@@ -322,11 +240,9 @@ export async function createHKRPGChannelClient({
       });
     },
     async *checkIntegrity() {
-      // FIXME: no pkg_version?
       yield* checkIntegrityProgram({
-        aria2,
+        sophon,
         gameDir: _gameInstallDir(),
-        remoteDir: decompressed_path,
       });
     },
     async *init(config: Config) {
@@ -339,9 +255,8 @@ export async function createHKRPGChannelClient({
         yield* patchRevertProgram(_gameInstallDir(), wine, server, config);
       } catch {
         yield* checkIntegrityProgram({
-          aria2,
+          sophon,
           gameDir: _gameInstallDir(),
-          remoteDir: decompressed_path,
         });
       }
     },
@@ -354,6 +269,27 @@ export async function createHKRPGChannelClient({
       };
     },
   };
+}
+
+/**
+ * data.unity3d is rewritten early during an update while config.ini is only
+ * rewritten once the whole update succeeds. The game reads config.ini, so an
+ * interrupted update leaves the launcher believing it is done while the game
+ * refuses to start. Report the lower of the two, the way the sophon server does.
+ */
+async function getInstalledVersion(gameDir: string, server: Server) {
+  const unityVersion = await getGameVersion2019(join(gameDir, server.dataDir));
+  const lines = await readAllLinesIfExists(join(gameDir, "config.ini"));
+  const configVersion = lines
+    .map(line => /^game_version=(\d+\.\d+\.\d+)/.exec(line.trim())?.[1])
+    .find(version => version != undefined);
+  if (configVersion && lt(configVersion, unityVersion)) {
+    log(
+      `config.ini reports ${configVersion} while data.unity3d reports ${unityVersion}; the update did not finish`
+    );
+    return configVersion;
+  }
+  return unityVersion;
 }
 
 async function checkGameState(locale: Locale, server: Server) {
@@ -369,7 +305,7 @@ async function checkGameState(locale: Locale, server: Server) {
     return {
       gameInstalled: true,
       gameInstallDir: gameDir,
-      gameVersion: await getGameVersion2019(join(gameDir, server.dataDir)),
+      gameVersion: await getInstalledVersion(gameDir, server),
     } as const;
   } catch {
     return {
