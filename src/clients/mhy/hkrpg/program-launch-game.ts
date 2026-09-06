@@ -1,6 +1,6 @@
 import { join } from "path-browserify";
 import { CommonUpdateProgram } from "@common-update-ui";
-import { Server } from "@constants";
+import { Server, DEFAULT_BLOCK_NET_DURATION } from "@constants";
 import {
   mkdirp,
   removeFile,
@@ -16,7 +16,6 @@ import {
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
-import { HKRPG_CN_BLOCK_URL, HKRPG_OS_BLOCK_URL } from "../../secret";
 import { gt } from "semver";
 
 export async function* launchGameProgram({
@@ -53,46 +52,22 @@ cd /d "${wine.toWinePath(gameDir)}"
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
 
-    if (config.blockNet) {
-      const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
-      const blockUrl =
-        server.id == "hkrpg_global" ? HKRPG_OS_BLOCK_URL : HKRPG_CN_BLOCK_URL;
-
-      const commands = [
-        `#!/bin/sh`,
-
-        `HOSTS_FILE="/etc/hosts"`,
-        `ENTRY="0.0.0.0 ${blockUrl}"`,
-        `PAD_START="# Temporarily Added by Yaagl"`,
-        `PAD_END="# End of section"`,
-
-        `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
-        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
-        `fi`,
-        `sleep 15`,
-        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
-
-        `rm ${tmpScriptPath}`,
-      ];
-
-      await writeFile(tmpScriptPath, commands.join("\n"));
-      await exec(
-        [
-          "osascript",
-          "-e",
-          `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
-        ],
-        {},
-        false
-      );
-    }
-
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
         WINEDLLOVERRIDES: "",
+        ...(config.blockNet
+          ? {
+              DYLD_INSERT_LIBRARIES: resolve(
+                "./sidecar/dns_delay/libyaagl_dns.dylib"
+              ),
+              YAAGL_BLOCK_DURATION: String(
+                config.blockNetDuration || DEFAULT_BLOCK_NET_DURATION
+              ),
+            }
+          : {}),
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",

@@ -1,0 +1,1 @@
+export const DEFAULT_BLOCK_NET_DURATION = 4;
