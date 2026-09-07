@@ -304,6 +304,15 @@ def get_game_version(game_data_dir: pathlib.Path, offset: int = 0x88) -> Optiona
 		return str_val.split('_')[0]
 
 
+def temp_name_for(relative_filename: str) -> str:
+	"""
+	Collision-free temporary name for a game file. Base names are not unique
+	within a manifest, so mix in a digest of the full relative path.
+	"""
+	digest = hashlib.md5(relative_filename.encode("utf-8")).hexdigest()[:16]
+	return digest + "_" + pathlib.Path(relative_filename).name
+
+
 # -------------------
 
 class DownloadInfo:
@@ -936,12 +945,17 @@ class SophonClient:
 		filename_safety_check(file_info.filename)
 		filename = pathlib.Path(file_info.filename) # "UnityGame_Data/Subdirectory/file.txt"
 
-		# Check whether the file already exists
-		if try_get_file_size(gamedir(filename)) == file_info.size:
-			if install_progress_handler:
-				install_progress_handler.file_download_skipped(file_info.filename, "exists")
-			#infolog(f"File '{filename.name}' already exists. ")
-			return True
+		# Check whether the file already exists.
+		# A file queued in `new_files_to_download` is there because the caller
+		# already found it wrong (repair md5 mismatch, failed patch). Its size can
+		# still match, so a size-only check would skip the files we were asked to
+		# restore.
+		if file_info.filename not in self.new_files_to_download:
+			if try_get_file_size(gamedir(filename)) == file_info.size:
+				if install_progress_handler:
+					install_progress_handler.file_download_skipped(file_info.filename, "exists")
+				#infolog(f"File '{filename.name}' already exists. ")
+				return True
 
 		CHUNK_URL_PREFIX = self.di_chunks.category_json["chunk_download"]["url_prefix"]
 
@@ -956,7 +970,7 @@ class SophonClient:
 			return
 
 		# Download to the temporary directory. Move after we're done.
-		dstfile = tempdir(filename.name)
+		dstfile = tempdir(temp_name_for(file_info.filename))
 		bytes_written = 0
 
 		while True: # run once
@@ -1223,7 +1237,7 @@ class SophonClient:
 		gamefile = gamedir(v.filename)
 
 		# Patched file goes into the temporary directory (at first)
-		dstfile = tempdir(pathlib.Path(v.filename).name)
+		dstfile = tempdir(temp_name_for(v.filename))
 		dstfile.unlink(True)  # remove any existing duplicate temporary file
 
 		ldiffname = ldiff_dir.joinpath(pinfo.patch_id)
