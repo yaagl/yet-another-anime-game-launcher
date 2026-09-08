@@ -42,10 +42,19 @@ export async function createApp() {
   await setKey("singleton", null);
 
   const aria2_port = 6868;
+  let closing = false;
 
   await Neutralino.events.on("windowClose", async () => {
+    if (closing) return;
+    closing = true;
     if (await GLOBAL_onClose(false)) {
-      exit(0);
+      if (NL_OS === "Darwin") {
+        // Neutralino.app.exit() can throw NSException on macOS while the
+        // native window is already closing. See neutralinojs#1469.
+        setTimeout(() => void Neutralino.app.killProcess(), 100);
+      } else {
+        exit(0);
+      }
     }
   });
 
