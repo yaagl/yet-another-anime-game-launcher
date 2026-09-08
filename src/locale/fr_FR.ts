@@ -123,6 +123,8 @@ export const fr_FR: typeof zh_CN = {
   SETTING_PROXY_HOST: en.SETTING_PROXY_HOST, // TODO: Translate
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
+  SETTING_DEBUG_LAUNCH: "Debug Launch Logging",
+
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
 
   UPDATE_PROMPT_IGNORE: "Ignorer la mise à jour",

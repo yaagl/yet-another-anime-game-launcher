@@ -1,6 +1,29 @@
 import { join } from "path-browserify";
 import { build, CommandSegments, rawString } from "./command-builder";
 
+export interface ExecOptions {
+  phase?: string;
+  logFile?: string;
+  teeOutput?: boolean;
+  debug?: boolean;
+  allowFailure?: boolean;
+}
+
+export interface ExecResultDetails extends Neutralino.os.ExecCommandResult {
+  command: string;
+  phase?: string;
+  logFile?: string;
+  cwd: string;
+  envDiff: string;
+  startedAt: string;
+  endedAt: string;
+}
+
+type ExecOptionsInput = boolean | ExecOptions | undefined;
+type LogRedirectInput = string | ExecOptions | undefined;
+
+const STDIO_SUMMARY_LIMIT = 4000;
+
 export function resolve(path: string): string {
   if (!path.startsWith("/")) {
     path = join(
@@ -19,58 +42,120 @@ export function resolve(path: string): string {
 export async function exec(
   segments: CommandSegments,
   env?: { [key: string]: string },
-  sudo = false,
-  log_redirect: string | undefined = undefined
-): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = build(
-    [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
-    env
+  sudoOrOptions: ExecOptionsInput = false,
+  logRedirectOrOptions: LogRedirectInput = undefined
+): Promise<ExecResultDetails> {
+  const { sudo, options } = normalizeExecOptions(
+    sudoOrOptions,
+    logRedirectOrOptions
   );
+  const cmd = buildExecCommand(segments, env, options);
+  const startedAt = new Date().toISOString();
+  const cwd = getExecutionCwd();
+  const envDiff = formatEnvDiff(env);
   await log(sudo ? runInSudo(cmd) : cmd);
+  await writeExecTrace(options, {
+    status: "start",
+    command: cmd,
+    cwd,
+    envDiff,
+    startedAt,
+  });
   const ret = await Neutralino.os.execCommand(sudo ? runInSudo(cmd) : cmd, {});
+  const endedAt = new Date().toISOString();
+  const detailedRet: ExecResultDetails = {
+    ...ret,
+    command: cmd,
+    phase: options.phase,
+    logFile: options.logFile,
+    cwd,
+    envDiff,
+    startedAt,
+    endedAt,
+  };
+  await writeExecTrace(options, {
+    status: "end",
+    command: cmd,
+    cwd,
+    envDiff,
+    startedAt,
+    endedAt,
+    exitCode: ret.exitCode,
+    stdOut: ret.stdOut,
+    stdErr: ret.stdErr,
+  });
   if (ret.exitCode != 0) {
-    throw new Error(
-      `Command return non-zero code (${ret.exitCode}) \n${cmd}\nStdOut:\n${ret.stdOut}\nStdErr:\n${ret.stdErr}`
-    );
+    if (options.allowFailure) return detailedRet;
+    throw new Error(formatExecFailure(detailedRet));
   }
-  return ret;
+  return detailedRet;
 }
 
 export async function exec2(
   segments: CommandSegments,
   env?: { [key: string]: string },
-  sudo = false,
-  log_redirect: string | undefined = undefined
-): Promise<Neutralino.os.ExecCommandResult> {
-  const cmd = build(
-    [...segments, ...(log_redirect ? [rawString("&>"), log_redirect] : [])],
-    env
+  sudoOrOptions: ExecOptionsInput = false,
+  logRedirectOrOptions: LogRedirectInput = undefined
+): Promise<ExecResultDetails> {
+  const { sudo, options } = normalizeExecOptions(
+    sudoOrOptions,
+    logRedirectOrOptions
   );
-  await log(cmd);
-  const { id, pid } = await Neutralino.os.spawnProcess(cmd);
+  const cmd = buildExecCommand(segments, env, options);
+  const startedAt = new Date().toISOString();
+  const cwd = getExecutionCwd();
+  const envDiff = formatEnvDiff(env);
+  await log(sudo ? runInSudo(cmd) : cmd);
+  await writeExecTrace(options, {
+    status: "start",
+    command: cmd,
+    cwd,
+    envDiff,
+    startedAt,
+  });
+  const { id, pid } = await Neutralino.os.spawnProcess(
+    sudo ? runInSudo(cmd) : cmd
+  );
   return await new Promise((res, rej) => {
+    let stdErr = "",
+      stdOut = "";
     const handler: Neutralino.events.Handler<
       Neutralino.os.SpawnProcessResult
-    > = event => {
+    > = async event => {
       if (!event) return;
-      let stdErr = "",
-        stdOut = "";
       if (event.detail.id == id) {
         if (event.detail["action"] == "exit") {
           const exit = Number(event.detail["data"]);
-          if (exit == 0) {
-            res({
-              pid,
-              exitCode: exit,
-              stdErr,
-              stdOut,
-            });
+          const endedAt = new Date().toISOString();
+          const detailedRet: ExecResultDetails = {
+            pid,
+            exitCode: exit,
+            stdErr,
+            stdOut,
+            command: cmd,
+            phase: options.phase,
+            logFile: options.logFile,
+            cwd,
+            envDiff,
+            startedAt,
+            endedAt,
+          };
+          await writeExecTrace(options, {
+            status: "end",
+            command: cmd,
+            cwd,
+            envDiff,
+            startedAt,
+            endedAt,
+            exitCode: exit,
+            pid,
+            stdOut,
+            stdErr,
+          });
+          if (exit == 0 || options.allowFailure) {
+            res(detailedRet);
           } else {
-            rej(
-              new Error(
-                `Command return non-zero code (${exit}) \n${cmd}\nStdOut:\n${stdOut}\nStdErr:\n${stdErr}`
-              )
-            );
+            rej(new Error(formatExecFailure(detailedRet)));
           }
 
           Neutralino.events.off("spawnedProcess", handler);
@@ -83,6 +168,123 @@ export async function exec2(
     };
     Neutralino.events.on("spawnedProcess", handler);
   });
+}
+
+export function buildExecCommand(
+  segments: CommandSegments,
+  env?: { [key: string]: string },
+  options: ExecOptions = {}
+): string {
+  const shouldRedirect = options.logFile && !options.teeOutput;
+  return build(
+    [
+      ...segments,
+      ...(shouldRedirect ? [rawString("&>"), options.logFile as string] : []),
+    ],
+    env
+  );
+}
+
+export function formatExecFailure(ret: ExecResultDetails): string {
+  return [
+    `Command return non-zero code (${ret.exitCode})`,
+    ret.phase ? `Phase: ${ret.phase}` : undefined,
+    `Command: ${ret.command}`,
+    `Cwd: ${ret.cwd}`,
+    `EnvDiff: ${ret.envDiff}`,
+    ret.logFile ? `LogFile: ${ret.logFile}` : undefined,
+    ret.pid != null ? `Pid: ${ret.pid}` : undefined,
+    `StartedAt: ${ret.startedAt}`,
+    `EndedAt: ${ret.endedAt}`,
+    `StdOut:\n${summarizeText(ret.stdOut)}`,
+    `StdErr:\n${summarizeText(ret.stdErr)}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export function summarizeText(value: string): string {
+  if (value.length <= STDIO_SUMMARY_LIMIT) return value;
+  return `${value.slice(0, STDIO_SUMMARY_LIMIT)}\n...[truncated ${
+    value.length - STDIO_SUMMARY_LIMIT
+  } chars]`;
+}
+
+function normalizeExecOptions(
+  sudoOrOptions: ExecOptionsInput,
+  logRedirectOrOptions: LogRedirectInput
+): { sudo: boolean; options: ExecOptions } {
+  const sudo = typeof sudoOrOptions == "boolean" ? sudoOrOptions : false;
+  const options =
+    typeof sudoOrOptions == "object"
+      ? sudoOrOptions
+      : typeof logRedirectOrOptions == "object"
+      ? logRedirectOrOptions
+      : {};
+  if (typeof logRedirectOrOptions == "string") {
+    return {
+      sudo,
+      options: {
+        ...options,
+        logFile: logRedirectOrOptions,
+      },
+    };
+  }
+  return { sudo, options };
+}
+
+async function writeExecTrace(
+  options: ExecOptions,
+  event: {
+    status: "start" | "end";
+    command: string;
+    cwd: string;
+    envDiff: string;
+    startedAt: string;
+    endedAt?: string;
+    exitCode?: number;
+    pid?: number;
+    stdOut?: string;
+    stdErr?: string;
+  }
+) {
+  if (!options.debug && !options.teeOutput) return;
+  const lines = [
+    `=== ${options.phase ?? "command"} ${event.status} ===`,
+    `startedAt=${event.startedAt}`,
+    event.endedAt ? `endedAt=${event.endedAt}` : undefined,
+    event.pid != null ? `pid=${event.pid}` : undefined,
+    event.exitCode != null ? `exitCode=${event.exitCode}` : undefined,
+    options.logFile ? `logFile=${options.logFile}` : undefined,
+    `cwd=${event.cwd}`,
+    `command=${event.command}`,
+    `env=${event.envDiff}`,
+  ].filter(Boolean);
+  if (event.status == "end" && options.teeOutput) {
+    lines.push("stdout:");
+    lines.push(summarizeText(event.stdOut ?? ""));
+    lines.push("stderr:");
+    lines.push(summarizeText(event.stdErr ?? ""));
+  }
+  const trace = `${lines.join("\n")}\n\n`;
+  await log(trace.trimEnd());
+  if (options.logFile && (options.debug || options.teeOutput)) {
+    await appendFile(options.logFile, trace);
+  }
+}
+
+function formatEnvDiff(env?: { [key: string]: string }): string {
+  const entries = Object.entries(env ?? {}).filter(([, value]) => value);
+  if (!entries.length) return "{}";
+  return `{ ${entries.map(([key, value]) => `${key}=${value}`).join(", ")} }`;
+}
+
+function getExecutionCwd(): string {
+  try {
+    return resolve("./");
+  } catch {
+    return "unknown";
+  }
 }
 
 export function runInSudo(cmd: string) {
@@ -255,6 +457,10 @@ export async function openDir(title: string) {
 
 export async function readFile(path: string) {
   return await Neutralino.filesystem.readFile(resolve(path));
+}
+
+export async function readDirectory(path: string) {
+  return await Neutralino.filesystem.readDirectory(resolve(path));
 }
 
 export async function readBinary(path: string) {

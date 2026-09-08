@@ -114,6 +114,8 @@ export const zh_CN = {
   SETTING_PROXY_DESC:
     "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
 
+  SETTING_DEBUG_LAUNCH: "启动诊断日志",
+
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
 
   UPDATE_PROMPT_IGNORE: "忽略此更新",
