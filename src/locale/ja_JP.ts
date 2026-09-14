@@ -112,6 +112,7 @@ export const ja_JP: typeof zh_CN = {
 
   SETTING_BLOCK_NET: "起動修正（ホストのブロック）",
   SETTING_TIMEOUT_FIX: "タイムアウト修正",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_LICENSES: "ライセンス",
   SETTING_ENABLE_HDR: "HDR有効",
 

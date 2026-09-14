@@ -44,10 +44,7 @@ export async function* launchGameProgram({
     args.push("-screen-height", config.resolutionHeight);
     args.push("-screen-fullscreen", "0");
   }
-  const useD3D12 =
-    wine.id ===
-      "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server" &&
-    wine.attributes.renderBackend === "d3dmetal";
+  const useD3D12 = config.useD3D12 && wine.attributes.supportsD3d12 === true;
   if (useD3D12) {
     args.push("-use-d3d12");
   }

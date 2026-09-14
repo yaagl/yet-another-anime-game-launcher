@@ -17,7 +17,7 @@ import {
   exec,
   removeFile,
 } from "@utils";
-import { Wine } from "@wine";
+import type { Wine } from "@wine";
 import { join } from "path-browserify";
 
 const CURRENT_MVK_VERSION = "1.2.2";
@@ -210,6 +210,60 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   await removeFile(resolve(`./dxmt/${tarName}`));
 
   setKey("installed_dxmt_version", CURRENT_DXMT_VERSION);
+}
+
+const D3DMETAL_ARCHIVE_NAME = "d3dmetal-gptk4b2-zzz-v1.0.5.tar.xz";
+const CURRENT_D3DMETAL_VERSION = "4.0.0-beta.2.zzz.1";
+const D3DMETAL_URL =
+  "https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/download/v1.0.5/";
+
+export async function* checkAndDownloadD3DMetal(
+  aria2: Aria2,
+  wineBinaryDir: string,
+  force = false
+): CommonUpdateProgram {
+  const d3dmetalDir = resolve("./d3dmetal");
+  const archivePath = join(d3dmetalDir, D3DMETAL_ARCHIVE_NAME);
+
+  if (
+    !(await fileOrDirExists(archivePath)) ||
+    !eq(
+      CURRENT_D3DMETAL_VERSION,
+      await getKeyOrDefault("installed_d3dmetal_version", "0.0.0")
+    )
+  ) {
+    await rmrf_dangerously(d3dmetalDir);
+    await mkdirp(d3dmetalDir);
+    yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
+    for await (const progress of aria2.doStreamingDownload({
+      uri: D3DMETAL_URL + D3DMETAL_ARCHIVE_NAME,
+      absDst: archivePath,
+    })) {
+      yield [
+        "setProgress",
+        Number((progress.completedLength * BigInt(100)) / progress.totalLength),
+      ];
+      yield [
+        "setStateText",
+        "DOWNLOADING_ENVIRONMENT_SPEED",
+        `${humanFileSize(Number(progress.downloadSpeed))}`,
+      ];
+    }
+    await setKey("installed_d3dmetal_version", CURRENT_D3DMETAL_VERSION);
+  }
+
+  if (
+    force ||
+    !eq(
+      CURRENT_D3DMETAL_VERSION,
+      await getKeyOrDefault("installed_d3dmetal_wine_version", "0.0.0")
+    )
+  ) {
+    yield ["setStateText", "EXTRACT_ENVIRONMENT"];
+    yield ["setUndeterminedProgress"];
+    await exec(["tar", "-Jxpf", archivePath, "-C", wineBinaryDir]);
+    await setKey("installed_d3dmetal_wine_version", CURRENT_D3DMETAL_VERSION);
+  }
 }
 
 const CURRENT_RESHADE_VERSION = "5.8.0";

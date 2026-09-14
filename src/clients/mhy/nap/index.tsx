@@ -13,6 +13,7 @@ import {
   getKey,
   getKeyOrDefault,
   md5,
+  resolve,
   setKey,
   stats,
   waitImageReady,
@@ -31,6 +32,7 @@ import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
+  checkAndDownloadD3DMetal,
   checkAndDownloadDXMT,
   checkAndDownloadDXVK,
   checkAndDownloadReshade,
@@ -40,6 +42,7 @@ import createResolution from "./config/resolution";
 import createBlockNet from "./config/block-net";
 import createSteamPatch from "./config/steam-patch";
 import createTimeoutFix from "./config/timeout-fix";
+import { createD3D12 } from "./config/d3d12";
 import { getGameVersion as _getGameVersion } from "../unity";
 import {
   HoyoConnectGameBackgroundType,
@@ -322,6 +325,9 @@ export async function createNAPChannelClient({
       //   );
       //   return;
       // }
+      if (wine.attributes.renderBackend == "d3dmetal") {
+        yield* checkAndDownloadD3DMetal(aria2, resolve("./wine"));
+      }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
@@ -365,6 +371,7 @@ export async function createNAPChannelClient({
       const [BN] = await createBlockNet({ locale, config });
       const [SP] = await createSteamPatch({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
+      const [D3D12] = await createD3D12({ locale, config, wine });
 
       return function () {
         return [
@@ -375,6 +382,7 @@ export async function createNAPChannelClient({
           <BN />,
           <SP />,
           <TF />,
+          <D3D12 />,
         ];
       };
     },

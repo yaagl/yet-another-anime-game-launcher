@@ -4,6 +4,7 @@ import { Github } from "../github";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "d3dmetal";
+  supportsD3d12: boolean;
   winePath: string; // Path to the wine directory inside the archive
 }
 
@@ -70,9 +71,10 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     id: "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server",
     displayName: "Wine 11.17 ZZZ DX12 (GPTK4.0b2)",
     remoteUrl:
-      "https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/download/v1.0.5/wine-11.17-zzz-dx12-gptk4b2-macos26.tar.xz",
+      "https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/download/v1.0.5/wine-11.17-zzz-core-macos26.tar.xz",
     attributes: {
       renderBackend: "d3dmetal",
+      supportsD3d12: true,
       winePath: "wine",
     },
   },

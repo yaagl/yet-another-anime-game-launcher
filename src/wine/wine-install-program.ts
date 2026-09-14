@@ -19,6 +19,7 @@ import { createWine } from "./wine";
 import { installMediaFoundation } from "./mf";
 import { WineDistribution } from "./distro";
 import { addCertsToWine } from "./cert";
+import { checkAndDownloadD3DMetal } from "../downloadable-resource";
 
 export async function createWineInstallProgram({
   aria2,
@@ -70,6 +71,10 @@ export async function createWineInstallProgram({
       );
     }
     await removeFile(wineTarPath);
+
+    if (wineDistro.attributes.renderBackend == "d3dmetal") {
+      yield* checkAndDownloadD3DMetal(aria2, wineBinaryDir, true);
+    }
 
     yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
 

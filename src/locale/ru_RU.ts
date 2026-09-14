@@ -112,6 +112,7 @@ export const ru_RU: typeof zh_CN = {
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix (Исправление тайм-аута)",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_LICENSES: "Лицензии",
 
   SETTING_ENABLE_HDR: "Включить HDR",

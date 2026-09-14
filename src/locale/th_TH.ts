@@ -110,6 +110,7 @@ export const th_TH: typeof zh_CN = {
 
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
   SETTING_ENABLE_HDR: "เปิดใช้ HDR",
 

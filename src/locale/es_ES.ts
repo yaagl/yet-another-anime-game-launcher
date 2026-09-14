@@ -110,6 +110,7 @@ export const es_ES: typeof zh_CN = {
 
   SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
   SETTING_TIMEOUT_FIX: "Timeout Fix",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
   SETTING_LICENSES: "Licencias",
 
   SETTING_ENABLE_HDR: "Activar HDR",

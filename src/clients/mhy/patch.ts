@@ -66,7 +66,7 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  if (wine.attributes.renderBackend != "d3dmetal") {
+  if (wine.attributes.renderBackend == "dxmt") {
     for (const f of DXMT_FILES) {
       const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
       await forceMove(wineLibPath, wineLibPath + ".bak");
@@ -96,7 +96,7 @@ export async function* patchProgram(
     }
   }
 
-  if (config.reshade && wine.attributes.renderBackend != "d3dmetal") {
+  if (config.reshade && wine.attributes.renderBackend == "dxmt") {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
       resolve("./reshade/d3dcompiler_47.dll"),
@@ -159,13 +159,13 @@ export async function* patchRevertProgram(
   }
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend != "d3dmetal") {
+  if (wine.attributes.renderBackend == "dxmt") {
     for (const f of DXMT_FILES) {
       const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
       await forceMove(wineLibPath + ".bak", wineLibPath);
     }
   }
-  if (config.reshade && wine.attributes.renderBackend != "d3dmetal") {
+  if (config.reshade && wine.attributes.renderBackend == "dxmt") {
     await removeFileIfExists(join(gameDir, "dxgi.dll"));
     await removeFileIfExists(join(gameDir, "d3dcompiler_47.dll"));
   }
