@@ -45,6 +45,12 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 - Uncompress and copy the resulting application to your `/Applications` folder. (Do not open the application from Downloads folder).
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
+
+### Optional ZZZ DX12 Wine
+
+Select **Wine 11.17 ZZZ DX12 (GPTK4.0b2)** in the Wine distribution settings to install the prebuilt [v1.0.5 runtime](https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/tag/v1.0.5). This optional runtime requires Apple Silicon, Rosetta 2, and macOS 26 or later; the current build has been verified on macOS 27, not on macOS 26 hardware. The default Wine distribution is unchanged.
+
+For this runtime, ZZZ uses DX12 in both normal and Steam launch modes, and Yaagl keeps its bundled D3DMetal components instead of replacing them with DXMT. No separate installer or launcher resource patch is required. Switching Wine distributions uses Yaagl's existing installation flow, which recreates the Wine prefix.
 <!--
 ## Development (Outdated)
 

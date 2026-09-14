@@ -160,6 +160,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     cmd,
     toWinePath,
     prefix: options.prefix,
+    id: options.distro.id,
     openCmdWindow,
     setProps,
     setNVExtension,

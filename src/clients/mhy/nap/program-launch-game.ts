@@ -44,6 +44,13 @@ export async function* launchGameProgram({
     args.push("-screen-height", config.resolutionHeight);
     args.push("-screen-fullscreen", "0");
   }
+  const useD3D12 =
+    wine.id ===
+      "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server" &&
+    wine.attributes.renderBackend === "d3dmetal";
+  if (useD3D12) {
+    args.push("-use-d3d12");
+  }
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
@@ -96,7 +103,10 @@ cd /d "${wine.toWinePath(gameDir)}"
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
-        ? [wine.toWinePath(join(gameDir, gameExecutable))]
+        ? [
+            wine.toWinePath(join(gameDir, gameExecutable)),
+            ...(useD3D12 ? ["-use-d3d12"] : []),
+          ]
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",

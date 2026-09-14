@@ -66,35 +66,35 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  for (const f of DXMT_FILES) {
-    const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
-    await forceMove(wineLibPath, wineLibPath + ".bak");
-    await cp(`./dxmt/${f}`, wineLibPath);
-  }
+  if (wine.attributes.renderBackend != "d3dmetal") {
+    for (const f of DXMT_FILES) {
+      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      await forceMove(wineLibPath, wineLibPath + ".bak");
+      await cp(`./dxmt/${f}`, wineLibPath);
+    }
 
-  // winemetal files always go to Wine lib directories
-  await cp(
-    `./dxmt/winemetal.dll`,
-    resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
-  );
-
-  await cp(
-    `./dxmt/winemetal.so`,
-    resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
-  );
-
-  // winemetal.dll also to system32 for both native and builtin
-  await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
-
-  if (server.id.startsWith("hkrpg")) {
     await cp(
-      `./dxmt/nvngx.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+      `./dxmt/winemetal.dll`,
+      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
     );
-    await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+
+    await cp(
+      `./dxmt/winemetal.so`,
+      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+    );
+
+    await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
+
+    if (server.id.startsWith("hkrpg")) {
+      await cp(
+        `./dxmt/nvngx.dll`,
+        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
+      );
+      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+    }
   }
 
-  if (config.reshade) {
+  if (config.reshade && wine.attributes.renderBackend != "d3dmetal") {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
       resolve("./reshade/d3dcompiler_47.dll"),
@@ -157,13 +157,13 @@ export async function* patchRevertProgram(
   }
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxmt") {
+  if (wine.attributes.renderBackend != "d3dmetal") {
     for (const f of DXMT_FILES) {
       const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
       await forceMove(wineLibPath + ".bak", wineLibPath);
     }
   }
-  if (config.reshade) {
+  if (config.reshade && wine.attributes.renderBackend != "d3dmetal") {
     await removeFileIfExists(join(gameDir, "dxgi.dll"));
     await removeFileIfExists(join(gameDir, "d3dcompiler_47.dll"));
   }
