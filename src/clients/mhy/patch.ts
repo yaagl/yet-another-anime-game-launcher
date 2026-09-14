@@ -73,6 +73,7 @@ export async function* patchProgram(
       await cp(`./dxmt/${f}`, wineLibPath);
     }
 
+    // winemetal files always go to Wine lib directories
     await cp(
       `./dxmt/winemetal.dll`,
       resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
@@ -83,6 +84,7 @@ export async function* patchProgram(
       resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
     );
 
+    // winemetal.dll also to system32 for both native and builtin
     await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
 
     if (server.id.startsWith("hkrpg")) {
