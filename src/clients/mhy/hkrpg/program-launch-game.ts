@@ -37,7 +37,7 @@ export async function* launchGameProgram({
 
   await fixWebview(wine, server);
   await wine.setProps(config);
-  if (wine.attributes.renderBackend == "dxmt") await wine.setNVExtension();
+  if (config.renderBackend == "dxmt") await wine.setNVExtension();
 
   const cmd = `@echo off
 cd "%~dp0"
@@ -52,6 +52,7 @@ cd /d "${wine.toWinePath(gameDir)}"
   try {
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
+    const d3dmetalDir = resolve("./wine/lib/external");
 
     if (config.blockNet) {
       const tmpScriptPath = "/tmp/yaagl_network_block_script.sh";
@@ -92,8 +93,9 @@ cd /d "${wine.toWinePath(gameDir)}"
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
         MTL_HUD_ENABLED: config.metalHud ? "1" : "",
-        WINEDLLOVERRIDES: "",
-        ...(wine.attributes.renderBackend == "dxmt"
+        WINEDLLOVERRIDES:
+          config.renderBackend == "d3dmetal" ? "dxgi,d3d11,d3d12=b" : "",
+        ...(config.renderBackend == "dxmt"
           ? {
               WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
@@ -105,6 +107,15 @@ cd /d "${wine.toWinePath(gameDir)}"
             }
           : {
               WINEESYNC: "1",
+              DYLD_FRAMEWORK_PATH: d3dmetalDir,
+              DYLD_LIBRARY_PATH: d3dmetalDir,
+              D3DMETAL_FRAMEWORK_PATH: join(
+                d3dmetalDir,
+                "D3DMetal.framework",
+                "D3DMetal"
+              ),
+              DMN_LOG: yaaglDir,
+              GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
             }),
         ...(config.proxyEnabled
           ? {

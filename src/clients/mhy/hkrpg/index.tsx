@@ -42,6 +42,7 @@ import {
 } from "../launcher-info";
 import createPatchOff from "./config/patch-off";
 import createBlockNet from "./config/block-net";
+import createRenderBackend from "./config/render-backend";
 import { getLatestAdvInfo, getLatestVersionInfo } from "../hyp-connect";
 
 // no need to check supported version
@@ -306,10 +307,10 @@ export async function createHKRPGChannelClient({
       //   );
       //   return;
       // }
-      if (config.reshade) {
+      if (config.reshade && config.renderBackend == "dxmt") {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      if (wine.attributes.renderBackend == "dxmt") {
+      if (config.renderBackend == "dxmt") {
         yield* checkAndDownloadDXMT(aria2);
       }
       yield* checkAndDownloadJadeite(aria2);
@@ -348,9 +349,10 @@ export async function createHKRPGChannelClient({
     async createConfig(locale: Locale, config: Partial<Config>) {
       const [PO] = await createPatchOff({ locale, config });
       const [BN] = await createBlockNet({ locale, config });
+      const [RB] = await createRenderBackend({ config });
 
       return function () {
-        return ["Game Version: ", gameCurrentVersion(), <PO />, <BN />];
+        return ["Game Version: ", gameCurrentVersion(), <RB />, <PO />, <BN />];
       };
     },
   };
