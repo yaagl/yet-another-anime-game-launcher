@@ -110,6 +110,14 @@ export async function createApp() {
 
   const onCheckUpdate = async () => {
     const result = await createUpdater({ github, aria2 });
+    if (result.latest === undefined) {
+      await Neutralino.os.showMessageBox(
+        "Error",
+        "Failed to check for updates. Please reopen the launcher and try again.",
+        "OK"
+      );
+      return;
+    }
     if (result.latest) {
       await locale.alert("SETTING_YAAGL_VERSION", "ALREADY_LATEST_VERSION");
     } else {
