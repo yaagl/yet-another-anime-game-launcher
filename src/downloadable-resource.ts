@@ -27,10 +27,8 @@ export async function* checkAndDownloadMoltenVK(
 ): CommonUpdateProgram {
   if (
     (await fileOrDirExists("./moltenvk/libMoltenVK.dylib")) &&
-    eq(
-      CURRENT_MVK_VERSION,
-      await getKeyOrDefault("installed_moltenvk_version", "0.0.0")
-    )
+    CURRENT_MVK_VERSION ===
+      (await getKeyOrDefault("installed_moltenvk_version", "0.0.0"))
   ) {
     return;
   }
@@ -65,10 +63,8 @@ const CURRENT_JADEITE_VERSION = "4.1.0";
 
 export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
   if (
-    eq(
-      CURRENT_DXVK_VERSION,
-      await getKeyOrDefault("installed_dxvk_version", "0.0.0")
-    )
+    CURRENT_DXVK_VERSION ===
+    (await getKeyOrDefault("installed_dxvk_version", "0.0.0"))
   ) {
     return;
   }
@@ -99,10 +95,8 @@ export async function* checkAndDownloadJadeite(
   aria2: Aria2
 ): CommonUpdateProgram {
   if (
-    eq(
-      CURRENT_JADEITE_VERSION,
-      await getKeyOrDefault("installed_jadeite_version", "0.0.0")
-    )
+    CURRENT_JADEITE_VERSION ===
+    (await getKeyOrDefault("installed_jadeite_version", "0.0.0"))
   ) {
     return;
   }
@@ -149,10 +143,8 @@ const CURRENT_DXMT_VERSION = "654f547";
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
-    eq(
-      CURRENT_DXMT_VERSION,
-      await getKeyOrDefault("installed_dxmt_version", "0.0.0")
-    )
+    CURRENT_DXMT_VERSION ===
+    (await getKeyOrDefault("installed_dxmt_version", "0.0.0"))
   ) {
     return;
   }
@@ -230,10 +222,8 @@ export async function* checkAndDownloadReshade(
   const reshaderDir = resolve("./reshade");
 
   if (
-    eq(
-      CURRENT_RESHADE_VERSION,
-      await getKeyOrDefault("installed_reshade", "0.0.0")
-    )
+    CURRENT_RESHADE_VERSION ===
+    (await getKeyOrDefault("installed_reshade", "0.0.0"))
   ) {
     return;
   }
