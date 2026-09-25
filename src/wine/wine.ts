@@ -11,6 +11,8 @@ import {
   stats,
   resolve,
   writeFile,
+  addTerminationHook,
+  timeout,
 } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
@@ -68,6 +70,41 @@ export async function createWine(options: {
       ...getEnvironmentVariables(),
     });
   }
+
+  async function shutdownServer() {
+    const wineserverBin = join(dirname(loaderBin), "wineserver");
+    const env = getEnvironmentVariables();
+    try {
+      // 1. Tell wineserver to terminate all client processes in the prefix
+      await unixExec2([wineserverBin, "-k"], env);
+    } catch {
+      // wineserver might already be stopped
+    }
+
+    try {
+      // 2. Wait up to 5s for processes to exit cleanly and flush registry
+      await Promise.race([
+        unixExec2([wineserverBin, "-w"], env),
+        timeout(5000),
+      ]);
+    } catch {
+      // 3. Fallback: Force kill (-k=9) if graceful termination timed out
+      try {
+        await unixExec2([wineserverBin, "-k=9"], env);
+        await Promise.race([
+          unixExec2([wineserverBin, "-w"], env),
+          timeout(2000),
+        ]);
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  addTerminationHook(async () => {
+    await shutdownServer();
+    return true;
+  });
 
   function toWinePath(absPath: string) {
     return "Z:" + `${absPath}`.replaceAll("/", "\\");
@@ -157,6 +194,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec,
     exec2,
     waitUntilServerOff,
+    shutdownServer,
     cmd,
     toWinePath,
     prefix: options.prefix,

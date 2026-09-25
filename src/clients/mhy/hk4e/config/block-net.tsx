@@ -87,7 +87,7 @@ export default async function ({
               <InputGroup>
                 <Input
                   type="number"
-                  min="5"
+                  min="1"
                   max="120"
                   value={duration()}
                   onChange={e =>

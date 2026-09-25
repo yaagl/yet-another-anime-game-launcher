@@ -19,6 +19,7 @@ import {
   stats,
   timeout,
   waitImageReady,
+  addTerminationHook,
 } from "@utils";
 import { join } from "path-browserify";
 import { gt, lt, SemVer } from "semver";
@@ -87,6 +88,14 @@ export async function createHK4EChannelClient({
     TERMINATE_WITH_PID: pid,
     SOPHON_PORT: sophon_port.toString(),
     SOPHON_HOST: sophon_host,
+  });
+  addTerminationHook(async () => {
+    try {
+      await exec(["kill", "-9", spid + ""]);
+    } catch {
+      // ignore
+    }
+    return true;
   });
   const sophon = await Promise.race([
     createSophonRetry(sophon_host, sophon_port),

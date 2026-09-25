@@ -93,6 +93,8 @@ cd /d "${wine.toWinePath(gameDir)}"
   } catch (e: unknown) {
     // it seems game crashed?
     await log(String(e));
+  } finally {
+    await wine.shutdownServer();
   }
 
   await removeFile(resolve("config.bat"));

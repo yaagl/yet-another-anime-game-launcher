@@ -87,11 +87,13 @@ export default async function ({
               <InputGroup>
                 <Input
                   type="number"
-                  min="5"
+                  min="1"
                   max="120"
                   value={duration()}
                   onChange={e =>
-                    setDuration(parseInt(e.target.value, 10) || 30)
+                    setDuration(
+                      parseInt(e.target.value, 10) || DEFAULT_BLOCK_NET_DURATION
+                    )
                   }
                 />
               </InputGroup>
