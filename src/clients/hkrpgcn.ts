@@ -38,6 +38,7 @@ export const SERVER_DEFINITION: Server = {
 export function createClient(options: CreateClientOptions) {
   return createHKRPGChannelClient({
     server: SERVER_DEFINITION,
+    releaseType: "cn",
     ...options,
   });
 }

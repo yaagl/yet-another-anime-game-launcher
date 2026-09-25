@@ -36,11 +36,13 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       bundleId = config.applicationId + ".hkrpg.cn";
       appDistributionName = config.cli.binaryName + " HSR";
       config.modes.window.icon = "/src/icons/March7th.cr.png";
+      includeSophon = true;
       break;
     case "hkrpgos":
       bundleId = config.applicationId + ".hkrpg.os";
       appDistributionName = config.cli.binaryName + " HSR OS";
       config.modes.window.icon = "/src/icons/March7th.cr.png";
+      includeSophon = true;
       break;
     case "bh3glb":
       bundleId = config.applicationId + ".bh3.glb";

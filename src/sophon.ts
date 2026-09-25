@@ -1,8 +1,10 @@
 import { log } from "@utils";
 
+export type GameType = "hk4e" | "nap" | "hkrpg";
+
 interface GameOperationOptions {
   gamedir: string;
-  game_type: string; // "hk4e" or "nap"
+  game_type: GameType; // "hk4e", "nap" or "hkrpg"
   tempdir?: string; // sophon manifest and intermediate files
 }
 
@@ -33,7 +35,7 @@ export interface SophonProgressEvent {
 }
 
 export interface SophonOnlineGameInfo {
-  game_type: "hk4e" | "nap" | "";
+  game_type: GameType | "";
   version: string;
   install_size: number;
   updatable_versions: string[];

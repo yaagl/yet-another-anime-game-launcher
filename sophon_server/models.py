@@ -4,7 +4,7 @@ from typing import Optional, List, Literal
 
 class GameOperationRequest(BaseModel):
     gamedir: str
-    game_type: Literal["hk4e", "nap"]
+    game_type: Literal["hk4e", "nap", "hkrpg"]
     tempdir: Optional[str] = None
 
 class InstallRequest(GameOperationRequest):
@@ -30,7 +30,7 @@ class TaskStatus(BaseModel):
 
 
 class OnlineGameInfo(BaseModel):
-    game_type: Literal["hk4e", "nap", ""]   # "" is for handling error cases
+    game_type: Literal["hk4e", "nap", "hkrpg", ""]   # "" is for handling error cases
     version: str
     install_size: int
     updatable_versions: List[str]
