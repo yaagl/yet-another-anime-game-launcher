@@ -95,6 +95,9 @@ export async function createHK4EChannelClient({
 
   const gameInfo = await sophon.getLatestOnlineGameInfo(releaseType, "hk4e");
   log(`Game info: ${JSON.stringify(gameInfo)}`);
+  if (gameInfo.error || !gameInfo.version) {
+    throw new Error(gameInfo.error || "Failed to retrieve online game version");
+  }
   const LATEST_GAME_VERSION: string = gameInfo.version;
   const UPDATABLE_VERSIONS: string[] = gameInfo.updatable_versions;
   const PRE_DOWNLOAD_VERSION: string = gameInfo.pre_download_version || "0.0.0";

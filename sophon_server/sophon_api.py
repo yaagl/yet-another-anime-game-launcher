@@ -62,7 +62,6 @@ import sys # stdout
 import tempfile # patch extraction
 import time
 from typing import Literal, Optional
-import uuid
 import struct
 import urllib.error # exception handling
 import urllib.request as request # downloads
@@ -71,6 +70,9 @@ from typing import TYPE_CHECKING
 import psutil
 import zstandard # archive unpacking
 from google.protobuf.json_format import MessageToJson
+
+from cache import load_cached_file
+from manifest_cache import load_manifest_with_retry
 
 import manifest_pb2 # generated
 import manifest_ldiff_pb2 # generated
@@ -571,36 +573,21 @@ class SophonClient:
 		shutil.rmtree(OPT.tempdir)
 
 
-	def load_cached_api_file(self, fname, url, POST_data = None):
+	def load_cached_api_file(self, fname, url, POST_data = None,
+	                         expected_size = None, expected_md5 = None,
+	                         reuse_valid_cache = False):
 		"""
-		Cached file download. For JSON (API) files only!
+		Download and cache an API response or manifest file.
 
-		fname: file name without path prefix
-		url:   str or function ptr to retrieve the URL
-		Returns: File handle
+		Files are downloaded atomically. Optional size and MD5 values are
+		used to validate both cached and newly downloaded files.
 		"""
 		fullname = tempdir(fname)
-		do_download = True
-
-		if fullname.is_file():
-			# keep cached for 24 hours
-			do_download = time.time() - fullname.stat().st_mtime > (24 * 3600)
-
-		if OPT.force_use_cache:
-			do_download = False
-
-		if do_download:
-			# Check whether the file is still up-to-date
-			if callable(url):
-				url = url()
-
-			if POST_data != None:
-				req = request.Request(url, data=POST_data)
-				resp = request.urlopen(req)
-				with fullname.open("wb") as fh:
-					fh.write(resp.read())
-			else:
-				request.urlretrieve(url, fullname)
+		downloaded = load_cached_file(
+			fullname, url, POST_data, expected_size, expected_md5,
+			OPT.force_use_cache, reuse_valid_cache,
+		)
+		if downloaded:
 			debuglog(f"Downloaded new file '{fname}'") #, src={url}")
 		else:
 			debuglog(f"Loaded existing file '{fname}'")
@@ -776,20 +763,36 @@ class SophonClient:
 		dlinfo.category_json = category
 
 		# Download and decompress manifest protobuf
-		fname_raw = category["manifest"]["id"]
-		url = category["manifest_download"]["url_prefix"] + "/" + category["manifest"]["id"]
+		manifest_info = category["manifest"]
+		fname_raw = manifest_info["id"]
+		url = category["manifest_download"]["url_prefix"] + "/" + fname_raw
+		compressed_size = int(manifest_info["compressed_size"])
+		expected_md5 = manifest_info["checksum"]
+		expected_uncompressed_size = int(manifest_info["uncompressed_size"])
+		compression = int(category["manifest_download"].get("compression", 0))
 
-		zstd_path = self.load_cached_api_file(fname_raw + ".zstd", url)
-		with zstd_path.open('br') as zfh:
-			reader = zstandard.ZstdDecompressor().stream_reader(zfh)
-			pb = None
-			if dlinfo == self.di_diffs:
-				pb = manifest_ldiff_pb2.DiffManifest()
-			elif dlinfo == self.di_chunks:
-				pb = manifest_pb2.Manifest()
-			else:
-				assert False, "unknown instance"
-			pb.ParseFromString(reader.read())
+		if dlinfo == self.di_diffs:
+			manifest_type = manifest_ldiff_pb2.DiffManifest
+		elif dlinfo == self.di_chunks:
+			manifest_type = manifest_pb2.Manifest
+		else:
+			assert False, "unknown instance"
+
+		manifest_path = tempdir(fname_raw + ".zstd")
+		pb = load_manifest_with_retry(
+			lambda: self.load_cached_api_file(
+					fname_raw + ".zstd", url,
+					expected_size=compressed_size,
+					reuse_valid_cache=True,
+				),
+			manifest_path,
+			compression,
+			expected_uncompressed_size,
+			manifest_type,
+			OPT.force_use_cache,
+			lambda message: warnlog(dlinfo.name, message),
+			expected_md5=expected_md5,
+		)
 		nfiles = len(pb.files)
 		debuglog(dlinfo.name, f"Decompressed manifest protobuf ({nfiles} files)")
 
