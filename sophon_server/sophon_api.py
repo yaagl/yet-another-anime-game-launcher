@@ -705,7 +705,7 @@ class SophonClient:
 			if self.rel_type == "os":
 				url = "sg-downloader-api.ho" + "yoverse.com"
 			elif self.rel_type == "cn":
-				assert False, "TODO"
+				url = "api-takumi.mih" + "oyo.com"
 		else:
 			if self.rel_type == "os":
 				url = "sg-public-api.ho" + "yoverse.com"
