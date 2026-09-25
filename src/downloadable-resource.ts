@@ -145,7 +145,7 @@ const DXMT_FILES_WITH_UNIXLIB = [
   "nvngx.dll",
 ];
 
-const CURRENT_DXMT_VERSION = "0.80.0";
+const CURRENT_DXMT_VERSION = "654f547";
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   if (
@@ -160,9 +160,9 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   await rmrf_dangerously(resolve(`./dxmt`));
   await mkdirp("./dxmt");
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  const archiveName = "dxmt-v0.80-builtin.tar.gz";
+  const archiveName = "dxmt-654f547ffab4e0c395ee368aad52bb4586b04576.zip";
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://github.com/3Shain/dxmt/releases/download/v0.80/${archiveName}`,
+    uri: `https://github.com/yaagl/anime-game-wine/releases/download/dxmt-654f547/${archiveName}`,
     absDst: resolve(`./dxmt/${archiveName}`),
   })) {
     yield [
@@ -178,27 +178,44 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
 
   yield ["setStateText", "EXTRACT_ENVIRONMENT"];
   yield ["setUndeterminedProgress"];
+
+  for await (const [dec, total] of doStreamUnzip(
+    resolve(`./dxmt/${archiveName}`),
+    resolve(`./dxmt`)
+  )) {
+    // yield ["setProgress", (dec / total) * 100]; // optional progress
+  }
+
+  const tarName = "dxmt-654f547ffab4e0c395ee368aad52bb4586b04576.tar.gz";
+
   await exec([
     "tar",
     "-xvf",
-    resolve(`./dxmt/${archiveName}`),
+    resolve(`./dxmt/${tarName}`),
     "-C",
     resolve("./dxmt"),
   ]);
 
+  const extractedFolder = "654f547ffab4e0c395ee368aad52bb4586b04576";
+
   await exec([
     "sh",
     "-c",
-    `mv "${resolve("./dxmt/v0.80/x86_64-windows/")}"* "${resolve("./dxmt/")}"`,
+    `mv "${resolve(`./dxmt/${extractedFolder}/x86_64-windows/`)}"* "${resolve(
+      "./dxmt/"
+    )}"`,
   ]);
   await exec([
     "sh",
     "-c",
-    `mv "${resolve("./dxmt/v0.80/x86_64-unix/")}"* "${resolve("./dxmt/")}"`,
+    `mv "${resolve(`./dxmt/${extractedFolder}/x86_64-unix/`)}"* "${resolve(
+      "./dxmt/"
+    )}"`,
   ]);
 
-  await rmrf_dangerously(resolve(`./dxmt/v0.80`));
+  await rmrf_dangerously(resolve(`./dxmt/${extractedFolder}`));
   await removeFile(resolve(`./dxmt/${archiveName}`));
+  await removeFile(resolve(`./dxmt/${tarName}`));
 
   setKey("installed_dxmt_version", CURRENT_DXMT_VERSION);
 }
