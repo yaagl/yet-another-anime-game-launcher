@@ -12,8 +12,42 @@ import {
   resolve,
   writeFile,
 } from "@utils";
+import type { ExecOptions } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
+import type { WineDistributionAttributes } from "./distro";
+
+export const DEFAULT_WINEDEBUG = "fixme-all,err-unwind,+timestamp";
+export const DEBUG_WINEDEBUG =
+  "+timestamp,+pid,+tid,+process,+module,+loaddll,+seh,+unwind";
+
+export function buildWineEnvironmentVariables({
+  prefix,
+  attributes,
+  env,
+}: {
+  prefix: string;
+  attributes: Partial<WineDistributionAttributes>;
+  env?: { [key: string]: string };
+}) {
+  const base: { [key: string]: string } = {
+    WINEDEBUG: DEFAULT_WINEDEBUG,
+    WINEPREFIX: prefix,
+    ...(attributes.renderBackend == "dxmt" ? { WINEMSYNC: "1" } : {}),
+  };
+  return {
+    ...base,
+    ...(env ?? {}),
+  };
+}
+
+function withPhase(options: ExecOptions | undefined, phase: string) {
+  return {
+    ...(options ?? {}),
+    phase,
+    allowFailure: true,
+  };
+}
 
 export async function createWine(options: {
   prefix: string;
@@ -29,16 +63,13 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | ExecOptions | undefined = undefined
   ) {
     return await unixExec(
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
         : [loaderBin, program, ...args],
-      {
-        ...getEnvironmentVariables(),
-        ...(env ?? {}),
-      },
+      getEnvironmentVariables(env),
       false,
       log_file
     );
@@ -48,36 +79,66 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | ExecOptions | undefined = undefined
   ) {
     return await unixExec2(
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
         : [loaderBin, program, ...args],
-      {
-        ...getEnvironmentVariables(),
-        ...(env ?? {}),
-      },
+      getEnvironmentVariables(env),
       false,
       log_file
     );
   }
 
-  async function waitUntilServerOff() {
-    return await unixExec2([join(dirname(loaderBin), "wineserver"), "-w"], {
-      ...getEnvironmentVariables(),
-    });
+  async function waitUntilServerOff(options?: ExecOptions) {
+    return await unixExec2(
+      [join(dirname(loaderBin), "wineserver"), "-w"],
+      getEnvironmentVariables(),
+      false,
+      options
+    );
+  }
+
+  async function stopServer(
+    env: { [key: string]: string },
+    options?: ExecOptions
+  ) {
+    await unixExec2(
+      [join(dirname(loaderBin), "wineserver"), "-k"],
+      env,
+      false,
+      withPhase(options, "wine.wineserver-k")
+    );
+    await unixExec2(
+      [join(dirname(loaderBin), "wineserver"), "-w"],
+      env,
+      false,
+      withPhase(options, "wine.wineserver-wait")
+    );
+  }
+
+  async function prepareForLaunch(options?: ExecOptions) {
+    await stopServer(getEnvironmentVariables(), options);
+    if (isMsyncEnabled()) {
+      await stopServer(getEnvironmentVariables({ WINEMSYNC: "" }), options);
+    }
   }
 
   function toWinePath(absPath: string) {
     return "Z:" + `${absPath}`.replaceAll("/", "\\");
   }
 
-  function getEnvironmentVariables() {
-    return {
-      WINEDEBUG: "fixme-all,err-unwind,+timestamp",
-      WINEPREFIX: options.prefix,
-    };
+  function getEnvironmentVariables(env?: { [key: string]: string }) {
+    return buildWineEnvironmentVariables({
+      prefix: options.prefix,
+      attributes: options.distro.attributes,
+      env,
+    });
+  }
+
+  function isMsyncEnabled() {
+    return options.distro.attributes.renderBackend == "dxmt";
   }
 
   async function openCmdWindow({ gameDir }: { gameDir: string }) {
@@ -93,8 +154,9 @@ export async function createWine(options: {
           "do",
           "script",
           `"${build([loaderBin, "cmd"], {
-            ...getEnvironmentVariables(),
-            WINEPATH: toWinePath(gameDir),
+            ...getEnvironmentVariables({
+              WINEPATH: toWinePath(gameDir),
+            }),
           })
             .replaceAll("\\", "\\\\")
             .replaceAll('"', '\\"')}"`,
@@ -116,7 +178,10 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  async function setProps(props: { retina: boolean; leftCmd: boolean }) {
+  async function setProps(
+    props: { retina: boolean; leftCmd: boolean },
+    options?: { logFile?: string; debug?: boolean }
+  ) {
     const cmd = `@echo off
 cd "%~dp0"
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ /d ${
@@ -131,9 +196,25 @@ reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t 
       "cmd",
       ["/c", `${toWinePath(resolve("./winedrv_config.bat"))}`],
       {},
-      "/dev/null"
+      options?.debug
+        ? {
+            phase: "wine.setProps",
+            logFile: options.logFile,
+            teeOutput: true,
+            debug: true,
+          }
+        : "/dev/null"
     );
-    await waitUntilServerOff();
+    await waitUntilServerOff(
+      options?.debug
+        ? {
+            phase: "wine.setProps.wineserver-wait",
+            logFile: options.logFile,
+            teeOutput: true,
+            debug: true,
+          }
+        : undefined
+    );
   }
 
   async function setNVExtension() {
@@ -157,6 +238,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec,
     exec2,
     waitUntilServerOff,
+    prepareForLaunch,
     cmd,
     toWinePath,
     prefix: options.prefix,

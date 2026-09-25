@@ -119,6 +119,8 @@ export const es_ES: typeof zh_CN = {
   SETTING_PROXY_DESC:
     "El proxy solo se aplica al juego, y no al launcher entero",
 
+  SETTING_DEBUG_LAUNCH: "Debug Launch Logging",
+
   SETTING_TURN_ON_STEAM_PATCH: "Activar Parche de Steam",
 
   UPDATE_PROMPT_IGNORE: "Ignorar actualización",

@@ -120,6 +120,8 @@ export const ru_RU: typeof zh_CN = {
   SETTING_PROXY_HOST: "Хост HTTP-прокси",
   SETTING_PROXY_DESC: "Прокси действует только на игру, а не на весь лаунчер.",
 
+  SETTING_DEBUG_LAUNCH: "Debug Launch Logging",
+
   SETTING_TURN_ON_STEAM_PATCH: "Использовать патч Steam",
 
   UPDATE_PROMPT_IGNORE: "Пропустить обновление",
