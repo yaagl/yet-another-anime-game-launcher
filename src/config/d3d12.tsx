@@ -5,7 +5,7 @@ import { assertValueDefined, getKey, setKey } from "@utils";
 import { NOOP } from "@config/config-def";
 import type { Config } from "@config/config-def";
 import type { Wine } from "@wine";
-import { D3DMETAL_RUNTIME_ID } from "../../../../wine/d3dmetal";
+import { D3DMETAL_RUNTIME_ID } from "../wine/d3dmetal";
 
 declare module "@config/config-def" {
   interface Config {
@@ -15,6 +15,7 @@ declare module "@config/config-def" {
 
 const CONFIG_KEY = "config_use_d3d12";
 
+// This is a shared Wine preference; each client owns its renderer launch arguments.
 export async function createD3D12({
   locale,
   config,

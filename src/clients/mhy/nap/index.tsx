@@ -41,7 +41,6 @@ import createResolution from "./config/resolution";
 import createBlockNet from "./config/block-net";
 import createSteamPatch from "./config/steam-patch";
 import createTimeoutFix from "./config/timeout-fix";
-import { createD3D12 } from "./config/d3d12";
 import { getGameVersion as _getGameVersion } from "../unity";
 import {
   HoyoConnectGameBackgroundType,
@@ -120,6 +119,7 @@ export async function createNAPChannelClient({
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
     installState: installed,
+    supportsD3d12: true,
     showPredownloadPrompt,
     installDir: _gameInstallDir,
     updateRequired,
@@ -367,7 +367,6 @@ export async function createNAPChannelClient({
       const [BN] = await createBlockNet({ locale, config });
       const [SP] = await createSteamPatch({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
-      const [D3D12] = await createD3D12({ locale, config, wine });
 
       return function () {
         return [
@@ -378,7 +377,6 @@ export async function createNAPChannelClient({
           <BN />,
           <SP />,
           <TF />,
-          <D3D12 />,
         ];
       };
     },

@@ -8,6 +8,8 @@ export type ChannelClientInstallState = "INSTALLED" | "NOT_INSTALLED";
 export interface ChannelClient {
   installState: () => ChannelClientInstallState;
   installDir: () => string;
+  /** Enables the shared DX12 toggle only when this client supports DX12 launch. */
+  supportsD3d12?: boolean;
 
   showPredownloadPrompt: () => boolean;
   updateRequired: () => boolean;

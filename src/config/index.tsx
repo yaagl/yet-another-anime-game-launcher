@@ -29,6 +29,7 @@ import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
+import { createD3D12 } from "./d3d12";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
@@ -42,6 +43,7 @@ export async function createConfiguration({
   locale,
   gameInstallDir,
   configForChannelClient,
+  supportsD3d12 = false,
   onCheckUpdate,
 }: {
   wine: Wine;
@@ -51,6 +53,7 @@ export async function createConfiguration({
     locale: Locale,
     config: Partial<Config>
   ) => Promise<() => JSXElement>;
+  supportsD3d12?: boolean;
   onCheckUpdate: () => void;
 }) {
   const config: Partial<Config> = {};
@@ -58,6 +61,7 @@ export async function createConfiguration({
     locale,
     config,
   });
+  const [D3D12] = await createD3D12({ locale, config, wine });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -231,6 +235,9 @@ export async function createConfiguration({
               <TabPanel flex={1} pt={0} pb={0} h="100%">
                 <VStack spacing={"$4"} w="40%" alignItems="start">
                   <WD />
+                  <Show when={supportsD3d12}>
+                    <D3D12 />
+                  </Show>
                 </VStack>
               </TabPanel>
               <Show when={advanceSetting()}>
