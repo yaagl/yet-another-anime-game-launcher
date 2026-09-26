@@ -32,7 +32,6 @@ import { patchRevertProgram } from "../patch";
 import { Aria2 } from "@aria2";
 import { Wine } from "@wine";
 import {
-  checkAndDownloadD3DMetal,
   checkAndDownloadDXMT,
   checkAndDownloadDXVK,
   checkAndDownloadReshade,
@@ -325,9 +324,6 @@ export async function createNAPChannelClient({
       //   );
       //   return;
       // }
-      if (wine.attributes.renderBackend == "d3dmetal") {
-        yield* checkAndDownloadD3DMetal(aria2, resolve("./wine"));
-      }
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }

@@ -125,5 +125,15 @@ export const ko_KR: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "업데이트 무시",
   SETTING_CHECK_UPDATE: "YAAGL 업데이트 확인",
   ALREADY_LATEST_VERSION: "이미 최신 버전을 사용 중입니다.",
+  D3DMETAL_LICENSE_TITLE: "Apple D3DMetal 소프트웨어 사용권 계약",
+  D3DMETAL_LICENSE_SOURCE: en.D3DMETAL_LICENSE_SOURCE,
+  D3DMETAL_LICENSE_LOADING: "사용권 계약을 다운로드하고 검증하는 중…",
+  D3DMETAL_LICENSE_ERROR:
+    "사용권 계약을 불러오거나 검증할 수 없습니다. 설치는 시작되지 않았습니다.",
+  D3DMETAL_LICENSE_RETRY: "다시 시도",
+  D3DMETAL_LICENSE_ACKNOWLEDGE:
+    "Apple 소프트웨어 사용권 계약을 읽었으며 이에 동의합니다.",
+  D3DMETAL_LICENSE_ACCEPT: "동의하고 설치",
+
   UPDATE_LAUNCHER: "런처 업데이트",
 };

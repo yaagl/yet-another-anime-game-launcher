@@ -1,6 +1,12 @@
-import { getKey } from "@utils";
+import { fileOrDirExists, getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
+import {
+  D3DMETAL_RUNTIME_ID,
+  D3DMETAL_RUNTIME_URL,
+  validatePreparedD3DMetalWine,
+} from "./d3dmetal";
+import { resolve } from "@utils";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "d3dmetal";
@@ -68,10 +74,9 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   },
 
   {
-    id: "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server",
-    displayName: "Wine 11.17 ZZZ DX12 (GPTK4.0b2)",
-    remoteUrl:
-      "https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/download/v1.0.5/wine-11.17-zzz-core-macos26.tar.xz",
+    id: D3DMETAL_RUNTIME_ID,
+    displayName: "Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)",
+    remoteUrl: D3DMETAL_RUNTIME_URL,
     attributes: {
       renderBackend: "d3dmetal",
       supportsD3d12: true,
@@ -114,6 +119,9 @@ export async function checkWine(github: Github): Promise<WineStatus> {
       "can not find default wine version: " + DEFAULT_WINE_DISTRO_TAG
     );
   }
+  const oldD3DMetalId =
+    "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server";
+  const d3dmetal = wine_versions.find(x => x.id === D3DMETAL_RUNTIME_ID)!;
   try {
     const wineState = await getKey("wine_state");
     if (wineState == "update") {
@@ -121,13 +129,26 @@ export async function checkWine(github: Github): Promise<WineStatus> {
       return {
         wineReady: false,
         wineDistribution:
-          wine_versions.find(x => x.id == update_wine_tag) ?? defaultDistro,
+          wine_versions.find(x => x.id == update_wine_tag) ??
+          (update_wine_tag === oldD3DMetalId ? d3dmetal : defaultDistro),
       } as const;
     }
     const currrent_wine_tag = await getKey("wine_tag");
     const wineDistribution = wine_versions.find(x => x.id == currrent_wine_tag);
     if (wineDistribution) {
+      if (wineDistribution.id === D3DMETAL_RUNTIME_ID) {
+        if (await fileOrDirExists(resolve("./wine.d3dmetal.install.json"))) {
+          return { wineReady: false, wineDistribution } as const;
+        }
+        try {
+          await validatePreparedD3DMetalWine(resolve("./wine"));
+        } catch {
+          return { wineReady: false, wineDistribution } as const;
+        }
+      }
       return { wineReady: true, wineDistribution } as const;
+    } else if (currrent_wine_tag === oldD3DMetalId) {
+      return { wineReady: false, wineDistribution: d3dmetal } as const;
     } else {
       // Force re-install for unknown wine version
       return {

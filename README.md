@@ -46,11 +46,13 @@ Use it at your own risk. Or enjoying it with a new f2p account.
 
 - Also make sure your game files aren't stored inside `/Applications`, use something inside your home folder instead, e.g `Games/GI`.
 
-### Optional ZZZ DX12 Wine
+### Optional D3DMetal Wine
 
-Select the optional supported **Wine 11.17 ZZZ DX12 (GPTK4.0b2)** distribution in the Wine settings to install the prebuilt [v1.0.5 runtime](https://github.com/dbc-hbin/zzz-wine-d3dmetal-dx12/releases/tag/v1.0.5). This optional runtime requires Apple Silicon, Rosetta 2, and macOS 26 or later; the current build has been verified on macOS 27, not on macOS 26 hardware. The default Wine distribution is unchanged.
+Select **Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)** in Wine settings to install the [experimental runtime](https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/tag/wine-11.17-gptk4.0b2-1). It requires Apple Silicon, Rosetta 2, and macOS 26 or later; macOS 26 hardware has not been tested. The default Wine distribution is unchanged.
 
-For this runtime, Yaagl downloads the Wine core and the pinned D3DMetal backend separately. It caches the backend and overlays it into the Wine core before Wine is initialized, reusing that cached backend after a core reinstall. DX12 mode is off by default; when enabled, ZZZ uses DX12 in both normal and Steam launch modes. Yaagl keeps its bundled D3DMetal components instead of replacing them with DXMT. No separate installer or launcher resource patch is required. Switching Wine distributions uses Yaagl's existing installation flow, which recreates the Wine prefix.
+Yaagl displays Apple's license and requires explicit acceptance before downloading the Wine core or D3DMetal framework. The core does not bundle that framework: the included native helper downloads the pinned [GPTK 4.0b2 redistribution](https://github.com/dbc-hbin/d3dmetal-redistributable/releases/tag/gptk-4.0b2), patches and signs it locally, and verifies it before Wine starts. Node.js and developer tools are not required on the installing Mac.
+
+DX12 mode remains off by default; when enabled, ZZZ uses DX12 in normal and Steam launch modes without replacing D3DMetal with DXMT. Switching Wine distributions recreates the Wine prefix. No separate launcher resource patch is required.
 <!--
 ## Development (Outdated)
 

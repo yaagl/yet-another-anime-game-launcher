@@ -125,5 +125,16 @@ export const en: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Ignore Update",
   SETTING_CHECK_UPDATE: "Check for YAAGL Updates",
   ALREADY_LATEST_VERSION: "You are already using the latest version.",
+  D3DMETAL_LICENSE_TITLE: "Apple D3DMetal Software License Agreement",
+  D3DMETAL_LICENSE_SOURCE:
+    "Apple Game Porting Toolkit 4.0 beta 2 · License.rtf from dbc-hbin/d3dmetal-redistributable release gptk-4.0b2",
+  D3DMETAL_LICENSE_LOADING: "Downloading and verifying the license…",
+  D3DMETAL_LICENSE_ERROR:
+    "Could not load or verify the license. Installation has not started.",
+  D3DMETAL_LICENSE_RETRY: "Retry",
+  D3DMETAL_LICENSE_ACKNOWLEDGE:
+    "I have read and agree to Apple's software license agreement.",
+  D3DMETAL_LICENSE_ACCEPT: "Agree and install",
+
   UPDATE_LAUNCHER: "Update Launcher",
 };
