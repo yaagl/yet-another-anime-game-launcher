@@ -1,12 +1,7 @@
-import { fileOrDirExists, getKey } from "@utils";
+import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
-import {
-  D3DMETAL_RUNTIME_ID,
-  D3DMETAL_RUNTIME_URL,
-  validatePreparedD3DMetalWine,
-} from "./d3dmetal";
-import { resolve } from "@utils";
+import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "d3dmetal";
@@ -136,16 +131,6 @@ export async function checkWine(github: Github): Promise<WineStatus> {
     const currrent_wine_tag = await getKey("wine_tag");
     const wineDistribution = wine_versions.find(x => x.id == currrent_wine_tag);
     if (wineDistribution) {
-      if (wineDistribution.id === D3DMETAL_RUNTIME_ID) {
-        if (await fileOrDirExists(resolve("./wine.d3dmetal.install.json"))) {
-          return { wineReady: false, wineDistribution } as const;
-        }
-        try {
-          await validatePreparedD3DMetalWine(resolve("./wine"));
-        } catch {
-          return { wineReady: false, wineDistribution } as const;
-        }
-      }
       return { wineReady: true, wineDistribution } as const;
     } else if (currrent_wine_tag === oldD3DMetalId) {
       return { wineReady: false, wineDistribution: d3dmetal } as const;
