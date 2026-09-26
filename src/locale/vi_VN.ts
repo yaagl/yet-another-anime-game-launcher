@@ -4,6 +4,7 @@ import { zh_CN } from "./zh_CN";
 export const vi_VN: typeof zh_CN = {
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Khởi động trò chơi",
+  STOP_GAME: "Dừng",
   INSTALL: "Cài đặt trò chơi",
   UPDATING: "Đang cập nhật",
   DOWNLOADING: "Đang tải",
@@ -120,6 +121,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "Bỏ qua cập nhật",
   SETTING_CHECK_UPDATE: "Kiểm tra cập nhật YAAGL",

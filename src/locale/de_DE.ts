@@ -4,6 +4,7 @@ import { en } from "@locale/en";
 export const de_DE: typeof zh_CN = {
   CONTENT_LANG_ID: "de-de",
   LAUNCH: "Spiel starten",
+  STOP_GAME: "Stoppen",
   INSTALL: "Spiel installieren",
   UPDATING: "Aktualisieren",
   DOWNLOADING: "Herunterladen",
@@ -122,6 +123,7 @@ export const de_DE: typeof zh_CN = {
   SETTING_PROXY_DESC: en.SETTING_PROXY_DESC, // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH, // TODO: Translate
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "Update ignorieren",
   SETTING_CHECK_UPDATE: "Nach YAAGL-Updates suchen",

@@ -69,6 +69,12 @@ export async function createWine(options: {
     });
   }
 
+  async function killServer() {
+    return await unixExec2([join(dirname(loaderBin), "wineserver"), "-k"], {
+      ...getEnvironmentVariables(),
+    });
+  }
+
   function toWinePath(absPath: string) {
     return "Z:" + `${absPath}`.replaceAll("/", "\\");
   }
@@ -125,6 +131,8 @@ reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ 
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t REG_SZ /d ${
       props.leftCmd ? "y" : "n"
     } /f
+reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v CaptureDisplaysForFullscreen /t REG_SZ /d n /f
+reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v WindowsMinimizeWhenFocusLost /t REG_SZ /d n /f
 `;
     await writeFile(resolve("winedrv_config.bat"), cmd);
     await exec(
@@ -157,6 +165,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec,
     exec2,
     waitUntilServerOff,
+    killServer,
     cmd,
     toWinePath,
     prefix: options.prefix,

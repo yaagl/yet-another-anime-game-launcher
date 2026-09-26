@@ -46,6 +46,7 @@ import createBlockNet from "./config/block-net";
 import createResolution from "./config/resolution";
 import createTimeoutFix from "./config/timeout-fix";
 import { createEnableHDRConfig } from "./config/enable-hdr";
+import { createBorderlessWindowConfig } from "./config/borderless";
 import { getGameVersion } from "../unity";
 import {
   VoicePackNames,
@@ -303,12 +304,14 @@ export async function createHK4EChannelClient({
       const [HDR] = await createEnableHDRConfig({ locale, config });
       const [RES] = await createResolution({ locale, config });
       const [TF] = await createTimeoutFix({ locale, config });
+      const [BW] = await createBorderlessWindowConfig({ locale, config });
 
       return function () {
         return [
           "Game Version: ",
           gameCurrentVersion(),
           <HDR />,
+          <BW />,
           <W3 />,
           <PO />,
           <SP />,

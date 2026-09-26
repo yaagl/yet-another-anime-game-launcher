@@ -59,6 +59,20 @@ body {
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
+.launch-button-running .stop-button {
+  background-color: #5c6068 !important;
+  color: #ffffff !important;
+}
+
+.launch-button-running .stop-button:hover {
+  background-color: #6c717a !important;
+}
+
+.launch-button-running .settings-button {
+  background-color: #4d5057 !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
 ::-webkit-scrollbar {
   height: 16px;
   overflow: visible;

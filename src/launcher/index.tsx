@@ -240,26 +240,38 @@ export async function createLauncher({
             >
               <PopoverTrigger as={Box}>
                 <ButtonGroup
-                  class="launch-button"
+                  class={`launch-button ${statusText() === locale.get("GAME_RUNNING") ? "launch-button-running" : ""}`}
                   size="xl"
                   attached
                   minWidth={150}
                 >
                   <Button
+                    class="stop-button"
                     mr="-1px"
-                    disabled={programBusy()}
-                    onClick={() => onButtonClick().catch(fatal)}
+                    disabled={programBusy() && statusText() !== locale.get("GAME_RUNNING")}
+                    colorScheme={statusText() === locale.get("GAME_RUNNING") ? "neutral" : "primary"}
+                    onClick={() => {
+                      if (statusText() === locale.get("GAME_RUNNING")) {
+                        wine.killServer().catch(fatal);
+                      } else {
+                        onButtonClick().catch(fatal);
+                      }
+                    }}
                   >
-                    {installState() == "INSTALLED"
-                      ? updateRequired()
-                        ? locale.get("UPDATE")
-                        : locale.get("LAUNCH")
-                      : locale.get("INSTALL")}
+                    {statusText() === locale.get("GAME_RUNNING")
+                      ? `✕ ${locale.get("STOP_GAME")}`
+                      : installState() == "INSTALLED"
+                        ? updateRequired()
+                          ? locale.get("UPDATE")
+                          : locale.get("LAUNCH")
+                        : locale.get("INSTALL")}
                   </Button>
                   <Show when={installState() == "INSTALLED"}>
                     <IconButton
+                      class="settings-button"
                       onClick={onOpen}
                       disabled={programBusy()}
+                      colorScheme={statusText() === locale.get("GAME_RUNNING") ? "neutral" : "primary"}
                       fontSize={30}
                       aria-label="Settings"
                       icon={<IconSetting />}

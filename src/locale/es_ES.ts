@@ -4,6 +4,7 @@ import { zh_CN } from "./zh_CN";
 export const es_ES: typeof zh_CN = {
   CONTENT_LANG_ID: "es-es",
   LAUNCH: "Iniciar el juego",
+  STOP_GAME: "Detener",
   INSTALL: "Instalar el juego",
   UPDATING: "Actualizando",
   DOWNLOADING: "Descargando",
@@ -119,7 +120,8 @@ export const es_ES: typeof zh_CN = {
   SETTING_PROXY_DESC:
     "El proxy solo se aplica al juego, y no al launcher entero",
 
-  SETTING_TURN_ON_STEAM_PATCH: "Activar Parche de Steam",
+  SETTING_TURN_ON_STEAM_PATCH: en.SETTING_TURN_ON_STEAM_PATCH,
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "Ignorar actualización",
   SETTING_CHECK_UPDATE: "Buscar actualizaciones de YAAGL",

@@ -4,6 +4,7 @@ import { zh_CN } from "./zh_CN";
 export const ru_RU: typeof zh_CN = {
   CONTENT_LANG_ID: "ru-ru",
   LAUNCH: "Запустить игру",
+  STOP_GAME: "Остановить",
   INSTALL: "Установить игру",
   UPDATING: "Обновление",
   DOWNLOADING: "Загрузка",
@@ -121,6 +122,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_PROXY_DESC: "Прокси действует только на игру, а не на весь лаунчер.",
 
   SETTING_TURN_ON_STEAM_PATCH: "Использовать патч Steam",
+  SETTING_BORDERLESS_WINDOW: en.SETTING_BORDERLESS_WINDOW,
 
   UPDATE_PROMPT_IGNORE: "Пропустить обновление",
   SETTING_CHECK_UPDATE: "Проверить обновления YAAGL",

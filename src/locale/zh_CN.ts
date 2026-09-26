@@ -3,6 +3,7 @@ import { SuppportedContentLangId } from "./supported-content-lang-id";
 export const zh_CN = {
   CONTENT_LANG_ID: "zh-cn" as SuppportedContentLangId,
   LAUNCH: "开始游戏",
+  STOP_GAME: "停止",
   INSTALL: "安装游戏",
   UPDATING: "正在更新",
   DOWNLOADING: "正在下载",
@@ -115,6 +116,7 @@ export const zh_CN = {
     "The proxy only applies to the game, not to the whole launcher.", // TODO: Translate
 
   SETTING_TURN_ON_STEAM_PATCH: "Enable Steam Patch", // TODO: Translate
+  SETTING_BORDERLESS_WINDOW: "无边框窗口化（防止切后台最小化）",
 
   UPDATE_PROMPT_IGNORE: "忽略此更新",
   SETTING_CHECK_UPDATE: "检查 YAAGL 更新",

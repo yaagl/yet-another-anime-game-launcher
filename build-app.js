@@ -330,6 +330,8 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
             <key>NSAllowsArbitraryLoads</key>
             <true/>
         </dict>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>Yaagl requires microphone access for in-game voice chat.</string>
     </dict>
     </plist>`
   );
