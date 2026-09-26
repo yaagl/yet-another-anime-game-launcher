@@ -116,6 +116,7 @@ export async function checkWine(github: Github): Promise<WineStatus> {
   }
   const oldD3DMetalId =
     "11.17-zzz-dx12-tuned-stage-parallel-cache-warmup-cursor-rollback-gptk4b2-arm64server";
+  const previousD3DMetalId = "wine-11.17-d3dmetal-gptk4.0b2-1";
   const d3dmetal = wine_versions.find(x => x.id === D3DMETAL_RUNTIME_ID)!;
   try {
     const wineState = await getKey("wine_state");
@@ -125,14 +126,20 @@ export async function checkWine(github: Github): Promise<WineStatus> {
         wineReady: false,
         wineDistribution:
           wine_versions.find(x => x.id == update_wine_tag) ??
-          (update_wine_tag === oldD3DMetalId ? d3dmetal : defaultDistro),
+          (update_wine_tag === oldD3DMetalId ||
+          update_wine_tag === previousD3DMetalId
+            ? d3dmetal
+            : defaultDistro),
       } as const;
     }
     const currrent_wine_tag = await getKey("wine_tag");
     const wineDistribution = wine_versions.find(x => x.id == currrent_wine_tag);
     if (wineDistribution) {
       return { wineReady: true, wineDistribution } as const;
-    } else if (currrent_wine_tag === oldD3DMetalId) {
+    } else if (
+      currrent_wine_tag === oldD3DMetalId ||
+      currrent_wine_tag === previousD3DMetalId
+    ) {
       return { wineReady: false, wineDistribution: d3dmetal } as const;
     } else {
       // Force re-install for unknown wine version

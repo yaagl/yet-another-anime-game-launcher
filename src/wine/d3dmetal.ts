@@ -9,16 +9,16 @@ import {
   resolve,
 } from "@utils";
 
-export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-1";
+export const D3DMETAL_RUNTIME_ID = "wine-11.17-d3dmetal-gptk4.0b2-2";
 export const D3DMETAL_ARCHIVE_NAME =
   "wine-11.17-d3dmetal-gptk4.0b2-macos26.tar.xz";
-export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-1/${D3DMETAL_ARCHIVE_NAME}`;
+export const D3DMETAL_RUNTIME_URL = `https://github.com/dbc-hbin/wine-yaagl-d3dmetal/releases/download/wine-11.17-gptk4.0b2-2/${D3DMETAL_ARCHIVE_NAME}`;
 // Pins from the independently published Wine release.
 export const D3DMETAL_ARCHIVE_SHA256 =
-  "8ca960dc85cf1c6407e620a7eccbe100be83bed46b4686358b8f2f8f44ea4517";
-export const D3DMETAL_ARCHIVE_SIZE = 237642832;
+  "4cb7fec41c0b78d23dd5d3b16f3f50e4ce1e463b5c05dec8dedca1943a5a7b64";
+export const D3DMETAL_ARCHIVE_SIZE = 237641872;
 const D3DMETAL_HELPER_SHA256 =
-  "a8659e11ac8bacdc9c0b58922e295874bbf80fdcb9057b011ae06e5a9b60e1ae";
+  "633878945623dccdde46737857cae4b630f925d98deafe4401fb9def386eb093";
 const OFFICIAL_RELEASE =
   "https://github.com/dbc-hbin/d3dmetal-redistributable/releases/download/gptk-4.0b2";
 const LICENSE_SHA256 =
