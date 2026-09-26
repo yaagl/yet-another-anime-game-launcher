@@ -110,6 +110,8 @@ export const es_ES: typeof zh_CN = {
 
   SETTING_BLOCK_NET: en.SETTING_BLOCK_NET,
   SETTING_TIMEOUT_FIX: "Timeout Fix",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "Ejecutar con DX12 (se recomienda macOS 27)",
   SETTING_LICENSES: "Licencias",
 
   SETTING_ENABLE_HDR: "Activar HDR",
@@ -124,5 +126,13 @@ export const es_ES: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Ignorar actualización",
   SETTING_CHECK_UPDATE: "Buscar actualizaciones de YAAGL",
   ALREADY_LATEST_VERSION: "Ya estás utilizando la última versión.",
+  D3DMETAL_LICENSE_TITLE:
+    "Acuerdo de licencia de Game Porting Toolkit 4.0 beta 2",
+  D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
+  D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
+  D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,
+  D3DMETAL_LICENSE_ACKNOWLEDGE: en.D3DMETAL_LICENSE_ACKNOWLEDGE,
+  D3DMETAL_LICENSE_ACCEPT: en.D3DMETAL_LICENSE_ACCEPT,
+
   UPDATE_LAUNCHER: "Actualizar Launcher",
 };

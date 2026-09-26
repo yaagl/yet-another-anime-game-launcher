@@ -1,4 +1,5 @@
 import { zh_CN } from "./zh_CN";
+import { en } from "./en";
 
 export const ja_JP: typeof zh_CN = {
   CONTENT_LANG_ID: "ja-jp",
@@ -112,6 +113,8 @@ export const ja_JP: typeof zh_CN = {
 
   SETTING_BLOCK_NET: "起動修正（ホストのブロック）",
   SETTING_TIMEOUT_FIX: "タイムアウト修正",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "DX12で実行（macOS 27を推奨）",
   SETTING_LICENSES: "ライセンス",
   SETTING_ENABLE_HDR: "HDR有効",
 
@@ -125,5 +128,12 @@ export const ja_JP: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "更新無視",
   SETTING_CHECK_UPDATE: "YAAGL更新を確認する",
   ALREADY_LATEST_VERSION: "既に最新バージョンを使用しています。",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 使用許諾契約",
+  D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
+  D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
+  D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,
+  D3DMETAL_LICENSE_ACKNOWLEDGE: en.D3DMETAL_LICENSE_ACKNOWLEDGE,
+  D3DMETAL_LICENSE_ACCEPT: en.D3DMETAL_LICENSE_ACCEPT,
+
   UPDATE_LAUNCHER: "ランチャー更新",
 };

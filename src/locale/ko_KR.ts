@@ -112,6 +112,8 @@ export const ko_KR: typeof zh_CN = {
 
   SETTING_BLOCK_NET: "게임실행 문제해결(hosts 수정)",
   SETTING_TIMEOUT_FIX: "타임아웃 문제 해결",
+  SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "DX12로 실행 (macOS 27 권장)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
   SETTING_ENABLE_HDR: "HDR 활성화",
 
@@ -124,5 +126,14 @@ export const ko_KR: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "업데이트 무시",
   SETTING_CHECK_UPDATE: "YAAGL 업데이트 확인",
   ALREADY_LATEST_VERSION: "이미 최신 버전을 사용 중입니다.",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 License 동의",
+  D3DMETAL_LICENSE_LOADING: "사용권 계약을 다운로드하고 검증하는 중…",
+  D3DMETAL_LICENSE_ERROR:
+    "사용권 계약을 불러오거나 검증할 수 없습니다. 설치는 시작되지 않았습니다.",
+  D3DMETAL_LICENSE_RETRY: "다시 시도",
+  D3DMETAL_LICENSE_ACKNOWLEDGE:
+    "Apple 소프트웨어 사용권 계약을 읽었으며 이에 동의합니다.",
+  D3DMETAL_LICENSE_ACCEPT: "동의하고 설치",
+
   UPDATE_LAUNCHER: "런처 업데이트",
 };

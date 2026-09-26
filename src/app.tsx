@@ -27,6 +27,7 @@ import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { createClient } from "./clients";
 import { createSignal, Show, JSXElement } from "solid-js";
+import type { Component } from "solid-js";
 import {
   Modal,
   ModalOverlay,
@@ -103,7 +104,7 @@ export async function createApp() {
   const wineStatus = await checkWine(github);
   const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
 
-  let MainApp: () => JSXElement;
+  let MainApp: Component;
 
   let showPromptSignal: (v: boolean) => void;
   let setPendingUpdateInfoSignal: (v: any) => void;

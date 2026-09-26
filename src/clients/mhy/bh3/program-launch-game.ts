@@ -52,7 +52,7 @@ cd /d "${wine.toWinePath(gameDir)}"
         "cmd",
         ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
         {
-          MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+          MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
           MVK_ALLOW_METAL_FENCES: "1",
           WINEDLLOVERRIDES: "d3d11,dxgi=n,b",
           ...(wine.attributes.renderBackend == "dxmt"
