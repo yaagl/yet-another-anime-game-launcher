@@ -107,6 +107,7 @@ export const zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "使用 DX12 运行（建议使用 macOS 27）",
   SETTING_LICENSES: "Licenses", // TODO: Translate
   SETTING_ENABLE_HDR: "启用 HDR",
 
@@ -120,9 +121,7 @@ export const zh_CN = {
   UPDATE_PROMPT_IGNORE: "忽略此更新",
   SETTING_CHECK_UPDATE: "检查 YAAGL 更新",
   ALREADY_LATEST_VERSION: "您已在使用最新版本。",
-  D3DMETAL_LICENSE_TITLE: "Apple D3DMetal 软件许可协议",
-  D3DMETAL_LICENSE_SOURCE:
-    "Apple Game Porting Toolkit 4.0 beta 2 · License.rtf，来自 dbc-hbin/d3dmetal-redistributable 的 gptk-4.0b2 发布版本",
+  D3DMETAL_LICENSE_TITLE: "Game Porting Toolkit 4.0 beta 2 许可协议",
   D3DMETAL_LICENSE_LOADING: "正在获取并验证许可协议…",
   D3DMETAL_LICENSE_ERROR: "无法获取或验证许可协议。安装尚未开始。",
   D3DMETAL_LICENSE_RETRY: "重试",

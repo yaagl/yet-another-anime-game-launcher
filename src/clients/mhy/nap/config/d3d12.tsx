@@ -1,4 +1,4 @@
-import { Box, Checkbox, FormControl } from "@hope-ui/solid";
+import { Box, Checkbox, FormControl, FormLabel } from "@hope-ui/solid";
 import { createEffect, createSignal } from "solid-js";
 import type { Locale } from "@locale";
 import { assertValueDefined, getKey, setKey } from "@utils";
@@ -53,6 +53,7 @@ export async function createD3D12({
     function UI() {
       return (
         <FormControl id="d3d12">
+          <FormLabel>{locale.get("SETTING_D3D12_RUN")}</FormLabel>
           <Box>
             <Checkbox
               checked={value()}

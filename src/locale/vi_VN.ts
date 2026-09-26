@@ -113,6 +113,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "Chạy với DX12 (khuyến nghị macOS 27)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
   SETTING_ENABLE_HDR: "Bật HDR",
 
@@ -125,8 +126,7 @@ export const vi_VN: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Bỏ qua cập nhật",
   SETTING_CHECK_UPDATE: "Kiểm tra cập nhật YAAGL",
   ALREADY_LATEST_VERSION: "Bạn đang sử dụng phiên bản mới nhất.",
-  D3DMETAL_LICENSE_TITLE: en.D3DMETAL_LICENSE_TITLE,
-  D3DMETAL_LICENSE_SOURCE: en.D3DMETAL_LICENSE_SOURCE,
+  D3DMETAL_LICENSE_TITLE: "Thỏa thuận cấp phép Game Porting Toolkit 4.0 beta 2",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

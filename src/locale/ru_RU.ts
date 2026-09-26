@@ -113,6 +113,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix (Исправление тайм-аута)",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "Запуск с DX12 (рекомендуется macOS 27)",
   SETTING_LICENSES: "Лицензии",
 
   SETTING_ENABLE_HDR: "Включить HDR",
@@ -126,8 +127,8 @@ export const ru_RU: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "Пропустить обновление",
   SETTING_CHECK_UPDATE: "Проверить обновления YAAGL",
   ALREADY_LATEST_VERSION: "Вы уже используете последнюю версию.",
-  D3DMETAL_LICENSE_TITLE: en.D3DMETAL_LICENSE_TITLE,
-  D3DMETAL_LICENSE_SOURCE: en.D3DMETAL_LICENSE_SOURCE,
+  D3DMETAL_LICENSE_TITLE:
+    "Лицензионное соглашение Game Porting Toolkit 4.0 beta 2",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

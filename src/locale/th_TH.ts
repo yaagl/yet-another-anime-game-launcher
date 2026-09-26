@@ -111,6 +111,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_BLOCK_NET: "Launch Fix(block hosts)",
   SETTING_TIMEOUT_FIX: "Timeout Fix",
   SETTING_D3D12: "DirectX 12 (D3DMetal)",
+  SETTING_D3D12_RUN: "เรียกใช้ด้วย DX12 (แนะนำ macOS 27)",
   SETTING_LICENSES: en.SETTING_LICENSES, // TODO: Translate
   SETTING_ENABLE_HDR: "เปิดใช้ HDR",
 
@@ -123,8 +124,8 @@ export const th_TH: typeof zh_CN = {
   UPDATE_PROMPT_IGNORE: "ละเว้นการอัปเดต",
   SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต YAAGL",
   ALREADY_LATEST_VERSION: "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว",
-  D3DMETAL_LICENSE_TITLE: en.D3DMETAL_LICENSE_TITLE,
-  D3DMETAL_LICENSE_SOURCE: en.D3DMETAL_LICENSE_SOURCE,
+  D3DMETAL_LICENSE_TITLE:
+    "ข้อตกลงสิทธิ์การใช้งาน Game Porting Toolkit 4.0 beta 2",
   D3DMETAL_LICENSE_LOADING: en.D3DMETAL_LICENSE_LOADING,
   D3DMETAL_LICENSE_ERROR: en.D3DMETAL_LICENSE_ERROR,
   D3DMETAL_LICENSE_RETRY: en.D3DMETAL_LICENSE_RETRY,

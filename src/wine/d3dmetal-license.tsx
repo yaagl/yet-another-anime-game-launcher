@@ -64,8 +64,6 @@ export function createD3DMetalLicenseUI({
               maxWidth="800px"
             >
               <h1>{locale.get("D3DMETAL_LICENSE_TITLE")}</h1>
-              <Text>Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)</Text>
-              <Text>{locale.get("D3DMETAL_LICENSE_SOURCE")}</Text>
               <Show when={loading()}>
                 <Text role="status">
                   {locale.get("D3DMETAL_LICENSE_LOADING")}
