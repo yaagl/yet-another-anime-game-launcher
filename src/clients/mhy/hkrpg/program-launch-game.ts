@@ -11,8 +11,10 @@ import {
   utf16le,
   log,
   exec,
+  rawString,
   getKeyOrDefault,
 } from "@utils";
+import { canModifyHosts } from "../../../hosts";
 import { Wine } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
@@ -67,23 +69,21 @@ cd /d "${wine.toWinePath(gameDir)}"
         `PAD_END="# End of section"`,
 
         `if ! grep -qF "$ENTRY" "$HOSTS_FILE"; then`,
-        `sudo bash -c "echo -e '$PAD_START\n$ENTRY\n$PAD_END' >> '/etc/hosts'"`,
+        `printf '%s\\n' "$PAD_START" "$ENTRY" "$PAD_END" >> "$HOSTS_FILE"`,
         `fi`,
         `sleep 15`,
-        `sudo sed -i.bak "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE"`,
+        // Overwrite the file without requiring write access to its directory.
+        `HOSTS_CONTENT=$(sed "/$PAD_START/,/$PAD_END/d" "$HOSTS_FILE") &&`,
+        `printf '%s\\n' "$HOSTS_CONTENT" > "$HOSTS_FILE"`,
 
         `rm ${tmpScriptPath}`,
       ];
 
       await writeFile(tmpScriptPath, commands.join("\n"));
       await exec(
-        [
-          "osascript",
-          "-e",
-          `do shell script "source ${tmpScriptPath} > /dev/null 2>&1 &" with administrator privileges`,
-        ],
+        ["sh", tmpScriptPath, rawString("> /dev/null 2>&1 &")],
         {},
-        false
+        !(await canModifyHosts())
       );
     }
 
