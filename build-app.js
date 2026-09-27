@@ -1,10 +1,25 @@
 const execa = require("execa");
 const fs = require("fs-extra");
 const path = require("path");
+const { parse: parseVersion } = require("semver");
 const { rimraf } = require("rimraf");
 const { IconIcns } = require("@shockpkg/icon-encoder");
 
 (async () => {
+  const releaseVersion =
+    process.env["YAAGL_VERSION"] ||
+    (await execa("git", ["describe", "--tags", "--abbrev=0"])).stdout.trim();
+  const parsedVersion = parseVersion(releaseVersion);
+  if (!parsedVersion) {
+    throw new Error(`Invalid release version: ${releaseVersion}`);
+  }
+  const shortVersion = [
+    parsedVersion.major,
+    parsedVersion.minor,
+    parsedVersion.patch,
+  ].join(".");
+  process.env["YAAGL_VERSION"] = parsedVersion.version;
+
   const icns = new IconIcns();
   const raw = true;
 
@@ -13,6 +28,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const config = await fs.readJSON(
     path.resolve(process.cwd(), "neutralino.config.json")
   );
+  config.version = shortVersion;
   let bundleId;
   let appDistributionName;
   let includeSophon = false;
@@ -318,9 +334,9 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleVersion</key>
-        <string>${config.version}</string>
+        <string>${shortVersion}</string>
         <key>CFBundleShortVersionString</key>
-        <string>${config.version}</string>
+        <string>${shortVersion}</string>
         <key>NSHumanReadableCopyright</key>
         <string>Copyright © 2023 3Shain.</string>
         <key>LSMinimumSystemVersion</key>
