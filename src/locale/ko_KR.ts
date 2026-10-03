@@ -128,4 +128,8 @@ export const ko_KR: typeof zh_CN = {
   GAME_VERSION_INVALID: "잘못된 게임 버전",
   GAME_VERSION_UNREADABLE:
     "설치된 게임 버전을 읽지 못했습니다. 게임 파일을 복구하거나 업데이트해야 할 수 있습니다.",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "권장 설정 적용",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "권장 설정이 적용되었습니다!",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "변경 사항을 적용하려면 Yaagl을 다시 시작하세요.",
 };

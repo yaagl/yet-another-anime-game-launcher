@@ -128,4 +128,8 @@ export const en: typeof zh_CN = {
   GAME_VERSION_INVALID: "Game version invalid",
   GAME_VERSION_UNREADABLE:
     "Failed to read the installed game version. You may need to repair or update your game files.",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "Apply Recommended Settings",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "Recommended settings applied!",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "Please close and restart Yaagl to apply changes.",
 };

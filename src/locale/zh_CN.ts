@@ -123,4 +123,7 @@ export const zh_CN = {
   GAME_VERSION_INVALID: "游戏版本无效",
   GAME_VERSION_UNREADABLE:
     "无法读取已安装的游戏版本。您可能需要修复或更新游戏文件。",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "应用推荐设置",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "推荐设置已应用！",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC: "请关闭并重启 Yaagl 以应用更改。",
 };

@@ -176,6 +176,55 @@ export async function createConfiguration({
                     >
                       {locale.get("SETTING_CHECK_INTEGRITY")}
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const channelClient = String(
+                          import.meta.env["YAAGL_CHANNEL_CLIENT"]
+                        );
+
+                        await setKey("wine_state", "update");
+                        await setKey(
+                          "wine_update_tag",
+                          "11.0-1-crossover-signed-experimental"
+                        );
+                        await setKey(
+                          "wine_update_url",
+                          "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1-signed/wine-crossover-11.0-1-osx64-signed.tar.xz"
+                        );
+
+                        if (
+                          channelClient.startsWith("hk4e") ||
+                          channelClient.startsWith("nap")
+                        ) {
+                          await setKey("config_steam_patch", "true");
+                        }
+
+                        if (
+                          channelClient.startsWith("hk4e") ||
+                          channelClient.startsWith("nap")
+                        ) {
+                          await setKey("config_timeout_fix", "true");
+                        }
+
+                        if (channelClient.startsWith("hkrpg")) {
+                          await setKey("config_block_net", "true");
+                        }
+
+                        notificationService.show({
+                          status: "success",
+                          title: locale.get(
+                            "SETTING_RECOMMENDED_SETTINGS_APPLIED"
+                          ),
+                          description: locale.get(
+                            "SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC"
+                          ),
+                        });
+                      }}
+                    >
+                      {locale.get("SETTING_APPLY_RECOMMENDED_SETTINGS")}
+                    </Button>
                     <Divider />
                     <Button
                       variant="ghost"

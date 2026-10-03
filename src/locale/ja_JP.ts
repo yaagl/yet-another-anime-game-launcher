@@ -129,4 +129,8 @@ export const ja_JP: typeof zh_CN = {
   GAME_VERSION_INVALID: "無効なゲームバージョン",
   GAME_VERSION_UNREADABLE:
     "インストールされているゲームのバージョンを読み取れませんでした。ゲームファイルを修復または更新する必要があるかもしれません。",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "推奨設定を適用",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "推奨設定が適用されました！",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "変更を適用するには、Yaagl を再起動してください。",
 };

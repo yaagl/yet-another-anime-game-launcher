@@ -128,4 +128,8 @@ export const vi_VN: typeof zh_CN = {
   GAME_VERSION_INVALID: "Phiên bản trò chơi không hợp lệ",
   GAME_VERSION_UNREADABLE:
     "Không thể đọc phiên bản trò chơi đã cài đặt. Bạn có thể cần sửa chữa hoặc cập nhật tệp trò chơi của mình.",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "Áp dụng Cài đặt Đề xuất",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "Đã áp dụng cài đặt đề xuất!",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "Vui lòng đóng và khởi động lại Yaagl để áp dụng thay đổi.",
 };

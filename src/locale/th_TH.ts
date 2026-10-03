@@ -126,4 +126,8 @@ export const th_TH: typeof zh_CN = {
   GAME_VERSION_INVALID: "เวอร์ชันเกมไม่ถูกต้อง",
   GAME_VERSION_UNREADABLE:
     "ไม่สามารถอ่านเวอร์ชันเกมที่ติดตั้งได้ คุณอาจต้องซ่อมแซมหรืออัปเดตไฟล์เกมของคุณ",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "ใช้การตั้งค่าที่แนะนำ",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "ใช้การตั้งค่าที่แนะนำแล้ว!",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "โปรดปิดและเริ่ม Yaagl ใหม่เพื่อใช้การเปลี่ยนแปลง",
 };

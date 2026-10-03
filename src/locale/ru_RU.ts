@@ -129,4 +129,8 @@ export const ru_RU: typeof zh_CN = {
   GAME_VERSION_INVALID: "Неверная версия игры",
   GAME_VERSION_UNREADABLE:
     "Не удалось прочитать установленную версию игры. Возможно, вам потребуется восстановить или обновить файлы игры.",
+  SETTING_APPLY_RECOMMENDED_SETTINGS: "Применить рекомендуемые настройки",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED: "Рекомендуемые настройки применены!",
+  SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
+    "Пожалуйста, закройте и перезапустите Yaagl, чтобы изменения вступили в силу.",
 };
