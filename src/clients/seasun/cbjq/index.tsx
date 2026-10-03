@@ -19,7 +19,7 @@ import {
   waitImageReady,
 } from "@utils";
 import { join } from "path-browserify";
-import { gt, lt } from "semver";
+import { gt, lt, valid } from "semver";
 import { Config } from "@config";
 // import { checkIntegrityProgram } from "../program-check-integrity";
 // import {
@@ -85,9 +85,14 @@ export async function createCBJQChannelClient({
   const [_gameInstallDir, setGameInstallDir] = createSignal(
     gameInstallDir ?? ""
   );
-  const [gameCurrentVersion, setGameVersion] = createSignal(
-    gameVersion ?? "0.0.0"
-  );
+
+  const parsedGameVersion = valid(gameVersion) ?? "0.0.0";
+  const [gameCurrentVersion, setGameVersion] = createSignal(parsedGameVersion);
+
+  if (gameInstalled && !valid(gameVersion)) {
+    await locale.alert("GAME_VERSION_INVALID", "GAME_VERSION_UNREADABLE");
+  }
+
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
     installState: installed,

@@ -123,4 +123,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "ตรวจสอบการอัปเดต YAAGL",
   ALREADY_LATEST_VERSION: "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว",
   UPDATE_LAUNCHER: "อัปเดต Launcher",
+  GAME_VERSION_INVALID: "เวอร์ชันเกมไม่ถูกต้อง",
+  GAME_VERSION_UNREADABLE:
+    "ไม่สามารถอ่านเวอร์ชันเกมที่ติดตั้งได้ คุณอาจต้องซ่อมแซมหรืออัปเดตไฟล์เกมของคุณ",
 };

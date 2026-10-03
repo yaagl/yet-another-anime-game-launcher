@@ -127,4 +127,7 @@ export const de_DE: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "Nach YAAGL-Updates suchen",
   ALREADY_LATEST_VERSION: "Sie verwenden bereits die neueste Version.",
   UPDATE_LAUNCHER: "Launcher aktualisieren",
+  GAME_VERSION_INVALID: "Ungültige Spielversion",
+  GAME_VERSION_UNREADABLE:
+    "Die installierte Spielversion konnte nicht gelesen werden. Möglicherweise müssen Sie Ihre Spieldateien reparieren oder aktualisieren.",
 };

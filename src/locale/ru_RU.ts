@@ -126,4 +126,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "Проверить обновления YAAGL",
   ALREADY_LATEST_VERSION: "Вы уже используете последнюю версию.",
   UPDATE_LAUNCHER: "Обновить лаунчер",
+  GAME_VERSION_INVALID: "Неверная версия игры",
+  GAME_VERSION_UNREADABLE:
+    "Не удалось прочитать установленную версию игры. Возможно, вам потребуется восстановить или обновить файлы игры.",
 };

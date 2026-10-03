@@ -120,4 +120,7 @@ export const zh_CN = {
   SETTING_CHECK_UPDATE: "检查 YAAGL 更新",
   ALREADY_LATEST_VERSION: "您已在使用最新版本。",
   UPDATE_LAUNCHER: "更新启动器",
+  GAME_VERSION_INVALID: "游戏版本无效",
+  GAME_VERSION_UNREADABLE:
+    "无法读取已安装的游戏版本。您可能需要修复或更新游戏文件。",
 };

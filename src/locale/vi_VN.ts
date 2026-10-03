@@ -125,4 +125,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "Kiểm tra cập nhật YAAGL",
   ALREADY_LATEST_VERSION: "Bạn đang sử dụng phiên bản mới nhất.",
   UPDATE_LAUNCHER: "Cập nhật Launcher",
+  GAME_VERSION_INVALID: "Phiên bản trò chơi không hợp lệ",
+  GAME_VERSION_UNREADABLE:
+    "Không thể đọc phiên bản trò chơi đã cài đặt. Bạn có thể cần sửa chữa hoặc cập nhật tệp trò chơi của mình.",
 };

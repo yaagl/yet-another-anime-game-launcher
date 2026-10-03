@@ -126,4 +126,7 @@ export const ja_JP: typeof zh_CN = {
   SETTING_CHECK_UPDATE: "YAAGL更新を確認する",
   ALREADY_LATEST_VERSION: "既に最新バージョンを使用しています。",
   UPDATE_LAUNCHER: "ランチャー更新",
+  GAME_VERSION_INVALID: "無効なゲームバージョン",
+  GAME_VERSION_UNREADABLE:
+    "インストールされているゲームのバージョンを読み取れませんでした。ゲームファイルを修復または更新する必要があるかもしれません。",
 };
