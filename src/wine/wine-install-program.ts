@@ -85,8 +85,18 @@ export async function createWineInstallProgram({
       prefix: wineAbsPrefix,
       distro: wineDistro,
     });
-    await wine.exec("wineboot", ["-u"], {}, "/dev/null");
-    await wine.exec("winecfg", ["-v", "win10"], {}, "/dev/null");
+    try {
+      await wine.exec("wineboot", ["-u"], {}, resolve("wineboot.log"));
+      await wine.exec("winecfg", ["-v", "win10"], {}, resolve("winecfg.log"));
+    } catch (e) {
+      throw new Error(
+        `Wine initialization failed.\n\nPlease check the log file at:\n${resolve(
+          "wineboot.log"
+        )}\n\n(Please ensure Rosetta 2 is installed.)\n\nOriginal error:\n${
+          e instanceof Error ? e.message : JSON.stringify(e)
+        }`
+      );
+    }
 
     // FIXME: don't abuse import.meta.env
     if (
