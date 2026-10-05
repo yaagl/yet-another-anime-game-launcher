@@ -132,4 +132,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "권장 설정이 적용되었습니다!",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "변경 사항을 적용하려면 Yaagl을 다시 시작하세요.",
+  SETTING_UNINSTALL_YAAGL: "Yaagl을 완전히 제거",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "Yaagl을 완전히 제거하시겠습니까? 이렇게 하면 모든 구성, Wine 접두사 및 데이터가 삭제됩니다. 게임 파일은 삭제되지 않습니다. Yaagl이 즉시 닫힙니다. 나중에 응용 프로그램 폴더에서 Yaagl.app을 수동으로 삭제하는 것을 잊지 마십시오.",
 };

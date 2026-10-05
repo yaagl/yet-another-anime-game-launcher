@@ -269,6 +269,44 @@ export async function createConfiguration({
                     <Button variant="ghost" size="sm" onClick={onCheckUpdate}>
                       {locale.get("SETTING_CHECK_UPDATE")}
                     </Button>
+                    <Divider />
+                    <Button
+                      variant="ghost"
+                      colorScheme="danger"
+                      size="sm"
+                      onClick={async () => {
+                        const confirm = await Neutralino.os.showMessageBox(
+                          locale.get("SETTING_UNINSTALL_YAAGL"),
+                          locale.get("SETTING_UNINSTALL_YAAGL_DESC"),
+                          "YES_NO",
+                          "WARNING"
+                        );
+                        if (confirm === "YES") {
+                          const dataDir = await resolve("./");
+
+                          if (
+                            dataDir.length > 10 &&
+                            dataDir.includes("Application Support")
+                          ) {
+                            await exec2(
+                              ["sh", "-c", `sleep 2 && rm -rf "${dataDir}"`],
+                              {},
+                              true
+                            );
+                            await Neutralino.app.exit();
+                          } else {
+                            await Neutralino.os.showMessageBox(
+                              "Uninstall Failed",
+                              `Could not safely determine the Yaagl OS folder path (${dataDir}). Please delete it manually.`,
+                              "OK",
+                              "ERROR"
+                            );
+                          }
+                        }
+                      }}
+                    >
+                      {locale.get("SETTING_UNINSTALL_YAAGL")}
+                    </Button>
                   </VStack>
                 </HStack>
               </TabPanel>

@@ -130,4 +130,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "ใช้การตั้งค่าที่แนะนำแล้ว!",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "โปรดปิดและเริ่ม Yaagl ใหม่เพื่อใช้การเปลี่ยนแปลง",
+  SETTING_UNINSTALL_YAAGL: "ถอนการติดตั้ง Yaagl อย่างสมบูรณ์",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "คุณแน่ใจหรือไม่ว่าต้องการถอนการติดตั้ง Yaagl อย่างสมบูรณ์ การดำเนินการนี้จะลบการกำหนดค่า, Wine prefixes และข้อมูลทั้งหมด ไฟล์เกมของคุณจะไม่ถูกลบ Yaagl จะปิดทันที โปรดจำไว้ว่าต้องลบแอป Yaagl.app ออกจากโฟลเดอร์ Applications ของคุณด้วยตนเองในภายหลัง",
 };

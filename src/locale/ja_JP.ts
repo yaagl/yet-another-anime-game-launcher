@@ -133,4 +133,7 @@ export const ja_JP: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "推奨設定が適用されました！",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "変更を適用するには、Yaagl を再起動してください。",
+  SETTING_UNINSTALL_YAAGL: "Yaaglを完全にアンインストール",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "Yaaglを完全にアンインストールしてもよろしいですか？これにより、すべての設定、Wine プレフィックス、およびデータが削除されます。ゲームファイルは削除されません。Yaaglは直ちに終了します。後でアプリケーションフォルダから Yaagl.app を手動で削除することを忘れないでください。",
 };

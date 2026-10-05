@@ -132,4 +132,7 @@ export const en: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "Recommended settings applied!",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "Please close and restart Yaagl to apply changes.",
+  SETTING_UNINSTALL_YAAGL: "Uninstall Yaagl Completely",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "Are you sure you want to completely uninstall Yaagl? This will delete all configuration, Wine prefixes, and data. Your game files will NOT be deleted. Yaagl will close immediately and delete its data. Please remember to manually delete the Yaagl .app from your Applications folder afterwards.",
 };

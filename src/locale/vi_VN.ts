@@ -132,4 +132,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "Đã áp dụng cài đặt đề xuất!",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "Vui lòng đóng và khởi động lại Yaagl để áp dụng thay đổi.",
+  SETTING_UNINSTALL_YAAGL: "Gỡ cài đặt hoàn toàn Yaagl",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "Bạn có chắc chắn muốn gỡ cài đặt hoàn toàn Yaagl không? Điều này sẽ xóa toàn bộ cấu hình, tiền tố Wine và dữ liệu. Các tệp trò chơi của bạn sẽ KHÔNG bị xóa. Yaagl sẽ đóng ngay lập tức. Vui lòng nhớ xóa thủ công tệp Yaagl.app khỏi thư mục Ứng dụng của bạn sau đó.",
 };

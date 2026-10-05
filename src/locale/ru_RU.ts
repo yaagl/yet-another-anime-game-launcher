@@ -133,4 +133,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_RECOMMENDED_SETTINGS_APPLIED: "Рекомендуемые настройки применены!",
   SETTING_RECOMMENDED_SETTINGS_APPLIED_DESC:
     "Пожалуйста, закройте и перезапустите Yaagl, чтобы изменения вступили в силу.",
+  SETTING_UNINSTALL_YAAGL: "Полностью удалить Yaagl",
+  SETTING_UNINSTALL_YAAGL_DESC:
+    "Вы уверены, что хотите полностью удалить Yaagl? Это приведет к удалению всех конфигураций, префиксов Wine и данных. Ваши файлы игры НЕ БУДУТ удалены. Yaagl немедленно закроется. Пожалуйста, не забудьте после этого вручную удалить приложение Yaagl.app из папки Программы.",
 };
