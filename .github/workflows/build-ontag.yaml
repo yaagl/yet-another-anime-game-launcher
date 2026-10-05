@@ -110,25 +110,25 @@ jobs:
           
           # DMGs for manual downloads
           create-dmg --no-code-sign --dmg-title="Yaagl" "Yaagl.app" || true
-          mv *.dmg "Yaagl.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl OS" "Yaagl OS.app" || true
-          mv *.dmg "Yaagl OS.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl OS.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl Honkai Global" "Yaagl Honkai Global.app" || true
-          mv *.dmg "Yaagl Honkai Global.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl Honkai Global.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl HSR" "Yaagl HSR.app" || true
-          mv *.dmg "Yaagl HSR.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl HSR.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl HSR OS" "Yaagl HSR OS.app" || true
-          mv *.dmg "Yaagl HSR OS.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl HSR OS.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl ZZZ" "Yaagl ZZZ.app" || true
-          mv *.dmg "Yaagl ZZZ.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl ZZZ.dmg"
           
           create-dmg --no-code-sign --dmg-title="Yaagl ZZZ OS" "Yaagl ZZZ OS.app" || true
-          mv *.dmg "Yaagl ZZZ OS.dmg"
+          mv "Yet Another Anime Game Launcher "*.dmg "Yaagl ZZZ OS.dmg"
 
       - name: Generate prerelease
         uses: "marvinpinto/action-automatic-releases@latest"
