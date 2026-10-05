@@ -90,6 +90,11 @@ jobs:
           YAAGL_CHANNEL_CLIENT=napos node ./build-app.js
           cp dist/Yaagl/resources.neu resources_napos.neu
 
+      - name: Setup Node 20 for DMG creation
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Tar app and Create DMG
         run: |
           npm install -g create-dmg
