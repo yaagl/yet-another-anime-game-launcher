@@ -25,6 +25,16 @@ export async function createAria2({
       if (status.status == "complete") {
         break;
       }
+      if (status.status == "error") {
+        const errorDetail =
+          status.errorMessage ||
+          (status.errorCode
+            ? `Error Code ${status.errorCode}`
+            : "Unknown aria2 error");
+        throw new Error(
+          `Download failed: ${errorDetail}\n\nPlease reopen the launcher to try again.`
+        );
+      }
       if (status.totalLength == BigInt(0)) {
         continue;
       }
@@ -36,6 +46,7 @@ export async function createAria2({
   async function* doStreamingDownload(options: {
     uri: string;
     absDst: string;
+    checksum?: string;
   }) {
     const gid = await sha256_16(`${options.uri}:${options.absDst}`);
     try {
@@ -55,6 +66,7 @@ export async function createAria2({
           out: options.absDst,
           continue: false,
           "allow-overwrite": true, // in case control file broken
+          ...(options.checksum ? { checksum: options.checksum } : {}),
         });
       } else {
         throw e;

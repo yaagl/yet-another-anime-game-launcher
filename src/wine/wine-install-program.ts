@@ -41,6 +41,7 @@ export async function createWineInstallProgram({
     for await (const progress of aria2.doStreamingDownload({
       uri: wineDistro.remoteUrl,
       absDst: wineTarPath,
+      checksum: wineDistro.checksum,
     })) {
       yield [
         "setProgress",

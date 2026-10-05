@@ -11,6 +11,7 @@ export interface WineDistribution {
   id: string;
   displayName: string;
   remoteUrl: string;
+  checksum?: string;
   attributes: Partial<WineDistributionAttributes>;
 }
 
@@ -20,6 +21,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     displayName: "Wine 11.0-1 Crossover (signed, experimental)",
     remoteUrl:
       "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1-signed/wine-crossover-11.0-1-osx64-signed.tar.xz",
+    checksum:
+      "sha-256=89fa7e90fb626523a90d5867a03c6be785d017176739c6320a3b86c7838c3a35",
     attributes: {
       renderBackend: "dxmt",
       winePath: "wine",
@@ -30,6 +33,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     displayName: "Wine 11.0 DXMT (signed, with patches)",
     remoteUrl:
       "https://github.com/yaagl/anime-game-wine/releases/download/wine-11.0-signed/wine-devel-11.0-osx64-signed.tar.xz",
+    checksum:
+      "sha-256=4ebba536115e937c3826fa5808dbed50cd5e91c8454999b54cbe0cd2a43d8b4c",
     attributes: {
       renderBackend: "dxmt",
       winePath: "wine",
@@ -40,6 +45,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     displayName: "Wine 11.8 DXMT (signed, experimental)",
     remoteUrl:
       "https://github.com/yaagl/anime-game-wine/releases/download/wine-11.8-signed/wine-devel-11.8-osx64-signed.tar.xz",
+    checksum:
+      "sha-256=42430b7e8398642d7121e7cbac0aa03ce7312b4500e4ddf7eb75a7c8f2407a9c",
     attributes: {
       renderBackend: "dxmt",
       winePath: "wine",
