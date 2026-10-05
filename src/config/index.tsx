@@ -184,15 +184,30 @@ export async function createConfiguration({
                           import.meta.env["YAAGL_CHANNEL_CLIENT"]
                         );
 
-                        await setKey("wine_state", "update");
-                        await setKey(
-                          "wine_update_tag",
-                          "11.0-1-crossover-signed-experimental"
+                        const currentWineState = await getKeyOrDefault(
+                          "wine_state",
+                          ""
                         );
-                        await setKey(
-                          "wine_update_url",
-                          "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1-signed/wine-crossover-11.0-1-osx64-signed.tar.xz"
+                        const currentWineTag = await getKeyOrDefault(
+                          "wine_tag",
+                          ""
                         );
+
+                        if (
+                          currentWineState !== "ready" ||
+                          currentWineTag !==
+                            "11.0-1-crossover-signed-experimental"
+                        ) {
+                          await setKey("wine_state", "update");
+                          await setKey(
+                            "wine_update_tag",
+                            "11.0-1-crossover-signed-experimental"
+                          );
+                          await setKey(
+                            "wine_update_url",
+                            "https://github.com/yaagl/anime-game-wine/releases/download/wine-crossover-11.0-1-signed/wine-crossover-11.0-1-osx64-signed.tar.xz"
+                          );
+                        }
 
                         if (
                           channelClient.startsWith("hk4e") ||
