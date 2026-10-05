@@ -73,7 +73,11 @@ node ./build-app.js
 
 ## Uninstall (completely)
 1. Drag app to the bin
-2. Delete folder `~/Library/Application Support/Yaagl` or `~/Library/Application Support/Yaagl OS` if you are using oversea version. (For HSR and ZZZ the name of folder is slightly different)
+2. Open Terminal and run:
+   ```sh
+   open ~/Library/Application\ Support/
+   ```
+   From there, locate and delete the `Yaagl` folder (or `Yaagl OS` if you are using overseas/global version). (For HSR and ZZZ the name of folder is slightly different)
 
 ## Related projects
 
