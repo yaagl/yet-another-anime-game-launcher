@@ -38,7 +38,7 @@ export async function* patchProgram(
       await cp(`./dxmt/${f}`, join(system32Dir, f));
     }
   }
-  if (config.reshade) {
+  if (config.reshade && wine.attributes.renderBackend !== "d3dmetal") {
     await cp(resolve("./reshade/dxgi.dll"), join(gameDir, "dxgi.dll"));
     await cp(
       resolve("./reshade/d3dcompiler_47.dll"),
@@ -64,7 +64,7 @@ export async function* patchRevertProgram(
       await forceMove(join(system32Dir, f + ".bak"), join(system32Dir, f));
     }
   }
-  if (config.reshade) {
+  if (config.reshade && wine.attributes.renderBackend !== "d3dmetal") {
     await removeFileIfExists(join(gameDir, "dxgi.dll"));
     await removeFileIfExists(join(gameDir, "d3dcompiler_47.dll"));
   }

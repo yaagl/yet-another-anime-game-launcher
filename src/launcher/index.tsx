@@ -47,6 +47,7 @@ export async function createLauncher({
   channelClient: {
     installDir,
     installState,
+    supportsD3d12,
     showPredownloadPrompt,
     updateRequired,
     install,
@@ -81,6 +82,7 @@ export async function createLauncher({
     locale,
     gameInstallDir: installDir,
     configForChannelClient: createConfig,
+    supportsD3d12,
     onCheckUpdate,
   });
 

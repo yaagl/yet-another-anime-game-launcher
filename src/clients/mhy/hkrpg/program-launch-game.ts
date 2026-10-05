@@ -91,7 +91,7 @@ cd /d "${wine.toWinePath(gameDir)}"
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
       {
-        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
         WINEDLLOVERRIDES: "",
         ...(wine.attributes.renderBackend == "dxmt"
           ? {
