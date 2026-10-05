@@ -1,4 +1,3 @@
-import { eq } from "semver";
 import { Aria2 } from "@aria2";
 import { CommonUpdateProgram } from "@common-update-ui";
 import {
@@ -17,7 +16,7 @@ import {
   exec,
   removeFile,
 } from "@utils";
-import { Wine } from "@wine";
+import type { Wine } from "@wine";
 import { join } from "path-browserify";
 
 const CURRENT_MVK_VERSION = "1.2.2";
@@ -219,6 +218,11 @@ export async function* checkAndDownloadReshade(
   wine: Wine,
   gameDir: string
 ): CommonUpdateProgram {
+  // D3DMetal does not inject ReShade; an enabled setting must not require it.
+  if (wine.attributes.renderBackend === "d3dmetal") {
+    return;
+  }
+
   const reshaderDir = resolve("./reshade");
 
   if (

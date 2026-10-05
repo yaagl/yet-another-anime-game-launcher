@@ -1,9 +1,11 @@
 import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
+import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
 
 export interface WineDistributionAttributes {
-  renderBackend: "dxmt";
+  renderBackend: "dxmt" | "d3dmetal";
+  supportsD3d12: boolean;
   winePath: string; // Path to the wine directory inside the archive
 }
 
@@ -70,6 +72,17 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     attributes: {
       renderBackend: "dxmt",
       winePath: "Wine Stable.app/Contents/Resources/wine",
+    },
+  },
+
+  {
+    id: D3DMETAL_RUNTIME_ID,
+    displayName: "Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)",
+    remoteUrl: D3DMETAL_RUNTIME_URL,
+    attributes: {
+      renderBackend: "d3dmetal",
+      supportsD3d12: true,
+      winePath: "wine",
     },
   },
 

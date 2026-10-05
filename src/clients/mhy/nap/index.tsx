@@ -123,6 +123,7 @@ export async function createNAPChannelClient({
   const updateRequired = () => lt(gameCurrentVersion(), GAME_LATEST_VERSION);
   return {
     installState: installed,
+    supportsD3d12: true,
     showPredownloadPrompt,
     installDir: _gameInstallDir,
     updateRequired,

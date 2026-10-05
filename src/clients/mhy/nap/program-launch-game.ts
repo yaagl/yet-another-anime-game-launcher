@@ -44,6 +44,10 @@ export async function* launchGameProgram({
     args.push("-screen-height", config.resolutionHeight);
     args.push("-screen-fullscreen", "0");
   }
+  const useD3D12 = config.useD3D12 && wine.attributes.supportsD3d12 === true;
+  if (useD3D12) {
+    args.push("-use-d3d12");
+  }
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
@@ -96,10 +100,13 @@ cd /d "${wine.toWinePath(gameDir)}"
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
-        ? [wine.toWinePath(join(gameDir, gameExecutable))]
+        ? [
+            wine.toWinePath(join(gameDir, gameExecutable)),
+            ...(useD3D12 ? ["-use-d3d12"] : []),
+          ]
         : ["/c", `${wine.toWinePath(resolve("./config.bat"))} `],
       {
-        MTL_HUD_ENABLED: config.metalHud ? "1" : "",
+        MTL_HUD_ENABLED: config.metalHud ? "1" : "0",
         WINEDLLOVERRIDES: "",
         WINE_ENABLE_TIMEOUT_FIX: config.timeoutFix ? "1" : "0",
         ...(wine.attributes.renderBackend == "dxmt"
