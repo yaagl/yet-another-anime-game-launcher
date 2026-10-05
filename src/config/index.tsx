@@ -199,13 +199,8 @@ export async function createConfiguration({
                           channelClient.startsWith("nap")
                         ) {
                           await setKey("config_steam_patch", "true");
-                        }
-
-                        if (
-                          channelClient.startsWith("hk4e") ||
-                          channelClient.startsWith("nap")
-                        ) {
                           await setKey("config_timeout_fix", "true");
+                          await setKey("config_block_net", "false");
                         }
 
                         if (channelClient.startsWith("hkrpg")) {
