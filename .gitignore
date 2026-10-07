@@ -38,3 +38,7 @@ server_secret.ts
 
 /sidecar/sophon_server
 **/__pycache__
+
+pnpm-workspace.yaml
+sidecar/dns_delay/libyaagl_dns.dylib
+

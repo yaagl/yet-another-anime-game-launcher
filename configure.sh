@@ -63,3 +63,9 @@ unzip -o -d bin neu.zip
 rm neu.zip
 
 curl -sSL https://github.com/neutralinojs/neutralino.js/releases/download/v3.9.0/neutralino.js > neutralino.js
+
+if command -v clang >/dev/null 2>&1; then
+  echo "Compiling dns_delay sidecar dylib..."
+  clang -dynamiclib -arch x86_64 -arch arm64 -O2 ./sidecar/dns_delay/yaagl_dns.c -o ./sidecar/dns_delay/libyaagl_dns.dylib
+fi
+
