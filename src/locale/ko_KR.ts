@@ -4,7 +4,7 @@ import { en } from "@locale/en";
 export const ko_KR: typeof zh_CN = {
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",
-  INSTALL: "게임 다운로드",
+  INSTALL: "다운로드",
   UPDATING: "업데이트 중",
   DOWNLOADING: "다운로드 중",
   FIXING_FILES: "게임 파일 복구 중 {0}/{1}",

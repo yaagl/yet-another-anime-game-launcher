@@ -4,7 +4,7 @@ import { zh_CN } from "./zh_CN";
 export const ru_RU: typeof zh_CN = {
   CONTENT_LANG_ID: "ru-ru",
   LAUNCH: "Запустить игру",
-  INSTALL: "Установить игру",
+  INSTALL: "Скачать",
   UPDATING: "Обновление",
   DOWNLOADING: "Загрузка",
   FIXING_FILES: "Исправление игровых файлов {0}/{1}",

@@ -4,7 +4,7 @@ import { en } from "@locale/en";
 export const de_DE: typeof zh_CN = {
   CONTENT_LANG_ID: "de-de",
   LAUNCH: "Spiel starten",
-  INSTALL: "Spiel installieren",
+  INSTALL: "Herunterladen",
   UPDATING: "Aktualisieren",
   DOWNLOADING: "Herunterladen",
   FIXING_FILES: "Spieldateien reparieren {0}/{1}",

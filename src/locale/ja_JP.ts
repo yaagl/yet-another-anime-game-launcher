@@ -4,7 +4,7 @@ import { en } from "./en";
 export const ja_JP: typeof zh_CN = {
   CONTENT_LANG_ID: "ja-jp",
   LAUNCH: "ゲーム開始",
-  INSTALL: "ゲームをインストール",
+  INSTALL: "ダウンロード",
   UPDATING: "更新中",
   DOWNLOADING: "ダウンロード中",
   FIXING_FILES: "ゲームファイルを修復中{0}/{1}",

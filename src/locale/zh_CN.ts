@@ -3,7 +3,7 @@ import { SuppportedContentLangId } from "./supported-content-lang-id";
 export const zh_CN = {
   CONTENT_LANG_ID: "zh-cn" as SuppportedContentLangId,
   LAUNCH: "开始游戏",
-  INSTALL: "安装游戏",
+  INSTALL: "下载",
   UPDATING: "正在更新",
   DOWNLOADING: "正在下载",
   FIXING_FILES: "正在修复第{0}个文件，共{1}个",

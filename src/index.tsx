@@ -1,9 +1,9 @@
 import { render } from "solid-js/web";
 import { createApp } from "./app";
 import { HopeProvider, NotificationsProvider } from "@hope-ui/solid";
-import { amber } from "@radix-ui/colors";
+import { slateDark, amber } from "@radix-ui/colors";
 
-import { fatal } from "./utils";
+import { fatal, getKeyOrDefault } from "./utils";
 
 function createPlates(
   tag: string,
@@ -28,14 +28,29 @@ if (typeof Neutralino == "undefined") {
     document.addEventListener("contextmenu", event => event.preventDefault());
   }
   createApp()
-    .then(UI => {
+    .then(async UI => {
+      const savedColorMode = await getKeyOrDefault("color_mode", "light");
+      localStorage.setItem("hope-ui-color-mode", savedColorMode);
+
       render(
         () => (
           <HopeProvider
             config={{
+              initialColorMode: "light",
               lightTheme: {
                 colors: {
                   ...createPlates("primary", amber, "amber"), // 兔兔伯爵，出击
+                },
+                fonts: {
+                  sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+                },
+              },
+              darkTheme: {
+                colors: {
+                  ...createPlates("primary", slateDark, "slate"),
+                },
+                fonts: {
+                  sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
                 },
               },
             }}

@@ -4,7 +4,7 @@ import { zh_CN } from "./zh_CN";
 export const vi_VN: typeof zh_CN = {
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Khởi động trò chơi",
-  INSTALL: "Cài đặt trò chơi",
+  INSTALL: "Tải xuống",
   UPDATING: "Đang cập nhật",
   DOWNLOADING: "Đang tải",
   FIXING_FILES: "Đang sửa tệp trò chơi {0}/{1}",

@@ -37,8 +37,11 @@ export async function createGameInstallDirConfig({
               <InputRightElement
                 cursor={"pointer"}
                 onClick={() => open(gameInstallDir())}
+                borderRadius="$md"
+                _hover={{ bg: "$neutral4" }}
+                transition="all 0.2s"
               >
-                <IconSetting boxSize="20px" color={"$blackAlpha9"} />
+                <IconSetting boxSize="20px" color={"$neutral11"} />
               </InputRightElement>
             </Tooltip>
           </InputGroup>

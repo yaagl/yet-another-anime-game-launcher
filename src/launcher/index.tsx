@@ -205,11 +205,11 @@ export async function createLauncher({
                   value={nonUrgentProgress()}
                   indeterminate={nonUrgentProgress() == 0}
                   size="sm"
-                  borderRadius={8}
+                  borderRadius={12}
                 >
                   <ProgressIndicator
                     style={"transition: none;"}
-                    borderRadius={8}
+                    borderRadius={12}
                   ></ProgressIndicator>
                 </Progress>
               </Show>
@@ -225,11 +225,11 @@ export async function createLauncher({
                   value={progress()}
                   indeterminate={progress() == 0}
                   size="sm"
-                  borderRadius={8}
+                  borderRadius={12}
                 >
                   <ProgressIndicator
                     style={"transition: none;"}
-                    borderRadius={8}
+                    borderRadius={12}
                   ></ProgressIndicator>
                 </Progress>
               </Show>
@@ -246,6 +246,11 @@ export async function createLauncher({
                   size="xl"
                   attached
                   minWidth={150}
+                  opacity={0.85}
+                  _hover={{ opacity: 1 }}
+                  transition="opacity 0.2s"
+                  borderRadius={12}
+                  overflow="hidden"
                 >
                   <Button
                     mr="-1px"

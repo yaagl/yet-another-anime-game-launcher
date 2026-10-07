@@ -3,7 +3,7 @@ import { zh_CN } from "./zh_CN";
 export const en: typeof zh_CN = {
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Launch Game",
-  INSTALL: "Install Game",
+  INSTALL: "Download",
   UPDATING: "Updating",
   DOWNLOADING: "Downloading",
   FIXING_FILES: "Fixing game files {0}/{1}",
