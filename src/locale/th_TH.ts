@@ -67,6 +67,7 @@ export const th_TH: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "โหมด Retina",
   SETTING_LEFT_CMD: "แมปปุ่ม CMD ซ้ายเป็น CTRL",
+  SETTING_SQUIRCLE_DOCK_ICON: "ไอคอน Dock ขอบมน",
   SETTING_TURN_OFF_AC_PATCH: "ปิดการใช้งานแพตช์ AC",
   SETTING_CUSTOM_RESOLUTION: "Custom resolution",
   SETTING_SAVE: "บันทึก",

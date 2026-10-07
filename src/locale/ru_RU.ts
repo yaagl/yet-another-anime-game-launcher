@@ -67,6 +67,7 @@ export const ru_RU: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Всё",
   SETTING_RETINA: "Режим Retina",
   SETTING_LEFT_CMD: "Назначить левый CMD как CTRL",
+  SETTING_SQUIRCLE_DOCK_ICON: "Скруглённая иконка в Dock",
   SETTING_TURN_OFF_AC_PATCH: "Отключить патч АЧ",
   SETTING_CUSTOM_RESOLUTION: "Пользовательское разрешение",
   SETTING_SAVE: "Сохранить",
