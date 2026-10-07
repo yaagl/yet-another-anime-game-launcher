@@ -70,6 +70,7 @@ export const es_ES: typeof zh_CN = {
   SETTING_DXVK_HUD_ALL: "Todo",
   SETTING_RETINA: "Modo Retina",
   SETTING_LEFT_CMD: "Asignar CMD izquierdo a CTRL",
+  SETTING_SQUIRCLE_DOCK_ICON: "Icono del Dock redondeado",
   SETTING_TURN_OFF_AC_PATCH: "Apagar el AC parche",
   SETTING_CUSTOM_RESOLUTION: "Resolución personalizada",
   SETTING_SAVE: "Guardar",

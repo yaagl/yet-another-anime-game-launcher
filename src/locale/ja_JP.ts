@@ -68,6 +68,7 @@ export const ja_JP: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retinaモード",
   SETTING_LEFT_CMD: "左CMDキーをCTRLキーにマップ",
+  SETTING_SQUIRCLE_DOCK_ICON: "Dockアイコンを角丸にする",
   SETTING_TURN_OFF_AC_PATCH: "ACパッチを無効にする",
   SETTING_CUSTOM_RESOLUTION: "カスタム解像度",
   SETTING_SAVE: "保存",

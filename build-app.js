@@ -271,6 +271,25 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));
   }
+  // Squircle Dock icon bridge, injected into the game's Wine process (src/wine/dock-icon.ts).
+  // Universal, since Wine runs as x86_64 under Rosetta.
+  await fs.ensureDir(path.resolve(sidecarDst, "dock-icon"));
+  await execa("xcrun", [
+    "--sdk",
+    "macosx",
+    "clang",
+    "-arch",
+    "x86_64",
+    "-arch",
+    "arm64",
+    "-mmacosx-version-min=11.0",
+    "-O2",
+    "-dynamiclib",
+    "-lobjc",
+    path.resolve(process.cwd(), "native", "DockIconBridge.m"),
+    "-o",
+    path.resolve(sidecarDst, "dock-icon", "DockIconBridge.dylib"),
+  ]);
 
   await (async function getFiles(dir) {
     const dirents = await fs.readdir(dir, { withFileTypes: true });

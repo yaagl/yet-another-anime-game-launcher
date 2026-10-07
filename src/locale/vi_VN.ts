@@ -69,6 +69,7 @@ export const vi_VN: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Chế độ Retina",
   SETTING_LEFT_CMD: "Ánh xạ CMD trái sang CTRL",
+  SETTING_SQUIRCLE_DOCK_ICON: "Biểu tượng Dock bo góc",
   SETTING_TURN_OFF_AC_PATCH: "tắt bản vá AC",
   SETTING_CUSTOM_RESOLUTION: "Độ phân giải tùy chỉnh",
   SETTING_SAVE: "Lưu",

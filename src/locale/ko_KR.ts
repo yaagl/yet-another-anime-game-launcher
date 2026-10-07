@@ -67,6 +67,7 @@ export const ko_KR: typeof zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 모드",
   SETTING_LEFT_CMD: "왼쪽 CMD를 CTRL로 할당",
+  SETTING_SQUIRCLE_DOCK_ICON: "Dock 아이콘 둥근 모서리",
   SETTING_TURN_OFF_AC_PATCH: "AC 패치 비활성화",
   SETTING_CUSTOM_RESOLUTION: "사용자 정의 해상도",
   SETTING_SAVE: "저장",

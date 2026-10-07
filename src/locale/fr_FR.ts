@@ -70,6 +70,7 @@ export const fr_FR: typeof zh_CN = {
   SETTING_MTL_HUD: "HUD Metal",
   SETTING_RETINA: "Mode Retina",
   SETTING_LEFT_CMD: "Mapper CMD gauche à CTRL",
+  SETTING_SQUIRCLE_DOCK_ICON: "Icône du Dock arrondie",
   SETTING_TURN_OFF_AC_PATCH: "Désactiver le patch AC",
   SETTING_CUSTOM_RESOLUTION: "Résolution personnalisée",
   SETTING_SAVE: "Sauvegarder",

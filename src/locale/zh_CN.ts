@@ -64,6 +64,7 @@ export const zh_CN = {
   SETTING_MTL_HUD: "Metal HUD",
   SETTING_RETINA: "Retina 模式",
   SETTING_LEFT_CMD: "映射左 CMD 键为 CTRL 键",
+  SETTING_SQUIRCLE_DOCK_ICON: "圆角 Dock 图标",
   SETTING_TURN_OFF_AC_PATCH: "关闭AC补丁",
   SETTING_CUSTOM_RESOLUTION: "自定义分辨率",
   SETTING_SAVE: "保存",
