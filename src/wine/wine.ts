@@ -11,9 +11,11 @@ import {
   stats,
   resolve,
   writeFile,
+  readBinary,
 } from "@utils";
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
+import gameModeBundleScript from "../constants/macos_game_mode_bundle.sh?raw";
 
 export async function createWine(options: {
   prefix: string;
@@ -48,12 +50,13 @@ export async function createWine(options: {
     program: string,
     args: string[],
     env?: { [key: string]: string },
-    log_file: string | undefined = undefined
+    log_file: string | undefined = undefined,
+    loader: string = loaderBin
   ) {
     return await unixExec2(
       program == "copy"
-        ? [loaderBin, "cmd", "/c", program, ...args]
-        : [loaderBin, program, ...args],
+        ? [loader, "cmd", "/c", program, ...args]
+        : [loader, program, ...args],
       {
         ...getEnvironmentVariables(),
         ...(env ?? {}),
@@ -61,6 +64,40 @@ export async function createWine(options: {
       false,
       log_file
     );
+  }
+
+  // macOS only enables Game Mode for apps whose bundle declares a game
+  // category. Builds (or refreshes) such a bundle around Wine's loader and
+  // returns how to launch the game through it; falls back to a normal launch.
+  async function prepareGameModeLaunch(
+    name: string,
+    id: string
+  ): Promise<{ loader?: string; env: { [key: string]: string } }> {
+    const bundle = resolve(`./gamemode/${id}.app`);
+    const bundleLoader = join(bundle, "Contents/MacOS/wine");
+    try {
+      const script = resolve("./macos_game_mode_bundle.sh");
+      await writeFile(script, gameModeBundleScript);
+      await unixExec([
+        "/bin/sh",
+        script,
+        bundle,
+        resolve("./wine"),
+        name,
+        `com.3shain.yaagl.gamemode.${id}`,
+        resolve("./icon.icns"),
+      ]);
+    } catch (e) {
+      await log(`macOS Game Mode bundle unavailable: ${e}`);
+      return { env: {} };
+    }
+    // A wrapper script as bin/wine sets up its runtime's environment, so keep
+    // launching through it and let it exec the bundle loader if it supports it.
+    const head = new Uint8Array(await readBinary(loaderBin)).subarray(0, 2);
+    if (head[0] == 0x23 && head[1] == 0x21) {
+      return { env: { YAAGL_GAME_MODE_LOADER: bundleLoader } };
+    }
+    return { loader: bundleLoader, env: {} };
   }
 
   async function waitUntilServerOff() {
@@ -156,6 +193,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
   return {
     exec,
     exec2,
+    prepareGameModeLaunch,
     waitUntilServerOff,
     cmd,
     toWinePath,

@@ -97,6 +97,9 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const gameMode = config.macosGameMode
+      ? await wine.prepareGameModeLaunch("Zenless Zone Zero", server.id)
+      : { env: {} };
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
@@ -125,8 +128,10 @@ cd /d "${wine.toWinePath(gameDir)}"
               HTTPS_PROXY: config.proxyHost,
             }
           : {}),
+        ...gameMode.env,
       },
-      logfile
+      logfile,
+      gameMode.loader
     );
     await wine.waitUntilServerOff();
     if (config.resolutionCustom) {

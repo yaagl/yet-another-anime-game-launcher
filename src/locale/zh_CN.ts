@@ -86,6 +86,9 @@ export const zh_CN = {
 
   SETTING_FPS_UNLOCK: "帧率限制解锁",
   SETTING_FPS_UNLOCK_DEFAULT: "不解锁",
+  SETTING_MACOS_GAME_MODE: "macOS 游戏模式",
+  SETTING_MACOS_GAME_MODE_DESC:
+    "让游戏以标记为游戏的 App 运行，使 macOS 可以开启游戏模式。不会提升帧率；部分用户开启游戏模式后会出现音频问题。",
 
   SETTING_ADVANCED: "高级设置",
   SETTING_ADVANCED_ALERT: "在不清楚作用的情况下，请不要改动任何设置。",

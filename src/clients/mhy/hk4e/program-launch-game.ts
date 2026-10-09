@@ -163,6 +163,9 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const gameMode = config.macosGameMode
+      ? await wine.prepareGameModeLaunch("Genshin Impact", server.id)
+      : { env: {} };
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
@@ -189,8 +192,10 @@ cd /d "${wine.toWinePath(gameDir)}"
               HTTPS_PROXY: config.proxyHost,
             }
           : {}),
+        ...gameMode.env,
       },
-      logfile
+      logfile,
+      gameMode.loader
     );
     await wine.waitUntilServerOff();
     if (config.hk4eEnableHDR) {
