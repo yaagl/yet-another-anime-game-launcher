@@ -47,6 +47,9 @@ cd /d "${wine.toWinePath(gameDir)}"
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
     const yaaglDir = resolve("./");
+    const gameMode = config.macosGameMode
+      ? await wine.prepareGameModeLaunch("Honkai Impact 3rd", server.id)
+      : { env: {} };
     await Promise.all([
       wine.exec2(
         "cmd",
@@ -72,8 +75,10 @@ cd /d "${wine.toWinePath(gameDir)}"
                 HTTPS_PROXY: config.proxyHost,
               }
             : {}),
+          ...gameMode.env,
         },
-        logfile
+        logfile,
+        gameMode.loader
       ),
       (async () => {
         // while (processRunning) {

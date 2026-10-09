@@ -89,6 +89,9 @@ export const en: typeof zh_CN = {
 
   SETTING_FPS_UNLOCK: "Unlock FPS Limit",
   SETTING_FPS_UNLOCK_DEFAULT: "Disabled",
+  SETTING_MACOS_GAME_MODE: "macOS Game Mode",
+  SETTING_MACOS_GAME_MODE_DESC:
+    "Runs the game as an app marked as a game so macOS can turn on Game Mode. It does not raise FPS, and some people get audio issues with Game Mode on.",
 
   SETTING_ADVANCED: "Advanced",
   SETTING_ADVANCED_ALERT:
