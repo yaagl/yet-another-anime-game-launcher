@@ -5,6 +5,10 @@ const { rimraf } = require("rimraf");
 const { IconIcns } = require("@shockpkg/icon-encoder");
 
 (async () => {
+  const buildArch = process.env.YAAGL_BUILD_ARCH || "x64";
+  if (!["x64", "arm64"].includes(buildArch)) {
+    throw new Error("YAAGL_BUILD_ARCH must be x64 or arm64");
+  }
   const icns = new IconIcns();
   const raw = true;
 
@@ -72,6 +76,11 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     bundleId += ".test";
     appDistributionName += " Test";
   }
+  // Allow local architecture experiments to keep their own application data.
+  if (process.env.YAAGL_BUILD_SUFFIX) {
+    bundleId += "." + process.env.YAAGL_BUILD_SUFFIX.toLowerCase();
+    appDistributionName += " " + process.env.YAAGL_BUILD_SUFFIX;
+  }
   await fs.writeJSON(
     path.resolve(process.cwd(), "neutralino.config.json"),
     config
@@ -92,7 +101,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   }
 
   const appname = config.cli.binaryName;
-  const binaryName = `${config.cli.binaryName}-mac_x64`;
+  const binaryName = `${config.cli.binaryName}-mac_${buildArch}`;
 
   // read package.json
   const pkg = await fs.readJSON(path.resolve(process.cwd(), "package.json"));
@@ -267,6 +276,30 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
   await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
     preserveTimestamps: true,
   });
+  // Overlay locally rebuilt helpers without changing the checked-in binaries.
+  if (process.env.YAAGL_SIDECAR_DIR) {
+    await fs.copy(path.resolve(process.env.YAAGL_SIDECAR_DIR), sidecarDst, {
+      preserveTimestamps: true,
+    });
+  }
+  // Native launcher builds must also contain native macOS sidecars. Windows
+  // PE files remain unchanged and are handled by the Wine/game runtime.
+  if (buildArch === "arm64") {
+    async function verifyArm64(dir) {
+      for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          await verifyArm64(file);
+        } else if (entry.isFile()) {
+          const { stdout } = await execa("file", ["-b", file]);
+          if (stdout.includes("Mach-O")) {
+            await execa("lipo", ["-verify_arch", "arm64", file]);
+          }
+        }
+      }
+    }
+    await verifyArm64(sidecarDst);
+  }
   // Remove protonextras for hkrpg
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));

@@ -38,3 +38,6 @@ server_secret.ts
 
 /sidecar/sophon_server
 **/__pycache__
+
+# Locally compiled ARM64 helper sources and artifacts
+/.arm64-build
