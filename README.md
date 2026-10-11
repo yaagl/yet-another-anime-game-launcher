@@ -90,3 +90,13 @@ node ./build-app.js
 * Krock, the game running on macOS can not come true without his patch (you can find the link to his work in this repository, while you have to make a little effort ;) )
 
 * mkrsym1, tackled IMO the most challenging AC component. It's a really remarkable and mind-blowing achievement.
+
+## Experimental ARM64 development builds
+
+See [ARM64 build instructions](docs/arm64-build.md) for an opt-in native launcher
+and sidecar build. This does not remove the Wine/game runtime's Rosetta dependency
+or establish macOS 28 game compatibility.
+
+Opt-in external Wine/FEX runtime integration for Genshin is documented in
+[docs/external-wine-runtime.md](docs/external-wine-runtime.md). It reuses the
+regular launcher UI and requires a separately prepared provider and prefix.

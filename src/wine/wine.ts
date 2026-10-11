@@ -15,11 +15,28 @@ import {
 import { dirname, join } from "path-browserify";
 import { WineDistribution } from "./distro";
 
+export interface ExternalWineRunner {
+  exec(
+    program: string,
+    args: string[],
+    env?: { [key: string]: string },
+    logFile?: string
+  ): Promise<Neutralino.os.ExecCommandResult>;
+  waitUntilServerOff(): Promise<Neutralino.os.ExecCommandResult>;
+  ownsGraphicsLibraries: boolean;
+  displayName: string;
+  runSession<T>(
+    program: () => AsyncGenerator<T, void>
+  ): AsyncGenerator<T, void>;
+  openCmdWindow?(gameDir: string): Promise<Neutralino.os.ExecCommandResult>;
+}
+
 export async function createWine(options: {
   prefix: string;
   distro: WineDistribution;
+  externalRunner?: ExternalWineRunner;
 }) {
-  const loaderBin = await getCorrectWineBinary();
+  const loaderBin = options.externalRunner ? "" : await getCorrectWineBinary();
 
   async function cmd(command: string, args: string[]) {
     return await exec("cmd", [command, ...args]);
@@ -31,6 +48,8 @@ export async function createWine(options: {
     env?: { [key: string]: string },
     log_file: string | undefined = undefined
   ) {
+    if (options.externalRunner)
+      return options.externalRunner.exec(program, args, env, log_file);
     return await unixExec(
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
@@ -50,6 +69,8 @@ export async function createWine(options: {
     env?: { [key: string]: string },
     log_file: string | undefined = undefined
   ) {
+    if (options.externalRunner)
+      return options.externalRunner.exec(program, args, env, log_file);
     return await unixExec2(
       program == "copy"
         ? [loaderBin, "cmd", "/c", program, ...args]
@@ -64,6 +85,8 @@ export async function createWine(options: {
   }
 
   async function waitUntilServerOff() {
+    if (options.externalRunner)
+      return options.externalRunner.waitUntilServerOff();
     return await unixExec2([join(dirname(loaderBin), "wineserver"), "-w"], {
       ...getEnvironmentVariables(),
     });
@@ -81,6 +104,14 @@ export async function createWine(options: {
   }
 
   async function openCmdWindow({ gameDir }: { gameDir: string }) {
+    if (options.externalRunner) {
+      if (!options.externalRunner.openCmdWindow) {
+        throw new Error(
+          "This external runtime does not provide a command prompt"
+        );
+      }
+      return options.externalRunner.openCmdWindow(gameDir);
+    }
     return await unixExec2(
       [
         `osascript`,
@@ -161,8 +192,20 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
+    supportsCommandPrompt:
+      !options.externalRunner || !!options.externalRunner.openCmdWindow,
     setProps,
     setNVExtension,
+    externalRuntimeName: options.externalRunner?.displayName,
+    managesGraphicsLibraries:
+      options.externalRunner?.ownsGraphicsLibraries ?? false,
+    runSession<T>(
+      program: () => AsyncGenerator<T, void>
+    ): AsyncGenerator<T, void> {
+      return options.externalRunner
+        ? options.externalRunner.runSession(program)
+        : program();
+    },
     attributes: {
       ...options.distro.attributes,
     },
