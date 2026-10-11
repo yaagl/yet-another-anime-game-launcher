@@ -268,16 +268,21 @@ export async function createHK4EChannelClient({
       if (config.reshade) {
         yield* checkAndDownloadReshade(aria2, wine, _gameInstallDir());
       }
-      if (wine.attributes.renderBackend == "dxmt") {
+      if (
+        !wine.managesGraphicsLibraries &&
+        wine.attributes.renderBackend == "dxmt"
+      ) {
         yield* checkAndDownloadDXMT(aria2);
       }
-      yield* launchGameProgram({
-        gameDir: _gameInstallDir(),
-        wine,
-        gameExecutable: server.executable,
-        config,
-        server,
-      });
+      yield* wine.runSession(() =>
+        launchGameProgram({
+          gameDir: _gameInstallDir(),
+          wine,
+          gameExecutable: server.executable,
+          config,
+          server,
+        })
+      );
     },
     async *checkIntegrity() {
       yield* checkIntegrityProgram({

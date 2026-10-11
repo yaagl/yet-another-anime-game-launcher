@@ -101,6 +101,7 @@ export async function createConfiguration({
   const [WD] = await createWineDistroConfig({
     locale,
     config,
+    externalRuntimeName: wine.externalRuntimeName,
   });
   const [D3D12] = await createD3D12({ locale, config, wine });
   const [MH] = await createMetalHUDConfig({ locale, config });
@@ -289,6 +290,7 @@ export async function createConfiguration({
 
             <Button
               {...actionBtnStyle}
+              disabled={!wine.supportsCommandPrompt}
               onClick={() => wine.openCmdWindow({ gameDir: gameInstallDir() })}
             >
               {locale.get("SETTING_OPEN_CMD")}

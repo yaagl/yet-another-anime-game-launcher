@@ -12,6 +12,7 @@ import {
   SelectPlaceholder,
   SelectTrigger,
   SelectValue,
+  Text,
 } from "@hope-ui/solid";
 import { createSignal, For, Show } from "solid-js";
 import { Locale } from "../locale";
@@ -28,10 +29,25 @@ declare module "./config-def" {
 export async function createWineDistroConfig({
   locale,
   config,
+  externalRuntimeName,
 }: {
   locale: Locale;
   config: Partial<Config>;
+  externalRuntimeName?: string;
 }) {
+  if (externalRuntimeName) {
+    config.wineDistro = externalRuntimeName;
+    return [
+      function UI() {
+        return (
+          <FormControl id="wineVersion">
+            <FormLabel>{locale.get("SETTING_WINE_VERSION")}</FormLabel>
+            <Text>{externalRuntimeName}</Text>
+          </FormControl>
+        );
+      },
+    ] as const;
+  }
   config.wineDistro = await getKey("wine_tag");
 
   const versions = await getWineDistributions();

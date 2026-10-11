@@ -96,3 +96,7 @@ node ./build-app.js
 See [ARM64 build instructions](docs/arm64-build.md) for an opt-in native launcher
 and sidecar build. This does not remove the Wine/game runtime's Rosetta dependency
 or establish macOS 28 game compatibility.
+
+Opt-in external Wine/FEX runtime integration for Genshin is documented in
+[docs/external-wine-runtime.md](docs/external-wine-runtime.md). It reuses the
+regular launcher UI and requires a separately prepared provider and prefix.

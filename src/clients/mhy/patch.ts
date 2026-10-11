@@ -66,7 +66,10 @@ export async function* patchProgram(
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
-  if (wine.attributes.renderBackend == "dxmt") {
+  if (
+    !wine.managesGraphicsLibraries &&
+    wine.attributes.renderBackend == "dxmt"
+  ) {
     for (const f of DXMT_FILES) {
       const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
       await forceMove(wineLibPath, wineLibPath + ".bak");
@@ -159,7 +162,10 @@ export async function* patchRevertProgram(
   }
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
-  if (wine.attributes.renderBackend == "dxmt") {
+  if (
+    !wine.managesGraphicsLibraries &&
+    wine.attributes.renderBackend == "dxmt"
+  ) {
     for (const f of DXMT_FILES) {
       const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
       await forceMove(wineLibPath + ".bak", wineLibPath);

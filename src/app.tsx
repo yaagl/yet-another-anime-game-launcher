@@ -12,6 +12,7 @@ import {
   exit,
   rawString,
 } from "./utils";
+import { loadExternalRuntime } from "./wine/external-runtime";
 import { createAria2Retry } from "./aria2";
 import {
   checkWine,
@@ -42,7 +43,18 @@ import {
 export async function createApp() {
   await setKey("singleton", null);
 
-  const aria2_port = 6868;
+  const externalRuntime = await loadExternalRuntime();
+  if (externalRuntime) {
+    await externalRuntime.recover();
+    addTerminationHook(async () => {
+      await externalRuntime.close();
+      return true;
+    });
+  }
+
+  const aria2_port = externalRuntime
+    ? await externalRuntime.getDownloadPort()
+    : 6868;
 
   await Neutralino.events.on("windowClose", async () => {
     if (await GLOBAL_onClose(false)) {
@@ -62,7 +74,7 @@ export async function createApp() {
     "--no-conf",
     "--enable-rpc",
     `--rpc-listen-port=${aria2_port}`,
-    `--rpc-listen-all=true`,
+    `--rpc-listen-all=${externalRuntime ? "false" : "true"}`,
     `--rpc-allow-origin-all`,
     `--input-file`,
     `${aria2_session}`,
@@ -101,7 +113,9 @@ export async function createApp() {
 
   const ignoredVersion = await getKeyOrDefault("ignore_launcher_update", "");
 
-  const wineStatus = await checkWine(github);
+  const wineStatus = externalRuntime
+    ? { wineReady: true, wineDistribution: externalRuntime.distribution }
+    : await checkWine(github);
   const prefixPath = resolve("./wineprefix"); // CHECK: hardcoded path?
 
   let MainApp: Component;
@@ -131,7 +145,8 @@ export async function createApp() {
 
   if (wineStatus.wineReady) {
     const wine = await createWine({
-      prefix: prefixPath,
+      prefix: externalRuntime?.prefix ?? prefixPath,
+      externalRunner: externalRuntime?.runner,
       distro: wineStatus.wineDistribution,
     });
     MainApp = await createLauncher({
