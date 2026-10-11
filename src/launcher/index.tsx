@@ -240,7 +240,11 @@ export async function createLauncher({
             >
               <PopoverTrigger as={Box}>
                 <ButtonGroup
-                  class={`launch-button ${statusText() === locale.get("GAME_RUNNING") ? "launch-button-running" : ""}`}
+                  class={`launch-button ${
+                    statusText() === locale.get("GAME_RUNNING")
+                      ? "launch-button-running"
+                      : ""
+                  }`}
                   size="xl"
                   attached
                   minWidth={150}
@@ -248,8 +252,15 @@ export async function createLauncher({
                   <Button
                     class="stop-button"
                     mr="-1px"
-                    disabled={programBusy() && statusText() !== locale.get("GAME_RUNNING")}
-                    colorScheme={statusText() === locale.get("GAME_RUNNING") ? "neutral" : "primary"}
+                    disabled={
+                      programBusy() &&
+                      statusText() !== locale.get("GAME_RUNNING")
+                    }
+                    colorScheme={
+                      statusText() === locale.get("GAME_RUNNING")
+                        ? "neutral"
+                        : "primary"
+                    }
                     onClick={() => {
                       if (statusText() === locale.get("GAME_RUNNING")) {
                         wine.killServer().catch(fatal);
@@ -261,17 +272,21 @@ export async function createLauncher({
                     {statusText() === locale.get("GAME_RUNNING")
                       ? `✕ ${locale.get("STOP_GAME")}`
                       : installState() == "INSTALLED"
-                        ? updateRequired()
-                          ? locale.get("UPDATE")
-                          : locale.get("LAUNCH")
-                        : locale.get("INSTALL")}
+                      ? updateRequired()
+                        ? locale.get("UPDATE")
+                        : locale.get("LAUNCH")
+                      : locale.get("INSTALL")}
                   </Button>
                   <Show when={installState() == "INSTALLED"}>
                     <IconButton
                       class="settings-button"
                       onClick={onOpen}
                       disabled={programBusy()}
-                      colorScheme={statusText() === locale.get("GAME_RUNNING") ? "neutral" : "primary"}
+                      colorScheme={
+                        statusText() === locale.get("GAME_RUNNING")
+                          ? "neutral"
+                          : "primary"
+                      }
                       fontSize={30}
                       aria-label="Settings"
                       icon={<IconSetting />}

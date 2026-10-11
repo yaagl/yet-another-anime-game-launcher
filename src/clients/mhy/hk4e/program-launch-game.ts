@@ -144,7 +144,9 @@ export async function* launchGameProgram({
   await wine.waitUntilServerOff();
 
   const borderlessArgs =
-    config.borderlessWindow !== false ? " -screen-fullscreen 0 -popupwindow" : "";
+    config.borderlessWindow !== false
+      ? " -screen-fullscreen 0 -popupwindow"
+      : "";
   const cmd = `@echo off
 cd "%~dp0"
 copy "${wine.toWinePath(
