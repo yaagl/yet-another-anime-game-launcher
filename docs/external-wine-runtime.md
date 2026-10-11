@@ -51,15 +51,15 @@ YAAGL appends the following arguments to `command`. Exit status zero means the
 operation completed; nonzero propagates the provider's error. Diagnostic output
 belongs on stderr when stdout contains JSON.
 
-| Arguments | Provider responsibility |
-| --- | --- |
-| `download-port` | Ask the OS for an available loopback TCP port (bind port zero), return `{"port":PORT}`. The opt-in launcher uses a per-launch port instead of sharing 6868 with a previous launcher or its exiting downloader. |
-| `recover` | Restore an abandoned journal before launcher initialization; refuse an active session owned by another launcher. |
-| `prepare OWNER_PID` | Snapshot temporary game files and registry values before any launch mutation; create an atomic journal, start independent owner-liveness monitoring, return `{"id":"opaque-session-id"}`. |
-| `exec JSON` | Execute `{program,args,env,logFile}` in the configured prefix, forward stdout/stderr and return the operation's exit code. The provider validates allowed operations and environment. Both synchronous and asynchronous Wine entry points use this blocking-completion protocol. |
-| `wait` | Wait for this prefix's Wine server to exit. |
-| `request-stop` | Stop only this session/prefix. Safe to call when the owner closes during preparation or execution. |
-| `finish SESSION_ID` | Stop remaining processes and restore that journal's exact file/registry state. Serialize with the independent owner monitor and verify restoration. |
+| Arguments           | Provider responsibility                                                                                                                                                                                                                                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `download-port`     | Ask the OS for an available loopback TCP port (bind port zero), return `{"port":PORT}`. The opt-in launcher uses a per-launch port instead of sharing 6868 with a previous launcher or its exiting downloader.                                                                   |
+| `recover`           | Restore an abandoned journal before launcher initialization; refuse an active session owned by another launcher.                                                                                                                                                                 |
+| `prepare OWNER_PID` | Snapshot temporary game files and registry values before any launch mutation; create an atomic journal, start independent owner-liveness monitoring, return `{"id":"opaque-session-id"}`.                                                                                        |
+| `exec JSON`         | Execute `{program,args,env,logFile}` in the configured prefix, forward stdout/stderr and return the operation's exit code. The provider validates allowed operations and environment. Both synchronous and asynchronous Wine entry points use this blocking-completion protocol. |
+| `wait`              | Wait for this prefix's Wine server to exit.                                                                                                                                                                                                                                      |
+| `request-stop`      | Stop only this session/prefix. Safe to call when the owner closes during preparation or execution.                                                                                                                                                                               |
+| `finish SESSION_ID` | Stop remaining processes and restore that journal's exact file/registry state. Serialize with the independent owner monitor and verify restoration.                                                                                                                              |
 
 YAAGL waits for `prepare` before entering the original game launch generator and
 calls `finish` from `finally`, including errors during patching. Window close
@@ -68,6 +68,17 @@ during preparation prevents the game from starting. Closing during restoration
 does not send another stop that could interrupt registry replay. Force quit
 cannot execute JavaScript cleanup; the provider's independent monitor must
 recover using the owner PID **and process identity**, accounting for PID reuse.
+
+Closing the **game** window is separate from closing the launcher. A provider
+must follow the actual game's lifetime rather than relying only on a Steam or
+shell helper, and must complete its blocking `exec`/`wait` operations after the
+game ends. If a runtime leaves processes behind during shutdown, cleanup must
+be scoped to the owned session/prefix and based on a confirmed shutdown event.
+Minimization, switching macOS Spaces, startup without a window, stale logs, or a
+failed window query must not be treated as game termination. The local provider
+uses a fresh game-log quit signal together with Windows-side confirmation that
+no windows remain for the exact game executable; this fallback is external to
+this PR, rather than a general Wine/FEX shutdown fix.
 
 When `ownsGraphicsLibraries` is true, YAAGL skips downloading/replacing its
 bundled x86_64 DXMT/Winemetal files and skips reverting those libraries. The
@@ -97,9 +108,12 @@ PR. Their source provenance, reproducible distribution and upstream review are
 separate work; this adapter alone is not a replacement runtime installer.
 
 The local launcher was packaged and opened through macOS LaunchServices with
-its original UI. Local game validation reaches the login background / protocol
-dialog and does not establish in-world playability. macOS 28 has not been tested;
-this change makes no guarantee of support for an unreleased OS. Installation,
+its original UI. Automated local integration reaches the login background /
+protocol dialog. Subsequent manual testing successfully logged in and reached an
+in-world scene, documented with UID-redacted screenshots in the PR. This does
+not establish long-session stability or broad gameplay compatibility. macOS 28
+has not been tested; this change makes no guarantee of support for an unreleased
+OS. Installation,
 updates, integrity repair, ReShade and other game clients have not been validated
 with the external runtime. The optional native build switches are described in `arm64-build.md`. The
 release/updater artifact strategy remains a separate concern: official
