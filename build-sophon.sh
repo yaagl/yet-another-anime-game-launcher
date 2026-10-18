@@ -1,22 +1,17 @@
 #!/bin/bash
-cp ./sidecar/hpatchz/hpatchz ./sophon_server/hpatchz
+set -euo pipefail
+cd "$(dirname "$0")"
 
-curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v31.1/protoc-31.1-osx-universal_binary.zip > protobuf.zip
-unzip -o -j protobuf.zip bin/protoc -d bin
-rm protobuf.zip
+sophon_build=(--package-path vendor/SophonClientv3 -c release --product SophonCLI --arch arm64 --arch x86_64)
+swift build "${sophon_build[@]}"
+sophon_bin="$(swift build "${sophon_build[@]}" --show-bin-path)"
+sophon_dist="$PWD/sidecar/sophon"
 
-pushd sophon_server
-../bin/protoc --python_out=. *.proto
-uv sync
-NUITKA_CACHE_DIR=./.cache uv run nuitka \
---warn-implicit-exceptions \
---warn-unusual-code \
---standalone \
---python-flag=isolated \
---include-data-files=./hpatchz=./hpatchz \
---output-filename=sophon-server \
---output-dir=./build \
---assume-yes-for-downloads \
-server.py
-rm ./hpatchz
-popd
+rm -rf "$sophon_dist"
+mkdir -p "$sophon_dist"
+cp "$sophon_bin/SophonCLI" "$sophon_dist/SophonCLI"
+xcrun swift-stdlib-tool --copy --scan-executable "$sophon_dist/SophonCLI" \
+  --destination "$sophon_dist" --platform macosx --sign -
+rm -f "$sophon_dist"/*.dylib.original
+install_name_tool -add_rpath '@executable_path' "$sophon_dist/SophonCLI"
+codesign --force --sign - "$sophon_dist/SophonCLI"

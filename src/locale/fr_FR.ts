@@ -2,6 +2,10 @@ import { zh_CN } from "./zh_CN";
 import { en } from "@locale/en";
 
 export const fr_FR: typeof zh_CN = {
+  CHECKING_GAME: "Vérification du jeu",
+  RESUME: "Reprendre",
+  CANCELLING: "Annulation…",
+  TIME_REMAINING: "{0}s restantes",
   CONTENT_LANG_ID: "fr-fr",
   LAUNCH: "Lancer le jeu",
   INSTALL: "Télécharger",

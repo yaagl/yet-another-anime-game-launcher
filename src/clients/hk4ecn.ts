@@ -8,9 +8,8 @@ import s from "../assets/Nahida.cr.png";
 import { createHK4EChannelClient } from "./mhy/hk4e";
 import type { CreateClientOptions } from "./shared";
 import {
-  CN_UPDATE_URL,
-  CN_CPS,
   CN_ADV_URL,
+  CN_CPS,
   CN_DATA_DIR,
   CN_EXECUTABLE,
   CN_COMPANY_NAME,
@@ -26,11 +25,10 @@ export const DEFAULT_WINE_DISTRO_TAG = "11.0-dxmt-signed-with-patches";
 
 const SERVER_DEFINITION: Server = {
   id: "hk4e_cn",
-  update_url: CN_UPDATE_URL,
+  adv_url: CN_ADV_URL,
   channel_id: 1,
   subchannel_id: 1,
   cps: CN_CPS,
-  adv_url: CN_ADV_URL,
   dataDir: CN_DATA_DIR,
   executable: CN_EXECUTABLE,
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,
@@ -68,7 +66,6 @@ const SERVER_DEFINITION: Server = {
 export function createClient(options: CreateClientOptions) {
   return createHK4EChannelClient({
     server: SERVER_DEFINITION,
-    releaseType: "cn",
     ...options,
   });
 }

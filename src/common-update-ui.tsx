@@ -31,6 +31,9 @@ export function createCommonUpdateUI(
             case "setStateText":
               setStatusText(locale.format(text[1], text.slice(2)));
               break;
+            case "setStatusText":
+              setStatusText(text[1]);
+              break;
           }
         }
         setDone(true);
@@ -78,4 +81,5 @@ export type CommonUpdateProgram<Ret = void> = AsyncGenerator<
 export type CommonProgressUICommand =
   | ["setProgress", number]
   | ["setStateText", LocaleTextKey, ...string[]]
+  | ["setStatusText", string]
   | ["setUndeterminedProgress"];

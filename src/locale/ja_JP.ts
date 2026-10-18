@@ -2,6 +2,10 @@ import { zh_CN } from "./zh_CN";
 import { en } from "./en";
 
 export const ja_JP: typeof zh_CN = {
+  CHECKING_GAME: "ゲームを確認中",
+  RESUME: "再開",
+  CANCELLING: "キャンセル中…",
+  TIME_REMAINING: "残り {0} 秒",
   CONTENT_LANG_ID: "ja-jp",
   LAUNCH: "ゲーム開始",
   INSTALL: "ダウンロード",

@@ -1,6 +1,10 @@
 import { zh_CN } from "./zh_CN";
 
 export const en: typeof zh_CN = {
+  CHECKING_GAME: "Checking game",
+  RESUME: "Resume",
+  CANCELLING: "Cancelling…",
+  TIME_REMAINING: "{0}s remaining",
   CONTENT_LANG_ID: "en-us",
   LAUNCH: "Launch Game",
   INSTALL: "Download",

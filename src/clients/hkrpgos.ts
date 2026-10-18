@@ -5,12 +5,11 @@ import s from "../assets/SilverWolf.cr.png";
 import { createHKRPGChannelClient } from "./mhy/hkrpg";
 import type { CreateClientOptions } from "./shared";
 import {
+  HKRPG_OS_ADV_URL,
   CN_COMPANY_NAME,
   HKRPG_DATA_DIR,
   HKRPG_EXECUTABLE,
-  HKRPG_OS_ADV_URL,
   HKRPG_OS_CPS,
-  HKRPG_OS_UPDATE_URL,
   HKRPG_REMOVED,
 } from "./secret";
 
@@ -20,11 +19,10 @@ export const DEFAULT_WINE_DISTRO_TAG = "11.0-1-crossover-signed-experimental";
 
 export const SERVER_DEFINITION: Server = {
   id: "hkrpg_global",
-  update_url: HKRPG_OS_UPDATE_URL,
+  adv_url: HKRPG_OS_ADV_URL,
   channel_id: 1,
   subchannel_id: 1,
   cps: HKRPG_OS_CPS,
-  adv_url: HKRPG_OS_ADV_URL,
   dataDir: HKRPG_DATA_DIR,
   executable: HKRPG_EXECUTABLE,
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME, // that's correct 😎

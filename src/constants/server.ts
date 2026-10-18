@@ -1,6 +1,5 @@
 export type Server = {
   id: string;
-  update_url: string;
   adv_url: string;
   cps: string;
   channel_id: number;
@@ -23,4 +22,8 @@ export type Server = {
     tag?: string;
   }[];
   hosts: string; // ?
+};
+
+export type LegacyServer = Server & {
+  update_url: string;
 };
