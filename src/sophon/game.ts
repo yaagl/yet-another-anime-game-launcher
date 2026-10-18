@@ -29,6 +29,7 @@ import {
   SophonSettings,
   sophonSettingsError,
 } from "./settings";
+import { getInstallOptions, InstallSelection } from "./install-options";
 
 export function canPlay(action: GameAction | undefined): boolean {
   return (
@@ -260,6 +261,13 @@ export async function createSophonGame(server: Server, locale: Locale) {
     cancelling,
     installDir,
     selectDirectory,
+    async installOptions() {
+      const client = await getSophonClient(downloader.settings().debugLogging);
+      return getInstallOptions(client, {
+        game: server.id,
+        cn: server.id.endsWith("_cn"),
+      });
+    },
     refresh,
     performAction,
     gameVersion: () => action()?.sourceVersion ?? "—",
@@ -273,9 +281,22 @@ export async function createSophonGame(server: Server, locale: Locale) {
     predownloadVersion: () =>
       action()?.cacheOnly ? action()?.targetVersion ?? "" : "",
     dismissPredownload: () => setDismissed(true),
-    async *install(directory: string): CommonUpdateProgram {
+    async *install(
+      directory: string,
+      selection?: InstallSelection
+    ): CommonUpdateProgram {
       await selectDirectory(directory);
-      yield* performAction();
+      if (error()) throw new Error(error());
+      const next = action();
+      if (
+        selection &&
+        next?.action !== "resumeInstall" &&
+        !(next?.action === "resumeUpdate" && !next.cacheOnly)
+      ) {
+        yield* run("install", { ...parameters(), ...selection });
+      } else {
+        yield* performAction();
+      }
     },
     update: () => performAction(),
     predownload: () => performAction(true),
@@ -292,7 +313,7 @@ export async function createSophonGame(server: Server, locale: Locale) {
       if (!operationRunning()) await refresh();
       return canPlay(action());
     },
-    async *checkIntegrity(): CommonUpdateProgram {
+    async *checkIntegrity(selection?: InstallSelection): CommonUpdateProgram {
       await refresh();
       const next = action();
       if (!next) throw new Error(error() || "Choose a game directory first");
@@ -302,7 +323,10 @@ export async function createSophonGame(server: Server, locale: Locale) {
       const params = parameters();
       yield* run("install", {
         ...params,
-        voicePacks: next.voicePacks,
+        mode: selection?.mode ?? "full",
+        voicePacks: [
+          ...new Set([...next.voicePacks, ...(selection?.voicePacks ?? [])]),
+        ],
         transfer: { ...params.transfer, preserveState: false },
       });
     },
