@@ -8,7 +8,7 @@ export const DEFAULT_WINE_DISTRO_TAG = "unstable-bh-wine-1.1";
 
 export const UPDATE_UI_IMAGE = s2;
 
-import { Server } from "@constants";
+import { LegacyServer } from "@constants";
 import {
   CN_COMPANY_NAME,
   BH3_GLB_EXECUTABLE,
@@ -17,7 +17,7 @@ import {
   BH3_GLB_DATA_DIR,
 } from "./secret";
 
-export const SERVER_DEFINITION: Server = {
+export const SERVER_DEFINITION: LegacyServer = {
   id: "BH3_GLB",
   hosts: "",
   removed: [

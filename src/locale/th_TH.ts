@@ -2,6 +2,10 @@ import { zh_CN } from "./zh_CN";
 import { en } from "@locale/en";
 
 export const th_TH: typeof zh_CN = {
+  CHECKING_GAME: "กำลังตรวจสอบเกม",
+  RESUME: "ดำเนินการต่อ",
+  CANCELLING: "กำลังยกเลิก…",
+  TIME_REMAINING: "เหลือ {0} วินาที",
   CONTENT_LANG_ID: "th-th",
   LAUNCH: "เริ่มเกม",
   INSTALL: "ดาวน์โหลด",

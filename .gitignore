@@ -36,5 +36,9 @@ server_secret.ts
 /napcn
 /napos
 
+/sidecar/sophon
+
+# Generated files from the former Python backend
+/sophon_server
 /sidecar/sophon_server
 **/__pycache__

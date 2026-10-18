@@ -19,32 +19,16 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Install UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Install Swift
+        uses: swift-actions/setup-swift@v3
+        with:
+          swift-version: "6.3.3"
 
-      - name: Sophon Build Cache
-        id: sophon-build-cache
+      - name: Cache Swift build
         uses: actions/cache@v4
         with:
-          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*.py', 'sophon_server/uv.lock', 'sophon_server/.python-version', 'sophon_server/pyproject.toml') }}
-          path: |
-            ./sophon_server/build/
-            ./sophon_server/.cache/
-
-      - name: Sophon Build
-        if: ${{ steps.sophon-build-cache.outputs.cache-hit != 'true' }}
-        run: |
-          ./build-sophon.sh
-
-      - name: Save Sophon Build Cache
-        if: ${{ steps.sophon-build-cache.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
-        with:
-          key: cache-key-${{ hashFiles('build-sophon.sh', 'sophon_server/*.py', 'sophon_server/uv.lock', 'sophon_server/.python-version', 'sophon_server/pyproject.toml') }}
-          path: |
-            ./sophon_server/build/
-            ./sophon_server/.cache/
+          path: vendor/SophonClientv3/.build
+          key: swift-${{ runner.os }}-${{ runner.arch }}-6.3.3-${{ hashFiles('build-sophon.sh', 'vendor/SophonClientv3/Package.swift', 'vendor/SophonClientv3/Package.resolved') }}
 
       - name: Install Node.js
         uses: actions/setup-node@v3

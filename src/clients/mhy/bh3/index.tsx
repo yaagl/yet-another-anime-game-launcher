@@ -4,7 +4,7 @@ import {
   ChannelClient,
   ChannelClientInstallState,
 } from "../../../channel-client";
-import { Server } from "@constants";
+import { LegacyServer, Server } from "@constants";
 import { Locale } from "@locale";
 import {
   assertValueDefined,
@@ -59,7 +59,7 @@ export async function createBH3ChannelClient({
   aria2,
   wine,
 }: {
-  server: Server;
+  server: LegacyServer;
   locale: Locale;
   aria2: Aria2;
   wine: Wine;
@@ -371,7 +371,7 @@ async function checkGameState(locale: Locale, server: Server) {
 }
 
 async function getLatestVersionInfo(
-  server: Server
+  server: LegacyServer
 ): Promise<LauncherResourceData> {
   const ret: LauncherResourceData = await (
     await fetch(server.update_url)

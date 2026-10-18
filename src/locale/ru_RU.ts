@@ -2,6 +2,10 @@ import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
 export const ru_RU: typeof zh_CN = {
+  CHECKING_GAME: "Проверка игры",
+  RESUME: "Продолжить",
+  CANCELLING: "Отмена…",
+  TIME_REMAINING: "Осталось {0} с",
   CONTENT_LANG_ID: "ru-ru",
   LAUNCH: "Запустить игру",
   INSTALL: "Скачать",

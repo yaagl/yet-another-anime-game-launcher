@@ -2,6 +2,10 @@ import { en } from "./en";
 import { zh_CN } from "./zh_CN";
 
 export const vi_VN: typeof zh_CN = {
+  CHECKING_GAME: "Đang kiểm tra trò chơi",
+  RESUME: "Tiếp tục",
+  CANCELLING: "Đang hủy…",
+  TIME_REMAINING: "Còn {0} giây",
   CONTENT_LANG_ID: "vi-vn",
   LAUNCH: "Khởi động trò chơi",
   INSTALL: "Tải xuống",

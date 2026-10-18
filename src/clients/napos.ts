@@ -8,7 +8,6 @@ import s from "../assets/Nahida.cr.png";
 import { createNAPChannelClient } from "./mhy/nap";
 import type { CreateClientOptions } from "./shared";
 import {
-  OS_UPDATE_URL,
   OS_ADV_URL,
   CN_COMPANY_NAME,
   NAP_DATA_DIR,
@@ -25,11 +24,10 @@ export const DEFAULT_WINE_DISTRO_TAG = "11.0-1-crossover-signed-experimental";
 
 const SERVER_DEFINITION: Server = {
   id: "nap_global",
-  update_url: OS_UPDATE_URL,
+  adv_url: OS_ADV_URL,
   channel_id: 1,
   subchannel_id: 0,
   cps: NAP_CPS,
-  adv_url: OS_ADV_URL,
   dataDir: NAP_DATA_DIR,
   executable: NAP_EXECUTABLE,
   THE_REAL_COMPANY_NAME: CN_COMPANY_NAME,

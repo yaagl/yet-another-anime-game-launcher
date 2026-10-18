@@ -33,11 +33,13 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       includeSophon = true;
       break;
     case "hkrpgcn":
+      includeSophon = true;
       bundleId = config.applicationId + ".hkrpg.cn";
       appDistributionName = config.cli.binaryName + " HSR";
       config.modes.window.icon = "/src/icons/March7th.cr.png";
       break;
     case "hkrpgos":
+      includeSophon = true;
       bundleId = config.applicationId + ".hkrpg.os";
       appDistributionName = config.cli.binaryName + " HSR OS";
       config.modes.window.icon = "/src/icons/March7th.cr.png";
@@ -56,11 +58,13 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       appDistributionName = config.cli.binaryName + " SCZ";
       break;
     case "napos":
+      includeSophon = true;
       bundleId = config.applicationId + ".nap.os";
       appDistributionName = config.cli.binaryName + " ZZZ OS";
       config.modes.window.icon = "/src/icons/ZZZ_Bang.cr.png";
       break;
     case "napcn":
+      includeSophon = true;
       bundleId = config.applicationId + ".nap.cn";
       appDistributionName = config.cli.binaryName + " ZZZ";
       config.modes.window.icon = "/src/icons/ZZZ_Bang.cr.png";
@@ -77,6 +81,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
     config
   );
   try {
+    if (includeSophon) await execa("./build-sophon.sh", { stdio: "inherit" });
     await execa("pnpm", ["exec", "tsc"]); // do typecheck first
     await execa("rm", ["-rf", "./.tmp"]);
     await execa("pnpm", ["exec", "vite", "build"]);
@@ -254,18 +259,11 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
     `Resources`,
     `sidecar`
   );
-  // copy sophon binary to sidecar
-  if (includeSophon) {
-    await fs.copy(
-      path.resolve(process.cwd(), `sophon_server`, `build`, `server.dist`),
-      path.resolve(sidecarDst, `sophon_server`), {
-      preserveTimestamps: true,
-    });
-  }
-  // Remove potentially existing dev sophon_server from sidecar
-  await fs.remove(path.resolve(process.cwd(), `sidecar`, `sophon_server`));
-  await fs.copy(path.resolve(process.cwd(), `sidecar`), sidecarDst, {
+  await fs.copy(path.resolve(process.cwd(), "sidecar"), sidecarDst, {
     preserveTimestamps: true,
+    filter: source =>
+      path.basename(source) !== "sophon_server" &&
+      (includeSophon || path.basename(source) !== "sophon"),
   });
   // Remove protonextras for hkrpg
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
@@ -324,7 +322,7 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         <key>NSHumanReadableCopyright</key>
         <string>Copyright © 2023 3Shain.</string>
         <key>LSMinimumSystemVersion</key>
-        <string>10.15.0</string>
+        <string>${includeSophon ? "13.0" : "10.15.0"}</string>
         <key>NSAppTransportSecurity</key>
         <dict>
             <key>NSAllowsArbitraryLoads</key>
