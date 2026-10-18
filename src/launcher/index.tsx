@@ -29,6 +29,7 @@ import { Wine } from "@wine";
 import { canPlay } from "../sophon/game";
 import { DownloadDetails } from "./download-details";
 import type { SophonActivity } from "../sophon/activity";
+import { InstallOptions } from "./install-options";
 
 function ActionIcon(props: { action: string }) {
   const paths: Record<string, string> = {
@@ -154,23 +155,36 @@ export async function createLauncher({
 
     const { isOpen, onOpen, onClose } = createDisclosure();
     const details = createDisclosure();
+    const [installDialog, setInstallDialog] = createSignal<
+      "install" | "verify"
+    >();
 
     const [videoLoaded, setVideoLoaded] = createSignal(false);
     let video: HTMLVideoElement | undefined;
     createEffect(() => {
       if (!videoLoaded()) return;
-      if (details.isOpen()) video?.pause();
+      if (details.isOpen() || installDialog()) video?.pause();
       else video?.play().catch(() => undefined);
     });
+
+    async function chooseGameDirectory() {
+      const directory = await selectPath();
+      if (directory) await sophon?.selectDirectory(directory);
+    }
 
     async function onButtonClick() {
       if (programBusy()) return; // ignore
       if (sophon) {
         if (!installDir()) {
-          const selection = await selectPath();
-          if (!selection) return;
-          await sophon.selectDirectory(selection);
-          taskQueue.next(() => sophon.performAction());
+          await chooseGameDirectory();
+          return;
+        }
+        if (sophon.error()) {
+          await sophon.refresh();
+          if (sophon.error()) throw new Error(sophon.error());
+        }
+        if (sophon.action()?.action === "install") {
+          setInstallDialog("install");
         } else if (canPlay(sophon.action())) {
           taskQueue.next(() => launch(config));
         } else {
@@ -379,7 +393,9 @@ export async function createLauncher({
               </Show>
               <Popover
                 placement="top"
-                opened={showPredownloadPrompt() && !isOpen()}
+                opened={
+                  showPredownloadPrompt() && !isOpen() && !installDialog()
+                }
                 onClose={dismissPredownload}
                 closeOnBlur={true}
               >
@@ -418,13 +434,7 @@ export async function createLauncher({
                           sophon?.operationRunning() ||
                           sophon?.loading()
                         }
-                        onClick={() =>
-                          (async () => {
-                            const directory = await selectPath();
-                            if (directory)
-                              await sophon?.selectDirectory(directory);
-                          })().catch(reportError)
-                        }
+                        onClick={() => chooseGameDirectory().catch(reportError)}
                         icon={
                           <svg
                             width="24"
@@ -491,13 +501,43 @@ export async function createLauncher({
                 onClose={action => {
                   onClose();
                   if (action == "check-integrity") {
-                    taskQueue.next(checkIntegrity);
+                    if (sophon) setInstallDialog("verify");
+                    else taskQueue.next(checkIntegrity);
                   }
                 }}
               ></ConfigurationUI>
             </Modal>
           </Flex>
         </Flex>
+        <Show when={installDialog() && sophon}>
+          {game => (
+            <Modal
+              opened={Boolean(installDialog())}
+              onClose={() => setInstallDialog(undefined)}
+              centered
+              scrollBehavior="inside"
+            >
+              <ModalOverlay />
+              <InstallOptions
+                game={game()}
+                verification={installDialog() === "verify"}
+                selectPath={selectPath}
+                onClose={() => setInstallDialog(undefined)}
+                onConfirm={selection => {
+                  const client = game();
+                  const verification = installDialog() === "verify";
+                  const directory = installDir();
+                  setInstallDialog(undefined);
+                  taskQueue.next(() =>
+                    verification
+                      ? client.checkIntegrity(selection)
+                      : client.install(directory, selection)
+                  );
+                }}
+              />
+            </Modal>
+          )}
+        </Show>
         <Show when={details.isOpen() && sophon?.activity()}>
           <Modal
             opened={details.isOpen()}
