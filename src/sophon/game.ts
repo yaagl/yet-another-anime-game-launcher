@@ -23,6 +23,7 @@ import {
 import { getSophonClient } from "./client";
 import { gameConfigDefaults } from "./config";
 import { progressCommands } from "./progress";
+import { createSophonActivity } from "./activity";
 
 export function canPlay(action: GameAction | undefined): boolean {
   return (
@@ -44,6 +45,7 @@ export async function createSophonGame(server: Server, locale: Locale) {
   const [dismissed, setDismissed] = createSignal(false);
   const [operationRunning, setOperationRunning] = createSignal(false);
   const [cancelling, setCancelling] = createSignal(false);
+  const stats = createSophonActivity();
   let activeClient: SophonRpcClient | undefined;
   let operationID: string | undefined;
 
@@ -93,6 +95,7 @@ export async function createSophonGame(server: Server, locale: Locale) {
       throw new Error("A game operation is still running");
     setOperationRunning(true);
     setCancelling(false);
+    stats.start(kind, params, action()?.targetVersion);
     let unsubscribe: (() => void) | undefined;
     let wake: (() => void) | undefined;
     let latest: OperationProgress | undefined;
@@ -117,16 +120,23 @@ export async function createSophonGame(server: Server, locale: Locale) {
       unsubscribe = client.onProgress(snapshot => {
         if (!operationID) early = snapshot;
         else if (snapshot.operationID === operationID) {
+          if (settled) return;
           latest = snapshot.progress;
+          stats.record(snapshot);
           wake?.();
         }
       });
       operationID = (await client[kind](params)).operationID;
-      if (early?.operationID === operationID) latest = early.progress;
+      stats.record({ operationID, status: "running" });
+      if (early?.operationID === operationID) {
+        latest = early.progress;
+        stats.record(early);
+      }
       if (cancelling()) await client.cancel(operationID);
       const completion = client.wait(operationID).then(
         status => {
           result = status;
+          stats.record(status);
           latest = status.progress ?? latest;
           settled = true;
           wake?.();
@@ -158,6 +168,9 @@ export async function createSophonGame(server: Server, locale: Locale) {
       yield ["setProgress", 100];
       yield ["setStateText", "INSTALL_DONE"];
       return true;
+    } catch (error) {
+      stats.fail(error);
+      throw error;
     } finally {
       unsubscribe?.();
       activeClient = undefined;
@@ -198,6 +211,8 @@ export async function createSophonGame(server: Server, locale: Locale) {
   }
 
   return {
+    activity: stats.activity,
+    history: stats.history,
     action,
     error,
     loading,

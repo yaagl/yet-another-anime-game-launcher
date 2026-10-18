@@ -48,8 +48,9 @@ export function progressCommands(
           : " / " + humanFileSize(download.total))
     );
   }
-  if (common.network.rate !== undefined) {
-    details.push(humanFileSize(common.network.rate) + "/s");
+  const speed = progress.phase === "scanning" ? common.read : common.network;
+  if (speed.rate !== undefined) {
+    details.push(humanFileSize(speed.rate) + "/s");
   }
   const eta = common.timing.etaSeconds ?? metric.etaSeconds;
   if (eta !== undefined) {

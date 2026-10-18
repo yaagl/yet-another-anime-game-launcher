@@ -3,7 +3,9 @@ import { SuppportedContentLangId } from "./supported-content-lang-id";
 export const zh_CN = {
   CHECKING_GAME: "正在检查游戏",
   RESUME: "继续",
-  CANCELLING: "正在取消…",
+  PAUSE: "暂停",
+  PAUSING: "正在暂停…",
+  PAUSED: "已暂停",
   TIME_REMAINING: "剩余 {0} 秒",
   CONTENT_LANG_ID: "zh-cn" as SuppportedContentLangId,
   LAUNCH: "开始游戏",

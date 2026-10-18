@@ -18,7 +18,7 @@ import {
   ProgressIndicator,
 } from "@hope-ui/solid";
 import { createIcon } from "@hope-ui/solid";
-import { Show, createSignal } from "solid-js";
+import { Show, createEffect, createSignal } from "solid-js";
 import { Locale } from "@locale";
 import { createConfiguration } from "@config";
 import { Github } from "../github";
@@ -27,6 +27,8 @@ import { ChannelClient } from "../channel-client";
 import { createTaskQueueState } from "./task-queue";
 import { Wine } from "@wine";
 import { canPlay } from "../sophon/game";
+import { DownloadDetails } from "./download-details";
+import type { SophonActivity } from "../sophon/activity";
 
 function ActionIcon(props: { action: string }) {
   const paths: Record<string, string> = {
@@ -36,6 +38,8 @@ function ActionIcon(props: { action: string }) {
     update: "M20 7a9 9 0 1 0 1 8M20 3v5h-5",
     retry: "M20 7a9 9 0 1 0 1 8M20 3v5h-5",
     checking: "M20 7a9 9 0 1 0 1 8M20 3v5h-5",
+    details: "M4 20h16M7 16v-4m5 4V4m5 12V8",
+    pause: "M8 5v14M16 5v14",
   };
   return (
     <svg
@@ -148,8 +152,15 @@ export async function createLauncher({
     });
 
     const { isOpen, onOpen, onClose } = createDisclosure();
+    const details = createDisclosure();
 
     const [videoLoaded, setVideoLoaded] = createSignal(false);
+    let video: HTMLVideoElement | undefined;
+    createEffect(() => {
+      if (!videoLoaded()) return;
+      if (details.isOpen()) video?.pause();
+      else video?.play().catch(() => undefined);
+    });
 
     async function onButtonClick() {
       if (programBusy()) return; // ignore
@@ -223,6 +234,7 @@ export async function createLauncher({
       >
         <Show when={background_video}>
           <video
+            ref={video}
             class="background-video"
             src={background_video}
             autoplay
@@ -278,7 +290,7 @@ export async function createLauncher({
             columnGap="10vw"
             alignItems={"flex-end"}
           >
-            <Box flex={1}>
+            <Box flex={1} minWidth={0}>
               <Show when={sophon?.error()}>
                 <p role="alert">{sophon?.error()}</p>
               </Show>
@@ -328,123 +340,150 @@ export async function createLauncher({
                   ></ProgressIndicator>
                 </Progress>
               </Show>
-              <Show when={sophon?.operationRunning()}>
-                <Button
-                  size="sm"
-                  mt="$2"
-                  disabled={sophon?.cancelling()}
-                  onClick={() => sophon?.cancel().catch(reportError)}
-                >
-                  {locale.get(
-                    sophon?.cancelling() ? "CANCELLING" : "SETTING_CANCEL"
-                  )}
-                </Button>
-              </Show>
             </Box>
-            <Popover
-              placement="top"
-              opened={showPredownloadPrompt() && !isOpen()}
-              onClose={dismissPredownload}
-              closeOnBlur={true}
-            >
-              <PopoverTrigger as={Box}>
+            <Flex direction="column" gap="$2" flexShrink={0}>
+              <Show when={sophon?.activity() || sophon?.operationRunning()}>
                 <ButtonGroup
                   class="launch-button"
-                  size="xl"
+                  role="group"
+                  aria-label="Download controls"
+                  size="sm"
+                  variant="subtle"
                   attached
-                  minWidth={150}
+                  alignSelf={
+                    launchButtonLocation === "left" ? "flex-start" : "flex-end"
+                  }
                   opacity={0.85}
                   _hover={{ opacity: 1 }}
                   transition="opacity 0.2s"
                   borderRadius={12}
                   overflow="hidden"
                 >
-                  <Button
-                    mr="-1px"
-                    disabled={
-                      programBusy() ||
-                      sophon?.loading() ||
-                      (sophon?.operationRunning() && !canPlay(sophon.action()))
-                    }
-                    onClick={() => onButtonClick().catch(reportError)}
+                  <Show when={sophon?.activity()}>
+                    <Button onClick={details.onOpen}>
+                      <ActionIcon action="details" />
+                      Stats for nerds
+                    </Button>
+                  </Show>
+                  <Show when={sophon?.operationRunning()}>
+                    <Button
+                      disabled={sophon?.cancelling()}
+                      onClick={() => sophon?.cancel().catch(reportError)}
+                    >
+                      <ActionIcon action="pause" />
+                      {locale.get(sophon?.cancelling() ? "PAUSING" : "PAUSE")}
+                    </Button>
+                  </Show>
+                </ButtonGroup>
+              </Show>
+              <Popover
+                placement="top"
+                opened={showPredownloadPrompt() && !isOpen()}
+                onClose={dismissPredownload}
+                closeOnBlur={true}
+              >
+                <PopoverTrigger as={Box}>
+                  <ButtonGroup
+                    class="launch-button"
+                    size="xl"
+                    attached
+                    minWidth={150}
+                    opacity={0.85}
+                    _hover={{ opacity: 1 }}
+                    transition="opacity 0.2s"
+                    borderRadius={12}
+                    overflow="hidden"
                   >
+                    <Button
+                      mr="-1px"
+                      disabled={
+                        programBusy() ||
+                        sophon?.loading() ||
+                        (sophon?.operationRunning() &&
+                          !canPlay(sophon.action()))
+                      }
+                      onClick={() => onButtonClick().catch(reportError)}
+                    >
+                      <Show when={sophon}>
+                        <ActionIcon action={primaryAction()} />
+                      </Show>
+                      {primaryLabel()}
+                    </Button>
                     <Show when={sophon}>
-                      <ActionIcon action={primaryAction()} />
+                      <IconButton
+                        aria-label={locale.get("SELECT_INSTALLATION_DIR")}
+                        disabled={
+                          programBusy() ||
+                          sophon?.operationRunning() ||
+                          sophon?.loading()
+                        }
+                        onClick={() =>
+                          (async () => {
+                            const directory = await selectPath();
+                            if (directory)
+                              await sophon?.selectDirectory(directory);
+                          })().catch(reportError)
+                        }
+                        icon={
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                          >
+                            <path d="M3 5h6l2 3h10v12H3z" />
+                          </svg>
+                        }
+                      />
                     </Show>
-                    {primaryLabel()}
-                  </Button>
-                  <Show when={sophon}>
                     <IconButton
-                      aria-label={locale.get("SELECT_INSTALLATION_DIR")}
+                      onClick={onOpen}
                       disabled={
                         programBusy() ||
                         sophon?.operationRunning() ||
                         sophon?.loading()
                       }
-                      onClick={() =>
-                        (async () => {
-                          const directory = await selectPath();
-                          if (directory)
-                            await sophon?.selectDirectory(directory);
-                        })().catch(reportError)
-                      }
-                      icon={
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          aria-hidden="true"
-                        >
-                          <path d="M3 5h6l2 3h10v12H3z" />
-                        </svg>
-                      }
+                      fontSize={30}
+                      aria-label="Settings"
+                      icon={<IconSetting />}
                     />
-                  </Show>
-                  <IconButton
-                    onClick={onOpen}
-                    disabled={
-                      programBusy() ||
-                      sophon?.operationRunning() ||
-                      sophon?.loading()
-                    }
-                    fontSize={30}
-                    aria-label="Settings"
-                    icon={<IconSetting />}
-                  />
-                </ButtonGroup>
-              </PopoverTrigger>
-              <PopoverContent
-                borderColor="$success3"
-                bg="$success3"
-                color="$success11"
-                width={200}
-              >
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <PopoverBody width={200}>
-                  <Button
-                    id="predownload"
-                    colorScheme="success"
-                    size="sm"
-                    variant="ghost"
-                    disabled={
-                      nonUrgentProgramBusy() ||
-                      sophon?.loading() ||
-                      sophon?.operationRunning()
-                    }
-                    onClick={() => nonUrgentTaskQueue.next(predownload)}
-                  >
-                    {sophon?.action()?.action === "resumeUpdate"
-                      ? locale.get("RESUME") + " · "
-                      : ""}
-                    {locale.format("PREDOWNLOAD_READY", [predownloadVersion()])}
-                  </Button>
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
+                  </ButtonGroup>
+                </PopoverTrigger>
+                <PopoverContent
+                  borderColor="$success3"
+                  bg="$success3"
+                  color="$success11"
+                  width={200}
+                >
+                  <PopoverArrow />
+                  <PopoverCloseButton />
+                  <PopoverBody width={200}>
+                    <Button
+                      id="predownload"
+                      colorScheme="success"
+                      size="sm"
+                      variant="ghost"
+                      disabled={
+                        nonUrgentProgramBusy() ||
+                        sophon?.loading() ||
+                        sophon?.operationRunning()
+                      }
+                      onClick={() => nonUrgentTaskQueue.next(predownload)}
+                    >
+                      {sophon?.action()?.action === "resumeUpdate"
+                        ? locale.get("RESUME") + " · "
+                        : ""}
+                      {locale.format("PREDOWNLOAD_READY", [
+                        predownloadVersion(),
+                      ])}
+                    </Button>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            </Flex>
             <Modal opened={isOpen()} onClose={onClose} scrollBehavior="inside">
               <ModalOverlay />
               <ConfigurationUI
@@ -458,6 +497,25 @@ export async function createLauncher({
             </Modal>
           </Flex>
         </Flex>
+        <Show when={details.isOpen() && sophon?.activity()}>
+          <Modal
+            opened={details.isOpen()}
+            onClose={details.onClose}
+            size="full"
+            scrollBehavior="inside"
+            motionPreset="none"
+          >
+            <ModalOverlay />
+            <DownloadDetails
+              locale={locale}
+              activity={sophon?.activity() as SophonActivity}
+              history={sophon?.history() ?? []}
+              cancelling={sophon?.cancelling() ?? false}
+              onClose={details.onClose}
+              onCancel={() => sophon?.cancel().catch(reportError)}
+            />
+          </Modal>
+        </Show>
       </div>
     );
   };
