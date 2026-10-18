@@ -1,0 +1,5 @@
+[submodule "vendor/SophonClientv3"]
+	path = vendor/SophonClientv3
+	url = https://github.com/riverfog7/SophonClientv3.git
+	branch = ai-slop
+	shallow = true
