@@ -4,7 +4,9 @@ import { en } from "@locale/en";
 export const de_DE: typeof zh_CN = {
   CHECKING_GAME: "Spiel wird geprüft",
   RESUME: "Fortsetzen",
-  CANCELLING: "Wird abgebrochen…",
+  PAUSE: "Pausieren",
+  PAUSING: "Wird pausiert…",
+  PAUSED: "Pausiert",
   TIME_REMAINING: "{0}s verbleibend",
   CONTENT_LANG_ID: "de-de",
   LAUNCH: "Spiel starten",

@@ -4,7 +4,9 @@ import { en } from "@locale/en";
 export const ko_KR: typeof zh_CN = {
   CHECKING_GAME: "게임 확인 중",
   RESUME: "계속",
-  CANCELLING: "취소 중…",
+  PAUSE: "일시 정지",
+  PAUSING: "일시 정지 중…",
+  PAUSED: "일시 정지됨",
   TIME_REMAINING: "{0}초 남음",
   CONTENT_LANG_ID: "ko-kr",
   LAUNCH: "게임 실행",

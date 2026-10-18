@@ -4,7 +4,9 @@ import { zh_CN } from "./zh_CN";
 export const ru_RU: typeof zh_CN = {
   CHECKING_GAME: "Проверка игры",
   RESUME: "Продолжить",
-  CANCELLING: "Отмена…",
+  PAUSE: "Пауза",
+  PAUSING: "Приостановка…",
+  PAUSED: "На паузе",
   TIME_REMAINING: "Осталось {0} с",
   CONTENT_LANG_ID: "ru-ru",
   LAUNCH: "Запустить игру",
