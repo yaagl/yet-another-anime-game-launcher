@@ -121,6 +121,7 @@ export async function createLauncher({
     gameInstallDir: installDir,
     configForChannelClient: createConfig,
     supportsD3d12,
+    sophon,
     onCheckUpdate,
   });
 
