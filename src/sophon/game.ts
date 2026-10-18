@@ -24,6 +24,11 @@ import { getSophonClient } from "./client";
 import { gameConfigDefaults } from "./config";
 import { progressCommands } from "./progress";
 import { createSophonActivity } from "./activity";
+import {
+  createSophonSettings,
+  SophonSettings,
+  sophonSettingsError,
+} from "./settings";
 
 export function canPlay(action: GameAction | undefined): boolean {
   return (
@@ -36,6 +41,7 @@ export function canPlay(action: GameAction | undefined): boolean {
 }
 
 export async function createSophonGame(server: Server, locale: Locale) {
+  const downloader = await createSophonSettings();
   const [installDir, setInstallDir] = createSignal(
     await getKeyOrDefault("game_install_dir", "")
   );
@@ -50,13 +56,29 @@ export async function createSophonGame(server: Server, locale: Locale) {
   let operationID: string | undefined;
 
   function parameters(): OperationParameters {
+    const settings = downloader.settings();
     return {
       game: server.id,
       cn: server.id.endsWith("_cn"),
       directory: installDir(),
+      downloads: settings.downloads,
+      writes: settings.writes,
+      checks: settings.checks,
+      postProcessors: settings.postProcessors,
+      maxRetries: settings.maxRetries,
+      retryInterval: settings.retryInterval,
+      maxCachedFileHandles: settings.maxCachedFileHandles,
       transfer: {
         cacheDirectory: resolve("./sophon/transfers"),
         stateDirectory: resolve("./sophon/state"),
+        predownloadDirectory: settings.predownloadDirectory || undefined,
+        memoryLimit: settings.memoryMiB * 1024 ** 2,
+        diskLimit: settings.diskGiB * 1024 ** 3,
+        diskCacheEnabled: settings.diskCacheEnabled,
+        entryLimit: settings.entryLimit,
+        ioPolicy: settings.ioPolicy,
+        writeMode: settings.writeMode,
+        preserveState: settings.preserveState,
       },
     };
   }
@@ -70,7 +92,8 @@ export async function createSophonGame(server: Server, locale: Locale) {
     setLoading(true);
     setError("");
     try {
-      setAction(await (await getSophonClient()).nextAction(parameters()));
+      const client = await getSophonClient(downloader.settings().debugLogging);
+      setAction(await client.nextAction(parameters()));
     } catch (error) {
       setError(String(error));
     } finally {
@@ -115,7 +138,7 @@ export async function createSophonGame(server: Server, locale: Locale) {
         const updated = gameConfigDefaults(contents, server);
         if (updated !== contents) await writeFile(file, updated);
       }
-      const client = await getSophonClient();
+      const client = await getSophonClient(downloader.settings().debugLogging);
       activeClient = client;
       unsubscribe = client.onProgress(snapshot => {
         if (!operationID) early = snapshot;
@@ -211,6 +234,23 @@ export async function createSophonGame(server: Server, locale: Locale) {
   }
 
   return {
+    settings: downloader.settings,
+    async saveSettings(settings: SophonSettings) {
+      if (operationRunning() || loading())
+        throw new Error(
+          "Wait for the current game operation to finish before changing settings."
+        );
+      const error = sophonSettingsError(settings);
+      if (error) throw new Error(error);
+      setLoading(true);
+      try {
+        if (settings.debugLogging !== downloader.settings().debugLogging)
+          await getSophonClient(settings.debugLogging);
+        await downloader.save(settings);
+      } finally {
+        setLoading(false);
+      }
+    },
     activity: stats.activity,
     history: stats.history,
     action,

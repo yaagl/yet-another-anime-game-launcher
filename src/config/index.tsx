@@ -40,6 +40,8 @@ import { createSignal, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
 import { createProxyHostConfig } from "@config/proxy-host";
+import { SophonSettingsPanel } from "./sophon";
+import type { SophonGame } from "../sophon/game";
 
 const IconSun = createIcon({
   viewBox: "0 0 24 24",
@@ -85,6 +87,7 @@ export async function createConfiguration({
   gameInstallDir,
   configForChannelClient,
   supportsD3d12 = false,
+  sophon,
   onCheckUpdate,
 }: {
   wine: Wine;
@@ -95,6 +98,7 @@ export async function createConfiguration({
     config: Partial<Config>
   ) => Promise<() => JSXElement>;
   supportsD3d12?: boolean;
+  sophon?: SophonGame;
   onCheckUpdate: () => void;
 }) {
   const config: Partial<Config> = {};
@@ -385,6 +389,9 @@ export async function createConfiguration({
                   <Tab {...tabStyle}>{locale.get("SETTING_GENERAL")}</Tab>
                   <Tab {...tabStyle}>{locale.get("SETTING_GAME")}</Tab>
                   <Tab {...tabStyle}>Wine</Tab>
+                  <Show when={sophon}>
+                    <Tab {...tabStyle}>Downloader</Tab>
+                  </Show>
                   <Show when={advanceSetting()}>
                     <Tab {...tabStyle}>{locale.get("SETTING_ADVANCED")}</Tab>
                   </Show>
@@ -498,6 +505,22 @@ export async function createConfiguration({
                     <QuickActionsPanel />
                   </HStack>
                 </TabPanel>
+
+                <Show when={sophon}>
+                  {game => (
+                    <TabPanel
+                      flex={1}
+                      p="$8"
+                      h="100%"
+                      overflowY="auto"
+                      bg="$neutral1"
+                    >
+                      <Box {...cardStyle} maxW="650px">
+                        <SophonSettingsPanel game={game()} />
+                      </Box>
+                    </TabPanel>
+                  )}
+                </Show>
 
                 {/* Advanced Tab */}
                 <Show when={advanceSetting()}>
