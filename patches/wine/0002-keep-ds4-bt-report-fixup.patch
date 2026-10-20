@@ -1,0 +1,35 @@
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -58,6 +58,7 @@
+ 
+ static struct bus_options options = {.devices = LIST_INIT(options.devices)};
+ static HANDLE driver_key;
++static BOOL keep_ds4_bluetooth_report_fixup;
+ 
+ struct hid_report
+ {
+@@ -1214,6 +1215,7 @@
+ 
+ static void bus_options_init(void)
+ {
++    keep_ds4_bluetooth_report_fixup = check_bus_option(L"KeepDS4BluetoothReportFixup", 0) == 1;
+     options.disable_sdl = !check_bus_option(L"Enable SDL", 1);
+     if (options.disable_sdl) TRACE("SDL devices disabled in registry\n");
+     options.disable_hidraw = check_bus_option(L"DisableHidraw", 0);
+@@ -1489,8 +1491,14 @@
+ 
+     if ((ext->report_fixups & HIDRAW_FIXUP_DUALSHOCK_BT))
+     {
+-        TRACE("Disabling report fixup for Bluetooth DualShock4 device %p\n", device);
+-        ext->report_fixups &= ~HIDRAW_FIXUP_DUALSHOCK_BT;
++        if (keep_ds4_bluetooth_report_fixup && ext->desc.is_hidraw &&
++            ext->desc.bus_type == BUS_TYPE_BLUETOOTH && ext->desc.vid == 0x054c && ext->desc.pid == 0x09cc)
++            TRACE_(ds4)("keep-fixup device=%p unix=%#I64x vid=054c pid=09cc\n", device, ext->unix_device);
++        else
++        {
++            TRACE("Disabling report fixup for Bluetooth DualShock4 device %p\n", device);
++            ext->report_fixups &= ~HIDRAW_FIXUP_DUALSHOCK_BT;
++        }
+     }
+ 
+     if ((ext->report_fixups & HIDRAW_FIXUP_DUALSENSE_BT))

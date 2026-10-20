@@ -1,0 +1,256 @@
+diff --git a/dlls/hid/hidd.c b/dlls/hid/hidd.c
+index af024b4..39605f0 100644
+--- a/dlls/hid/hidd.c
++++ b/dlls/hid/hidd.c
+@@ -36,8 +36,10 @@
+ #include "initguid.h"
+ #include "ddk/hidclass.h"
+ #include "ddk/hidsdi.h"
++#include "wine/hid.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(hid);
++WINE_DECLARE_DEBUG_CHANNEL(ds4);
+ 
+ static BOOL sync_ioctl(HANDLE file, DWORD code, void *in_buf, DWORD in_len, void *out_buf, DWORD out_len)
+ {
+@@ -157,6 +159,9 @@ BOOLEAN WINAPI HidD_GetPreparsedData( HANDLE file, PHIDP_PREPARSED_DATA *prepars
+         return FALSE;
+     }
+     *preparsed_data = data;
++    if (TRACE_ON(ds4) && info.VendorID == 0x054c && info.ProductID == 0x09cc &&
++        is_ds4_trace_descriptor( (struct hid_preparsed_data *)data ))
++        TRACE_(ds4)( "descriptor file=%p preparsed=%p vid=054c pid=09cc fingerprint=b3ad25ad\n", file, data );
+     return TRUE;
+ }
+ 
+diff --git a/dlls/hid/hidp.c b/dlls/hid/hidp.c
+index 27c2bef..d34e615 100644
+--- a/dlls/hid/hidp.c
++++ b/dlls/hid/hidp.c
+@@ -35,6 +35,7 @@
+ #include "wine/debug.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(hid);
++WINE_DECLARE_DEBUG_CHANNEL(ds4parse);
+ 
+ static NTSTATUS get_value_caps_range( struct hid_preparsed_data *preparsed, HIDP_REPORT_TYPE report_type, ULONG report_len,
+                                       const struct hid_value_caps **caps, const struct hid_value_caps **caps_end )
+@@ -996,10 +997,12 @@ NTSTATUS WINAPI HidP_GetData( HIDP_REPORT_TYPE report_type, HIDP_DATA *data, ULO
+     filter.report_id = report_buf[0];
+     status = enum_value_caps( preparsed, report_type, report_len, &filter, find_all_data, &params, &limit );
+     *data_len = params.data - data;
+-    if (status != HIDP_STATUS_SUCCESS) return status;
+-
+-    if (params.data > params.data_end) return HIDP_STATUS_BUFFER_TOO_SMALL;
+-    return HIDP_STATUS_SUCCESS;
++    if (status == HIDP_STATUS_SUCCESS && params.data > params.data_end) status = HIDP_STATUS_BUFFER_TOO_SMALL;
++    if (TRACE_ON(ds4parse) && report_type == HidP_Input && is_ds4_trace_descriptor( preparsed ))
++        TRACE_(ds4parse)( "parser preparsed=%p fingerprint=b3ad25ad id=%#x len=%lu status=%#lx controls=%lu sample=%s\n",
++                     preparsed_data, (BYTE)report_buf[0], report_len, status, *data_len,
++                     debugstr_an( report_buf, min( report_len, 12 ) ) );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI HidP_GetLinkCollectionNodes( HIDP_LINK_COLLECTION_NODE *nodes, ULONG *nodes_len, PHIDP_PREPARSED_DATA preparsed_data )
+diff --git a/dlls/win32u/rawinput.c b/dlls/win32u/rawinput.c
+index 6650d65..d3f69cf 100644
+--- a/dlls/win32u/rawinput.c
++++ b/dlls/win32u/rawinput.c
+@@ -36,6 +36,7 @@
+ #include "wine/debug.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(rawinput);
++WINE_DECLARE_DEBUG_CHANNEL(ds4);
+ 
+ #define WINE_MOUSE_HANDLE       ((HANDLE)1)
+ #define WINE_KEYBOARD_HANDLE    ((HANDLE)2)
+@@ -322,6 +323,31 @@ static struct device *find_device_from_handle( HANDLE handle, BOOL refresh )
+     return NULL;
+ }
+ 
++static void trace_ds4_rawinput( const RAWINPUT *input, const char *stage )
++{
++    const RAWHID *hid = &input->data.hid;
++    struct device *device;
++    UINT i;
++
++    if (!TRACE_ON(ds4) || input->header.dwType != RIM_TYPEHID ||
++        input->header.dwSize < offsetof(RAWINPUT, data.hid.bRawData) || !hid->dwSizeHid ||
++        hid->dwCount > (input->header.dwSize - offsetof(RAWINPUT, data.hid.bRawData)) / hid->dwSizeHid)
++        return;
++    pthread_mutex_lock( &rawinput_mutex );
++    device = find_device_from_handle( input->header.hDevice, FALSE );
++    if (device && device->info.dwType == RIM_TYPEHID &&
++        device->info.hid.dwVendorId == 0x054c && device->info.hid.dwProductId == 0x09cc &&
++        is_ds4_trace_descriptor( device->data ))
++        for (i = 0; i < hid->dwCount; ++i)
++        {
++            const BYTE *report = hid->bRawData + i * hid->dwSizeHid;
++            TRACE_(ds4)( "%s device=%p fingerprint=b3ad25ad id=%#x len=%u sample=%s\n",
++                         stage, input->header.hDevice, report[0], hid->dwSizeHid,
++                         debugstr_an( (const char *)report, min( hid->dwSizeHid, 12 ) ) );
++        }
++    pthread_mutex_unlock( &rawinput_mutex );
++}
++
+ /**********************************************************************
+  *         NtUserGetRawInputDeviceList   (win32u.@)
+  */
+@@ -430,7 +456,14 @@ UINT WINAPI NtUserGetRawInputDeviceInfo( HANDLE handle, UINT command, void *data
+                   preparsed->number_link_collection_nodes * sizeof(struct hid_collection_node);
+ 
+         if (preparsed && len <= data_len && data)
++        {
+             memcpy( data, preparsed, len );
++            if (TRACE_ON(ds4) && device->info.dwType == RIM_TYPEHID &&
++                device->info.hid.dwVendorId == 0x054c && device->info.hid.dwProductId == 0x09cc &&
++                is_ds4_trace_descriptor( preparsed ))
++                TRACE_(ds4)( "descriptor device=%p preparsed=%p vid=054c pid=09cc fingerprint=b3ad25ad\n",
++                             handle, data );
++        }
+         *data_size = len;
+         break;
+     }
+@@ -455,7 +488,7 @@ UINT WINAPI NtUserGetRawInputDeviceInfo( HANDLE handle, UINT command, void *data
+ UINT WINAPI NtUserGetRawInputBuffer( RAWINPUT *data, UINT *data_size, UINT header_size )
+ {
+     struct user_thread_info *thread_info;
+-    UINT count;
++    UINT count, capacity;
+ 
+     TRACE( "data %p, data_size %p, header_size %u\n", data, data_size, header_size );
+ 
+@@ -474,6 +507,7 @@ UINT WINAPI NtUserGetRawInputBuffer( RAWINPUT *data, UINT *data_size, UINT heade
+     /* with old WOW64 mode we didn't go through the WOW64 thunks, patch the header size here */
+     if (NtCurrentTeb()->WowTebOffset) header_size = sizeof(RAWINPUTHEADER64);
+ 
++    capacity = *data_size;
+     thread_info = get_user_thread_info();
+     SERVER_START_REQ( get_rawinput_buffer )
+     {
+@@ -486,6 +520,18 @@ UINT WINAPI NtUserGetRawInputBuffer( RAWINPUT *data, UINT *data_size, UINT heade
+     }
+     SERVER_END_REQ;
+ 
++    if (TRACE_ON(ds4) && data && count != ~0u && header_size == sizeof(RAWINPUTHEADER))
++    {
++        UINT i;
++        SIZE_T offset = 0;
++        for (i = 0; i < count && offset <= capacity && capacity - offset >= sizeof(RAWINPUTHEADER); ++i)
++        {
++            RAWINPUT *input = (RAWINPUT *)((char *)data + offset);
++            if (input->header.dwSize < sizeof(RAWINPUTHEADER) || input->header.dwSize > capacity - offset) break;
++            trace_ds4_rawinput( input, "raw-buffer" );
++            offset += ((SIZE_T)input->header.dwSize + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
++        }
++    }
+     return count;
+ }
+ 
+@@ -551,6 +597,7 @@ UINT WINAPI NtUserGetRawInputData( HRAWINPUT handle, UINT command, void *data, U
+         if (size < offsetof(RAWHID, bRawData[0])) goto failed;
+         if (size != offsetof(RAWHID, bRawData[hid->dwCount * hid->dwSizeHid])) goto failed;
+         memcpy( &rawinput->data.hid, msg_data + 1, size );
++        trace_ds4_rawinput( rawinput, "raw-read" );
+     }
+     else
+     {
+diff --git a/dlls/winebus.sys/main.c b/dlls/winebus.sys/main.c
+index 4e2227b..eaa1f76 100644
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -45,6 +45,7 @@
+ DEFINE_GUID(GUID_NULL,0,0,0,0,0,0,0,0,0,0,0);
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(hid);
++WINE_DECLARE_DEBUG_CHANNEL(ds4);
+ 
+ static DRIVER_OBJECT *driver_obj;
+ 
+@@ -99,6 +100,12 @@ struct device_extension
+     UINT64 unix_device;
+ };
+ 
++static BOOL is_ds4_trace_device( const struct device_extension *ext )
++{
++    return ext->desc.is_hidraw && ext->desc.bus_type == BUS_TYPE_BLUETOOTH &&
++           ext->desc.vid == 0x054c && ext->desc.pid == 0x09cc;
++}
++
+ static CRITICAL_SECTION device_list_cs;
+ static CRITICAL_SECTION_DEBUG critsect_debug =
+ {
+@@ -614,6 +621,11 @@ static BOOL deliver_next_report(struct device_extension *ext, IRP *irp)
+     irp->IoStatus.Information = report->length;
+     irp->IoStatus.Status = STATUS_SUCCESS;
+ 
++    if (is_ds4_trace_device(ext))
++        TRACE_(ds4)("deliver device=%p unix=%#I64x vid=054c pid=09cc id=%#x len=%lu sample=%s\n",
++                    ext->device, ext->unix_device, report->length ? report->buffer[0] : 0, report->length,
++                    debugstr_an((char *)report->buffer, min(report->length, 12)));
++
+     if (TRACE_ON(hid))
+     {
+         TRACE("device %p/%#I64x input report length %lu:\n", ext->device, ext->unix_device, report->length);
+@@ -638,7 +650,12 @@ static void process_hid_report(DEVICE_OBJECT *device, BYTE *report_buf, DWORD re
+     struct hid_report *report, *last_report;
+     IRP *irp;
+ 
++    if (!report_len) return;
+     TRACE("device %p report_buf %p (%#x), report_len %#lx\n", device, report_buf, *report_buf, report_len);
++    if (is_ds4_trace_device(ext))
++        TRACE_(ds4)("receive device=%p unix=%#I64x vid=054c pid=09cc id=%#x len=%lu fixups=%#x sample=%s\n",
++                    device, ext->unix_device, report_buf[0], report_len, ext->report_fixups,
++                    debugstr_an((char *)report_buf, min(report_len, 12)));
+ 
+     if (!(report = RtlAllocateHeap(GetProcessHeap(), 0, size))) return;
+     memcpy(report->buffer, report_buf, report_len);
+@@ -1462,6 +1479,10 @@ static void hidraw_disable_report_fixups(DEVICE_OBJECT *device)
+ {
+     struct device_extension *ext = (struct device_extension *)device->DeviceExtension;
+ 
++    if (is_ds4_trace_device(ext))
++        TRACE_(ds4)("disable-fixup device=%p unix=%#I64x vid=054c pid=09cc before=%#x\n",
++                    device, ext->unix_device, ext->report_fixups);
++
+     /* FIXME: we may want to validate CRC at the end of the outbound HID reports,
+      * as controllers do not switch modes if it is incorrect.
+      */
+@@ -1622,6 +1643,9 @@ static NTSTATUS WINAPI hid_internal_dispatch(DEVICE_OBJECT *device, IRP *irp)
+         {
+             HID_XFER_PACKET *packet = (HID_XFER_PACKET *)irp->UserBuffer;
+             unix_device_get_feature_report(device, packet, &irp->IoStatus);
++            if (is_ds4_trace_device(ext))
++                TRACE_(ds4)("feature device=%p unix=%#I64x vid=054c pid=09cc id=%u len=%lu status=%#lx\n",
++                            device, ext->unix_device, packet->reportId, packet->reportBufferLen, irp->IoStatus.Status);
+             if (!irp->IoStatus.Status) hidraw_disable_report_fixups(device);
+             if (!irp->IoStatus.Status && TRACE_ON(hid))
+             {
+diff --git a/include/wine/hid.h b/include/wine/hid.h
+index cb31bd6..64cd9d1 100644
+--- a/include/wine/hid.h
++++ b/include/wine/hid.h
+@@ -117,6 +117,23 @@ struct hid_preparsed_data
+ #define HID_FEATURE_VALUE_CAPS(d) ((d)->value_caps + (d)->feature_caps_start)
+ #define HID_COLLECTION_NODES(d) (struct hid_collection_node *)((char *)(d)->value_caps + (d)->caps_size)
+ 
++/* shortcut: local DS4 descriptor only; regenerate the fingerprint after descriptor changes. */
++static inline BOOL is_ds4_trace_descriptor( const struct hid_preparsed_data *data )
++{
++    const BYTE *bytes = (const BYTE *)data;
++    UINT i, size;
++    UINT32 hash = 2166136261u;
++
++    if (!data || memcmp( data->magic, "HidP KDR", 8 ) ||
++        data->usage_page != 1 || data->usage != 5 || data->input_report_byte_length != 547)
++        return FALSE;
++    size = FIELD_OFFSET(struct hid_preparsed_data, value_caps) + data->caps_size +
++           data->number_link_collection_nodes * sizeof(struct hid_collection_node);
++    if (size != 6404) return FALSE;
++    for (i = 0; i < size; ++i) hash = (hash ^ bytes[i]) * 16777619u;
++    return hash == 0xb3ad25ad;
++}
++
+ 
+ /* Wine-specific Digitizer page usages, not declared in hidusage.h */
+ /* From HID Usage Tables */
