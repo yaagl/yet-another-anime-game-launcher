@@ -25,6 +25,10 @@ export async function createWine(options: {
     return await exec("cmd", [command, ...args]);
   }
 
+  async function winecfg(args: string[] = []) {
+    return await exec("winecfg", args, {}, resolve("winecfg.log"));
+  }
+
   async function exec(
     program: string,
     args: string[],
@@ -158,6 +162,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec2,
     waitUntilServerOff,
     cmd,
+    winecfg,
     toWinePath,
     prefix: options.prefix,
     openCmdWindow,
