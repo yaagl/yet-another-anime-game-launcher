@@ -10,6 +10,7 @@ import {
   setKey,
   getKeyOrDefault,
   exit,
+  open,
   rawString,
 } from "./utils";
 import { createAria2Retry } from "./aria2";
@@ -178,12 +179,15 @@ export async function createApp() {
             <ModalContent>
               <ModalHeader>{locale.get("NEW_VERSION_AVAILABLE")}</ModalHeader>
               <ModalBody>
-                <Text mb={"$4"} style={{ "white-space": "pre-wrap" }}>
-                  {locale.format("NEW_VERSION_AVAILABLE_DESC", [
-                    pendingUpdateInfo().version!,
-                    pendingUpdateInfo().description!,
-                  ])}
+                <Text mb={"$2"} style={{ "white-space": "pre-wrap" }}>
+                  {locale
+                    .format("NEW_VERSION_AVAILABLE_DESC", [
+                      pendingUpdateInfo().version ?? "",
+                      "",
+                    ])
+                    .trim()}
                 </Text>
+                {renderMarkdown(pendingUpdateInfo().description ?? "")}
               </ModalBody>
               <ModalFooter>
                 <Button
@@ -231,4 +235,130 @@ export async function createApp() {
       </>
     );
   };
+}
+
+function renderInline(text: string): JSXElement[] {
+  const nodes: JSXElement[] = [];
+  const tokenRe =
+    /`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\*\*([^*]+)\*\*|__([^_]+)__|~~([^~]+)~~|\*([^*]+)\*|_([^_]+)_/g;
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = tokenRe.exec(text)) !== null) {
+    if (m.index > lastIndex) {
+      nodes.push(text.slice(lastIndex, m.index));
+    }
+    if (m[1] !== undefined) {
+      nodes.push(<code>{m[1]}</code>);
+    } else if (m[2] !== undefined && m[3] !== undefined) {
+      const url = m[3];
+      nodes.push(
+        <a
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            open(url);
+          }}
+        >
+          {m[2]}
+        </a>
+      );
+    } else if (m[4] !== undefined || m[5] !== undefined) {
+      nodes.push(<strong>{m[4] ?? m[5]}</strong>);
+    } else if (m[6] !== undefined) {
+      nodes.push(<del>{m[6]}</del>);
+    } else if (m[7] !== undefined || m[8] !== undefined) {
+      nodes.push(<em>{m[7] ?? m[8]}</em>);
+    }
+    lastIndex = tokenRe.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+  return nodes;
+}
+
+function renderMarkdown(md: string): JSXElement {
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  const blocks: JSXElement[] = [];
+  let listItems: JSXElement[] = [];
+  let listOrdered = false;
+  let codeLines: string[] | null = null;
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    const items = listItems;
+    listItems = [];
+    blocks.push(listOrdered ? <ol>{items}</ol> : <ul>{items}</ul>);
+  };
+
+  for (const rawLine of lines) {
+    if (rawLine.trimStart().startsWith("```")) {
+      flushList();
+      if (codeLines === null) {
+        codeLines = [];
+      } else {
+        const code = codeLines.join("\n");
+        codeLines = null;
+        blocks.push(
+          <pre>
+            <code>{code}</code>
+          </pre>
+        );
+      }
+      continue;
+    }
+    if (codeLines !== null) {
+      codeLines.push(rawLine);
+      continue;
+    }
+    const line = rawLine.trim();
+    if (!line) {
+      flushList();
+      continue;
+    }
+    const ulMatch = rawLine.match(/^\s*[-*+]\s+(.*)$/);
+    if (ulMatch) {
+      if (listItems.length && listOrdered) flushList();
+      listOrdered = false;
+      listItems.push(<li>{renderInline(ulMatch[1])}</li>);
+      continue;
+    }
+    const olMatch = rawLine.match(/^\s*\d+\.\s+(.*)$/);
+    if (olMatch) {
+      if (listItems.length && !listOrdered) flushList();
+      listOrdered = true;
+      listItems.push(<li>{renderInline(olMatch[1])}</li>);
+      continue;
+    }
+    flushList();
+    const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (/^(?:---+|\*\*\*+|___+)$/.test(line)) {
+      blocks.push(<hr />);
+    } else if (headingMatch) {
+      const level = headingMatch[1].length;
+      const content = renderInline(headingMatch[2]);
+      blocks.push(
+        level === 1 ? (
+          <h2>{content}</h2>
+        ) : level === 2 ? (
+          <h3>{content}</h3>
+        ) : (
+          <h4>{content}</h4>
+        )
+      );
+    } else if (line.startsWith("> ")) {
+      blocks.push(<blockquote>{renderInline(line.slice(2))}</blockquote>);
+    } else {
+      blocks.push(<p>{renderInline(rawLine)}</p>);
+    }
+  }
+  flushList();
+  if (codeLines !== null) {
+    blocks.push(
+      <pre>
+        <code>{codeLines.join("\n")}</code>
+      </pre>
+    );
+  }
+  return <div class="update-markdown">{blocks}</div>;
 }

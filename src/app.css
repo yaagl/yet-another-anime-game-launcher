@@ -86,3 +86,77 @@ body {
 ::-webkit-scrollbar-thumb:active {
   box-shadow: inset 1px 1px 3px #a6a6a6;
 }
+
+.update-markdown {
+  max-height: 50vh;
+  overflow-y: auto;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.update-markdown h2,
+.update-markdown h3,
+.update-markdown h4 {
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+
+.update-markdown h2 {
+  font-size: 1.2em;
+}
+
+.update-markdown h3 {
+  font-size: 1.1em;
+}
+
+.update-markdown p,
+.update-markdown ul,
+.update-markdown ol,
+.update-markdown pre,
+.update-markdown blockquote {
+  margin: 0.4em 0;
+}
+
+.update-markdown ul,
+.update-markdown ol {
+  padding-left: 1.4em;
+}
+
+.update-markdown ul {
+  list-style-type: disc;
+}
+
+.update-markdown ol {
+  list-style-type: decimal;
+}
+
+.update-markdown code {
+  background: rgba(127, 127, 127, 0.15);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.update-markdown pre {
+  background: rgba(127, 127, 127, 0.12);
+  padding: 0.6em;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.update-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.update-markdown blockquote {
+  border-left: 3px solid rgba(127, 127, 127, 0.4);
+  padding-left: 0.75em;
+  opacity: 0.85;
+}
+
+.update-markdown a {
+  color: #3182ce;
+  text-decoration: underline;
+}
