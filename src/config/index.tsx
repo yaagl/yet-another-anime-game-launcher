@@ -47,6 +47,7 @@ import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
 import { createSignal, For, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
+import createMacOSGameMode from "./macos-game-mode";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
 import { createProxyHostConfig } from "@config/proxy-host";
 import { SophonSettingsPanel } from "./sophon";
@@ -161,6 +162,7 @@ export async function createConfiguration({
   const [UL] = await createLocaleConfig({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
+  const [GM] = await createMacOSGameMode({ locale, config });
 
   const [PRE] = await createProxyEnabledConfig({ locale, config });
   const [PRH] = await createProxyHostConfig({ locale, config });
@@ -441,6 +443,8 @@ export async function createConfiguration({
                             <R />
                             <Divider />
                             <LC />
+                            <Divider />
+                            <GM />
                           </VStack>
                         </Box>
                         <Box {...cardStyle}>

@@ -87,6 +87,9 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const gameMode = config.macosGameMode
+      ? await wine.prepareGameModeLaunch("Honkai: Star Rail", server.id)
+      : { env: {} };
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
@@ -112,8 +115,10 @@ cd /d "${wine.toWinePath(gameDir)}"
               HTTPS_PROXY: config.proxyHost,
             }
           : {}),
+        ...gameMode.env,
       },
-      logfile
+      logfile,
+      gameMode.loader
     );
     await wine.waitUntilServerOff();
   } catch (e: unknown) {
