@@ -153,4 +153,10 @@ export const ja_JP: typeof zh_CN = {
   SETTING_UNINSTALL_YAAGL: "Yaaglを完全にアンインストール",
   SETTING_UNINSTALL_YAAGL_DESC:
     "Yaaglを完全にアンインストールしてもよろしいですか？これにより、すべての設定、Wine プレフィックス、およびデータが削除されます。ゲームファイルは削除されません。Yaaglは直ちに終了します。後でアプリケーションフォルダから Yaagl.app を手動で削除することを忘れないでください。",
+  SETUP_TITLE: "初期設定",
+  SETUP_DESC:
+    "環境ファイルをダウンロードする前に、設定方法を選択してください。",
+  SETUP_RECOMMENDED: "推奨設定",
+  SETUP_CUSTOM: "カスタム設定",
+  SETUP_CONTINUE: "続行",
 };

@@ -19,10 +19,12 @@ export async function createD3D12({
   locale,
   config,
   wine,
+  supportsD3d12,
 }: {
   locale: Locale;
   config: Partial<Config>;
-  wine: Wine;
+  wine?: Wine;
+  supportsD3d12?: () => boolean;
 }) {
   try {
     config.useD3D12 = (await getKey(CONFIG_KEY)) == "true";
@@ -57,7 +59,11 @@ export async function createD3D12({
           <Box>
             <Checkbox
               checked={value()}
-              disabled={wine.attributes.supportsD3d12 !== true}
+              disabled={
+                supportsD3d12
+                  ? !supportsD3d12()
+                  : wine?.attributes.supportsD3d12 !== true
+              }
               onChange={() => setValue(x => !x)}
               size="md"
             >

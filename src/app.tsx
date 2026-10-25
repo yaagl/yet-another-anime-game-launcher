@@ -150,6 +150,7 @@ export async function createApp() {
       aria2,
       wineAbsPrefix: prefixPath,
       wineDistro: wineStatus.wineDistribution,
+      wineUpdate: wineStatus.wineUpdate,
       locale,
     });
   }

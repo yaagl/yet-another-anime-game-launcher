@@ -1,5 +1,6 @@
 import { Aria2 } from "@aria2";
 import { CommonUpdateProgram, createCommonUpdateUI } from "@common-update-ui";
+import { applyRecommendedSettings, RECOMMENDED_WINE_TAG } from "@config";
 import { Locale } from "@locale";
 import {
   rmrf_dangerously,
@@ -24,6 +25,7 @@ import { getWineDistributions } from "./distro";
 import type { WineDistribution } from "./distro";
 import { addCertsToWine } from "./cert";
 import { createD3DMetalLicenseUI } from "./d3dmetal-license";
+import { createInitialSetupUI } from "./initial-setup";
 import {
   D3DMETAL_RUNTIME_ID,
   loadD3DMetalLicense,
@@ -35,22 +37,27 @@ export async function createWineInstallProgram({
   aria2,
   wineAbsPrefix,
   wineDistro,
+  wineUpdate = false,
   locale,
 }: {
   aria2: Aria2;
   locale: Locale;
   wineAbsPrefix: string;
   wineDistro: WineDistribution;
+  wineUpdate?: boolean;
 }) {
-  async function* program(acceptedAppleLicense = false): CommonUpdateProgram {
-    const isOurRuntime = wineDistro.id === D3DMETAL_RUNTIME_ID;
+  async function* program(
+    targetDistro: WineDistribution,
+    acceptedAppleLicense = false
+  ): CommonUpdateProgram {
+    const isOurRuntime = targetDistro.id === D3DMETAL_RUNTIME_ID;
     if (isOurRuntime && !acceptedAppleLicense) {
       throw new Error(
         "Apple license consent is required before installing D3DMetal"
       );
     }
     const wineBinaryDir = resolve("./wine");
-    const isXZ = wineDistro.remoteUrl.endsWith(".xz");
+    const isXZ = targetDistro.remoteUrl.endsWith(".xz");
     const suffix = isOurRuntime ? ".d3dmetal." + generateRandomString(16) : "";
     const wineTarPath = resolve(
       isOurRuntime
@@ -63,9 +70,9 @@ export async function createWineInstallProgram({
       if (!isOurRuntime) await rmrf_dangerously(wineAbsPrefix);
       yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
       for await (const progress of aria2.doStreamingDownload({
-        uri: wineDistro.remoteUrl,
+        uri: targetDistro.remoteUrl,
         absDst: wineTarPath,
-        checksum: wineDistro.checksum,
+        checksum: targetDistro.checksum,
       })) {
         if (!isOurRuntime || progress.totalLength > BigInt(0)) {
           yield [
@@ -89,7 +96,7 @@ export async function createWineInstallProgram({
         await tar_extract_directory(
           wineTarPath,
           stage,
-          wineDistro.attributes.winePath ?? "wine",
+          targetDistro.attributes.winePath ?? "wine",
           true
         );
         await prepareD3DMetalWine(stage);
@@ -100,11 +107,11 @@ export async function createWineInstallProgram({
       } else {
         await rmrf_dangerously(wineBinaryDir);
         await exec(["mkdir", "-p", wineBinaryDir]);
-        if (wineDistro.attributes.winePath) {
+        if (targetDistro.attributes.winePath) {
           await tar_extract_directory(
             resolve("./wine.tar." + (isXZ ? "xz" : "gz")),
             wineBinaryDir,
-            wineDistro.attributes.winePath,
+            targetDistro.attributes.winePath,
             isXZ
           );
         } else {
@@ -128,7 +135,7 @@ export async function createWineInstallProgram({
 
       const wine = await createWine({
         prefix: wineAbsPrefix,
-        distro: wineDistro,
+        distro: targetDistro,
       });
       try {
         await wine.exec("wineboot", ["-u"], {}, resolve("wineboot.log"));
@@ -153,9 +160,9 @@ export async function createWineInstallProgram({
 
       // Keep a pending update selector on interrupted native installs until
       // the installed tag is recorded and the runtime is ready.
-      if (isOurRuntime) await setKey("wine_tag", wineDistro.id);
+      if (isOurRuntime) await setKey("wine_tag", targetDistro.id);
       await setKey("wine_state", "ready");
-      if (!isOurRuntime) await setKey("wine_tag", wineDistro.id);
+      if (!isOurRuntime) await setKey("wine_tag", targetDistro.id);
       await setKey("wine_update_url", null);
       await setKey("wine_update_tag", null);
       const netbiosname = `DESKTOP-${generateRandomString(7)}`; // exactly 15 chars
@@ -169,31 +176,66 @@ export async function createWineInstallProgram({
     }
   }
 
-  if (wineDistro.id === D3DMETAL_RUNTIME_ID) {
-    return createD3DMetalLicenseUI({
-      locale,
-      loadLicense: () => loadD3DMetalLicense(aria2),
-      onAccept: () => createCommonUpdateUI(locale, () => program(true)),
-      onCancel: async () => {
-        const previousTag = await getKeyOrDefault("wine_tag", "");
-        if (
-          previousTag !== D3DMETAL_RUNTIME_ID &&
-          (await getWineDistributions()).some(x => x.id === previousTag) &&
-          (await fileOrDirExists(resolve("./wine"))) &&
-          (await fileOrDirExists(wineAbsPrefix)) &&
-          !(await fileOrDirExists(
-            resolve("./wine/lib/external/prepared-d3dmetal.json")
-          ))
-        ) {
-          await setKey("wine_state", "ready");
-          await setKey("wine_update_tag", null);
-          await setKey("wine_update_url", null);
-          await _safeRelaunch();
-          return;
-        }
-        await Neutralino.app.exit(0);
-      },
-    });
+  function createInstallerForDistro(
+    targetDistro: WineDistribution,
+    onBack?: () => void
+  ) {
+    if (targetDistro.id === D3DMETAL_RUNTIME_ID) {
+      return createD3DMetalLicenseUI({
+        locale,
+        loadLicense: () => loadD3DMetalLicense(aria2),
+        onAccept: () =>
+          createCommonUpdateUI(locale, () => program(targetDistro, true)),
+        onCancel: async () => {
+          if (onBack) {
+            await setKey("wine_state", null);
+            await setKey("wine_update_tag", null);
+            await setKey("wine_update_url", null);
+            onBack();
+            return;
+          }
+          const previousTag = await getKeyOrDefault("wine_tag", "");
+          if (
+            previousTag !== D3DMETAL_RUNTIME_ID &&
+            (await getWineDistributions()).some(x => x.id === previousTag) &&
+            (await fileOrDirExists(resolve("./wine"))) &&
+            (await fileOrDirExists(wineAbsPrefix)) &&
+            !(await fileOrDirExists(
+              resolve("./wine/lib/external/prepared-d3dmetal.json")
+            ))
+          ) {
+            await setKey("wine_state", "ready");
+            await setKey("wine_update_tag", null);
+            await setKey("wine_update_url", null);
+            await _safeRelaunch();
+            return;
+          }
+          await Neutralino.app.exit(0);
+        },
+      });
+    }
+    return createCommonUpdateUI(locale, () => program(targetDistro));
   }
-  return createCommonUpdateUI(locale, () => program());
+
+  if (wineUpdate) {
+    return createInstallerForDistro(wineDistro);
+  }
+
+  return await createInitialSetupUI({
+    locale,
+    defaultWineDistro: wineDistro,
+    onSelectRecommended: async onBack => {
+      await applyRecommendedSettings();
+      const versions = await getWineDistributions();
+      const recommendedDistro =
+        versions.find(x => x.id === RECOMMENDED_WINE_TAG) ?? wineDistro;
+      return createInstallerForDistro(recommendedDistro, onBack);
+    },
+    onSelectCustom: async (chosenDistro, onBack) => {
+      await setKey("wine_state", "update");
+      await setKey("wine_update_tag", chosenDistro.id);
+      await setKey("wine_update_url", chosenDistro.remoteUrl);
+      return createInstallerForDistro(chosenDistro, onBack);
+    },
+  });
 }

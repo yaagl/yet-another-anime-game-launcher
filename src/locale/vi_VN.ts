@@ -151,4 +151,10 @@ export const vi_VN: typeof zh_CN = {
   SETTING_UNINSTALL_YAAGL: "Gỡ cài đặt hoàn toàn Yaagl",
   SETTING_UNINSTALL_YAAGL_DESC:
     "Bạn có chắc chắn muốn gỡ cài đặt hoàn toàn Yaagl không? Điều này sẽ xóa toàn bộ cấu hình, tiền tố Wine và dữ liệu. Các tệp trò chơi của bạn sẽ KHÔNG bị xóa. Yaagl sẽ đóng ngay lập tức. Vui lòng nhớ xóa thủ công tệp Yaagl.app khỏi thư mục Ứng dụng của bạn sau đó.",
+  SETUP_TITLE: "Thiết lập ban đầu",
+  SETUP_DESC:
+    "Chọn cách bạn muốn cấu hình môi trường Wine trước khi tải xuống.",
+  SETUP_RECOMMENDED: "Cài đặt đề xuất",
+  SETUP_CUSTOM: "Cài đặt tùy chỉnh",
+  SETUP_CONTINUE: "Tiếp tục",
 };

@@ -156,4 +156,10 @@ export const fr_FR: typeof zh_CN = {
   SETTING_UNINSTALL_YAAGL: "Désinstaller complètement Yaagl",
   SETTING_UNINSTALL_YAAGL_DESC:
     "Êtes-vous sûr de vouloir désinstaller complètement Yaagl ? Cela supprimera toute la configuration, les préfixes Wine et les données. Vos fichiers de jeu NE SERONT PAS supprimés. Yaagl se fermera immédiatement. N'oubliez pas de supprimer manuellement l'application Yaagl.app de votre dossier Applications par la suite.",
+  SETUP_TITLE: "Configuration initiale",
+  SETUP_DESC:
+    "Choisissez comment vous souhaitez configurer l'environnement Wine avant le téléchargement.",
+  SETUP_RECOMMENDED: "Paramètres recommandés",
+  SETUP_CUSTOM: "Paramètres personnalisés",
+  SETUP_CONTINUE: "Continuer",
 };

@@ -145,4 +145,9 @@ export const zh_CN = {
   SETTING_UNINSTALL_YAAGL: "彻底卸载 Yaagl",
   SETTING_UNINSTALL_YAAGL_DESC:
     "你确定要彻底卸载 Yaagl 吗？这将删除所有配置、Wine 容器及数据。你的游戏文件不会被删除。Yaagl 将立即关闭并清除数据。请记得在此之后手动删除应用程序文件夹中的 Yaagl.app。",
+  SETUP_TITLE: "初始设置",
+  SETUP_DESC: "在下载环境文件之前，请选择您的配置方式。",
+  SETUP_RECOMMENDED: "推荐设置",
+  SETUP_CUSTOM: "自定义设置",
+  SETUP_CONTINUE: "继续并安装",
 };

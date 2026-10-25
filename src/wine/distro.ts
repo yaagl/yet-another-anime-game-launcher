@@ -104,6 +104,7 @@ export async function getWineDistributions(): Promise<WineDistribution[]> {
 export type WineStatus =
   | {
       wineReady: false;
+      wineUpdate?: boolean;
       wineDistribution: WineDistribution;
     }
   | {
@@ -127,6 +128,7 @@ export async function checkWine(github: Github): Promise<WineStatus> {
       const update_wine_tag = await getKey("wine_update_tag");
       return {
         wineReady: false,
+        wineUpdate: true,
         wineDistribution:
           wine_versions.find(x => x.id == update_wine_tag) ?? defaultDistro,
       } as const;
@@ -139,12 +141,14 @@ export async function checkWine(github: Github): Promise<WineStatus> {
       // Force re-install for unknown wine version
       return {
         wineReady: false,
+        wineUpdate: false,
         wineDistribution: defaultDistro,
       };
     }
   } catch (e) {
     return {
       wineReady: false,
+      wineUpdate: false,
       wineDistribution: defaultDistro,
     } as const;
   }
