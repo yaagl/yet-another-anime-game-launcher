@@ -332,6 +332,43 @@ export function getCPUInfo() {
   return Neutralino.computer.getCPUInfo();
 }
 
+export async function getDisplayRefreshRate(): Promise<number> {
+  try {
+    const displays = await Neutralino.computer.getDisplays();
+    const primary = displays.find(d => d.refreshRate > 0);
+    if (primary && primary.refreshRate > 0) {
+      return Math.round(primary.refreshRate);
+    }
+  } catch {
+    // fallback below
+  }
+  return 60;
+}
+
+export function getDefaultPreferredMaxFrameRate(refreshRate: number): number {
+  const rate =
+    Number.isFinite(refreshRate) && refreshRate > 0
+      ? Math.round(refreshRate)
+      : 60;
+  return Math.ceil(rate / Math.max(1, Math.floor(rate / 60)));
+}
+
+export async function resolvePreferredMaxFrameRate(config: {
+  maxFrameRateCustom?: boolean;
+  maxFrameRate?: string;
+}): Promise<number> {
+  if (config.maxFrameRateCustom) {
+    const customRefreshRate = Number(config.maxFrameRate);
+    if (Number.isFinite(customRefreshRate)) {
+      if (customRefreshRate <= 0) {
+        return 0;
+      }
+      return getDefaultPreferredMaxFrameRate(customRefreshRate);
+    }
+  }
+  return 60;
+}
+
 export function open(url: string) {
   return Neutralino.os.open(url);
 }

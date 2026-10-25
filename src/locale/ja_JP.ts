@@ -160,4 +160,7 @@ export const ja_JP: typeof zh_CN = {
   SETUP_CUSTOM: "カスタム設定",
   SETUP_CONTINUE: "続行",
   FORCE_CLOSE: "強制終了",
+  SETTING_DXMT_MAX_FRAMERATE: "カスタムモニターリフレッシュレート (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "FPSが60未満に制限される場合（144Hzモニターで48FPSになるなど）、有効にしてモニターのリフレッシュレート（例：144）を入力してください。",
 };

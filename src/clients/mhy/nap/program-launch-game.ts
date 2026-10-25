@@ -12,6 +12,7 @@ import {
   log,
   exec,
   getKeyOrDefault,
+  resolvePreferredMaxFrameRate,
 } from "../../../utils";
 import { Wine } from "../../../wine";
 import { Config } from "@config";
@@ -97,6 +98,9 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const preferredMaxFrameRate = config.maxFrameRateCustom
+      ? await resolvePreferredMaxFrameRate(config)
+      : 0;
     await wine.exec2(
       config.steamPatch ? "C:\\windows\\system32\\steam.exe" : "cmd",
       config.steamPatch
@@ -113,6 +117,11 @@ cd /d "${wine.toWinePath(gameDir)}"
           ? {
               WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
+              ...(preferredMaxFrameRate > 0
+                ? {
+                    DXMT_CONFIG: `d3d11.preferredMaxFrameRate=${preferredMaxFrameRate};`,
+                  }
+                : {}),
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
               GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
             }

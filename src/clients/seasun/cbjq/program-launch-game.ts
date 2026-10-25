@@ -11,6 +11,7 @@ import {
   forceMove,
   stats,
   exec,
+  resolvePreferredMaxFrameRate,
 } from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
@@ -51,6 +52,7 @@ cd /d "${wine.toWinePath(gameDir)}"
     yield ["setStateText", "GAME_RUNNING"];
     const logfile = resolve(`./logs/game_${Date.now()}.log`);
     const yaaglDir = resolve("./");
+    const preferredMaxFrameRate = await resolvePreferredMaxFrameRate(config);
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
@@ -62,7 +64,11 @@ cd /d "${wine.toWinePath(gameDir)}"
           ? {
               WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
-              DXMT_CONFIG: "d3d11.preferredMaxFrameRate=60;",
+              ...(preferredMaxFrameRate > 0
+                ? {
+                    DXMT_CONFIG: `d3d11.preferredMaxFrameRate=${preferredMaxFrameRate};`,
+                  }
+                : {}),
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
               GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",
             }

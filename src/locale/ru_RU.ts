@@ -159,4 +159,8 @@ export const ru_RU: typeof zh_CN = {
   SETUP_CUSTOM: "Пользовательские настройки",
   SETUP_CONTINUE: "Продолжить",
   FORCE_CLOSE: "Принудительно закрыть",
+  SETTING_DXMT_MAX_FRAMERATE:
+    "Пользовательская частота обновления монитора (Гц)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "Включите и введите частоту обновления монитора (например, 144 для 144Гц дисплея), если FPS ограничен ниже 60.",
 };

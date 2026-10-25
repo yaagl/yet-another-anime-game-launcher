@@ -160,4 +160,8 @@ export const de_DE: typeof zh_CN = {
   SETUP_CUSTOM: "Benutzerdefinierte Einstellungen",
   SETUP_CONTINUE: "Weiter",
   FORCE_CLOSE: "Beenden erzwingen",
+  SETTING_DXMT_MAX_FRAMERATE:
+    "Benutzerdefinierte Monitor-Bildwiederholfrequenz (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "Aktivieren und geben Sie die Bildwiederholfrequenz Ihres Monitors ein (z. B. 144 für ein 144Hz-Display), falls Ihre FPS unter 60 begrenzt sind.",
 };

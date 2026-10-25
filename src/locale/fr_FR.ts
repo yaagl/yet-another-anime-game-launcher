@@ -163,4 +163,8 @@ export const fr_FR: typeof zh_CN = {
   SETUP_CUSTOM: "Paramètres personnalisés",
   SETUP_CONTINUE: "Continuer",
   FORCE_CLOSE: "Forcer la fermeture",
+  SETTING_DXMT_MAX_FRAMERATE:
+    "Taux de rafraîchissement du moniteur personnalisé (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "Activez et entrez le taux de rafraîchissement de votre moniteur (ex. 144 pour un écran 144Hz) si vos FPS sont bloqués sous 60.",
 };

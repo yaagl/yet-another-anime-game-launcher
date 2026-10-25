@@ -156,4 +156,7 @@ export const th_TH: typeof zh_CN = {
   SETUP_CUSTOM: "การตั้งค่าแบบกำหนดเอง",
   SETUP_CONTINUE: "ดำเนินการต่อ",
   FORCE_CLOSE: "บังคับปิด",
+  SETTING_DXMT_MAX_FRAMERATE: "กำหนดอัตรารีเฟรชหน้าจอเอง (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "เปิดใช้งานและป้อนอัตรารีเฟรชของจอภาพ (เช่น 144 สำหรับหน้าจอ 144Hz) หาก FPS ของคุณถูกจำกัดไว้ต่ำกว่า 60",
 };

@@ -158,4 +158,7 @@ export const vi_VN: typeof zh_CN = {
   SETUP_CUSTOM: "Cài đặt tùy chỉnh",
   SETUP_CONTINUE: "Tiếp tục",
   FORCE_CLOSE: "Buộc đóng",
+  SETTING_DXMT_MAX_FRAMERATE: "Tùy chỉnh tần số quét màn hình (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "Bật và nhập tần số quét màn hình của bạn (ví dụ: 144 cho màn hình 144Hz) nếu FPS bị giới hạn dưới 60.",
 };

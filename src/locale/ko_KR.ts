@@ -159,4 +159,7 @@ export const ko_KR: typeof zh_CN = {
   SETUP_CUSTOM: "사용자 지정 설정",
   SETUP_CONTINUE: "계속",
   FORCE_CLOSE: "강제 종료",
+  SETTING_DXMT_MAX_FRAMERATE: "사용자 지정 모니터 주사율 (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "FPS가 60 미만으로 제한되는 경우(예: 144Hz 모니터에서 48 FPS 고정), 이 옵션을 켜고 모니터의 주사율(예: 144)을 입력하세요.",
 };

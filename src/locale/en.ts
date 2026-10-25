@@ -160,4 +160,7 @@ export const en: typeof zh_CN = {
   SETUP_CUSTOM: "Custom Settings",
   SETUP_CONTINUE: "Continue",
   FORCE_CLOSE: "Force Close",
+  SETTING_DXMT_MAX_FRAMERATE: "Custom Monitor Refresh Rate (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "Enable and enter your monitor's refresh rate (e.g. 144 for a 144Hz display) if your FPS is capped below 60.",
 };

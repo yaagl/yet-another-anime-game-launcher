@@ -42,6 +42,7 @@ import { createRetinaConfig } from "./retina";
 import { createLeftCmdConfig } from "./left-cmd";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createD3D12 } from "./d3d12";
+import { createMaxFrameRateConfig } from "./max-framerate";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
@@ -149,6 +150,7 @@ export async function createConfiguration({
     config,
   });
   const [D3D12] = await createD3D12({ locale, config, wine });
+  const [MFR] = await createMaxFrameRateConfig({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -488,6 +490,7 @@ export async function createConfiguration({
                       <Box {...cardStyle} maxW="650px">
                         <VStack spacing="$4" alignItems="stretch">
                           <ChannelClientConfig />
+                          <MFR />
                           <Show when={supportsD3d12}>
                             <Divider />
                             <D3D12 />
@@ -656,6 +659,7 @@ export async function createInitialSetupConfiguration({
     config,
     supportsD3d12: () => selectedDistro().attributes.supportsD3d12 === true,
   });
+  const [MFR] = await createMaxFrameRateConfig({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
@@ -951,6 +955,7 @@ export async function createInitialSetupConfiguration({
                       <Box {...cardStyle} maxW="650px">
                         <VStack spacing="$4" alignItems="stretch">
                           <GameItems />
+                          <MFR />
                           <Show when={supportsD3d12}>
                             <Divider />
                             <D3D12 />

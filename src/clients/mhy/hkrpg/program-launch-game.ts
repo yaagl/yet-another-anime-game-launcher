@@ -12,6 +12,7 @@ import {
   log,
   exec,
   getKeyOrDefault,
+  resolvePreferredMaxFrameRate,
 } from "@utils";
 import { Wine } from "@wine";
 import { Config } from "@config";
@@ -87,6 +88,7 @@ cd /d "${wine.toWinePath(gameDir)}"
       );
     }
 
+    const preferredMaxFrameRate = await resolvePreferredMaxFrameRate(config);
     await wine.exec2(
       "cmd",
       ["/c", `${wine.toWinePath(resolve("./config.bat"))}`],
@@ -97,8 +99,13 @@ cd /d "${wine.toWinePath(gameDir)}"
           ? {
               WINEMSYNC: "1",
               DXMT_LOG_PATH: yaaglDir,
-              DXMT_CONFIG:
-                "d3d11.preferredMaxFrameRate=60;dxgi.customVendorId=10de;dxgi.customDeviceId=2684",
+              DXMT_CONFIG: [
+                ...(preferredMaxFrameRate > 0
+                  ? [`d3d11.preferredMaxFrameRate=${preferredMaxFrameRate}`]
+                  : []),
+                "dxgi.customVendorId=10de",
+                "dxgi.customDeviceId=2684",
+              ].join(";"),
               DXMT_CONFIG_FILE: join(yaaglDir, "dxmt.conf"),
               DXMT_ENABLE_NVEXT: "1",
               GST_PLUGIN_FEATURE_RANK: "atdec:MAX,avdec_h264:MAX",

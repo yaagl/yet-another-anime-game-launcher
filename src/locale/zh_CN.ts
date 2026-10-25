@@ -151,4 +151,7 @@ export const zh_CN = {
   SETUP_CUSTOM: "自定义设置",
   SETUP_CONTINUE: "继续并安装",
   FORCE_CLOSE: "强制关闭",
+  SETTING_DXMT_MAX_FRAMERATE: "自定义显示器刷新率 (Hz)",
+  SETTING_DXMT_MAX_FRAMERATE_DESC:
+    "如果高刷屏幕下帧率受限（如 144Hz 屏幕被锁 48 FPS），请启用并输入您的显示器刷新率（例如 144）。",
 };
