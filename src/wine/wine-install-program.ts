@@ -30,6 +30,7 @@ import {
   prepareD3DMetalWine,
   verifyD3DMetalArchive,
 } from "./d3dmetal";
+import { DS4_RUNTIME_ID, installDS4Runtime, restoreDS4Runtime } from "./ds4";
 
 export async function createWineInstallProgram({
   aria2,
@@ -43,11 +44,26 @@ export async function createWineInstallProgram({
   wineDistro: WineDistribution;
 }) {
   async function* program(acceptedAppleLicense = false): CommonUpdateProgram {
+    if (wineDistro.id === DS4_RUNTIME_ID) {
+      yield ["setStateText", "CONFIGURING_ENVIRONMENT"];
+      yield ["setUndeterminedProgress"];
+      await installDS4Runtime(wineAbsPrefix);
+      await setKey("wine_tag", DS4_RUNTIME_ID);
+      await setKey("wine_state", "ready");
+      await setKey("wine_update_tag", null);
+      await setKey("wine_update_url", null);
+      yield ["setStateText", "INSTALL_DONE"];
+      return;
+    }
     const isOurRuntime = wineDistro.id === D3DMETAL_RUNTIME_ID;
     if (isOurRuntime && !acceptedAppleLicense) {
       throw new Error(
         "Apple license consent is required before installing D3DMetal"
       );
+    }
+    if (await restoreDS4Runtime(wineAbsPrefix, wineDistro.id)) {
+      yield ["setStateText", "INSTALL_DONE"];
+      return;
     }
     const wineBinaryDir = resolve("./wine");
     const isXZ = wineDistro.remoteUrl.endsWith(".xz");

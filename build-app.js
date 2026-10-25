@@ -265,6 +265,22 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
       path.basename(source) !== "sophon_server" &&
       (includeSophon || path.basename(source) !== "sophon"),
   });
+  if (includeSophon && process.env["YAAGL_DS4_RUNTIME"]) {
+    const ds4 = path.resolve(process.env["YAAGL_DS4_RUNTIME"]);
+    const manifest = await fs.readJSON(path.join(ds4, "manifest.json"));
+    const archive = path.join(ds4, "runtime.tar.gz");
+    const { stdout } = await execa("/usr/bin/shasum", ["-a", "256", archive]);
+    if (
+      manifest.id !== "11.0-dxmt-ds4-bluetooth-1" ||
+      stdout.trim().split(/\s+/)[0].replace(/^\\/, "") !== manifest.archiveSha256
+    ) {
+      throw new Error("Invalid bundled DS4 runtime; run scripts/package_ds4_runtime.py");
+    }
+    await fs.ensureDir(path.join(sidecarDst, "ds4-runtime"));
+    for (const name of ["manifest.json", "runtime.tar.gz"]) {
+      await fs.copy(path.join(ds4, name), path.join(sidecarDst, "ds4-runtime", name));
+    }
+  }
   // Remove protonextras for hkrpg
   if (["hkrpgcn", "hkrpgos"].includes(process.env["YAAGL_CHANNEL_CLIENT"])) {
     await fs.remove(path.resolve(sidecarDst, "protonextras"));

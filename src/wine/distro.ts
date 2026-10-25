@@ -2,6 +2,7 @@ import { getKey } from "@utils";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
 import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
+import { getDS4Distribution } from "./ds4";
 
 export interface WineDistributionAttributes {
   renderBackend: "dxmt" | "d3dmetal";
@@ -98,7 +99,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
 ];
 
 export async function getWineDistributions(): Promise<WineDistribution[]> {
-  return YAAGL_BUILTIN_WINE;
+  const ds4 = await getDS4Distribution();
+  return ds4 ? [ds4, ...YAAGL_BUILTIN_WINE] : YAAGL_BUILTIN_WINE;
 }
 
 export type WineStatus =

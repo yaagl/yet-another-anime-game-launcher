@@ -47,5 +47,6 @@ jobs:
         run: |
           ./configure.sh
           pnpm exec tsc
+          pnpm exec vitest run src/wine/ds4-registry.spec.ts src/wine/ds4.spec.ts
           pnpm run format-check
           pnpm run lint
