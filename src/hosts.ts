@@ -1,5 +1,14 @@
 import { exec, readAllLines, rawString } from "./utils";
 
+export async function canModifyHosts() {
+  // ACLs distinguish write and append; the append probe writes no data.
+  const result = await Neutralino.os.execCommand(
+    "test -w /etc/hosts && (: >> /etc/hosts) 2>/dev/null",
+    {}
+  );
+  return result.exitCode == 0;
+}
+
 export async function ensureHosts(hosts: [string, string][]) {
   const content = await readAllLines("/etc/hosts");
   let start = 0;
@@ -25,5 +34,9 @@ export async function ensureHosts(hosts: [string, string][]) {
     ...(newContentPost.length ? newContentPost : [""]),
   ];
   const contentsss = newContent.join("\n");
-  await exec(["printf", contentsss, rawString(">"), "/etc/hosts"], {}, true);
+  await exec(
+    ["printf", contentsss, rawString(">"), "/etc/hosts"],
+    {},
+    !(await canModifyHosts())
+  );
 }
