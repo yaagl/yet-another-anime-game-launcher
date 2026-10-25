@@ -155,4 +155,5 @@ export const th_TH: typeof zh_CN = {
   SETUP_RECOMMENDED: "การตั้งค่าที่แนะนำ",
   SETUP_CUSTOM: "การตั้งค่าแบบกำหนดเอง",
   SETUP_CONTINUE: "ดำเนินการต่อ",
+  FORCE_CLOSE: "บังคับปิด",
 };

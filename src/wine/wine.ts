@@ -69,6 +69,12 @@ export async function createWine(options: {
     });
   }
 
+  async function killServer() {
+    return await unixExec2([join(dirname(loaderBin), "wineserver"), "-k"], {
+      ...getEnvironmentVariables(),
+    });
+  }
+
   function toWinePath(absPath: string) {
     return "Z:" + `${absPath}`.replaceAll("/", "\\");
   }
@@ -157,6 +163,7 @@ reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\NVIDIA Corporation\\Global\\NGXCore" /v F
     exec,
     exec2,
     waitUntilServerOff,
+    killServer,
     cmd,
     toWinePath,
     prefix: options.prefix,

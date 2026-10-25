@@ -159,4 +159,5 @@ export const ja_JP: typeof zh_CN = {
   SETUP_RECOMMENDED: "推奨設定",
   SETUP_CUSTOM: "カスタム設定",
   SETUP_CONTINUE: "続行",
+  FORCE_CLOSE: "強制終了",
 };

@@ -333,16 +333,35 @@ export async function createLauncher({
                 </Progress>
               </Show>
               <Show when={programBusy()}>
-                <h3
-                  style={
-                    (sophon && !background
-                      ? ""
-                      : "text-shadow: 1px 1px 2px #333;color:white;") +
-                    "margin-bottom:5px;margin-top:8px;"
-                  }
+                <Flex
+                  alignItems="center"
+                  justifyContent="space-between"
+                  gap="$3"
+                  mb="5px"
+                  mt="8px"
                 >
-                  {statusText()}
-                </h3>
+                  <h3
+                    style={
+                      (sophon && !background
+                        ? ""
+                        : "text-shadow: 1px 1px 2px #333;color:white;") +
+                      "margin:0;"
+                    }
+                  >
+                    {statusText()}
+                  </h3>
+                  <Show when={statusText() === locale.get("GAME_RUNNING")}>
+                    <Button
+                      size="xs"
+                      colorScheme="danger"
+                      borderRadius={8}
+                      flexShrink={0}
+                      onClick={() => wine.killServer().catch(() => undefined)}
+                    >
+                      {locale.get("FORCE_CLOSE")}
+                    </Button>
+                  </Show>
+                </Flex>
                 <Progress
                   value={progress()}
                   indeterminate={progress() == 0}

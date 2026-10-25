@@ -150,4 +150,5 @@ export const zh_CN = {
   SETUP_RECOMMENDED: "推荐设置",
   SETUP_CUSTOM: "自定义设置",
   SETUP_CONTINUE: "继续并安装",
+  FORCE_CLOSE: "强制关闭",
 };

@@ -162,4 +162,5 @@ export const fr_FR: typeof zh_CN = {
   SETUP_RECOMMENDED: "Paramètres recommandés",
   SETUP_CUSTOM: "Paramètres personnalisés",
   SETUP_CONTINUE: "Continuer",
+  FORCE_CLOSE: "Forcer la fermeture",
 };

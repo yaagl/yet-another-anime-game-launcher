@@ -158,4 +158,5 @@ export const ko_KR: typeof zh_CN = {
   SETUP_RECOMMENDED: "권장 설정",
   SETUP_CUSTOM: "사용자 지정 설정",
   SETUP_CONTINUE: "계속",
+  FORCE_CLOSE: "강제 종료",
 };

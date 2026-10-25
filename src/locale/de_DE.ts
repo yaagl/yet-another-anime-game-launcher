@@ -159,4 +159,5 @@ export const de_DE: typeof zh_CN = {
   SETUP_RECOMMENDED: "Empfohlene Einstellungen",
   SETUP_CUSTOM: "Benutzerdefinierte Einstellungen",
   SETUP_CONTINUE: "Weiter",
+  FORCE_CLOSE: "Beenden erzwingen",
 };

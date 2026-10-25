@@ -158,4 +158,5 @@ export const ru_RU: typeof zh_CN = {
   SETUP_RECOMMENDED: "Рекомендуемые настройки",
   SETUP_CUSTOM: "Пользовательские настройки",
   SETUP_CONTINUE: "Продолжить",
+  FORCE_CLOSE: "Принудительно закрыть",
 };

@@ -129,11 +129,16 @@ cd /d "${wine.toWinePath(gameDir)}"
       logfile
     );
     await wine.waitUntilServerOff();
+  } catch (e: unknown) {
+    // it seems game crashed?
+    await log(String(e));
+  }
+
+  try {
     if (config.resolutionCustom) {
       await revertResolutionRegistry(wine, server);
     }
   } catch (e: unknown) {
-    // it seems game crashed?
     await log(String(e));
   }
 

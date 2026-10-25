@@ -157,4 +157,5 @@ export const vi_VN: typeof zh_CN = {
   SETUP_RECOMMENDED: "Cài đặt đề xuất",
   SETUP_CUSTOM: "Cài đặt tùy chỉnh",
   SETUP_CONTINUE: "Tiếp tục",
+  FORCE_CLOSE: "Buộc đóng",
 };
