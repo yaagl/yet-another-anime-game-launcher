@@ -13,7 +13,7 @@ import {
   exec,
   resolvePreferredMaxFrameRate,
 } from "@utils";
-import { Wine } from "@wine";
+import { Wine, dockIconEnv } from "@wine";
 import { Config } from "@config";
 import {
   patchProgram,
@@ -81,6 +81,7 @@ cd /d "${wine.toWinePath(gameDir)}"
               HTTPS_PROXY: config.proxyHost,
             }
           : {}),
+        ...(await dockIconEnv(config.squircleDockIcon)),
       },
       logfile
     );

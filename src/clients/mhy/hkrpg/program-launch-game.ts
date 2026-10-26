@@ -14,7 +14,7 @@ import {
   getKeyOrDefault,
   resolvePreferredMaxFrameRate,
 } from "@utils";
-import { Wine } from "@wine";
+import { Wine, dockIconEnv } from "@wine";
 import { Config } from "@config";
 import { putLocal, patchProgram, patchRevertProgram } from "../patch";
 import { HKRPG_CN_BLOCK_URL, HKRPG_OS_BLOCK_URL } from "../../secret";
@@ -119,6 +119,7 @@ cd /d "${wine.toWinePath(gameDir)}"
               HTTPS_PROXY: config.proxyHost,
             }
           : {}),
+        ...(await dockIconEnv(config.squircleDockIcon)),
       },
       logfile
     );
