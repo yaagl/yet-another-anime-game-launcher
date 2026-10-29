@@ -97,7 +97,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   }
 
   const appname = config.cli.binaryName;
-  const binaryName = `${config.cli.binaryName}-mac_x64`;
+  const binaryName = `${config.cli.binaryName}-mac_universal`;
 
   // read package.json
   const pkg = await fs.readJSON(path.resolve(process.cwd(), "package.json"));
