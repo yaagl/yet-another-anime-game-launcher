@@ -165,15 +165,6 @@ function sparkleVersion(version) {
       "Resources"
     )
   );
-  await fs.mkdir(
-    path.resolve(
-      process.cwd(),
-      `${appDistributionName}.app`,
-      "Contents",
-      "Resources",
-      ".storage"
-    )
-  );
   const contents = path.resolve(`${appDistributionName}.app`, "Contents");
   await fs.copy(
     path.join(updaterSDK, "Sparkle.framework"),
@@ -276,12 +267,15 @@ function sparkleVersion(version) {
       "parameterized"
     ),
     `#!/usr/bin/env bash
+set -e
 SCRIPT_DIR="$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 APST_DIR="$HOME/Library/Application Support/${appDistributionName}"
 echo $APST_DIR
 mkdir -p "$APST_DIR"
 CONTENTS_DIR="$(dirname "$SCRIPT_DIR")"
-rsync -rlptu "$CONTENTS_DIR/Resources/." "$APST_DIR"
+# Neutralino 4.11 stores its settings beside resources.neu. Link the bundled
+# archive so settings remain writable without copying or updating application code.
+ln -sfn "$CONTENTS_DIR/Resources/${resourcesFile}" "$APST_DIR/resources.neu"
 cd "$APST_DIR"
 PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$APST_DIR"`
   );

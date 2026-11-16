@@ -11,6 +11,7 @@ import {
   setKey,
   cp,
   resolve,
+  resolveResource,
   removeFileIfExists,
   fileOrDirExists,
   getKeyOrDefault,
@@ -117,19 +118,19 @@ export async function* patchProgram(
 
   if (!server.id.startsWith("hkrpg")) {
     await cp(
-      resolve("./sidecar/protonextras/steam64.exe"),
+      resolveResource("./sidecar/protonextras/steam64.exe"),
       join(system32Dir, "steam.exe")
     );
     await cp(
-      resolve("./sidecar/protonextras/steam32.exe"),
+      resolveResource("./sidecar/protonextras/steam32.exe"),
       join(syswow64Dir, "steam.exe")
     );
     await cp(
-      resolve("./sidecar/protonextras/lsteamclient64.dll"),
+      resolveResource("./sidecar/protonextras/lsteamclient64.dll"),
       join(system32Dir, "lsteamclient.dll")
     );
     await cp(
-      resolve("./sidecar/protonextras/lsteamclient32.dll"),
+      resolveResource("./sidecar/protonextras/lsteamclient32.dll"),
       join(syswow64Dir, "lsteamclient.dll")
     );
   }

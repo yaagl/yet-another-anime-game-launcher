@@ -1,6 +1,6 @@
 import { rawString } from "./command-builder";
 import { wait } from "./helper";
-import { exec, spawn, resolve, log } from "./neu";
+import { exec, spawn, resolve, resolveResource, log } from "./neu";
 
 export async function xattrRemove(attr: string, path: string) {
   return await exec(
@@ -21,7 +21,7 @@ export async function xdelta3(
   targetFile: string
 ): Promise<Neutralino.os.ExecCommandResult> {
   return await exec([
-    resolve("./sidecar/xdelta/xdelta3"),
+    resolveResource("./sidecar/xdelta/xdelta3"),
     "-d",
     "-s",
     originalFile,
@@ -36,7 +36,7 @@ export async function hpatchz(
   targetFile: string
 ) {
   return await exec([
-    resolve("./sidecar/hpatchz/hpatchz"),
+    resolveResource("./sidecar/hpatchz/hpatchz"),
     "-f",
     originalFile,
     patchFile,
@@ -117,7 +117,7 @@ export async function* doStreamUnzip(
 
 export async function extract7z(source: string, destination: string) {
   return await exec([
-    resolve("./sidecar/7z/7zz"),
+    resolveResource("./sidecar/7z/7zz"),
     "x",
     source,
     `-o${destination}`,
