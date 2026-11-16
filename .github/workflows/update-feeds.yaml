@@ -1,0 +1,34 @@
+name: Publish update feeds
+on:
+  release:
+    types: [published, edited, released, unpublished, deleted]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to refresh
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sparkle-update-feeds
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'yaagl/yet-another-anime-game-launcher' && (github.event_name == 'workflow_dispatch' || github.event.release.tag_name != 'updates')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+      - name: Publish signed appcasts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_ED_KEY: ${{ secrets.SPARKLE_PRIVATE_ED_KEY }}
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+          RELEASE_ACTION: ${{ github.event.action }}
+        run: bash scripts/publish-updates.sh
