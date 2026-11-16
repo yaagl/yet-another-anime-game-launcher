@@ -3,8 +3,48 @@ const fs = require("fs-extra");
 const path = require("path");
 const { rimraf } = require("rimraf");
 const { IconIcns } = require("@shockpkg/icon-encoder");
+const { valid, SemVer } = require("semver");
+
+// Sparkle ignores '-' suffixes; encode SemVer precedence as numeric parts.
+function sparkleVersion(version) {
+  const parsed = new SemVer(version);
+  const parts = [
+    parsed.major,
+    parsed.minor,
+    parsed.patch,
+    parsed.prerelease.length ? 0 : 1,
+  ];
+  for (const identifier of parsed.prerelease) {
+    const text = String(identifier);
+    parts.push(1);
+    if (/^\d+$/.test(text))
+      parts.push(0, text.length, ...Array.from(text, Number));
+    else
+      parts.push(
+        1,
+        ...Array.from(text, character => character.charCodeAt(0)),
+        0
+      );
+  }
+  return [...parts, 0].join(".");
+}
 
 (async () => {
+  const publicKey = process.env.SPARKLE_PUBLIC_ED_KEY || "";
+  if (publicKey && !/^[A-Za-z0-9+/]{43}=$/.test(publicKey)) {
+    throw new Error("SPARKLE_PUBLIC_ED_KEY must be a base64 Ed25519 public key");
+  }
+  if (process.env.YAAGL_VERSION && !publicKey) {
+    throw new Error(
+      "Release builds require SPARKLE_PUBLIC_ED_KEY for verified updates"
+    );
+  }
+  const releaseVersion = process.env.YAAGL_VERSION && valid(process.env.YAAGL_VERSION);
+  if (process.env.YAAGL_VERSION && !releaseVersion) {
+    throw new Error("YAAGL_VERSION must be a semantic version");
+  }
+  const updateRepository = "yaagl/yet-another-anime-game-launcher";
+  const { stdout: updaterSDK } = await execa("bash", ["./build-updater.sh"]);
   const icns = new IconIcns();
   const raw = true;
 
@@ -13,6 +53,7 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
   const config = await fs.readJSON(
     path.resolve(process.cwd(), "neutralino.config.json")
   );
+  if (releaseVersion) config.version = releaseVersion;
   let bundleId;
   let appDistributionName;
   let includeSophon = false;
@@ -132,6 +173,20 @@ const { IconIcns } = require("@shockpkg/icon-encoder");
       "Resources",
       ".storage"
     )
+  );
+  const contents = path.resolve(`${appDistributionName}.app`, "Contents");
+  await fs.copy(
+    path.join(updaterSDK, "Sparkle.framework"),
+    path.join(contents, "Frameworks", "Sparkle.framework"),
+    { preserveTimestamps: true }
+  );
+  await fs.copy(
+    path.join(updaterSDK, "yaagl-updater"),
+    path.join(contents, "MacOS", "yaagl-updater")
+  );
+  await fs.copy(
+    path.join(updaterSDK, "LICENSE"),
+    path.join(contents, "Resources", "Sparkle-LICENSE")
   );
   // move binary to app folder
   await fs.move(
@@ -316,9 +371,22 @@ PATH_LAUNCH="$(dirname "$CONTENTS_DIR")" exec "$SCRIPT_DIR/${appname}" --path="$
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleVersion</key>
-        <string>${config.version}</string>
+        <string>${sparkleVersion(config.version)}</string>
         <key>CFBundleShortVersionString</key>
         <string>${config.version}</string>
+        <key>YAAGLClient</key>
+        <string>${process.env.YAAGL_CHANNEL_CLIENT}</string>
+        <key>SUFeedURL</key>
+        <string>https://github.com/${updateRepository}/releases/download/updates/appcast_${process.env.YAAGL_CHANNEL_CLIENT}.xml</string>
+        ${publicKey ? `<key>SUPublicEDKey</key><string>${publicKey}</string>` : ""}
+        <key>SUEnableAutomaticChecks</key>
+        <true/>
+        <key>SUAllowsAutomaticUpdates</key>
+        <false/>
+        <key>SUVerifyUpdateBeforeExtraction</key>
+        <true/>
+        <key>SURequireSignedFeed</key>
+        <true/>
         <key>NSHumanReadableCopyright</key>
         <string>Copyright © 2023 3Shain.</string>
         <key>LSMinimumSystemVersion</key>
