@@ -45,7 +45,7 @@ import { createD3D12 } from "./d3d12";
 import { createMaxFrameRateConfig } from "./max-framerate";
 import createLocaleConfig from "./ui-locale";
 import createFPSUnlock from "./fps-unlock";
-import { exec2, getKeyOrDefault, resolve, setKey } from "../utils";
+import { exec2, exit, getKeyOrDefault, resolve, setKey } from "../utils";
 import { createSignal, For, JSXElement, Show } from "solid-js";
 import createReShade from "./reshade";
 import { createProxyEnabledConfig } from "@config/proxy-enabled";
@@ -351,7 +351,7 @@ export async function createConfiguration({
                       {},
                       true
                     );
-                    await Neutralino.app.exit();
+                    await exit();
                   } else {
                     await Neutralino.os.showMessageBox(
                       "Uninstall Failed",

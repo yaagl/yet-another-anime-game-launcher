@@ -44,10 +44,15 @@ export async function createApp() {
   await setKey("singleton", null);
 
   const aria2_port = 6868;
+  let closing = false;
 
   await Neutralino.events.on("windowClose", async () => {
-    if (await GLOBAL_onClose(false)) {
-      exit(0);
+    if (closing) return;
+    closing = true;
+    try {
+      if (await GLOBAL_onClose(false)) await exit(0);
+    } finally {
+      closing = false;
     }
   });
 
