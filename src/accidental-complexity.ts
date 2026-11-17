@@ -22,8 +22,16 @@ export async function createGameInstallationDirectorySanitizer({
         continue;
       }
       const segments = path.split("/").slice(1);
+      if (path.startsWith("/Applications")) {
+        await locale.alert("PATH_INVALID", "PATH_INVALID_FORBIDDEN_DIR");
+        continue;
+      }
       if (path.startsWith(HOME)) {
-        if (["Desktop", "Downloads", "Documents"].indexOf(segments[2]) >= 0) {
+        if (
+          ["Desktop", "Downloads", "Documents", "Applications"].indexOf(
+            segments[2]
+          ) >= 0
+        ) {
           await locale.alert("PATH_INVALID", "PATH_INVALID_FORBIDDEN_DIR");
           continue;
         }
