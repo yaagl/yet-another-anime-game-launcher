@@ -4,6 +4,7 @@ import { Github } from "../github";
 import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
 
 export interface WineDistributionAttributes {
+  architecture: "x86_64" | "arm64";
   renderBackend: "dxmt" | "d3dmetal";
   supportsD3d12: boolean;
   winePath: string; // Path to the wine directory inside the archive
@@ -14,10 +15,24 @@ export interface WineDistribution {
   displayName: string;
   remoteUrl: string;
   checksum?: string;
-  attributes: Partial<WineDistributionAttributes>;
+  attributes: Partial<WineDistributionAttributes> &
+    Pick<WineDistributionAttributes, "architecture">;
 }
 
 const YAAGL_BUILTIN_WINE: WineDistribution[] = [
+  {
+    id: "wine-11-22-alpha-1-arm64",
+    displayName: "Wine 11.22 ARM64 (Alpha)",
+    remoteUrl:
+      "https://github.com/yaagl/anime-game-wine/releases/download/wine-11-22-alpha1/wine-11.22-alpha-1-arm64.tar.xz",
+    checksum:
+      "sha-256=45480533a1b4bb7cbf6d1dc2ae05dee4546b2e655dd064b661621c3efd506ba1",
+    attributes: {
+      architecture: "arm64",
+      renderBackend: "dxmt",
+      winePath: "wine",
+    },
+  },
   {
     id: "11.0-1-crossover-signed-experimental",
     displayName: "Wine 11.0-1 Crossover (signed, experimental)",
@@ -26,6 +41,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=89fa7e90fb626523a90d5867a03c6be785d017176739c6320a3b86c7838c3a35",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -38,6 +54,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=4ebba536115e937c3826fa5808dbed50cd5e91c8454999b54cbe0cd2a43d8b4c",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -50,6 +67,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=42430b7e8398642d7121e7cbac0aa03ce7312b4500e4ddf7eb75a7c8f2407a9c",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -60,6 +78,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/dawn-winery/dawn-signed/releases/download/wine-gcenx-11.4-osx64/wine-devel-11.4-osx64-signed.tar.xz",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
       winePath: "wine-devel-11.4-osx64-signed/Contents/Resources/wine",
     },
@@ -70,6 +89,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/dawn-winery/dawn-signed/releases/download/wine-stable-gcenx-11.0-osx64/wine-stable-11.0-osx64-signed.tar.xz",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
       winePath: "Wine Stable.app/Contents/Resources/wine",
     },
@@ -80,6 +100,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     displayName: "Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)",
     remoteUrl: D3DMETAL_RUNTIME_URL,
     attributes: {
+      architecture: "x86_64",
       renderBackend: "d3dmetal",
       supportsD3d12: true,
       winePath: "wine",
@@ -92,6 +113,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
     attributes: {
+      architecture: "x86_64",
       renderBackend: "dxmt",
     },
   },

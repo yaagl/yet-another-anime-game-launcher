@@ -20,7 +20,7 @@ import {
 import { Config } from "@config";
 import { disableUnityFeature } from "./unity";
 import { Wine } from "@wine";
-import { DXMT_FILES, DXVK_FILES } from "src/downloadable-resource";
+import { DXMT_FILES, getDXMTArchitecture } from "src/downloadable-resource";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -67,32 +67,43 @@ export async function* patchProgram(
   const syswow64Dir = join(wine.prefix, "drive_c", "windows", "syswow64");
 
   if (wine.attributes.renderBackend == "dxmt") {
+    const architecture = getDXMTArchitecture(wine);
+    const windowsDir = `./dxmt/${architecture}-windows`;
     for (const f of DXMT_FILES) {
-      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      const wineLibPath = resolve(
+        `./wine/lib/wine/${architecture}-windows/${f}`
+      );
       await forceMove(wineLibPath, wineLibPath + ".bak");
-      await cp(`./dxmt/${f}`, wineLibPath);
+      await cp(join(windowsDir, f), wineLibPath);
     }
 
     // winemetal files always go to Wine lib directories
     await cp(
-      `./dxmt/winemetal.dll`,
-      resolve("./wine/lib/wine/x86_64-windows/winemetal.dll")
+      join(windowsDir, "winemetal.dll"),
+      resolve(`./wine/lib/wine/${architecture}-windows/winemetal.dll`)
     );
 
     await cp(
-      `./dxmt/winemetal.so`,
-      resolve("./wine/lib/wine/x86_64-unix/winemetal.so")
+      `./dxmt/${architecture}-unix/winemetal.so`,
+      resolve(`./wine/lib/wine/${architecture}-unix/winemetal.so`)
     );
 
     // winemetal.dll also to system32 for both native and builtin
-    await cp(`./dxmt/winemetal.dll`, join(system32Dir, "winemetal.dll"));
+    await cp(
+      join(windowsDir, "winemetal.dll"),
+      join(system32Dir, "winemetal.dll")
+    );
 
     if (server.id.startsWith("hkrpg")) {
-      await cp(
-        `./dxmt/nvngx.dll`,
-        resolve("./wine/lib/wine/x86_64-windows/nvngx.dll")
-      );
-      await cp(`./dxmt/nvngx.dll`, join(system32Dir, "nvngx.dll"));
+      for (const file of architecture === "aarch64"
+        ? ["nvngx.dll", "nvapi64.dll"]
+        : ["nvngx.dll"]) {
+        await cp(
+          join(windowsDir, file),
+          resolve(`./wine/lib/wine/${architecture}-windows/${file}`)
+        );
+        await cp(join(windowsDir, file), join(system32Dir, file));
+      }
     }
   }
 
@@ -160,8 +171,11 @@ export async function* patchRevertProgram(
 
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   if (wine.attributes.renderBackend == "dxmt") {
+    const architecture = getDXMTArchitecture(wine);
     for (const f of DXMT_FILES) {
-      const wineLibPath = resolve(`./wine/lib/wine/x86_64-windows/${f}`);
+      const wineLibPath = resolve(
+        `./wine/lib/wine/${architecture}-windows/${f}`
+      );
       await forceMove(wineLibPath + ".bak", wineLibPath);
     }
   }
