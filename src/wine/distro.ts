@@ -1,5 +1,5 @@
 import { exec, getKey } from "@utils";
-import { coerce, gte } from "semver";
+import { coerce, compare, gte } from "semver";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
 import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
@@ -129,7 +129,7 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
   },
 ];
 
-export async function getWineDistributions(): Promise<WineDistribution[]> {
+async function getWineAvailability() {
   const [architecture, { stdOut: productVersion }] = await Promise.all([
     Neutralino.computer.getArch(),
     exec(["/usr/bin/sw_vers", "-productVersion"]),
@@ -137,17 +137,32 @@ export async function getWineDistributions(): Promise<WineDistribution[]> {
   const macOSVersion = coerce(productVersion.trim());
   if (!macOSVersion)
     throw new Error(`Invalid macOS version: ${productVersion}`);
+  if (architecture !== "arm" && architecture !== "x64")
+    throw new Error(
+      `Could not determine a supported launcher architecture: ${architecture}`
+    );
 
-  return YAAGL_BUILTIN_WINE.filter(
-    wine =>
-      (architecture === "arm" ||
-        (architecture === "x64" &&
-          wine.attributes.architecture === "x86_64")) &&
-      gte(macOSVersion, wine.attributes.minimumMacOSVersion)
-  );
+  return {
+    macOSVersion: macOSVersion.version,
+    distributions: YAAGL_BUILTIN_WINE.filter(
+      wine =>
+        (architecture === "arm" || wine.attributes.architecture === "x86_64") &&
+        gte(macOSVersion, wine.attributes.minimumMacOSVersion)
+    ),
+  };
+}
+
+export async function getWineDistributions(): Promise<WineDistribution[]> {
+  return (await getWineAvailability()).distributions;
 }
 
 export type WineStatus =
+  | {
+      wineReady: false;
+      unavailable: true;
+      message: string;
+      retry: boolean;
+    }
   | {
       wineReady: false;
       wineUpdate?: boolean;
@@ -159,7 +174,34 @@ export type WineStatus =
     };
 
 export async function checkWine(github: Github): Promise<WineStatus> {
-  const wine_versions = await getWineDistributions();
+  let availability: Awaited<ReturnType<typeof getWineAvailability>>;
+  try {
+    availability = await getWineAvailability();
+  } catch (error) {
+    return {
+      wineReady: false,
+      unavailable: true,
+      message: String(error),
+      retry: true,
+    };
+  }
+  const wine_versions = availability.distributions;
+  if (!wine_versions.length) {
+    const minimumVersion = YAAGL_BUILTIN_WINE.map(
+      wine => wine.attributes.minimumMacOSVersion
+    ).sort(compare)[0];
+    return {
+      wineReady: false,
+      unavailable: true,
+      message: `Your Mac is running macOS ${
+        availability.macOSVersion
+      }. Current Wine runtimes require macOS ${minimumVersion.replace(
+        /\.0$/,
+        ""
+      )} or later.`,
+      retry: false,
+    };
+  }
   const defaultDistro = wine_versions.find(
     x => x.id == DEFAULT_WINE_DISTRO_TAG
   );
