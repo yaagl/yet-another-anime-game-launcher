@@ -27,6 +27,7 @@ import { createUpdater, downloadProgram } from "./updater";
 import { createCommonUpdateUI } from "./common-update-ui";
 import { createLocale } from "./locale";
 import { createClient } from "./clients";
+import { createWineUnavailableUI } from "./wine/initial-setup";
 import { createSignal, Show, JSXElement } from "solid-js";
 import type { Component } from "solid-js";
 import {
@@ -135,7 +136,9 @@ export async function createApp() {
     }
   };
 
-  if (wineStatus.wineReady) {
+  if ("unavailable" in wineStatus) {
+    MainApp = createWineUnavailableUI({ ...wineStatus, onCheckUpdate });
+  } else if (wineStatus.wineReady) {
     const wine = await createWine({
       prefix: prefixPath,
       distro: wineStatus.wineDistribution,
