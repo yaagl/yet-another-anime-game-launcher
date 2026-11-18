@@ -91,22 +91,30 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
 }
 
 export async function* checkAndDownloadJadeite(
-  aria2: Aria2
+  aria2: Aria2,
+  wine: Wine
 ): CommonUpdateProgram {
-  if (
-    CURRENT_JADEITE_VERSION ===
-    (await getKeyOrDefault("installed_jadeite_version", "0.0.0"))
-  ) {
+  const arm64 = wine.attributes.architecture === "arm64";
+  const version = arm64
+    ? `${CURRENT_JADEITE_VERSION}-arm64-ready`
+    : CURRENT_JADEITE_VERSION;
+  if (version === (await getKeyOrDefault("installed_jadeite_version", ""))) {
     return;
   }
 
-  await rmrf_dangerously(resolve(`./jadeite`));
-
-  await mkdirp("./jadeite");
+  const directory = resolve("./jadeite");
+  const sha256 = arm64
+    ? "13f9877dd7bf54287e5860fb9211d8667a3bb1ee4263bb0c0c6559f41dcd647b"
+    : "12d4c37b09d3e81640536fd68c2c62913fc4b4a90c0183e4dec845e4934a9858";
+  const archive = join(directory, `${sha256}.zip`);
+  await mkdirp(directory);
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v4.1.0/v4.1.0.zip`,
-    absDst: resolve(`./jadeite/archive.zip`),
+    uri: arm64
+      ? `https://web.aws.riverfog7.com/files/jadeite/v${version}.zip`
+      : `https://codeberg.org/mkrsym1/jadeite/releases/download/v${version}/v${version}.zip`,
+    checksum: `sha-256=${sha256}`,
+    absDst: archive,
   })) {
     yield [
       "setProgress",
@@ -119,14 +127,11 @@ export async function* checkAndDownloadJadeite(
     ];
   }
 
-  for await (const [dec, total] of doStreamUnzip(
-    resolve(`./jadeite/archive.zip`),
-    resolve(`./jadeite`)
-  )) {
+  await setKey("installed_jadeite_version", "installing");
+  for await (const [dec, total] of doStreamUnzip(archive, directory)) {
     yield ["setProgress", (dec / total) * 100];
   }
-
-  setKey("installed_jadeite_version", CURRENT_JADEITE_VERSION);
+  await setKey("installed_jadeite_version", version);
 }
 
 export const DXMT_FILES = ["d3d10core.dll", "d3d11.dll", "dxgi.dll"];
