@@ -40,6 +40,7 @@ import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
 import { createLeftCmdConfig } from "./left-cmd";
+import { createGameControllerFixConfig } from "./game-controller-fix";
 import { createWineDistroConfig } from "./wine-distribution";
 import { createD3D12 } from "./d3d12";
 import { createMaxFrameRateConfig } from "./max-framerate";
@@ -154,6 +155,7 @@ export async function createConfiguration({
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
+  const [GCF] = await createGameControllerFixConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
     locale,
     config,
@@ -443,6 +445,8 @@ export async function createConfiguration({
                             <R />
                             <Divider />
                             <LC />
+                            <Divider />
+                            <GCF />
                           </VStack>
                         </Box>
                         <Box {...cardStyle}>
@@ -663,6 +667,7 @@ export async function createInitialSetupConfiguration({
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
+  const [GCF] = await createGameControllerFixConfig({ locale, config });
   const [UL] = await createLocaleConfig({ locale, config });
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
@@ -907,6 +912,8 @@ export async function createInitialSetupConfiguration({
                       <R />
                       <Divider />
                       <LC />
+                      <Divider />
+                      <GCF />
                     </VStack>
                   </Box>
                   <Box {...cardStyle}>

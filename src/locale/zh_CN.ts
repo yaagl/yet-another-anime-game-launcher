@@ -154,4 +154,5 @@ export const zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "自定义显示器刷新率 (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "如果高刷屏幕下帧率受限（如 144Hz 屏幕被锁 48 FPS），请启用并输入您的显示器刷新率（例如 144）。",
+  SETTING_GAME_CONTROLLER_FIX: "游戏手柄修复（可能不适用于所有手柄）",
 };

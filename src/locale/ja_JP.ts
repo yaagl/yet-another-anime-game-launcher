@@ -163,4 +163,6 @@ export const ja_JP: typeof zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "カスタムモニターリフレッシュレート (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "FPSが60未満に制限される場合（144Hzモニターで48FPSになるなど）、有効にしてモニターのリフレッシュレート（例：144）を入力してください。",
+  SETTING_GAME_CONTROLLER_FIX:
+    "ゲームコントローラーの修正（すべてのコントローラーで動作するとは限りません）",
 };

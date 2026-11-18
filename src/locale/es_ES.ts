@@ -163,4 +163,6 @@ export const es_ES: typeof zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "Tasa de refresco del monitor personalizada (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "Activa e introduce la tasa de refresco de tu monitor (p. ej., 144 para una pantalla de 144Hz) si tus FPS están limitados por debajo de 60.",
+  SETTING_GAME_CONTROLLER_FIX:
+    "Corrección de mando de juego (puede no funcionar con todos los mandos)",
 };

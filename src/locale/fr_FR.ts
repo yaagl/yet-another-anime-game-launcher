@@ -167,4 +167,6 @@ export const fr_FR: typeof zh_CN = {
     "Taux de rafraîchissement du moniteur personnalisé (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "Activez et entrez le taux de rafraîchissement de votre moniteur (ex. 144 pour un écran 144Hz) si vos FPS sont bloqués sous 60.",
+  SETTING_GAME_CONTROLLER_FIX:
+    "Correctif de manette de jeu (peut ne pas fonctionner avec toutes les manettes)",
 };

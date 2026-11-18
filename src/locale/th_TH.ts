@@ -159,4 +159,5 @@ export const th_TH: typeof zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "กำหนดอัตรารีเฟรชหน้าจอเอง (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "เปิดใช้งานและป้อนอัตรารีเฟรชของจอภาพ (เช่น 144 สำหรับหน้าจอ 144Hz) หาก FPS ของคุณถูกจำกัดไว้ต่ำกว่า 60",
+  SETTING_GAME_CONTROLLER_FIX: "แก้ไขจอยเกม (อาจใช้ไม่ได้กับจอยเกมทุกรุ่น)",
 };

@@ -163,4 +163,6 @@ export const en: typeof zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "Custom Monitor Refresh Rate (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "Enable and enter your monitor's refresh rate (e.g. 144 for a 144Hz display) if your FPS is capped below 60.",
+  SETTING_GAME_CONTROLLER_FIX:
+    "Game Controller Fix (may not work for all controllers)",
 };

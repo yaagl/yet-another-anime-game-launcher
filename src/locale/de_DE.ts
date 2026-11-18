@@ -164,4 +164,6 @@ export const de_DE: typeof zh_CN = {
     "Benutzerdefinierte Monitor-Bildwiederholfrequenz (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "Aktivieren und geben Sie die Bildwiederholfrequenz Ihres Monitors ein (z. B. 144 für ein 144Hz-Display), falls Ihre FPS unter 60 begrenzt sind.",
+  SETTING_GAME_CONTROLLER_FIX:
+    "Gamecontroller-Fix (funktioniert möglicherweise nicht mit allen Controllern)",
 };

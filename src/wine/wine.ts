@@ -122,7 +122,11 @@ export async function createWine(options: {
     await setKey("wine_netbiosname", netbiosname);
   }
 
-  async function setProps(props: { retina: boolean; leftCmd: boolean }) {
+  async function setProps(props: {
+    retina: boolean;
+    leftCmd: boolean;
+    gameControllerFix?: boolean;
+  }) {
     const cmd = `@echo off
 cd "%~dp0"
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ /d ${
@@ -131,6 +135,10 @@ reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v RetinaMode /t REG_SZ 
 reg add "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" /v LeftCommandIsCtrl /t REG_SZ /d ${
       props.leftCmd ? "y" : "n"
     } /f
+reg add "HKLM\\System\\CurrentControlSet\\Services\\winebus" /v DisableHidraw /t REG_DWORD /d ${
+      props.gameControllerFix ? 1 : 0
+    } /f
+reg add "HKLM\\System\\CurrentControlSet\\Services\\winebus" /v "Enable SDL" /t REG_DWORD /d 1 /f
 `;
     await writeFile(resolve("winedrv_config.bat"), cmd);
     await exec(

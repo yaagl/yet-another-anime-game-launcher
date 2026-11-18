@@ -162,4 +162,6 @@ export const ko_KR: typeof zh_CN = {
   SETTING_DXMT_MAX_FRAMERATE: "사용자 지정 모니터 주사율 (Hz)",
   SETTING_DXMT_MAX_FRAMERATE_DESC:
     "FPS가 60 미만으로 제한되는 경우(예: 144Hz 모니터에서 48 FPS 고정), 이 옵션을 켜고 모니터의 주사율(예: 144)을 입력하세요.",
+  SETTING_GAME_CONTROLLER_FIX:
+    "게임 컨트롤러 오류 수정 (일부 컨트롤러에서는 작동하지 않을 수 있음)",
 };
