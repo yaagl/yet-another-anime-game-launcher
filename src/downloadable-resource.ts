@@ -91,22 +91,30 @@ export async function* checkAndDownloadDXVK(aria2: Aria2): CommonUpdateProgram {
 }
 
 export async function* checkAndDownloadJadeite(
-  aria2: Aria2
+  aria2: Aria2,
+  wine: Wine
 ): CommonUpdateProgram {
-  if (
-    CURRENT_JADEITE_VERSION ===
-    (await getKeyOrDefault("installed_jadeite_version", "0.0.0"))
-  ) {
+  const arm64 = wine.attributes.architecture === "arm64";
+  const version = arm64
+    ? `${CURRENT_JADEITE_VERSION}-arm64-ready`
+    : CURRENT_JADEITE_VERSION;
+  if (version === (await getKeyOrDefault("installed_jadeite_version", ""))) {
     return;
   }
 
-  await rmrf_dangerously(resolve(`./jadeite`));
-
-  await mkdirp("./jadeite");
+  const directory = resolve("./jadeite");
+  const sha256 = arm64
+    ? "13f9877dd7bf54287e5860fb9211d8667a3bb1ee4263bb0c0c6559f41dcd647b"
+    : "12d4c37b09d3e81640536fd68c2c62913fc4b4a90c0183e4dec845e4934a9858";
+  const archive = join(directory, `${sha256}.zip`);
+  await mkdirp(directory);
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://codeberg.org/mkrsym1/jadeite/releases/download/v4.1.0/v4.1.0.zip`,
-    absDst: resolve(`./jadeite/archive.zip`),
+    uri: arm64
+      ? `https://web.aws.riverfog7.com/files/jadeite/v${version}.zip`
+      : `https://codeberg.org/mkrsym1/jadeite/releases/download/v${version}/v${version}.zip`,
+    checksum: `sha-256=${sha256}`,
+    absDst: archive,
   })) {
     yield [
       "setProgress",
@@ -119,42 +127,37 @@ export async function* checkAndDownloadJadeite(
     ];
   }
 
-  for await (const [dec, total] of doStreamUnzip(
-    resolve(`./jadeite/archive.zip`),
-    resolve(`./jadeite`)
-  )) {
+  await setKey("installed_jadeite_version", "installing");
+  for await (const [dec, total] of doStreamUnzip(archive, directory)) {
     yield ["setProgress", (dec / total) * 100];
   }
-
-  setKey("installed_jadeite_version", CURRENT_JADEITE_VERSION);
+  await setKey("installed_jadeite_version", version);
 }
 
 export const DXMT_FILES = ["d3d10core.dll", "d3d11.dll", "dxgi.dll"];
 
-const DXMT_FILES_WITH_UNIXLIB = [
-  ...DXMT_FILES,
-  "winemetal.dll",
-  "winemetal.so",
-  "nvngx.dll",
-];
+const DXMT_COMMIT = "654f547ffab4e0c395ee368aad52bb4586b04576";
 
-const CURRENT_DXMT_VERSION = "654f547";
+export function getDXMTArchitecture(wine: Wine) {
+  return wine.attributes.architecture === "arm64" ? "aarch64" : "x86_64";
+}
 
 export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
-  if (
-    CURRENT_DXMT_VERSION ===
-    (await getKeyOrDefault("installed_dxmt_version", "0.0.0"))
-  ) {
+  if (DXMT_COMMIT === (await getKeyOrDefault("installed_dxmt_version", ""))) {
     return;
   }
 
-  await rmrf_dangerously(resolve(`./dxmt`));
-  await mkdirp("./dxmt");
+  const directory = resolve("./dxmt");
+  const tag = `dxmt-${DXMT_COMMIT.slice(0, 7)}`;
+  const archiveName = `dxmt-${DXMT_COMMIT}.zip`;
+  const archivePath = resolve(archiveName);
+  const tarPath = join(directory, `dxmt-${DXMT_COMMIT}.tar.gz`);
   yield ["setStateText", "DOWNLOADING_ENVIRONMENT"];
-  const archiveName = "dxmt-654f547ffab4e0c395ee368aad52bb4586b04576.zip";
   for await (const progress of aria2.doStreamingDownload({
-    uri: `https://github.com/yaagl/anime-game-wine/releases/download/dxmt-654f547/${archiveName}`,
-    absDst: resolve(`./dxmt/${archiveName}`),
+    uri: `https://github.com/yaagl/anime-game-wine/releases/download/${tag}/${archiveName}`,
+    absDst: archivePath,
+    checksum:
+      "sha-256=fbc0721fb72ebafd2bad0dbdd3d13a52056fd10c4a9a699cee2689363823255b",
   })) {
     yield [
       "setProgress",
@@ -170,45 +173,13 @@ export async function* checkAndDownloadDXMT(aria2: Aria2): CommonUpdateProgram {
   yield ["setStateText", "EXTRACT_ENVIRONMENT"];
   yield ["setUndeterminedProgress"];
 
-  for await (const [dec, total] of doStreamUnzip(
-    resolve(`./dxmt/${archiveName}`),
-    resolve(`./dxmt`)
-  )) {
-    // yield ["setProgress", (dec / total) * 100]; // optional progress
-  }
-
-  const tarName = "dxmt-654f547ffab4e0c395ee368aad52bb4586b04576.tar.gz";
-
-  await exec([
-    "tar",
-    "-xvf",
-    resolve(`./dxmt/${tarName}`),
-    "-C",
-    resolve("./dxmt"),
-  ]);
-
-  const extractedFolder = "654f547ffab4e0c395ee368aad52bb4586b04576";
-
-  await exec([
-    "sh",
-    "-c",
-    `mv "${resolve(`./dxmt/${extractedFolder}/x86_64-windows/`)}"* "${resolve(
-      "./dxmt/"
-    )}"`,
-  ]);
-  await exec([
-    "sh",
-    "-c",
-    `mv "${resolve(`./dxmt/${extractedFolder}/x86_64-unix/`)}"* "${resolve(
-      "./dxmt/"
-    )}"`,
-  ]);
-
-  await rmrf_dangerously(resolve(`./dxmt/${extractedFolder}`));
-  await removeFile(resolve(`./dxmt/${archiveName}`));
-  await removeFile(resolve(`./dxmt/${tarName}`));
-
-  setKey("installed_dxmt_version", CURRENT_DXMT_VERSION);
+  await rmrf_dangerously(directory);
+  await mkdirp(directory);
+  await exec(["unzip", "-oq", archivePath, "-d", directory]);
+  await exec(["tar", "-xzf", tarPath, "--strip-components=1", "-C", directory]);
+  await removeFile(tarPath);
+  await setKey("installed_dxmt_version", DXMT_COMMIT);
+  await removeFile(archivePath);
 }
 
 const CURRENT_RESHADE_VERSION = "5.8.0";

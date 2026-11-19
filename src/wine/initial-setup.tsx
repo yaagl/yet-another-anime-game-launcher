@@ -15,8 +15,96 @@ import type { Component } from "solid-js";
 import { UPDATE_UI_IMAGE } from "../clients";
 import { createInitialSetupConfiguration } from "../config";
 import type { Locale } from "../locale";
-import { fatal } from "../utils";
+import { fatal, open, _safeRelaunch } from "../utils";
 import type { WineDistribution } from "./distro";
+
+export function createWineUnavailableUI({
+  message,
+  retry,
+  onCheckUpdate,
+}: {
+  message: string;
+  retry: boolean;
+  onCheckUpdate: () => Promise<void>;
+}): Component {
+  return function WineUnavailableUI() {
+    const [busy, setBusy] = createSignal(false);
+    const [error, setError] = createSignal("");
+
+    async function run(action: () => Promise<unknown>) {
+      if (busy()) return;
+      setBusy(true);
+      setError("");
+      try {
+        await action();
+      } catch (error) {
+        setError(String(error));
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    return (
+      <Center h="100vh" bg="$neutral1" p="$6">
+        <Box
+          bg="$neutral2"
+          borderWidth="1px"
+          borderColor="$neutral5"
+          borderRadius={12}
+          p="$6"
+          w="100%"
+          maxW="520px"
+          shadow="$sm"
+        >
+          <VStack spacing="$4" alignItems="stretch">
+            <Heading level="2" size="lg" textAlign="center">
+              {retry
+                ? "Unable to check Wine compatibility"
+                : "No compatible Wine runtime available"}
+            </Heading>
+            <Text textAlign="center" color="$neutral11">
+              {message}
+            </Text>
+            <Show when={error()}>
+              <Text color="$danger11">{error()}</Text>
+            </Show>
+            <Button
+              disabled={busy()}
+              onClick={() =>
+                run(
+                  retry
+                    ? _safeRelaunch
+                    : () =>
+                        open(
+                          "x-apple.systempreferences:com.apple.Software-Update-Settings.extension"
+                        )
+                )
+              }
+            >
+              {retry ? "Retry" : "Open Software Update"}
+            </Button>
+            <Button
+              disabled={busy()}
+              variant="subtle"
+              onClick={() => run(onCheckUpdate)}
+            >
+              Check for Launcher Updates
+            </Button>
+            <Button
+              disabled={busy()}
+              variant="ghost"
+              onClick={() =>
+                run(() => Neutralino.events.dispatch("windowClose", null))
+              }
+            >
+              Quit
+            </Button>
+          </VStack>
+        </Box>
+      </Center>
+    );
+  };
+}
 
 export async function createInitialSetupUI({
   locale,

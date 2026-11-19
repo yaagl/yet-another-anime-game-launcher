@@ -1,150 +1,170 @@
-import { Aria2 } from "./aria2";
-import { Github, GithubReleaseInfo } from "./github";
-import { gt } from "semver";
 import { CURRENT_YAAGL_VERSION } from "./constants";
 import {
-  env,
-  forceMove,
+  addTerminationHook,
+  getKeyOrDefault,
+  GLOBAL_onClose,
   log,
-  resolve,
-  rmrf_dangerously,
-  mkdirp,
-  tar_extract_directory,
-  removeFile,
+  resolveResource,
+  spawn,
 } from "./utils";
-import { CommonUpdateProgram } from "./common-update-ui";
 
-const owner = "3shain";
-const repo = "yet-another-anime-game-launcher";
+export const UPDATE_CHANNEL_KEY = "config_updateChannel";
+export const updateChannels = [
+  { value: "stable", label: "Stable", channels: [] },
+  { value: "rc", label: "Release candidate", channels: ["rc"] },
+  { value: "beta", label: "Beta", channels: ["rc", "beta"] },
+  { value: "alpha", label: "Alpha", channels: ["rc", "beta", "alpha"] },
+  {
+    value: "prerelease",
+    label: "All prereleases",
+    channels: ["rc", "beta", "alpha", "prerelease"],
+  },
+] as const;
+export type UpdateChannel = (typeof updateChannels)[number]["value"];
 
-export async function createUpdater(deps: { github: Github; aria2: Aria2 }) {
-  if (CURRENT_YAAGL_VERSION === "development") {
-    return {
-      latest: true,
-    } as const;
-  }
-  try {
-    let updateVersion = "";
-    if (
-      import.meta.env["YAAGL_CHANNEL_CLIENT"] &&
-      import.meta.env["YAAGL_CHANNEL_CLIENT"] != "hk4euniversal"
-    ) {
-      updateVersion = import.meta.env["YAAGL_CHANNEL_CLIENT"];
-    } else if ((await env("YAAGL_OS")) == "1") {
-      updateVersion = "hk4eos";
-    } else {
-      updateVersion = "hk4ecn";
-    }
-    const latest: GithubReleaseInfo = (await deps.github.api(
-      `/repos/${owner}/${repo}/releases/latest`
-    )) as GithubReleaseInfo;
-    const update_neu = `resources_${updateVersion}.neu`;
-    const neu = latest.assets.find(x => x.name == update_neu);
-
-    // Determine app bundle name based on updateVersion
-    let appBundleName = "";
-    switch (updateVersion) {
-      case "hk4ecn":
-        appBundleName = "Yaagl.app.tar.gz";
-        break;
-      case "hk4eos":
-        appBundleName = "Yaagl.OS.app.tar.gz";
-        break;
-      case "bh3glb":
-        appBundleName = "Yaagl.Honkai.Global.app.tar.gz";
-        break;
-      case "hkrpgcn":
-        appBundleName = "Yaagl.HSR.app.tar.gz";
-        break;
-      case "hkrpgos":
-        appBundleName = "Yaagl.HSR.OS.app.tar.gz";
-        break;
-      case "napcn":
-        appBundleName = "Yaagl.ZZZ.app.tar.gz";
-        break;
-      case "napos":
-        appBundleName = "Yaagl.ZZZ.OS.app.tar.gz";
-        break;
-    }
-    const sidecar = latest.assets.find(x => x.name == appBundleName);
-
-    if (gt(latest.tag_name, CURRENT_YAAGL_VERSION) && neu !== undefined) {
-      return {
-        latest: false,
-        downloadUrl: neu.browser_download_url,
-        sidecarDownloadUrl: sidecar?.browser_download_url,
-        version: latest.tag_name,
-        description: latest.body,
-      } as const;
-    }
-    return {
-      latest: true,
-    } as const;
-  } catch {
-    return {
-      latest: undefined,
-    };
-  }
+export async function getUpdateChannel(): Promise<UpdateChannel> {
+  const value = await getKeyOrDefault(UPDATE_CHANNEL_KEY, "stable");
+  return (
+    updateChannels.find(channel => channel.value === value)?.value ?? "stable"
+  );
 }
 
-export type Updater = ReturnType<typeof createUpdater> extends Promise<infer T>
-  ? T
-  : never;
+export async function createUpdater(parentPID: string) {
+  let process: Pick<Neutralino.os.SpawnProcessResult, "id" | "pid"> | undefined;
+  let pending = Promise.resolve();
+  let quittingForUpdate = false;
+  let userInitiated = false;
+  let reportedError = false;
+  let output = "";
 
-export async function* downloadProgram(
-  aria2: Aria2,
-  url: string,
-  sidecarUrl?: string
-): CommonUpdateProgram {
-  yield ["setStateText", "DOWNLOADING_UPDATE_FILE"];
-  if (sidecarUrl) {
-    for await (const progress of aria2.doStreamingDownload({
-      uri: sidecarUrl,
-      absDst: resolve("./sidecar.tar.gz"),
-    })) {
-      yield [
-        "setProgress",
-        Number((progress.completedLength * BigInt(50)) / progress.totalLength),
-      ];
+  async function reportError(message: string, show = userInitiated) {
+    await log(`Updater: ${message}`);
+    if (show && !reportedError) {
+      reportedError = true;
+      await Neutralino.os.showMessageBox("Update error", message, "OK");
     }
-    await rmrf_dangerously("./sidecar");
-    await mkdirp("./sidecar");
-    let topLevelDir = sidecarUrl.split("/").pop()?.replace(".tar.gz", "") || "";
+  }
 
-    if (topLevelDir === "Yaagl.app") topLevelDir = "Yaagl.app";
-    if (topLevelDir === "Yaagl.OS.app") topLevelDir = "Yaagl OS.app";
-    if (topLevelDir === "Yaagl.Honkai.Global.app")
-      topLevelDir = "Yaagl Honkai Global.app";
-    if (topLevelDir === "Yaagl.HSR.app") topLevelDir = "Yaagl HSR.app";
-    if (topLevelDir === "Yaagl.HSR.OS.app") topLevelDir = "Yaagl HSR OS.app";
-    if (topLevelDir === "Yaagl.ZZZ.app") topLevelDir = "Yaagl ZZZ.app";
-    if (topLevelDir === "Yaagl.ZZZ.OS.app") topLevelDir = "Yaagl ZZZ OS.app";
+  async function stop() {
+    const current = process;
+    process = undefined;
+    if (current)
+      await Neutralino.os
+        .updateSpawnedProcess(current.id, "exit")
+        .catch(error => log(`Updater already stopped: ${error}`));
+  }
 
-    await tar_extract_directory(
-      "./sidecar.tar.gz",
-      "./sidecar",
-      `${topLevelDir}/Contents/Resources/sidecar`,
-      false
+  await Neutralino.events.on<Neutralino.os.SpawnProcessResult>(
+    "spawnedProcess",
+    async event => {
+      if (!event || event.detail.id !== process?.id) return;
+      const { action, data } = event.detail;
+      if (action === "exit") {
+        process = undefined;
+        if (Number(data) !== 0 && !quittingForUpdate)
+          await reportError(
+            `Updater stopped unexpectedly (code ${data}). Check the launcher log for details.`
+          );
+        return;
+      }
+      if (action === "stdErr") {
+        await log(`Updater: ${data}`);
+        return;
+      }
+      if (action !== "stdOut") return;
+      output += String(data);
+      let newline: number;
+      while ((newline = output.indexOf("\n")) >= 0) {
+        const line = output.slice(0, newline);
+        output = output.slice(newline + 1);
+        let message: { event: string; message?: string };
+        try {
+          message = JSON.parse(line);
+        } catch {
+          continue;
+        }
+        if (!message || typeof message !== "object") continue;
+        if (message.event === "error") {
+          await reportError(message.message ?? "Could not start updater");
+        } else if (message.event === "quit" && !quittingForUpdate) {
+          quittingForUpdate = true;
+          try {
+            if (await GLOBAL_onClose(false)) {
+              await Neutralino.app.exit(0);
+            } else {
+              quittingForUpdate = false;
+              await stop();
+            }
+          } catch (error) {
+            quittingForUpdate = false;
+            await stop();
+            await Neutralino.os.showMessageBox(
+              "Update error",
+              String(error),
+              "OK"
+            );
+          }
+        }
+      }
+    }
+  );
+
+  addTerminationHook(async () => {
+    if (!quittingForUpdate) await stop();
+    return true;
+  });
+
+  async function check(command: "check" | "background" | "configure") {
+    const manual = command === "check";
+    if (CURRENT_YAAGL_VERSION === "development") {
+      if (manual)
+        await Neutralino.os.showMessageBox(
+          "Updates",
+          "Automatic updates are disabled in development builds.",
+          "OK"
+        );
+      return;
+    }
+    if (quittingForUpdate || (command === "configure" && !process)) return;
+    if (command !== "configure") userInitiated = manual;
+    const channel = await getUpdateChannel();
+    if (!process) {
+      output = "";
+      reportedError = false;
+      process = await spawn([
+        resolveResource("../MacOS/yaagl-updater"),
+        parentPID,
+      ]);
+    }
+    const current = process;
+    if (!current)
+      throw new Error("Updater stopped before receiving the check request");
+    const channels = (
+      updateChannels.find(option => option.value === channel) ??
+      updateChannels[0]
+    ).channels;
+    await Neutralino.os.updateSpawnedProcess(
+      current.id,
+      "stdIn",
+      JSON.stringify({ command, channels }) + "\n"
     );
-
-    await removeFile("./sidecar.tar.gz");
   }
 
-  for await (const progress of aria2.doStreamingDownload({
-    uri: url,
-    absDst: resolve("./resources.neu.update"),
-  })) {
-    yield [
-      "setProgress",
-      sidecarUrl
-        ? 50 +
-          Number((progress.completedLength * BigInt(50)) / progress.totalLength)
-        : Number(
-            (progress.completedLength * BigInt(100)) / progress.totalLength
-          ),
-    ];
+  function request(command: "check" | "background" | "configure") {
+    pending = pending
+      .then(() => check(command))
+      .catch(async error => {
+        await stop();
+        await reportError(String(error), command === "check");
+      });
+    return pending;
   }
 
-  yield ["setUndeterminedProgress"];
-  await forceMove("./resources.neu.update", "./resources.neu");
+  await Neutralino.events.on("updateChannelChanged", () =>
+    request("configure")
+  );
+  return {
+    checkForUpdates: () => request("check"),
+    checkInBackground: () => request("background"),
+  };
 }

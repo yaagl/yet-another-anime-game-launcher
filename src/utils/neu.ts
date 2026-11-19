@@ -2,6 +2,19 @@ import { join } from "path-browserify";
 import { build, CommandSegments, rawString } from "./command-builder";
 import { wait } from "./helper";
 
+let bundledResources = "";
+
+export async function initializeBundledResources() {
+  if (import.meta.env.PROD) {
+    const app = await Neutralino.os.getEnv("PATH_LAUNCH").catch(() => "");
+    if (app) bundledResources = join(app, "Contents", "Resources");
+  }
+}
+
+export function resolveResource(path: string): string {
+  return bundledResources ? join(bundledResources, path) : resolve(path);
+}
+
 export function resolve(path: string): string {
   if (!path.startsWith("/")) {
     path = join(

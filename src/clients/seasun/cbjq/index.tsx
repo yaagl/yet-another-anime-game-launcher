@@ -193,7 +193,7 @@ export async function createCBJQChannelClient({
       if (wine.attributes.renderBackend == "dxmt") {
         yield* checkAndDownloadDXMT(aria2);
       }
-      yield* checkAndDownloadJadeite(aria2);
+      yield* checkAndDownloadJadeite(aria2, wine);
       yield* launchGameProgram({
         gameDir: _gameInstallDir(),
         wine,

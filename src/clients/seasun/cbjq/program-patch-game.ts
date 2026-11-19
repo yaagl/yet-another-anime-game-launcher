@@ -17,7 +17,7 @@ import {
 } from "@utils";
 import { Config } from "@config";
 import { Wine } from "@wine";
-import { DXMT_FILES, DXVK_FILES } from "src/downloadable-resource";
+import { DXMT_FILES, getDXMTArchitecture } from "src/downloadable-resource";
 
 export async function putLocal(url: string, dest: string) {
   return await writeBinary(dest, await (await fetch(url)).arrayBuffer());
@@ -33,9 +33,10 @@ export async function* patchProgram(
   }
   const system32Dir = join(wine.prefix, "drive_c", "windows", "system32");
   if (wine.attributes.renderBackend == "dxmt") {
+    const windowsDir = `./dxmt/${getDXMTArchitecture(wine)}-windows`;
     for (const f of DXMT_FILES) {
       await forceMove(join(system32Dir, f), join(system32Dir, f + ".bak"));
-      await cp(`./dxmt/${f}`, join(system32Dir, f));
+      await cp(join(windowsDir, f), join(system32Dir, f));
     }
   }
   if (config.reshade && wine.attributes.renderBackend !== "d3dmetal") {

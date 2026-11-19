@@ -45,6 +45,7 @@ import { createWineDistroConfig } from "./wine-distribution";
 import { createD3D12 } from "./d3d12";
 import { createMaxFrameRateConfig } from "./max-framerate";
 import createLocaleConfig from "./ui-locale";
+import { createUpdateChannelConfig } from "./update-channel";
 import createFPSUnlock from "./fps-unlock";
 import { exec2, exit, getKeyOrDefault, resolve, setKey } from "../utils";
 import { createSignal, For, JSXElement, Show } from "solid-js";
@@ -163,6 +164,7 @@ export async function createConfiguration({
   });
 
   const [UL] = await createLocaleConfig({ locale, config });
+  const [UC] = await createUpdateChannelConfig();
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
 
@@ -465,6 +467,7 @@ export async function createConfiguration({
                         <Box {...cardStyle}>
                           <VStack spacing="$4" alignItems="stretch">
                             <UL />
+                            <UC />
                             <FormControl>
                               <FormLabel>
                                 {locale.get("SETTING_YAAGL_VERSION")}
@@ -669,6 +672,7 @@ export async function createInitialSetupConfiguration({
   const [LC] = await createLeftCmdConfig({ locale, config });
   const [GCF] = await createGameControllerFixConfig({ locale, config });
   const [UL] = await createLocaleConfig({ locale, config });
+  const [UC] = await createUpdateChannelConfig();
   const [FO] = await createFPSUnlock({ locale, config });
   const [RS] = await createReShade({ locale, config });
   const [PRE] = await createProxyEnabledConfig({ locale, config });
@@ -928,6 +932,7 @@ export async function createInitialSetupConfiguration({
                   <Box {...cardStyle}>
                     <VStack spacing="$4" alignItems="stretch">
                       <UL />
+                      <UC />
                       <FormControl>
                         <FormLabel>
                           {locale.get("SETTING_YAAGL_VERSION")}

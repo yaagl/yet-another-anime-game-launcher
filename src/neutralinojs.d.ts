@@ -949,7 +949,7 @@ declare namespace Neutralino {
     function updateSpawnedProcess(
       id: number,
       action: "stdIn" | "stdInEnd" | "exit",
-      data?: object
+      data?: object | string
     ): Promise<void>;
 
     /**

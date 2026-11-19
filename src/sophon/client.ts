@@ -1,5 +1,5 @@
 import { SophonRpcClient } from "@sophon-rpc";
-import { addTerminationHook, log, resolve } from "@utils";
+import { addTerminationHook, log, resolve, resolveResource } from "@utils";
 
 let client: Promise<SophonRpcClient> | undefined;
 let clientDebugLogging = false;
@@ -27,7 +27,7 @@ export async function getSophonClient(
   }
   clientDebugLogging = debugLogging;
   client = SophonRpcClient.stdio(
-    resolve("./sidecar/sophon/SophonCLI"),
+    resolveResource("./sidecar/sophon/SophonCLI"),
     [
       "--progress-snapshots-only",
       "--manifest-cache-dir",

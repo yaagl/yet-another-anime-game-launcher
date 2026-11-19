@@ -1,9 +1,12 @@
-import { getKey } from "@utils";
+import { exec, getKey } from "@utils";
+import { coerce, compare, gte } from "semver";
 import { DEFAULT_WINE_DISTRO_TAG } from "../clients";
 import { Github } from "../github";
 import { D3DMETAL_RUNTIME_ID, D3DMETAL_RUNTIME_URL } from "./d3dmetal";
 
 export interface WineDistributionAttributes {
+  architecture: "x86_64" | "arm64";
+  minimumMacOSVersion: string;
   renderBackend: "dxmt" | "d3dmetal";
   supportsD3d12: boolean;
   winePath: string; // Path to the wine directory inside the archive
@@ -14,10 +17,25 @@ export interface WineDistribution {
   displayName: string;
   remoteUrl: string;
   checksum?: string;
-  attributes: Partial<WineDistributionAttributes>;
+  attributes: Partial<WineDistributionAttributes> &
+    Pick<WineDistributionAttributes, "architecture" | "minimumMacOSVersion">;
 }
 
 const YAAGL_BUILTIN_WINE: WineDistribution[] = [
+  {
+    id: "wine-11-22-alpha-1-arm64",
+    displayName: "Wine 11.22 ARM64 (Alpha)",
+    remoteUrl:
+      "https://github.com/yaagl/anime-game-wine/releases/download/wine-11-22-alpha1/wine-11.22-alpha-1-arm64.tar.xz",
+    checksum:
+      "sha-256=45480533a1b4bb7cbf6d1dc2ae05dee4546b2e655dd064b661621c3efd506ba1",
+    attributes: {
+      architecture: "arm64",
+      minimumMacOSVersion: "26.4.0",
+      renderBackend: "dxmt",
+      winePath: "wine",
+    },
+  },
   {
     id: "11.0-1-crossover-signed-experimental",
     displayName: "Wine 11.0-1 Crossover (signed, experimental)",
@@ -26,6 +44,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=89fa7e90fb626523a90d5867a03c6be785d017176739c6320a3b86c7838c3a35",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -38,6 +58,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=4ebba536115e937c3826fa5808dbed50cd5e91c8454999b54cbe0cd2a43d8b4c",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -50,6 +72,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     checksum:
       "sha-256=42430b7e8398642d7121e7cbac0aa03ce7312b4500e4ddf7eb75a7c8f2407a9c",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
       winePath: "wine",
     },
@@ -60,6 +84,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/dawn-winery/dawn-signed/releases/download/wine-gcenx-11.4-osx64/wine-devel-11.4-osx64-signed.tar.xz",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
       winePath: "wine-devel-11.4-osx64-signed/Contents/Resources/wine",
     },
@@ -70,6 +96,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/dawn-winery/dawn-signed/releases/download/wine-stable-gcenx-11.0-osx64/wine-stable-11.0-osx64-signed.tar.xz",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
       winePath: "Wine Stable.app/Contents/Resources/wine",
     },
@@ -80,6 +108,8 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     displayName: "Wine 11.17 D3DMetal (GPTK 4.0b2, experimental)",
     remoteUrl: D3DMETAL_RUNTIME_URL,
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "d3dmetal",
       supportsD3d12: true,
       winePath: "wine",
@@ -92,16 +122,47 @@ const YAAGL_BUILTIN_WINE: WineDistribution[] = [
     remoteUrl:
       "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
     attributes: {
+      architecture: "x86_64",
+      minimumMacOSVersion: "15.0.0",
       renderBackend: "dxmt",
     },
   },
 ];
 
+async function getWineAvailability() {
+  const [architecture, { stdOut: productVersion }] = await Promise.all([
+    Neutralino.computer.getArch(),
+    exec(["/usr/bin/sw_vers", "-productVersion"]),
+  ]);
+  const macOSVersion = coerce(productVersion.trim());
+  if (!macOSVersion)
+    throw new Error(`Invalid macOS version: ${productVersion}`);
+  if (architecture !== "arm" && architecture !== "x64")
+    throw new Error(
+      `Could not determine a supported launcher architecture: ${architecture}`
+    );
+
+  return {
+    macOSVersion: macOSVersion.version,
+    distributions: YAAGL_BUILTIN_WINE.filter(
+      wine =>
+        (architecture === "arm" || wine.attributes.architecture === "x86_64") &&
+        gte(macOSVersion, wine.attributes.minimumMacOSVersion)
+    ),
+  };
+}
+
 export async function getWineDistributions(): Promise<WineDistribution[]> {
-  return YAAGL_BUILTIN_WINE;
+  return (await getWineAvailability()).distributions;
 }
 
 export type WineStatus =
+  | {
+      wineReady: false;
+      unavailable: true;
+      message: string;
+      retry: boolean;
+    }
   | {
       wineReady: false;
       wineUpdate?: boolean;
@@ -113,7 +174,34 @@ export type WineStatus =
     };
 
 export async function checkWine(github: Github): Promise<WineStatus> {
-  const wine_versions = await getWineDistributions();
+  let availability: Awaited<ReturnType<typeof getWineAvailability>>;
+  try {
+    availability = await getWineAvailability();
+  } catch (error) {
+    return {
+      wineReady: false,
+      unavailable: true,
+      message: String(error),
+      retry: true,
+    };
+  }
+  const wine_versions = availability.distributions;
+  if (!wine_versions.length) {
+    const minimumVersion = YAAGL_BUILTIN_WINE.map(
+      wine => wine.attributes.minimumMacOSVersion
+    ).sort(compare)[0];
+    return {
+      wineReady: false,
+      unavailable: true,
+      message: `Your Mac is running macOS ${
+        availability.macOSVersion
+      }. Current Wine runtimes require macOS ${minimumVersion.replace(
+        /\.0$/,
+        ""
+      )} or later.`,
+      retry: false,
+    };
+  }
   const defaultDistro = wine_versions.find(
     x => x.id == DEFAULT_WINE_DISTRO_TAG
   );
