@@ -39,6 +39,7 @@ import { Config } from "./config-def";
 import { createMetalHUDConfig } from "./metal-hud";
 import { createGameInstallDirConfig } from "./game-install-dir";
 import { createRetinaConfig } from "./retina";
+import { createSquircleDockIconConfig } from "./squircle-dock-icon";
 import { createLeftCmdConfig } from "./left-cmd";
 import { createGameControllerFixConfig } from "./game-controller-fix";
 import { createWineDistroConfig } from "./wine-distribution";
@@ -154,6 +155,7 @@ export async function createConfiguration({
   const [MFR] = await createMaxFrameRateConfig({ locale, config });
   const [MH] = await createMetalHUDConfig({ locale, config });
   const [R] = await createRetinaConfig({ locale, config });
+  const [SDI] = await createSquircleDockIconConfig({ locale, config });
   const [LC] = await createLeftCmdConfig({ locale, config });
   const [GCF] = await createGameControllerFixConfig({ locale, config });
   const [GID] = await createGameInstallDirConfig({
@@ -443,6 +445,8 @@ export async function createConfiguration({
                             <MH />
                             <Divider />
                             <R />
+                            <Divider />
+                            <SDI />
                             <Divider />
                             <LC />
                             <Divider />
